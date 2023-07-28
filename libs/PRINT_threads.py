@@ -127,7 +127,7 @@ class RoboCommWorker(QObject):
         """ receive 36-byte data block, write to ROB vars """
 
         ans,rawData,state = UTIL.ROB_tcpip.receive()
-        ans = round(ans, 2)
+        if(ans is not None): ans = round(ans, 2)
 
         if (state == True):
             print(f"RECV:    {ans}")

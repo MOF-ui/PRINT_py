@@ -258,7 +258,7 @@ class ToolCommand:
         self.KNIFE_ID       = int(KNIFE_ID)
         self.KNIFE_YN       = bool(KNIFE_YN)
         self.M4_ID          = int(M4_ID)
-        self.M4_STEPS       = int(M4_STEPS)
+        self.M4_STEPS       = bool(M4_STEPS)
         self.PNMTC_FIBER_ID = int(PNMTC_FIBER_ID)
         self.PNMTC_FIBER_YN = bool(PNMTC_FIBER_YN)
         self.TIME_ID        = int(TIME_ID)
@@ -841,6 +841,7 @@ class TCPIP:
                                   ,QEntry.TOOL.TIME_ID
                                   ,QEntry.TOOL.TIME_TIME)
             
+            print(message)
             if(len(message) != self.W_BL):  return ValueError,len(message) 
             
             try:                self.sock.sendall(message)
