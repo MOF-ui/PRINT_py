@@ -1,0 +1,11 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>images/up.png</file>
+    <file>images/down.png</file>
+    <file>images/up1.png</file>
+    <file>images/down1.png</file>
+    <file>images/left.png</file>
+    <file>images/right.png</file>
+    <file>images/delete.png</file>
+</qresource>
+</RCC>
