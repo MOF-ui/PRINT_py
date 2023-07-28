@@ -108,7 +108,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 # self.connectTCP(3)
 
             # kick the robot to get started
-            self.sendCommand( UTIL.QEntry( ID= 1, MT='J', PT='Q', COOR_1=UTIL.Coor(X=1153.4, Y=3945.6, Z=1320.0, X_ori=0.70614, Y_ori=0.02032, Z_ori=0.70777, Q=0.00351, EXT=0.1) ) )
+            # self.sendCommand( UTIL.QEntry( ID= 1 
+            #                               ,MT='J'
+            #                               ,PT='Q'
+            #                               ,COOR_1= UTIL.Coor( X=1153.4
+            #                                                  ,Y=3945.6
+            #                                                  ,Z=1320.0
+            #                                                  ,X_ori=0.70614
+            #                                                  ,Y_ori=0.02032
+            #                                                  ,Z_ori=0.70777
+            #                                                  ,Q=0.00351
+            #                                                  ,EXT=0.1)
+            #                               ,TOOL= UTIL.ToolCommand(M1_STEPS= 130, TIME_TIME= 1) ) )
             self.logEntry('GNRL','setup finished.')
             self.logEntry('newline')
 
@@ -258,7 +269,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 # self.pump2Conn = True
                 # return True
 
-        return False
+            case _:
+                return False        
 
 
 
@@ -297,6 +309,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 #     self.pumpCommThread_2.wait()
                 # else:
                 #     raise ConnectionError('TCP not supported, unable to disconnect') # UTIL.PUMP1_tcpip.close()
+            
+            case _:
+                pass
 
 
 
@@ -451,10 +466,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             else:
                 self.logEntry('WDOG',f"User chose to close PRINT_py, exiting...")
                 self.close()
+
+        else:
+            UTIL.ROB_tcpip.connected = False
+            self.TCP_ROB_indi_connected.setStyleSheet( "border-radius: 25px;\
+                                                        background-color: #4c4a48;" )
+            self.resetWatchdog(1)
+
         
-
-
-
 
 
 
@@ -464,6 +483,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #     match dognumber:
     #         case 1:   self.receiveWD.stop()
     #         case _:   pass
+
 
 
 
@@ -996,7 +1016,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                               ,SV       = copy.deepcopy( UTIL.DC_speed )
                               ,Z        = 0)
         
-        self.logEntry('DCom',f"sending DC command: ({newPos})")
+        self.logEntry('DCom',f"sending DC command: ({command})")
         return self.sendCommand(command, DC = True)
 
 
@@ -1138,7 +1158,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ actual sendCommand function, uses the TCPIP class from utilies, handles errors (not done yet) """
         
         if (command == IndexError):     return None
-        if (not DC):                    command.SV *= self.SCTRL_num_liveAd_robot.value() / 100.0
+        # if (not DC):                    command.SV *= self.SCTRL_num_liveAd_robot.value() / 100.0
         msg, msgLen = UTIL.ROB_tcpip.send(command)
         
         if (msg == True):
