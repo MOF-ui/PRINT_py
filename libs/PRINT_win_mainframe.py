@@ -1014,7 +1014,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                               ,MT       = mt
                               ,COOR_1   = newPos
                               ,SV       = copy.deepcopy( UTIL.DC_speed )
-                              ,Z        = 0)
+                              ,SBT= 10000
+                              ,SC='T'
+                              ,Z        = 0,
+                              TOOL=UTIL.ToolCommand(TIME_TIME=10000))
         
         self.logEntry('DCom',f"sending DC command: ({command})")
         return self.sendCommand(command, DC = True)

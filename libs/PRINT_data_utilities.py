@@ -792,56 +792,55 @@ class TCPIP:
         
 
 
-    def send(self,QEntry):
+    def send(self,entry):
         """ sends data to server, packing according to robots protocol, additional function for pump needed """
 
         message = []        
         try:
             message = struct.pack('<iccffffffffffffffffiiiiiciiiiiiiiiiiiiiiii'
-                                  ,QEntry.ID
-                                  ,bytes(QEntry.MT,"utf-8")
-                                  ,bytes(QEntry.PT,"utf-8")
-                                  ,QEntry.COOR_1.X
-                                  ,QEntry.COOR_1.Y
-                                  ,QEntry.COOR_1.Z
-                                  ,QEntry.COOR_1.X_ori
-                                  ,QEntry.COOR_1.Y_ori
-                                  ,QEntry.COOR_1.Z_ori
-                                  ,QEntry.COOR_1.Q
-                                  ,QEntry.COOR_1.EXT
-                                  ,QEntry.COOR_2.X
-                                  ,QEntry.COOR_2.Y
-                                  ,QEntry.COOR_2.Z
-                                  ,QEntry.COOR_2.X_ori
-                                  ,QEntry.COOR_2.Y_ori
-                                  ,QEntry.COOR_2.Z_ori
-                                  ,QEntry.COOR_2.Q
-                                  ,QEntry.COOR_2.EXT
-                                  ,QEntry.SV.ACR
-                                  ,QEntry.SV.DCR
-                                  ,QEntry.SV.TS
-                                  ,QEntry.SV.OS
-                                  ,QEntry.SBT
-                                  ,bytes(QEntry.SC,"utf-8")
-                                  ,QEntry.Z
-                                  ,QEntry.TOOL.M1_ID
-                                  ,QEntry.TOOL.M1_STEPS
-                                  ,QEntry.TOOL.M2_ID
-                                  ,QEntry.TOOL.M2_STEPS
-                                  ,QEntry.TOOL.M3_ID
-                                  ,QEntry.TOOL.M3_STEPS
-                                  ,QEntry.TOOL.PNMTC_CLAMP_ID
-                                  ,QEntry.TOOL.PNMTC_CLAMP_YN
-                                  ,QEntry.TOOL.KNIFE_ID
-                                  ,QEntry.TOOL.KNIFE_YN
-                                  ,QEntry.TOOL.M4_ID
-                                  ,QEntry.TOOL.M4_STEPS
-                                  ,QEntry.TOOL.PNMTC_FIBER_ID
-                                  ,QEntry.TOOL.PNMTC_FIBER_YN
-                                  ,QEntry.TOOL.TIME_ID
-                                  ,QEntry.TOOL.TIME_TIME)
+                                  ,entry.ID
+                                  ,bytes(entry.MT,"utf-8")
+                                  ,bytes(entry.PT,"utf-8")
+                                  ,entry.COOR_1.X
+                                  ,entry.COOR_1.Y
+                                  ,entry.COOR_1.Z
+                                  ,entry.COOR_1.X_ori
+                                  ,entry.COOR_1.Y_ori
+                                  ,entry.COOR_1.Z_ori
+                                  ,entry.COOR_1.Q
+                                  ,entry.COOR_1.EXT
+                                  ,entry.COOR_2.X
+                                  ,entry.COOR_2.Y
+                                  ,entry.COOR_2.Z
+                                  ,entry.COOR_2.X_ori
+                                  ,entry.COOR_2.Y_ori
+                                  ,entry.COOR_2.Z_ori
+                                  ,entry.COOR_2.Q
+                                  ,entry.COOR_2.EXT
+                                  ,entry.SV.ACR
+                                  ,entry.SV.DCR
+                                  ,entry.SV.TS
+                                  ,entry.SV.OS
+                                  ,entry.SBT
+                                  ,bytes(entry.SC,"utf-8")
+                                  ,entry.Z
+                                  ,entry.TOOL.M1_ID
+                                  ,entry.TOOL.M1_STEPS
+                                  ,entry.TOOL.M2_ID
+                                  ,entry.TOOL.M2_STEPS
+                                  ,entry.TOOL.M3_ID
+                                  ,entry.TOOL.M3_STEPS
+                                  ,entry.TOOL.PNMTC_CLAMP_ID
+                                  ,entry.TOOL.PNMTC_CLAMP_YN
+                                  ,entry.TOOL.KNIFE_ID
+                                  ,entry.TOOL.KNIFE_YN
+                                  ,entry.TOOL.M4_ID
+                                  ,entry.TOOL.M4_STEPS
+                                  ,entry.TOOL.PNMTC_FIBER_ID
+                                  ,entry.TOOL.PNMTC_FIBER_YN
+                                  ,entry.TOOL.TIME_ID
+                                  ,entry.TOOL.TIME_TIME)
             
-            print(message)
             if(len(message) != self.W_BL):  return ValueError,len(message) 
             
             try:                self.sock.sendall(message)
