@@ -15,7 +15,7 @@ import libs.PRINT_data_utilities as UTIL
 class UTIL_test(unittest.TestCase):
 
 
-    def test_CoorClass (self):
+    def test_Coor_class (self):
         """ test Coor class, used to store positional data from robot """
         
         # __init__ & __str__
@@ -51,7 +51,7 @@ class UTIL_test(unittest.TestCase):
                          ,UTIL.Coor( 1.1, 2.2, 3.3, 4.4, 5.6, 6.7, 7.8, 8.9) )
         
 
-    def test_SpeedClass(self):
+    def test_Speed_class(self):
         """ test Speed class, used to store acceleration and travel speed settings """
         
         # __init__ & __str__
@@ -68,7 +68,7 @@ class UTIL_test(unittest.TestCase):
         
 
 
-    def test_ToolCommandClass(self):
+    def test_ToolCommand_class(self):
         """ test ToolCommand class, used to store AmConEE data """
 
         # __init__ & __str__
@@ -89,7 +89,7 @@ class UTIL_test(unittest.TestCase):
         
 
 
-    def test_QEntryClass (self):
+    def test_QEntry_class (self):
         """ test QEntry class, build 159-bytes commands """
 
         self.maxDiff = 2000
@@ -112,7 +112,7 @@ class UTIL_test(unittest.TestCase):
         
 
 
-    def test_QueueClass (self):
+    def test_Queue_class (self):
         """ test Queue class, organizes QEntry list """
 
         self.maxDiff = 2000
@@ -229,7 +229,7 @@ class UTIL_test(unittest.TestCase):
         
 
 
-    def test_RoboTelemetryClass (self):
+    def test_RoboTelemetry_class (self):
         """ test RoboTelemetry class, used to store 36 TCP-response from robot """
         
         # __init__ & __str__
@@ -250,7 +250,7 @@ class UTIL_test(unittest.TestCase):
         
 
 
-    def test_PumpTelemetryClass (self):
+    def test_PumpTelemetry_class (self):
         """ test RoboTelemetry class, used to store 36 TCP-response from robot """
         
         # __init__ & __str__
@@ -266,7 +266,7 @@ class UTIL_test(unittest.TestCase):
 
 
 
-    def test_DataBlockClass (self):
+    def test_DataBlock_class (self):
         """ test DataBlock class, used to sort data for InfluxDB """
 
         # __init__ & __str__
@@ -296,14 +296,16 @@ class UTIL_test(unittest.TestCase):
 
 
 
-    def test_TCPIPClass (self):
+    def test_TCPIP_class (self):
         """ test TCPIP class, handles connection data und functions """
 
         testTCPIP = UTIL.TCPIP()
 
         # __init__ & __str__
-        self.assertEqual( str( UTIL.TCPIP( IP= '1.1.1.1', PORT= 2222, C_TOUT= 3.3, RW_TOUT= 4.4
-                                          ,R_BL= 5.5, W_BL= 6.6) )
+        initTestTCPIP = UTIL.TCPIP( IP= '1.1.1.1', PORT= 2222, C_TOUT= 3.3, RW_TOUT= 4.4
+                                   ,R_BL= 5.5, W_BL= 6.6)
+        
+        self.assertEqual( str( initTestTCPIP )
                          ,f"IP: 1.1.1.1   PORT: {2222}   C_TOUT: {3.3}   RW_TOUT: {4.4}   "\
                           f"R_BL: {5}   W_BL: {6}" )
         
@@ -311,17 +313,97 @@ class UTIL_test(unittest.TestCase):
                          ,f"IP:    PORT: {0}   C_TOUT: {1.0}   RW_TOUT: {1.0}   "\
                           f"R_BL: {0}   W_BL: {0}" )
         
+        initTestTCPIP.close( end= True )
+        
         # setParams
-        testTCPIP.setParams( { 'IP':'1.1.1.1', 'PORT': '2222', 'CTOUT': 3.3
-                              ,'RWTOUT': 4.4, 'R_BL': 5.5, 'W_BL': 6.6} )
+        testTCPIP.setParams( { 'IP':'1.1.1.1', 'PORT': 2222, 'CTOUT': 0.003
+                              ,'RWTOUT': 0.004, 'R_BL': 5.5, 'W_BL': 6.6} )
         self.assertEqual( str( testTCPIP) 
-                         ,f"IP: 1.1.1.1   PORT: {2222}   C_TOUT: {3.3}   RW_TOUT: {4.4}   "\
+                         ,f"IP: 1.1.1.1   PORT: {2222}   C_TOUT: {0.003}   RW_TOUT: {0.004}   "\
                           f"R_BL: {5}   W_BL: {6}" )
         
-        testTCPIP.connected = 1
-        self.assertRaises( expected_exception= PermissionError
-                          ,callable= testTCPIP.setParams( None ))
+        testTCPIP.connected = True
+        self.assertRaises( PermissionError
+                          ,testTCPIP.setParams, paramDict=None)
+        testTCPIP.connected = False
+        
+        # connect
+        self.assertEqual( testTCPIP.connect()
+                         ,(TimeoutError, ('1.1.1.1', 2222)) )
 
+        testTCPIP.PORT = 'ABC'
+        self.assertRaises( ConnectionError,
+                           testTCPIP.connect )
+        
+        # send
+        self.assertEqual( testTCPIP.send( UTIL.QEntry(ID= 1) )
+                         ,(ConnectionError, None) )
+        
+        testTCPIP.connected = True
+        self.assertEqual( testTCPIP.send( UTIL.QEntry(ID= 1) ) 
+                         ,(ValueError, 159) )
+        
+        testTCPIP.W_BL = 159
+        self.assertEqual( testTCPIP.send( UTIL.QEntry(ID= 1) )
+                         ,(OSError, None) )
+
+        #receive
+        self.assertEqual( testTCPIP.receive()
+                         ,(None, None, False) )
+        
+        #close
+        testTCPIP.close ( end= True )
+        self.assertFalse( testTCPIP.connected )
+
+
+
+    def test_preCheckGcodeFile_function (self):
+        """ checks preCheckGcodeFiles function, should count the number of commands in a file """
+
+        testTxt = ';comment\nG1 X0 Y0 Z0\nG1 X2 Y0 Z0.0\nG1 X2 Y1.5 Z0'
+        self.assertEqual( UTIL.preCheckGcodeFile()
+                         ,(0, 0, 'empty') )
+        self.assertEqual( UTIL.preCheckGcodeFile(testTxt)
+                         ,(3, 3.5, ''))
+
+
+
+    def test_preCheckRapidFile_function (self):
+        """ checks preCheckGcodeFiles function, should count the number of commands in a file """
+
+        testTxt = '!comment\nMoveL [[0.0,0.0,0.0],...,v50,z10,tool0\n'\
+                  + 'MoveL [[2.0,0.0,0.0],...,v50,z10,tool0\nMoveL [[2.0,1.5,0.0],...,v50,z10,tool0'
+        self.assertEqual( UTIL.preCheckRapidFile()
+                         ,(0, 0, 'empty') )
+        self.assertEqual( UTIL.preCheckRapidFile(testTxt)
+                         ,(3, 3.5, ''))
+    
+
+
+    def test_reShort_function (self):
+        """ see reShort in libs/PRINT_data_utilities """
+        
+        self.assertEqual( UTIL.reShort('\d+\.\d+', 'A12B', '0', '\d+')      ,('12'  , True) )
+        self.assertEqual( UTIL.reShort('\d+\.\d+', 'A12.3B', '0', '\d+')    ,('12.3', True) )
+        self.assertEqual( UTIL.reShort('\d+\.\d+', 'ABC', '0', '\d+')       ,('0'   , False) )
+        self.assertEqual( UTIL.reShort('\d+\.\d+', 'A12B', '0')             ,('0'   , False) )
+    
+
+    
+    def test_gcodeToQEntry_function (self):
+        """ see gcodeToQEntry in libs/PRINT_data_utilities """
+        
+        testPos   = UTIL.Coor(1,1,1,1,1,1,1,1)
+        testSpeed = UTIL.Speed(2,2,2,2)
+        testZone  = 3
+        UTIL.DC_curr_zero = UTIL.Coor(4,4,4,4,4,4,4,4)
+
+        testTxt   = 'G1 X5.5 Y6 EXT7 F80'
+        self.assertEqual( UTIL.gcodeToQEntry( pos= testPos, speed= testSpeed
+                                             ,zone= testZone, txt= testTxt)
+                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(9.5,10,5,5,5,5,5,11), SV= UTIL.Speed(2,2,8,2)
+                                        ,Z= 3  )
+                           ,'G1') )
 
 
 
