@@ -5,6 +5,15 @@
 
 ####################################################   IMPORTS  ####################################################
 
+# python standard libraries
+import os
+import sys
+
+# appending the parent directory path
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir  = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 # PyQt stuff
 from PyQt5.QtCore import QObject,QTimer,QMutex,pyqtSignal
 
@@ -13,7 +22,7 @@ from PyQt5.QtCore import QObject,QTimer,QMutex,pyqtSignal
 from mtec.mtec_mod import MtecMod
 
 # import my own libs
-from . import PRINT_data_utilities as UTIL
+import PRINT_data_utilities as UTIL
 
 
 

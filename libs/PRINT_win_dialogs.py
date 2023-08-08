@@ -5,9 +5,19 @@
 
 #######################################     IMPORTS      #####################################################
 
+# python standard libraries
+import os
 import sys
+
+# appending the parent directory path
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir  = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
+# PyQt stuff
 from PyQt5.QtWidgets import QApplication,QDialog,QFileDialog
 
+# import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
 from ui.UI_dialogs import Ui_Dialog, Ui_FileDialog, Ui_ConnDialog
 
 

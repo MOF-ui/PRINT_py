@@ -6,10 +6,16 @@
 #######################################     IMPORTS      #####################################################
 
 # python standard libraries
+import os
 import sys
 import copy
 from pathlib import Path
 from datetime import datetime
+
+# appending the parent directory path
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir  = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
 
 # PyQt stuff
@@ -67,6 +73,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 self.logEntry('GNRL','no logpath given, user choose to exit, exit after setup...')
                 # suicide after the actual .exec is finished, exit without chrash
                 QTimer.singleShot(0, self.close)
+            else:
+                self.logEntry('GNRL','no logpath given, user chose to continue without...')
 
         else:
             self.logpath = lpath

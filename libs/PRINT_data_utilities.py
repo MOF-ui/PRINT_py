@@ -36,11 +36,12 @@ class Coor:
             external axis position
 
     FUNCTIONS:
-        __init__
-        __str__
-        __add__
-        __sub__
-        __round__
+        __init__ \n
+        __str__  \n
+        __add__  \n
+        __sub__  \n
+        __round__\n
+        __eq__
     """
 
     def __init__(self,
@@ -74,46 +75,50 @@ class Coor:
     def __add__(self,summand):
 
         try:
-            return Coor( (self.X        + summand.X)
-                        ,(self.Y        + summand.Y)
-                        ,(self.Z        + summand.Z)
-                        ,(self.X_ori    + summand.X_ori)
-                        ,(self.Y_ori    + summand.Y_ori)
-                        ,(self.Z_ori    + summand.Z_ori)
-                        ,(self.Q        + summand.Q)
-                        ,(self.EXT      + summand.EXT) )
+            return round( Coor( (self.X        + summand.X)
+                               ,(self.Y        + summand.Y)
+                               ,(self.Z        + summand.Z)
+                               ,(self.X_ori    + summand.X_ori)
+                               ,(self.Y_ori    + summand.Y_ori)
+                               ,(self.Z_ori    + summand.Z_ori)
+                               ,(self.Q        + summand.Q)
+                               ,(self.EXT      + summand.EXT) )
+                         , 6)
         except AttributeError:
-            return Coor( (self.X        + summand)
-                        ,(self.Y        + summand)
-                        ,(self.Z        + summand)
-                        ,(self.X_ori    + summand)
-                        ,(self.Y_ori    + summand)
-                        ,(self.Z_ori    + summand)
-                        ,(self.Q        + summand)
-                        ,(self.EXT      + summand) )
+            return round( Coor( (self.X        + summand)
+                               ,(self.Y        + summand)
+                               ,(self.Z        + summand)
+                               ,(self.X_ori    + summand)
+                               ,(self.Y_ori    + summand)
+                               ,(self.Z_ori    + summand)
+                               ,(self.Q        + summand)
+                               ,(self.EXT      + summand) )
+                         , 6)
     
 
 
     def __sub__(self,subtrahend):
 
         try:
-            return Coor( (self.X        - subtrahend.X)
-                        ,(self.Y        - subtrahend.Y)
-                        ,(self.Z        - subtrahend.Z)
-                        ,(self.X_ori    - subtrahend.X_ori)
-                        ,(self.Y_ori    - subtrahend.Y_ori)
-                        ,(self.Z_ori    - subtrahend.Z_ori)
-                        ,(self.Q        - subtrahend.Q)
-                        ,(self.EXT      - subtrahend.EXT) )
+            return round( Coor( (self.X        - subtrahend.X)
+                               ,(self.Y        - subtrahend.Y)
+                               ,(self.Z        - subtrahend.Z)
+                               ,(self.X_ori    - subtrahend.X_ori)
+                               ,(self.Y_ori    - subtrahend.Y_ori)
+                               ,(self.Z_ori    - subtrahend.Z_ori)
+                               ,(self.Q        - subtrahend.Q)
+                               ,(self.EXT      - subtrahend.EXT) )
+                        , 6)
         except AttributeError:
-            return Coor( (self.X        - subtrahend)
-                        ,(self.Y        - subtrahend)
-                        ,(self.Z        - subtrahend)
-                        ,(self.X_ori    - subtrahend)
-                        ,(self.Y_ori    - subtrahend)
-                        ,(self.Z_ori    - subtrahend)
-                        ,(self.Q        - subtrahend)
-                        ,(self.EXT      - subtrahend) )
+            return round( Coor( (self.X        - subtrahend)
+                               ,(self.Y        - subtrahend)
+                               ,(self.Z        - subtrahend)
+                               ,(self.X_ori    - subtrahend)
+                               ,(self.Y_ori    - subtrahend)
+                               ,(self.Z_ori    - subtrahend)
+                               ,(self.Q        - subtrahend)
+                               ,(self.EXT      - subtrahend) )
+                        , 6)
     
 
 
@@ -127,6 +132,25 @@ class Coor:
                     ,round(self.Z_ori, digits)
                     ,round(self.Q    , digits)
                     ,round(self.EXT  , digits) )
+    
+
+
+    def __eq__(self,other):
+
+        try:
+            if(     self.X     == other.X
+                and self.Y     == other.Y
+                and self.Z     == other.Z
+                and self.X_ori == other.X_ori
+                and self.Y_ori == other.Y_ori
+                and self.Z_ori == other.Z_ori
+                and self.Q     == other.Q
+                and self.EXT   == other.EXT):
+                return True
+            else: return False
+
+        except AttributeError:
+            return False
 
 
 
@@ -146,10 +170,11 @@ class Speed:
             deceleration ramp
     
     FUNCTIONS:
-        __init__
-        __str__
-        __mul__
-        __rmul__
+        __init__\n
+        __str__ \n
+        __mul__ \n
+        __rmul__\n
+        __eq__
     """
 
     def __init__(self, 
@@ -158,10 +183,10 @@ class Speed:
                  TS     = 200, 
                  OS     = 50):
         
-        self.ACR    = int(ACR)
-        self.DCR    = int(DCR)
-        self.TS     = int(TS)
-        self.OS     = int(OS)
+        self.ACR    = int( round( ACR , 0) )
+        self.DCR    = int( round( DCR , 0) )
+        self.TS     = int( round( TS  , 0) )
+        self.OS     = int( round( OS  , 0) )
 
 
 
@@ -173,16 +198,31 @@ class Speed:
 
     def __mul__(self,other):
 
-        return Speed( TS = int( self.TS * other) 
-                     ,OS = int( self.OS * other) 
-                     ,ACR = int( self.ACR * other) 
-                     ,DCR = int( self.DCR * other) )
+        return Speed( TS = int(  round( self.TS *  other, 0) ) 
+                     ,OS = int(  round( self.OS *  other, 0) ) 
+                     ,ACR = int( round( self.ACR * other, 0) ) 
+                     ,DCR = int( round( self.DCR * other, 0) ) )
     
 
 
     def __rmul__(self,other):
 
         return self.__mul__(other)
+    
+
+
+    def __eq__(self,other):
+
+        try:
+            if(     self.ACR == other.ACR
+                and self.DCR == other.DCR
+                and self.TS  == other.TS
+                and self.OS  == other.OS):
+                return True
+            else: return False
+
+        except AttributeError:
+            return False
 
 
 
@@ -225,8 +265,9 @@ class ToolCommand:
             current time in milli seconds at EE
         
     FUNCTIONS:
-        __def__
-        __str__
+        __def__\n
+        __str__\n
+        __eq__
     """
 
     def __init__(self,
@@ -272,6 +313,33 @@ class ToolCommand:
                 f"P_C: {self.PNMTC_CLAMP_ID}, {self.PNMTC_CLAMP_YN}   KN: {self.KNIFE_ID}, {self.KNIFE_YN}   "\
                 f"M4: {self.M4_ID}, {self.M4_STEPS}   P_F: {self.PNMTC_FIBER_ID}, {self.PNMTC_FIBER_YN}   "\
                 f"TIME: {self.TIME_ID}, {self.TIME_TIME}"
+    
+
+
+    def __eq__(self,other):
+
+        try:
+            if(     self.M1_ID          == other.M1_ID
+                and self.M1_STEPS       == other.M1_STEPS
+                and self.M2_ID          == other.M2_ID
+                and self.M2_STEPS       == other.M2_STEPS
+                and self.M3_ID          == other.M3_ID
+                and self.M3_STEPS       == other.M3_STEPS
+                and self.PNMTC_CLAMP_ID == other.PNMTC_CLAMP_ID
+                and self.PNMTC_CLAMP_YN == other.PNMTC_CLAMP_YN
+                and self.KNIFE_ID       == other.KNIFE_ID
+                and self.KNIFE_YN       == other.KNIFE_YN
+                and self.M4_ID          == other.M4_ID
+                and self.M4_STEPS       == other.M4_STEPS
+                and self.PNMTC_FIBER_ID == other.PNMTC_FIBER_ID
+                and self.PNMTC_FIBER_YN == other.PNMTC_FIBER_YN
+                and self.TIME_ID        == other.TIME_ID
+                and self.TIME_TIME      == other.TIME_TIME):
+                return True
+            else: return False
+
+        except AttributeError:
+            return False
 
 
 
@@ -304,8 +372,9 @@ class QEntry:
             tool command in Jonas' standard format
         
     FUNCTIONS:
-        __init__
-        __str__
+        __init__\n
+        __str__\n
+        __eq__
     """
 
     def __init__(self,
@@ -341,6 +410,27 @@ class QEntry:
                 f"\n\t\t|| COOR_2: {self.COOR_2}"\
                 f"\n\t\t|| SV:     {self.SV} \t|| SBT: {self.SBT}   SC: {self.SC}   Z: {self.Z}"\
                 f"\n\t\t|| TOOL:   {self.TOOL}"
+    
+
+
+    def __eq__(self,other):
+
+        try:
+            if(     self.ID     == other.ID
+                and self.MT     == other.MT
+                and self.PT     == other.PT
+                and self.COOR_1 == other.COOR_1
+                and self.COOR_2 == other.COOR_2
+                and self.SV     == other.SV
+                and self.SBT    == other.SBT
+                and self.SC     == other.SC
+                and self.Z      == other.Z
+                and self.TOOL   == other.TOOL):
+                return True
+            else: return False
+
+        except AttributeError:
+            return False
 
 
 
@@ -354,10 +444,11 @@ class Queue:
                 a list of QEntry elements, careful: list index does not match QEntry.ID
 
         FUNCTIONS:
-            __init__
-            __getitem__
-            __len__
-            __str__
+            __init__\n
+            __getitem__\n
+            __len__\n
+            __str__\n
+            __eq__
 
             lastEntry:
                 returns last entry
@@ -396,7 +487,7 @@ class Queue:
 
     def __str__(self):
 
-        if (len(self.queue) == 0):
+        if (len(self.queue) != 0):
             i   = 0
             ans = ''
             for x in self.queue:
@@ -404,6 +495,18 @@ class Queue:
                 ans += f"Element {i}: {x}\n"
             return ans
         return "Queue is empty!"
+    
+
+
+    def __eq__(self, other):
+
+        length = len(self)
+        if( length != len(other) ): return False
+
+        for elem in range(length):
+            if (self[elem] != other[elem]): return False
+        
+        return True
     
 
 
@@ -417,15 +520,19 @@ class Queue:
 
     def entryBeforeID(self,ID):
         """ return queue entry before (index - 1) a specific ID, return last entry if ID not found,
-            returns None if queue is empty"""
+            returns None if queue is empty or if ID was not matched """
 
-        if (len(self.queue) == 0): 
+        length = len(self.queue)
+        i      = 0
+
+        if (length == 0):  return None
+
+        for entry in range(length):
+            if (self.queue[entry].ID == ID): break
+            else:                            i += 1
+        
+        if ( (i < 1) or (i >= length) ): 
             return None
-
-        i = 0
-        for entry in self.queue:
-            if (entry.ID == ID):    break
-            else:                   i += 1
         
         return self.queue[ i - 1 ]
 
@@ -558,15 +665,16 @@ class RoboTelemetry:
     
     
     FUNCTIONS:
-        __init__
-        __str__
-        __round__
+        __init__\n
+        __str__\n
+        __round__\n
+        __eq__
     """
 
     def __init__(self,
-                TOOL_SPEED  = 0.0,
-                ID          = -1,
-                POS         = None):
+                 TOOL_SPEED  = 0.0,
+                 ID          = -1,
+                 POS         = None):
         
         self.TOOL_SPEED = float(TOOL_SPEED)
         self.ID         = int(ID)
@@ -587,8 +695,22 @@ class RoboTelemetry:
     def __round__(self, digits):
 
         return RoboTelemetry( round(self.TOOL_SPEED, digits) 
-                             ,round(self.ID,         digits)
+                             ,self.ID
                              ,round(self.POS,        digits))
+    
+
+
+    def __eq__(self, other):
+
+        try:
+            if(     self.TOOL_SPEED == other.TOOL_SPEED
+                and self.ID         == other.ID
+                and self.POS        == other.POS):
+                return True
+            else: return False
+
+        except AttributeError:
+            return False
 
 
 
@@ -599,9 +721,10 @@ class PumpTelemetry:
     """ class used to store the standard telemetry data the pump 
     
     FUNCTIONS:
-        __init__
-        __str__
-        __round__
+        __init__\n
+        __str__\n
+        __round__\n
+        __eq__
     """
 
     def __init__(self,
@@ -632,14 +755,30 @@ class PumpTelemetry:
     
 
 
+    def __eq__(self, other):
+
+        try:
+            if(     self.FREQ == other.FREQ
+                and self.VOLT == other.VOLT
+                and self.AMPS == other.AMPS
+                and self.TORQ == other.TORQ):
+                return True
+            else: return False
+
+        except AttributeError:
+            return False
+    
+
+
 
 
 class DataBlock:
     """ structure for DAQ 
     
     FUNCTIONS:
-        __init__
-        __str__
+        __init__\n
+        __str__\n
+        __eq__
     """
 
     def __init__(self,
@@ -675,7 +814,7 @@ class DataBlock:
         self.kPumpFreq =        float(kPumpFreq)
         self.kPumpAmps =        float(kPumpAmps)
         self.id =               int(id)
-        self.toolspeed =        float(toolSpeed)
+        self.toolSpeed =        float(toolSpeed)
         self.porosAnalysis =    float(porosAnalysis)
         self.distanceFront =    float(distanceFront)
         self.distanceEnd =      float(distanceEnd)
@@ -692,8 +831,38 @@ class DataBlock:
         return f"ambTemp: {self.ambTemp}    ambHum: {self.ambHum}    delivPumpTemp: {self.delivPumpTemp}    robBaseTemp: {self.robBaseTemp}    "\
                f"kPumpTemp: {self.kPumpTemp}    delivPumpPress: {self.delivPumpPress}    kPumpPress: {self.kPumpPress}    PUMP1: {self.PUMP1}    "\
                f"PUMP2: {self.PUMP2}    admPumpFreq: {self.admPumpFreq}    admPumpAmps: {self.admPumpAmps}    kPumpFreq: {self.kPumpFreq}    "\
-               f"kPumpAmps: {self.kPumpAmps}    id: {self.id}    toolspeed: {self.toolspeed}    POS: {self.POS}    porosAnalysis: {self.porosAnalysis}    "\
+               f"kPumpAmps: {self.kPumpAmps}    id: {self.id}    toolspeed: {self.toolSpeed}    POS: {self.POS}    porosAnalysis: {self.porosAnalysis}    "\
                f"distanceFront: {self.distanceFront}    distanceEnd: {self.distanceEnd}"    
+    
+
+
+    def __eq__(self, other):
+
+        try:
+            if(     self.ambTemp        == other.ambTemp
+                and self.ambHum         == other.ambHum
+                and self.delivPumpTemp  == other.delivPumpTemp
+                and self.robBaseTemp    == other.robBaseTemp
+                and self.kPumpTemp      == other.kPumpTemp
+                and self.delivPumpPress == other.delivPumpPress
+                and self.kPumpPress     == other.kPumpPress
+                and self.PUMP1          == other.PUMP1
+                and self.PUMP2          == other.PUMP2
+                and self.admPumpFreq    == other.admPumpFreq
+                and self.admPumpAmps    == other.admPumpAmps
+                and self.kPumpFreq      == other.kPumpFreq
+                and self.kPumpAmps      == other.kPumpAmps
+                and self.id             == other.id
+                and self.toolSpeed      == other.toolSpeed
+                and self.POS            == other.POS
+                and self.porosAnalysis  == other.porosAnalysis
+                and self.distanceFront  == other.distanceFront
+                and self.distanceEnd    == other.distanceEnd):
+                return True
+            else: return False
+
+        except AttributeError:
+            return False
 
 
 
@@ -760,19 +929,19 @@ class TCPIP:
         if(self.connected): 
             raise PermissionError('params not changeable while connected to server!')
         
-        self.IP         = paramDict["IP"]
-        self.PORT       = paramDict["PORT"]
-        self.C_TOUT     = paramDict["CTOUT"]
-        self.RW_TOUT    = paramDict["RWTOUT"]
-        self.R_BL       = paramDict["R_BL"]
-        self.W_BL       = paramDict["W_BL"]
+        self.IP         = str  ( paramDict["IP"] )
+        self.PORT       = str  ( paramDict["PORT"] )
+        self.C_TOUT     = float( paramDict["CTOUT"] )
+        self.RW_TOUT    = float( paramDict["RWTOUT"] )
+        self.R_BL       = int  ( paramDict["R_BL"] )
+        self.W_BL       = int  ( paramDict["W_BL"] )
 
 
 
     def connect(self):
         """ tries to connect to the IP and PORT given, returns errors if not possible """
 
-        if('COM' in self.PORT): raise ConnectionError('requested TCP/IP connection via COM-Port!')
+        if(type(self.PORT) is not int): raise ConnectionError('requested TCP/IP connection via COM-Port!')
         server_address = (self.IP, int(self.PORT))
         self.sock.settimeout(self.C_TOUT)
 
