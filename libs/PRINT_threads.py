@@ -22,7 +22,7 @@ from PyQt5.QtCore import QObject,QTimer,QMutex,pyqtSignal
 from mtec.mtec_mod import MtecMod
 
 # import my own libs
-import PRINT_data_utilities as UTIL
+import libs.PRINT_data_utilities as UTIL
 
 
 

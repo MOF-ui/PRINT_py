@@ -1284,7 +1284,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.robotStopCommand()
 
             self.roboCommThread.quit()
-            UTIL.ROB_tcpip.close()
+            UTIL.ROB_tcpip.close( end= True )
             self.roboCommThread.wait()
 
         if(self.pump1Conn):

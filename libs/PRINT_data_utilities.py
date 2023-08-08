@@ -913,7 +913,7 @@ class TCPIP:
         self.R_BL       = int(R_BL)
         self.W_BL       = int(W_BL)
 
-        self.connected  = 0
+        self.connected  = False
         self.sock       = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.telemetry  = RoboTelemetry()
     
@@ -941,13 +941,14 @@ class TCPIP:
     def connect(self):
         """ tries to connect to the IP and PORT given, returns errors if not possible """
 
-        if(type(self.PORT) is not int): raise ConnectionError('requested TCP/IP connection via COM-Port!')
-        server_address = (self.IP, int(self.PORT))
+        try:                server_address = (self.IP, int(self.PORT))
+        except ValueError:  raise ConnectionError('requested TCP/IP connection via COM-Port!')
+        
         self.sock.settimeout(self.C_TOUT)
 
         try:
             self.sock.connect(server_address)
-            self.connected = 1
+            self.connected = True
             self.sock.settimeout(self.RW_TOUT)
             return True,server_address
         
@@ -964,7 +965,9 @@ class TCPIP:
     def send(self,entry):
         """ sends data to server, packing according to robots protocol, additional function for pump needed """
 
-        message = []        
+        message = [] 
+        if( not self.connected ): return ConnectionError, None
+
         try:
             message = struct.pack('<iccffffffffffffffffiiiiiciiiiiiiiiiiiiiiii'
                                   ,entry.ID
@@ -1029,8 +1032,8 @@ class TCPIP:
 
         try:
             while ( len(data) < self.R_BL ):        data = self.sock.recv(self.R_BL)
-        except TimeoutError as tio:     return None, None, False
-        except Exception as err:        return err, data, False
+        except TimeoutError:        return None, None, False
+        except Exception as err:    return err, data, False
 
         if len(data) != self.R_BL:       return ValueError,data,False
         else:
@@ -1047,12 +1050,12 @@ class TCPIP:
             
 
 
-    def close(self):
+    def close(self, end= False):
         """ close TCP connection """
         
         self.sock.close()
-        self.connected  = 0
-        self.sock       = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connected  = False
+        if(not end): self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
 
@@ -1079,7 +1082,8 @@ class TCPIP:
 
 
 def preCheckGcodeFile(txt=''):
-    """ extracts the number of GCode commands and the filament length from text """
+    """ extracts the number of GCode commands and the filament length from text,
+        ignores Z movement for now, slicing only in x-y-plane yet """
     
     try:
         if (txt == ''):    return 0, 0, 'empty'
@@ -1110,7 +1114,8 @@ def preCheckGcodeFile(txt=''):
 
 
 def preCheckRapidFile(txt=''):
-    """ extracts the number of GCode commands and the filament length from text """
+    """ extracts the number of GCode commands and the filament length from text,
+        does not handle Offs commands yet """
     
     try:
         if (txt == ''):    return 0, 0, 'empty'
@@ -1122,7 +1127,9 @@ def preCheckRapidFile(txt=''):
         filamentLength  = 0.0
 
         for row in rows:
-            if ( ('Move' in row)  and  ('MoveL p' not in row) ):   
+            if ( ('Move' in row)  
+                  and ('pStart' not in row)
+                  and ('pHome' not in row) ):   
                 commNum += 1
                 Y_new = float( re.findall('\d+\.\d+', row)[0] )
                 X_new = float( re.findall('\d+\.\d+', row)[1] )
@@ -1169,7 +1176,7 @@ def gcodeToQEntry(pos, speed, zone, txt = ''):
     match command:
         
         case 'G1':
-            entry = QEntry(ID=0, COOR_1=pos, SV=speed, Z=IO_zone)
+            entry = QEntry(ID=0, COOR_1=pos, SV=speed, Z=zone)
                 
             X,res                       = reShort('X\d+[,.]\d+', txt, pos.X, 'X\d+')
             if(res): entry.COOR_1.X     = float( X[1:] .replace(',','.') )
