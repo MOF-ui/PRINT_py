@@ -1210,12 +1210,12 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
             if ('EXT0' not in txt): entry.COOR_1.EXT += pos.EXT
         
         case 'G92':
-            return None, KeyError('G92 commands are not supported')
-            # if ('X0' in txt):   DC_curr_zero.X   = pos.X
-            # if ('Y0' in txt):   DC_curr_zero.Y   = pos.Y
-            # if ('Z0' in txt):   DC_curr_zero.Z   = pos.Z
-            # if ('EXT0' in txt): DC_curr_zero.EXT = pos.EXT
-            # return None, command
+            # return None, KeyError('G92 commands are not supported')
+            if ('X0' in txt):   DC_curr_zero.X   = pos.X
+            if ('Y0' in txt):   DC_curr_zero.Y   = pos.Y
+            if ('Z0' in txt):   DC_curr_zero.Z   = pos.Z
+            if ('EXT0' in txt): DC_curr_zero.EXT = pos.EXT
+            return None, command
         
         case ';':
             return None, command
