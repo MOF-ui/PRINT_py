@@ -399,11 +399,57 @@ class UTIL_test(unittest.TestCase):
         UTIL.DC_curr_zero = UTIL.Coor(4,4,4,4,4,4,4,4)
 
         testTxt   = 'G1 X5.5 Y6 EXT7 F80'
-        self.assertEqual( UTIL.gcodeToQEntry( pos= testPos, speed= testSpeed
+        self.assertEqual( UTIL.gcodeToQEntry( mutPos= testPos, mutSpeed= testSpeed
                                              ,zone= testZone, txt= testTxt)
-                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(9.5,10,5,5,5,5,5,11), SV= UTIL.Speed(2,2,8,2)
-                                        ,Z= 3  )
+                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(9.5,10,5,5,5,5,5,11)
+                                        ,SV= UTIL.Speed(2,2,8,2) ,Z= 3  )
                            ,'G1') )
+        
+        testTxt   = 'G28 X0 Y0'
+        self.assertEqual( UTIL.gcodeToQEntry( mutPos= testPos, mutSpeed= testSpeed
+                                             ,zone= testZone, txt= testTxt)
+                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(4,4,5,4,4,4,4,5)
+                                        ,SV= UTIL.Speed(2,2,2,2) ,Z= 3  )
+                            ,'G28' ) )
+        
+        # testTxt   = 'G92 X0 Y0'
+        # UTIL.gcodeToQEntry( mutPos= testPos, mutSpeed= testSpeed,zone= testZone, txt= testTxt)
+        # self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor(1,1,4,4,4,4,4,4) )
+    
+
+    
+    def test_rapidToQEntry_function (self):
+        """ see gcodeToQEntry in libs/PRINT_data_utilities """
+        
+        UTIL.DC_curr_zero = UTIL.Coor(4,4,4,4,4,4,4,4)
+
+        testTxt   = 'MoveL [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[0,0,0,0],[0,0,0,0,0,0]],\
+                    [8,9,10,11],z12,tool0 EXT:13'
+        self.assertEqual( UTIL.rapidToQEntry( txt= testTxt )
+                         ,(UTIL.QEntry( COOR_1= UTIL.Coor(1.1,2.2,3.3,4.4,5.5,6.6,7.7,13)
+                                        ,PT= 'Q'
+                                        ,SV= UTIL.Speed(10,11,8,9) ,Z= 12)  
+                          ,None ) )
+        
+        testTxt   = 'MoveL Offs(pHome,1.1,2.2,3.3),[8,9,10,11],z12,tool0 EXT:13'
+        self.assertEqual( UTIL.rapidToQEntry( txt= testTxt )
+                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(5.1,6.2,7.3,4,4,4,4,13)
+                                        ,PT= 'Q'
+                                        ,SV= UTIL.Speed(10,11,8,9) ,Z= 12 )
+                            ,None ) )
+        
+
+
+    def test_showOnTerminal_function (self):
+        """ see showOnTerminal in libs/PRINT_data_utilities """
+
+        UTIL.TERM_maxLen = 1
+        UTIL.showOnTerminal('1')
+        self.assertEqual(UTIL.TERM_log, ['1'])
+
+        UTIL.showOnTerminal('2')
+        self.assertEqual(UTIL.TERM_log, ['2'])
+
 
 
 
