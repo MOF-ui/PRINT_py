@@ -412,9 +412,9 @@ class UTIL_test(unittest.TestCase):
                                         ,SV= UTIL.Speed(2,2,2,2) ,Z= 3  )
                             ,'G28' ) )
         
-        # testTxt   = 'G92 X0 Y0'
-        # UTIL.gcodeToQEntry( mutPos= testPos, mutSpeed= testSpeed,zone= testZone, txt= testTxt)
-        # self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor(1,1,4,4,4,4,4,4) )
+        testTxt   = 'G92 X0 Y0'
+        UTIL.gcodeToQEntry( mutPos= testPos, mutSpeed= testSpeed,zone= testZone, txt= testTxt)
+        self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor(1,1,4,4,4,4,4,4) )
     
 
     
