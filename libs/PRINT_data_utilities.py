@@ -1163,11 +1163,16 @@ def reShort(regEx,txt,default,fallbackRegEx = ''):
 
 
 
-def gcodeToQEntry(pos, speed, zone, txt = ''):
+def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
     """ converts a single line of GCode G1 command to a QEntry, can be used in loops for multiline code,
         "pos" should be the pos before this command is executed (before its EXECUTED, not before its added  
         to SC_queue) as its the fallback option if no new X, Y, Z or EXT posistion is passed"""
     global DC_curr_zero
+
+    # handle mutuables here
+    pos   = copy.deepcopy(mutPos)
+    speed = copy.deepcopy(mutSpeed)
+    zero  = copy.deepcopy(DC_curr_zero)
 
     try:                command = reShort('^G\d+', txt, 0, '^;')[0]
     except IndexError:  return None, None
@@ -1192,19 +1197,25 @@ def gcodeToQEntry(pos, speed, zone, txt = ''):
                 F                       = float( F[1:] .replace(',','.') )
                 entry.SV.TS             = int(F * IO_fr_to_ts)
 
-            EXT,res                     = reShort('EXT\d+[,.]\d+', txt, pos.Z, 'EXT\d+')
+            EXT,res                     = reShort('EXT\d+[,.]\d+', txt, pos.EXT, 'EXT\d+')
             if(res): entry.COOR_1.EXT   = float( EXT[3:] .replace(',','.') )
+
+            entry.COOR_1 += zero
             
         case 'G28':
-            # just create an entry with the speed data, DC_curr_zero is added below anyways
-            entry = QEntry( ID = 0, COOR_1 = DC_curr_zero, SV = speed, Z  = IO_zone)
-            if ('X0' not in txt):   entry.COOR_1.X   = pos.X
-            if ('Y0' not in txt):   entry.COOR_1.Y   = pos.Y
-            if ('Z0' not in txt):   entry.COOR_1.Z   = pos.Z
-            if ('EXT0' not in txt): entry.COOR_1.EXT = pos.EXT
+            entry = QEntry( ID = 0, COOR_1 = zero, SV = speed, Z  = zone)
+            if ('X0' not in txt):   entry.COOR_1.X   += pos.X
+            if ('Y0' not in txt):   entry.COOR_1.Y   += pos.Y
+            if ('Z0' not in txt):   entry.COOR_1.Z   += pos.Z
+            if ('EXT0' not in txt): entry.COOR_1.EXT += pos.EXT
         
         case 'G92':
             return None, KeyError('G92 commands are not supported')
+            # if ('X0' in txt):   DC_curr_zero.X   = pos.X
+            # if ('Y0' in txt):   DC_curr_zero.Y   = pos.Y
+            # if ('Z0' in txt):   DC_curr_zero.Z   = pos.Z
+            # if ('EXT0' in txt): DC_curr_zero.EXT = pos.EXT
+            # return None, command
         
         case ';':
             return None, command
@@ -1212,7 +1223,6 @@ def gcodeToQEntry(pos, speed, zone, txt = ''):
         case _:
             return None, None
         
-    entry.COOR_1 += DC_curr_zero
     return entry,command
 
 
@@ -1245,7 +1255,7 @@ def rapidToQEntry(txt = ''):
             for i in range(7):  res_coor.append(float(xyzOff[i]))
         
         ext, res        = reShort('EXT:\d+\.\d+',txt,'error','EXT:\d+')
-        ext             = DC_curr_zero.EXT + float(ext[4:])
+        ext             = float(ext[4:])
         res_speed       = re.findall('\d+,\d+,\d+,\d+(?=\],z)',txt)[0]
         res_speed       = re.findall('\d+',res_speed)
 
@@ -1283,7 +1293,7 @@ def createLogfile():
     try:
         desk    = os.environ['USERPROFILE']
         logpath = desk / Path("Desktop/PRINT_py_log")
-        logpath.mkdir(parents=True,exist_ok=True)
+        logpath.mkdir( parents=True, exist_ok=True )
 
         logpath = logpath / Path(str(datetime.now().strftime('%Y-%m-%d_%H%M%S')) + ".txt")
         text    = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}    GNRL:        program booting, starting GUI...\n"
