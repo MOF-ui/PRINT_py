@@ -1,11 +1,12 @@
 import socket
 import struct
-import time
 from threading import Thread
 from time import sleep
 
 def stt_update():
 	global ID
+	global toggle
+
 	while toggle:
 		if(ID > 0): conn.sendall(struct.pack('<fifffffff',99.0,ID,1.0,2.0,3.0,4.0,5.0,6.0,7.0))
 		sleep(1)
