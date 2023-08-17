@@ -525,14 +525,14 @@ class Queue:
         length = len(self.queue)
         i      = 0
 
-        if (length == 0):  return None
+        if (length == 0):  raise AttributeError
 
         for entry in range(length):
             if (self.queue[entry].ID == ID): break
             else:                            i += 1
         
         if ( (i < 1) or (i >= length) ): 
-            return None
+            raise AttributeError
         
         return self.queue[ i - 1 ]
 
@@ -557,9 +557,10 @@ class Queue:
 
 
 
-    def add(self, newEntry):
+    def add(self, entry):
         """ adds a new QEntry to queue, checks if QEntry.ID makes sense, places QEntry in queue according to the ID given """
 
+        newEntry = copy.deepcopy(entry)
         lastItem = len(self.queue) - 1 
         if(lastItem < 0):
             global SC_curr_comm_id
@@ -1091,20 +1092,25 @@ def preCheckGcodeFile(txt=''):
         rows            = txt.split('\n')
         X               = 0.0
         Y               = 0.0
+        Z               = 0.0
         commNum         = 0
         filamentLength  = 0.0
 
         for row in rows:
             if ( len( re.findall('G\d+', row) ) > 0 ):   commNum += 1
 
-            Y_new = float( reShort('Y\d+[,.]\d+', row, 'Y' + str(Y), 'Y\d+')[0][1:] )
             X_new = float( reShort('X\d+[,.]\d+', row, 'X' + str(X), 'X\d+')[0][1:] )
+            Y_new = float( reShort('Y\d+[,.]\d+', row, 'Y' + str(Y), 'Y\d+')[0][1:] )
+            Z_new = float( reShort('Z\d+[,.]\d+', row, 'Z' + str(Z), 'Z\d+')[0][1:] )
 
             # do the Pythagoras for me, baby
-            filamentLength += m.sqrt( m.pow( (X_new - X), 2 ) + m.pow( (Y_new - Y), 2 ) )
+            filamentLength += m.sqrt( m.pow( (X_new - X), 2 ) 
+                                     +m.pow( (Y_new - Y), 2 ) 
+                                     +m.pow( (Z_new - Z), 2 ) )
 
             X = X_new
             Y = Y_new
+            Z = Z_new
 
     except Exception as e:
         return None, None, e
@@ -1123,22 +1129,27 @@ def preCheckRapidFile(txt=''):
         rows            = txt.split('\n')
         X               = 0.0
         Y               = 0.0
+        Z               = 0.0
         commNum         = 0
         filamentLength  = 0.0
 
         for row in rows:
-            if ( ('Move' in row)  
-                  and ('pStart' not in row)
-                  and ('pHome' not in row) ):   
+            # the ' p' expression is to differ between 'MoveJ pHome,[...]'
+            # and 'MoveJ Offs(pHome [...]'
+            if ( ('Move' in row) and (' p' not in row) ):   
                 commNum += 1
-                Y_new = float( re.findall('\d+\.\d+', row)[0] )
-                X_new = float( re.findall('\d+\.\d+', row)[1] )
+                X_new = float( re.findall('\d+\.\d+', row)[0] )
+                Y_new = float( re.findall('\d+\.\d+', row)[1] )
+                Z_new = float( re.findall('\d+\.\d+', row)[2] )
 
                 # do the Pythagoras for me, baby
-                filamentLength += m.sqrt( m.pow( (X_new - X), 2 ) + m.pow( (Y_new - Y), 2 ) )
+                filamentLength += m.sqrt( m.pow( (X_new - X), 2 ) 
+                                         +m.pow( (Y_new - Y), 2 ) 
+                                         +m.pow( (Z_new - Z), 2 ) )
 
                 X = X_new
                 Y = Y_new
+                Z = Z_new
 
     except Exception as e:
         return None, None, e
@@ -1232,9 +1243,11 @@ def rapidToQEntry(txt = ''):
         DC_curr_zero), can be used in loops for multiline code, returns entry and any Exceptions"""
     global DC_curr_zero
     
-    entry = QEntry(ID=0, PT='Q')
+    entry = QEntry(ID=0)
     try:
-        entry.MT            = re.findall('Move[J,L,C]', txt, 0)[0][4]
+        entry.MT        = re.findall('Move[J,L,C]', txt, 0)[0][4]
+        ext, res        = reShort('EXT:\d+\.\d+',txt,'error','EXT:\d+')
+        ext             = float(ext[4:])
         
         if( 'Offs' in txt):
             res_coor            = [ DC_curr_zero.X
@@ -1243,19 +1256,17 @@ def rapidToQEntry(txt = ''):
                                    ,DC_curr_zero.X_ori
                                    ,DC_curr_zero.Y_ori
                                    ,DC_curr_zero.Z_ori
-                                   ,DC_curr_zero.Q
-                                   ,DC_curr_zero.EXT]
+                                   ,DC_curr_zero.Q]
             xyzOff              = re.findall('pHome,\d+\.\d+,\d+\.\d+,\d+\.\d+',txt)[0]
             xyzOff              = re.findall('\d+\.\d+', xyzOff)
             for i in range(3):  res_coor[i] += float(xyzOff[i])
+            ext                 += DC_curr_zero.EXT
 
         else:
+            entry.PT = 'Q'
             res_coor = []
             xyzOff              = re.findall('\d+\.\d+',txt)
             for i in range(7):  res_coor.append(float(xyzOff[i]))
-        
-        ext, res        = reShort('EXT:\d+\.\d+',txt,'error','EXT:\d+')
-        ext             = float(ext[4:])
         res_speed       = re.findall('\d+,\d+,\d+,\d+(?=\],z)',txt)[0]
         res_speed       = re.findall('\d+',res_speed)
 
