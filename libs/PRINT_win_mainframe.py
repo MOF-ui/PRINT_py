@@ -42,11 +42,12 @@ import libs.PRINT_data_utilities as UTIL
 class Mainframe(QMainWindow, Ui_MainWindow):
     """ main UI of PRINT_py (further details pending) """
     
-    logpath     = ''
-    testrun     = False
-    pump1Conn   = False
-    pump2Conn   = False
-    DAQ         = False
+    logpath     = ''            # reference for logEntry, set by __init__
+    testrun     = False         # switch for mainframe_test.py
+    pump1Conn   = False         # switch to enable pump1
+    pump2Conn   = False         # switch to enable pump2
+    DAQ         = False         # reference for DAQ main window, instance is loaded in __init__
+    firstPos    = True          # one-time switch to get robot home position
 
 
 
@@ -361,6 +362,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ write robots telemetry to global variables """
 
         mutex.lock()
+        # set the fist given position to zero as this is usually the standard position for Rob2
+        if (self.firstPos):
+            UTIL.DC_curr_zero = pos
+            self.firstPos = False
+
         UTIL.ROB_pos        = pos
         UTIL.ROB_toolSpeed  = toolSpeed
         UTIL.ROB_comm_id    = robo_comm_id
