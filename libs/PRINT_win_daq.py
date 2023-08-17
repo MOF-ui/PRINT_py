@@ -84,7 +84,7 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         self.MOT_disp_2kPumpAmps.setText        ( f"{UTIL.STT_datablock.kPumpAmps} A" )
 
         self.ROB_disp_id.setText                ( f"{UTIL.STT_datablock.id}" )
-        self.ROB_disp_tcpSpeed.setText          ( f"{UTIL.STT_datablock.toolspeed} mm/s" )
+        self.ROB_disp_tcpSpeed.setText          ( f"{UTIL.STT_datablock.toolSpeed} mm/s" )
         self.ROB_disp_xPos.setText              ( f"{UTIL.STT_datablock.POS.X} mm" )
         self.ROB_disp_yPos.setText              ( f"{UTIL.STT_datablock.POS.Y} mm" )
         self.ROB_disp_zPos.setText              ( f"{UTIL.STT_datablock.POS.Z} mm" )
