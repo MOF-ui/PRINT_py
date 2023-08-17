@@ -369,7 +369,7 @@ QTabBar::tab:!selected:hover {
 }</string>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="PRINT_tab">
      <property name="styleSheet">
@@ -932,6 +932,9 @@ color: #E1E5EE;</string>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
+       <property name="maximum">
+        <number>99999</number>
+       </property>
       </widget>
       <widget class="QLabel" name="SGLC_lbl_rapidSglComm_addByID">
        <property name="geometry">
@@ -1018,6 +1021,9 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="maximum">
+        <number>99999</number>
        </property>
        <property name="displayIntegerBase">
         <number>10</number>
@@ -2169,23 +2175,23 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="DC_lbl_stepWidth_1mm">
        <property name="geometry">
         <rect>
-         <x>350</x>
-         <y>120</y>
-         <width>71</width>
-         <height>31</height>
+         <x>330</x>
+         <y>110</y>
+         <width>111</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <family>Bahnschrift</family>
-         <pointsize>16</pointsize>
+         <pointsize>14</pointsize>
         </font>
        </property>
        <property name="styleSheet">
         <string notr="true">border: 0px;
 background-color: #5D707F;
 color: #E1E5EE;
-font-size: 16pt;</string>
+font-size: 14pt;</string>
        </property>
        <property name="text">
         <string>1 mm</string>
@@ -2197,17 +2203,17 @@ font-size: 16pt;</string>
       <widget class="QLabel" name="DC_lbl_stepWidth_10mm">
        <property name="geometry">
         <rect>
-         <x>600</x>
-         <y>120</y>
-         <width>61</width>
-         <height>31</height>
+         <x>570</x>
+         <y>110</y>
+         <width>121</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true">border: 0px;
 background-color: #5D707F;
 color: #E1E5EE;
-font-size: 16pt;</string>
+font-size: 14pt;</string>
        </property>
        <property name="text">
         <string>10 mm</string>
@@ -2219,17 +2225,17 @@ font-size: 16pt;</string>
       <widget class="QLabel" name="DC_lbl_stepWidth_100mm">
        <property name="geometry">
         <rect>
-         <x>840</x>
-         <y>120</y>
-         <width>71</width>
-         <height>31</height>
+         <x>810</x>
+         <y>100</y>
+         <width>131</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true">border: 0px;
 background-color: #5D707F;
 color: #E1E5EE;
-font-size: 16pt;</string>
+font-size: 14pt;</string>
        </property>
        <property name="text">
         <string>100 mm</string>
@@ -2238,6 +2244,33 @@ font-size: 16pt;</string>
         <set>Qt::AlignBottom|Qt::AlignHCenter</set>
        </property>
       </widget>
+      <zorder>DC_lbl_stepWidth_100mm</zorder>
+      <zorder>DC_0_frameLabel</zorder>
+      <zorder>DC_drpd_moveType</zorder>
+      <zorder>DC_lbl_robotMoving</zorder>
+      <zorder>DC_indi_robotMoving</zorder>
+      <zorder>DC_btt_xyzZero</zorder>
+      <zorder>DC_btt_extZero</zorder>
+      <zorder>DC_btt_home</zorder>
+      <zorder>DC_btt_xPlus</zorder>
+      <zorder>DC_btt_xMinus</zorder>
+      <zorder>DC_lbl_x</zorder>
+      <zorder>DC_btt_yPlus</zorder>
+      <zorder>DC_btt_yMinus</zorder>
+      <zorder>DC_lbl_y</zorder>
+      <zorder>DC_lbl_ext</zorder>
+      <zorder>DC_btt_extPlus</zorder>
+      <zorder>DC_btt_zMinus</zorder>
+      <zorder>DC_lbl_z</zorder>
+      <zorder>DC_btt_zPlus</zorder>
+      <zorder>DC_btt_extMinus</zorder>
+      <zorder>DC_disp_x</zorder>
+      <zorder>DC_disp_y</zorder>
+      <zorder>DC_disp_z</zorder>
+      <zorder>DC_disp_ext</zorder>
+      <zorder>DC_lbl_stepWidth_1mm</zorder>
+      <zorder>DC_lbl_stepWidth_10mm</zorder>
+      <zorder>DC_sld_stepWidth</zorder>
      </widget>
      <widget class="QFrame" name="NC_frame">
       <property name="geometry">
@@ -2770,6 +2803,12 @@ color: #E1E5EE;</string>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
+       <property name="minimum">
+        <double>-9999.989999999999782</double>
+       </property>
+       <property name="maximum">
+        <double>9999.989999999999782</double>
+       </property>
       </widget>
       <widget class="QDoubleSpinBox" name="NC_float_y">
        <property name="geometry">
@@ -2782,6 +2821,12 @@ color: #E1E5EE;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="minimum">
+        <double>-9999.989999999999782</double>
+       </property>
+       <property name="maximum">
+        <double>9999.989999999999782</double>
        </property>
       </widget>
       <widget class="QDoubleSpinBox" name="NC_float_ext">
@@ -2796,6 +2841,12 @@ color: #E1E5EE;</string>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
+       <property name="minimum">
+        <double>-9999.989999999999782</double>
+       </property>
+       <property name="maximum">
+        <double>9999.989999999999782</double>
+       </property>
       </widget>
       <widget class="QDoubleSpinBox" name="NC_float_z">
        <property name="geometry">
@@ -2808,6 +2859,12 @@ color: #E1E5EE;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="minimum">
+        <double>-9999.989999999999782</double>
+       </property>
+       <property name="maximum">
+        <double>9999.989999999999782</double>
        </property>
       </widget>
       <widget class="QDoubleSpinBox" name="NC_float_zOrient">
@@ -2822,6 +2879,12 @@ color: #E1E5EE;</string>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
+       <property name="minimum">
+        <double>-9999.989999999999782</double>
+       </property>
+       <property name="maximum">
+        <double>9999.989999999999782</double>
+       </property>
       </widget>
       <widget class="QDoubleSpinBox" name="NC_float_yOrient">
        <property name="geometry">
@@ -2835,6 +2898,12 @@ color: #E1E5EE;</string>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
+       <property name="minimum">
+        <double>-9999.989999999999782</double>
+       </property>
+       <property name="maximum">
+        <double>9999.989999999999782</double>
+       </property>
       </widget>
       <widget class="QDoubleSpinBox" name="NC_float_xOrient">
        <property name="geometry">
@@ -2847,6 +2916,12 @@ color: #E1E5EE;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="minimum">
+        <double>-9999.989999999999782</double>
+       </property>
+       <property name="maximum">
+        <double>9999.989999999999782</double>
        </property>
       </widget>
       <zorder>NC_lbl_ext_set</zorder>
@@ -5584,6 +5659,9 @@ ramp [mm/²]</string>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
+       <property name="suffix">
+        <string/>
+       </property>
        <property name="maximum">
         <double>9999.000000000000000</double>
        </property>
@@ -5599,6 +5677,9 @@ ramp [mm/²]</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string/>
        </property>
        <property name="maximum">
         <double>9999.000000000000000</double>
