@@ -571,10 +571,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_disp_progCommID.setText      ( str(comID) )
         self.SCTRL_disp_elemInQ.setText         ( str(len(UTIL.SC_queue)) ) 
 
-        self.DC_disp_x.setText                  ( str( round( pos.X   - zero.X  ,6 )) )
-        self.DC_disp_y.setText                  ( str( round( pos.Y   - zero.Y  ,6 )) )
-        self.DC_disp_z.setText                  ( str( round( pos.Z   - zero.Z  ,6 )) )
-        self.DC_disp_ext.setText                ( str( round( pos.EXT - zero.EXT,6 )) )
+        self.DC_disp_x.setText                  ( str( round( pos.X   - zero.X  ,3 )) )
+        self.DC_disp_y.setText                  ( str( round( pos.Y   - zero.Y  ,3 )) )
+        self.DC_disp_z.setText                  ( str( round( pos.Z   - zero.Z  ,3 )) )
+        self.DC_disp_ext.setText                ( str( round( pos.EXT - zero.EXT,3 )) )
 
         self.NC_disp_x.setText                  ( str(pos.X) )
         self.NC_disp_y.setText                  ( str(pos.Y) )
