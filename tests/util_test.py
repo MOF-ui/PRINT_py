@@ -148,9 +148,9 @@ class UTIL_test(unittest.TestCase):
                           ,UTIL.QEntry(ID= 2, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3)) )
         
         # entryBeforeID
-        self.assertIsNone( emptyQueue.entryBeforeID(1) )
-        self.assertIsNone( testQueue.entryBeforeID(1) )
-        self.assertIsNone( testQueue.entryBeforeID(3) )
+        self.assertRaises( AttributeError, emptyQueue.entryBeforeID, 1 )
+        self.assertRaises( AttributeError, testQueue.entryBeforeID,  1 )
+        self.assertRaises( AttributeError, testQueue.entryBeforeID,  3 )
         self.assertEqual ( testQueue.entryBeforeID(2)
                           ,UTIL.QEntry(ID= 1) )
         
@@ -423,18 +423,18 @@ class UTIL_test(unittest.TestCase):
         
         UTIL.DC_curr_zero = UTIL.Coor(4,4,4,4,4,4,4,4)
 
-        testTxt   = 'MoveL [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[0,0,0,0],[0,0,0,0,0,0]],\
+        testTxt   = 'MoveJ [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[0,0,0,0],[0,0,0,0,0,0]],\
                     [8,9,10,11],z12,tool0 EXT:13'
         self.assertEqual( UTIL.rapidToQEntry( txt= testTxt )
                          ,(UTIL.QEntry( COOR_1= UTIL.Coor(1.1,2.2,3.3,4.4,5.5,6.6,7.7,13)
-                                        ,PT= 'Q'
+                                        ,MT= 'J' ,PT= 'Q'
                                         ,SV= UTIL.Speed(10,11,8,9) ,Z= 12)  
                           ,None ) )
         
         testTxt   = 'MoveL Offs(pHome,1.1,2.2,3.3),[8,9,10,11],z12,tool0 EXT:13'
         self.assertEqual( UTIL.rapidToQEntry( txt= testTxt )
-                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(5.1,6.2,7.3,4,4,4,4,13)
-                                        ,PT= 'Q'
+                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(5.1,6.2,7.3,4,4,4,4,17)
+                                        ,PT= 'E'
                                         ,SV= UTIL.Speed(10,11,8,9) ,Z= 12 )
                             ,None ) )
         
