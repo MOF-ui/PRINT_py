@@ -62,6 +62,15 @@ class Mainfraime_test(unittest.TestCase):
         global testFrame
 
         # primary function
+        # check first run
+        self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor() )
+        testFrame.posUpdate( rawDataString= 'ABC'
+                            ,pos= UTIL.Coor(1,2,3,4,5,6,7,8.8)
+                            ,toolSpeed= 0
+                            ,robo_comm_id=0)
+        self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor(1,2,3,4,5,6,7,8.8) )
+
+        # check loop run
         UTIL.SC_curr_comm_id = 15
         UTIL.DC_curr_zero    = UTIL.Coor(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1)
         testFrame.posUpdate( rawDataString= 'ABC'
@@ -564,7 +573,7 @@ class Mainfraime_test(unittest.TestCase):
                          ,[ str(UTIL.QEntry( ID= 3, MT= 'E' ))] )
         
         UTIL.SC_curr_comm_id = 1
-        UTIL.SC_queue.display()
+        UTIL.SC_queue.clear()
     
 
 
@@ -631,47 +640,50 @@ class Mainfraime_test(unittest.TestCase):
         global testFrame
 
         testFrame.close()
+
         UTIL.ROB_tcpip.close  (end= True)
         UTIL.PUMP1_tcpip.close(end= True)
         UTIL.PUMP2_tcpip.close(end= True)
+        UTIL.TERM_log.clear()
 
 
 
 
+# create test logfile and 0_BT_testfiles
+desk    = os.environ['USERPROFILE']
+dirpath = desk / pl.Path("Desktop/PRINT_py_testrun")
+dirpath.mkdir( parents=True, exist_ok=True )
+
+logpath = dirpath / pl.Path(str(datetime.now().strftime('%Y-%m-%d_%H%M%S')) + ".txt")
+text    = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}:   test running..\n\n"
+
+logfile = open(logpath,'x')
+logfile.write(text)
+logfile.close()
+
+gcodeTestpath = dirpath / pl.Path('0_UT_testfile.gcode')
+rapidTestpath = dirpath / pl.Path('0_UT_testfile.mod')
+gcodeText     = ';comment\nG1 Y2\nG1 Z1'
+rapidText     = '!comment\nMoveJ pHome,v200,fine,tool0;\n\n\
+                    ! start printjob relative to pStart\n\
+                    MoveL Offs(pHome,0.0,2.0,0.0),[200,50,50,50],z10,tool0 EXT:11;\n\
+                    MoveL Offs(pHome,0.0,2.0,1.0),[200,50,50,50],z10,tool0 EXT:11;'
+
+gcodeTestfile = open(gcodeTestpath,'w')
+rapidTestfile = open(rapidTestpath,'w')
+gcodeTestfile.write(gcodeText)
+rapidTestfile.write(rapidText)
+gcodeTestfile.close()
+rapidTestfile.close()
+
+# create application
+app = 0
+win = 0
+app         = QApplication(sys.argv)
+testFrame   = MF.Mainframe(lpath= logpath, connDef= (False, False), testrun= True)
+
+
+
+# run test immediatly only if called alone
 if __name__ == '__main__':
-
-    # create test logfile and 0_BT_testfiles
-    desk    = os.environ['USERPROFILE']
-    dirpath = desk / pl.Path("Desktop/PRINT_py_testrun")
-    dirpath.mkdir( parents=True, exist_ok=True )
-
-    logpath = dirpath / pl.Path(str(datetime.now().strftime('%Y-%m-%d_%H%M%S')) + ".txt")
-    text    = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}:   test running..\n\n"
-
-    logfile = open(logpath,'x')
-    logfile.write(text)
-    logfile.close()
-
-    gcodeTestpath = dirpath / pl.Path('0_UT_testfile.gcode')
-    rapidTestpath = dirpath / pl.Path('0_UT_testfile.mod')
-    gcodeText     = ';comment\nG1 Y2\nG1 Z1'
-    rapidText     = '!comment\nMoveJ pHome,v200,fine,tool0;\n\n\
-                     ! start printjob relative to pStart\n\
-                     MoveL Offs(pHome,0.0,2.0,0.0),[200,50,50,50],z10,tool0 EXT:11;\n\
-                     MoveL Offs(pHome,0.0,2.0,1.0),[200,50,50,50],z10,tool0 EXT:11;'
-
-    gcodeTestfile = open(gcodeTestpath,'w')
-    rapidTestfile = open(rapidTestpath,'w')
-    gcodeTestfile.write(gcodeText)
-    rapidTestfile.write(rapidText)
-    gcodeTestfile.close()
-    rapidTestfile.close()
-
-    # create application
-    app = 0
-    win = 0
-    app         = QApplication(sys.argv)
-    testFrame   = MF.Mainframe(lpath= logpath, connDef= (False, False), testrun= True)
-
-    # run test
     unittest.main()
