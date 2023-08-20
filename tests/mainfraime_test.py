@@ -68,7 +68,8 @@ class Mainfraime_test(unittest.TestCase):
                             ,pos= UTIL.Coor(1,2,3,4,5,6,7,8.8)
                             ,toolSpeed= 0
                             ,robo_comm_id=0)
-        self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor(1,2,3,4,5,6,7,8.8) )
+        # check first loop switch, Q is not set by posUpdate
+        self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor(1,2,3,4,5,6,0,8.8) )
 
         # check loop run
         UTIL.SC_curr_comm_id = 15

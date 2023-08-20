@@ -362,19 +362,20 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ write robots telemetry to global variables """
 
         mutex.lock()
-        # set the fist given position to zero as this is usually the standard position for Rob2
-        if (self.firstPos):
-            UTIL.DC_curr_zero = pos
-            self.firstPos = False
-
         UTIL.ROB_pos        = pos
         UTIL.ROB_toolSpeed  = toolSpeed
         UTIL.ROB_comm_id    = robo_comm_id
-
+            
+        # prep database entry
         UTIL.STT_datablock.POS          = pos           - UTIL.DC_curr_zero
         UTIL.STT_datablock.toolSpeed    = toolSpeed
         UTIL.STT_datablock.id           = robo_comm_id
         mutex.unlock()
+
+        # set the fist given position to zero as this is usually the standard position for Rob2
+        if (self.firstPos):
+            self.setZero([1,2,3,4,5,6,8])
+            self.firstPos = False
 
         self.logEntry('RTel',f"ID {robo_comm_id},   {pos}   ToolSpeed: {toolSpeed}")
         self.labelUpdate_onReceive(rawDataString)
@@ -1241,7 +1242,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         UTIL.DC_curr_zero = newZero
         mutex.unlock()
 
-        self.logEntry('DCom',f"current zero position updated: ({UTIL.DC_curr_zero})")
+        self.logEntry('ZERO',f"current zero position updated: ({UTIL.DC_curr_zero})")
 
 
 
