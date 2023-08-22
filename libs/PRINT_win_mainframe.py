@@ -539,6 +539,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def logEntry(self, source='[  ]', text=''):
         """ set one-line for log entries, safes A LOT of code """
 
+        text = text.replace('\n','')
+        text = text.replace('\t','')
         if (self.logpath == ''):    return None
         if (source == 'newline'):   text = '\n'
         else:                       text = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}    {source}:        {text}\n"
@@ -818,11 +820,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # get text and position BEFORE PLANNED COMMAND EXECUTION
         speed   = copy.deepcopy(UTIL.PRIN_speed)
         try:
-            if( not atID ):     pos = copy.deepcopy( UTIL.SC_queue.lastEntry().COOR_1 )\
-                                      - UTIL.DC_curr_zero
-            else:               pos = copy.deepcopy( UTIL.SC_queue.entryBeforeID(ID).COOR_1 )\
-                                      - UTIL.DC_curr_zero
-        except AttributeError:  pos = UTIL.Coor()
+            if( not atID ):     pos = copy.deepcopy( UTIL.SC_queue.lastEntry().COOR_1 )
+            else:               pos = copy.deepcopy( UTIL.SC_queue.entryBeforeID(ID).COOR_1 )
+        except AttributeError:  pos = UTIL.DC_curr_zero
         if( not fromFile ):     txt = self.SGLC_entry_gcodeSglComm.toPlainText() 
         else:                   txt = fileText
         
