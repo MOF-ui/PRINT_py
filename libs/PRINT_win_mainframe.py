@@ -1148,13 +1148,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
     def robotStopCommand(self, directly = True):
 
-        command = UTIL.QEntry( ID = 0
+        command = UTIL.QEntry( ID = 1
                               ,MT = 'E')
         
         if(directly):
             self.logEntry('SysC',"sending robot stop command directly")
             return self.sendCommand(command, DC = True)
         else:
+            command.ID = 0
             UTIL.SC_queue.add(command)
             self.logEntry('SysC',"added robot stop command to queue")
             return command
