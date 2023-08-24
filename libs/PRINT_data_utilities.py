@@ -1195,13 +1195,19 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
             entry = QEntry(ID=0, COOR_1=pos, SV=speed, Z=zone)
                 
             X,res                       = reShort('X\d+[,.]\d+', txt, pos.X, 'X\d+')
-            if(res): entry.COOR_1.X     = float( X[1:] .replace(',','.') )
+            if(res): 
+                entry.COOR_1.X =  float( X[1:] .replace(',','.') )
+                entry.COOR_1.X += zero.X
 
             Y,res                       = reShort('Y\d+[,.]\d+', txt, pos.Y, 'Y\d+')
-            if(res): entry.COOR_1.Y     = float( Y[1:] .replace(',','.') )
+            if(res): 
+                entry.COOR_1.Y =  float( Y[1:] .replace(',','.') )
+                entry.COOR_1.Y += zero.Y
 
             Z,res                       = reShort('Z\d+[,.]\d+', txt, pos.Z, 'Z\d+')
-            if(res): entry.COOR_1.Z     = float( Z[1:] .replace(',','.') )
+            if(res): 
+                entry.COOR_1.Z =  float( Z[1:] .replace(',','.') )
+                entry.COOR_1.Z += zero.Z
             
             F,res                       = reShort('F\d+[,.]\d+', txt, speed.TS, 'F\d+')
             if(res):
@@ -1209,9 +1215,9 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
                 entry.SV.TS             = int(F * IO_fr_to_ts)
 
             EXT,res                     = reShort('EXT\d+[,.]\d+', txt, pos.EXT, 'EXT\d+')
-            if(res): entry.COOR_1.EXT   = float( EXT[3:] .replace(',','.') )
-
-            entry.COOR_1 += zero
+            if(res): 
+                entry.COOR_1.EXT =  float( EXT[3:] .replace(',','.') )
+                entry.COOR_1.EXT += zero.EXT
             
         case 'G28':
             entry = QEntry( ID = 0, COOR_1 = zero, SV = speed, Z  = zone)

@@ -545,6 +545,13 @@ class Mainfraime_test(unittest.TestCase):
                          ,UTIL.QEntry( ID= 1, COOR_1= UTIL.Coor( X= 1, Y= 3.2, Z= 1, X_ori= 1
                                                                 ,Y_ori= 1, Z_ori= 1, Q= 1, EXT= 1 ) ) )
         
+        testFrame.TERM_entry_gcodeInterp.setText('G1 X1 Z3')
+        UTIL.ROB_pos = UTIL.Coor( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
+        UTIL.DC_curr_zero = UTIL.Coor( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
+
+        self.assertEqual( testFrame.sendGcodeCommand()[1]
+                         ,UTIL.QEntry( ID= 2, COOR_1= UTIL.Coor( 2.1,2.2,6.3,4.4,5.5,6.6,7.7,8.8 ) ) )
+        
         UTIL.ROB_pos = UTIL.Coor()
         UTIL.SC_curr_comm_id = 1
     
