@@ -62,6 +62,8 @@ class Mainfraime_test(unittest.TestCase):
         global testFrame
 
         # primary function
+        UTIL.DC_curr_zero = UTIL.Coor()
+
         # check first run
         self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor() )
         testFrame.posUpdate( rawDataString= 'ABC'
@@ -230,6 +232,25 @@ class Mainfraime_test(unittest.TestCase):
                          ,str(UTIL.QEntry( ID= 1, COOR_1= UTIL.Coor(X= 2.2, Y= 1) )) )
         
         UTIL.SC_queue.clear()
+    
+
+
+    def test_labelUpdate_onNewZero (self):
+        """ rababer rababer """
+        global testFrame
+
+        UTIL.DC_curr_zero = UTIL.Coor(1.1,2,3,4,5,6,7,8)
+        testFrame.labelUpdate_onNewZero()
+        
+        self.assertEqual( testFrame.ZERO_disp_x.text(), '1.1' )
+        self.assertEqual( testFrame.ZERO_disp_y.text(), '2.0' )
+        self.assertEqual( testFrame.ZERO_disp_z.text(), '3.0' )
+        self.assertEqual( testFrame.ZERO_disp_xOrient.text(), '4.0' )
+        self.assertEqual( testFrame.ZERO_disp_yOrient.text(), '5.0' )
+        self.assertEqual( testFrame.ZERO_disp_zOrient.text(), '6.0' )
+        self.assertEqual( testFrame.ZERO_disp_ext.text(), '8.0' )
+
+        UTIL.DC_curr_zero = UTIL.Coor()
         
     
 
@@ -575,7 +596,7 @@ class Mainfraime_test(unittest.TestCase):
         global testFrame
 
         self.assertEqual( testFrame.forcedStopCommand()[1], UTIL.QEntry( ID= 0, MT= 'S' ) )
-        self.assertEqual( testFrame.robotStopCommand()[1],  UTIL.QEntry( ID= 0, MT= 'E' ) )
+        self.assertEqual( testFrame.robotStopCommand()[1],  UTIL.QEntry( ID= 1, MT= 'E' ) )
         testFrame.robotStopCommand(directly= False)
         self.assertEqual( UTIL.SC_queue.display()
                          ,[ str(UTIL.QEntry( ID= 3, MT= 'E' ))] )
@@ -644,7 +665,7 @@ class Mainfraime_test(unittest.TestCase):
 
     def test_zz_end (self):
         """ does not test anything, just here to close all sockets/ exit cleanly,
-            named '_zz_' to be executed bei unittest at last """
+            named '_zz_' to be executed by unittest at last """
         global testFrame
 
         testFrame.close()

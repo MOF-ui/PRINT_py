@@ -639,7 +639,21 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.ICQ_arr_terminal.clear()
         self.ICQ_arr_terminal.addItems  ( UTIL.ROB_comm_queue.display() )
+
     
+
+    def labelUpdate_onNewZero(self):
+        """ show when DC_zero has changed """
+
+        self.ZERO_disp_x.setText        ( str( UTIL.DC_curr_zero.X ) )
+        self.ZERO_disp_y.setText        ( str( UTIL.DC_curr_zero.Y ) )
+        self.ZERO_disp_z.setText        ( str( UTIL.DC_curr_zero.Z ) )
+        self.ZERO_disp_xOrient.setText  ( str( UTIL.DC_curr_zero.X_ori ) )
+        self.ZERO_disp_yOrient.setText  ( str( UTIL.DC_curr_zero.Y_ori ) )
+        self.ZERO_disp_zOrient.setText  ( str( UTIL.DC_curr_zero.Z_ori ) )
+        self.ZERO_disp_ext.setText      ( str( UTIL.DC_curr_zero.EXT ) )
+    
+
 
 
 
@@ -838,6 +852,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             
             if(not fromFile):       self.SGLC_entry_gcodeSglComm.setText(panTxt)
             return entry, None
+        
+        elif( command == 'G92' ):   self.labelUpdate_onNewZero()
 
         # set command ID if given, sorting is done later by "Queue" class
         if(atID):    entry.ID = ID
@@ -1081,9 +1097,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # act according to GCode command
         entry,command = UTIL.gcodeToQEntry(pos, speed ,UTIL.IO_zone ,txt)
         
-        if ( (command != 'G1') and (command != 'G28') ):
+        if   ( command == 'G92'):
+            self.labelUpdate_onNewLabel()
+        elif ( (command != 'G1') and (command != 'G28') ):
             if  (command == ';'):       panTxt = f"leading semicolon interpreted as comment:\n{txt}"
-            elif(command == 'G92'):     panTxt = f"G92 not supported:\n{txt}"
             elif(command is None):      panTxt = f"SYNTAX ERROR:\n{txt}"
             else:                       panTxt = f"{command}\n{txt}"
 
@@ -1230,19 +1247,21 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         newZero = copy.deepcopy(UTIL.DC_curr_zero)
         currPos = copy.deepcopy(UTIL.ROB_pos)
 
-        # 7 is a placeholder for Q, which can not be set by hand
-        if 1 in axis:   newZero.X     = currPos.X
-        if 2 in axis:   newZero.Y     = currPos.Y
-        if 3 in axis:   newZero.Z     = currPos.Z
-        if 4 in axis:   newZero.X_ori = currPos.X_ori
-        if 5 in axis:   newZero.Y_ori = currPos.Y_ori
-        if 6 in axis:   newZero.Z_ori = currPos.Z_ori
-        if 8 in axis:   newZero.EXT   = currPos.EXT
+        if axis:
+            # 7 is a placeholder for Q, which can not be set by hand
+            if 1 in axis:   newZero.X     = currPos.X
+            if 2 in axis:   newZero.Y     = currPos.Y
+            if 3 in axis:   newZero.Z     = currPos.Z
+            if 4 in axis:   newZero.X_ori = currPos.X_ori
+            if 5 in axis:   newZero.Y_ori = currPos.Y_ori
+            if 6 in axis:   newZero.Z_ori = currPos.Z_ori
+            if 8 in axis:   newZero.EXT   = currPos.EXT
+            
+            mutex.lock()
+            UTIL.DC_curr_zero = newZero
+            mutex.unlock()
         
-        mutex.lock()
-        UTIL.DC_curr_zero = newZero
-        mutex.unlock()
-
+        self.labelUpdate_onNewZero()
         self.logEntry('ZERO',f"current zero position updated: ({UTIL.DC_curr_zero})")
 
 
