@@ -14,13 +14,9 @@
 #   that can easily cause a lot of damage. Also, I am not a programmer (nor is english my first language
 #   for that matter). Therefore you can not count on me following standard industrial procedures or that 
 #   all of the docstrings convey the meaning I intended. I tried to build this application according to the 
-#   standards that I know of, though. Also I am yet to write a unittest for this program, but as i'm doing
-#   all of this parallel to my actual work, I can't see it coming, yet.
+#   standards that I know of, though. 
 #
 #   LICENSE
-#   This code is currently meant to be used only by members of the Civil Engineering Institut of TU Berlin at the 
-#   robotic cell in Peter-Behrends-Halle. But just in case anyone ever gets the software from me at any later
-#   point, maybe as a project partner or because you find a stick laying around, I want this clearly stated:
 #   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
 #   (https://creativecommons.org/licenses/by-sa/4.0/). Feel free to use, modify or distribute this code as  
 #   far as you like, so long as you make anything based on it publicly avialable under the same license.
@@ -89,7 +85,7 @@
 #   4 byte, FLOAT - Rx
 #   4 byte, FLOAT - Ry
 #   4 byte, FLOAT - Rz
-#   4 byte, FLOAT - EXT:
+#   4 byte, FLOAT - EXT
 #
 #
 #####################################################################################################################
@@ -144,8 +140,8 @@ else:
 
 
 # overwrite ROBO_tcpip for testing, delete later
-# UTIL.ROB_tcpip.IP      = 'localhost'
-# UTIL.ROB_tcpip.PORT    = 10001
+UTIL.ROB_tcpip.IP      = 'localhost'
+UTIL.ROB_tcpip.PORT    = 10001
 
 
 # get the go from user
@@ -169,7 +165,7 @@ logpath = UTIL.createLogfile()
 app = 0                             # leave that here so app doesnt include the remnant of a previous QApplication instance
 win = 0
 app = QApplication(sys.argv)
-win = Mainframe( lpath= logpath ,connDef= csConnDef )
+win = Mainframe( lpath= logpath, connDef= csConnDef)
 win.show()
 app.exec()
 # sys.exit(app.exec())
