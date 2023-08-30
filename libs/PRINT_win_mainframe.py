@@ -1164,6 +1164,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def robotStopCommand(self, directly = True):
+        """ close connection signal for robot, add it to Queue or gives it to the actual sendCommand function """
 
         command = UTIL.QEntry( ID = 1
                               ,MT = 'E')
