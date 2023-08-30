@@ -536,14 +536,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                        LOG FUNCTION                                               #
     #####################################################################################################
 
-    def logEntry(self, source='[  ]', text=''):
+    def logEntry(self, source='[    ]', text=''):
         """ set one-line for log entries, safes A LOT of code """
 
         text = text.replace('\n','')
         text = text.replace('\t','')
         if (self.logpath == ''):    return None
         if (source == 'newline'):   text = '\n'
-        else:                       text = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}    {source}:        {text}\n"
+        else:                       text = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}    [{source}]:        {text}\n"
         self.SET_disp_logEntry.setText(text)
 
         try:
