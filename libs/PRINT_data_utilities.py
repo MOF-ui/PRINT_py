@@ -1018,7 +1018,8 @@ class TCPIP:
             
             try:                self.sock.sendall(message)
             except OSError:     return OSError,None
-
+            
+            print(f"SEND:    {entry.ID}, length: {len(message)}")
             return True,len(message)
         
         except Exception as err:
