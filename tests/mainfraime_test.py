@@ -364,6 +364,8 @@ class Mainfraime_test(unittest.TestCase):
                                              ,SV= UTIL.Speed( TS=4 ) ) )
                            ,str( UTIL.QEntry( ID= 4
                                              ,COOR_1= UTIL.Coor(X= 2.2, Y= 2.2, EXT=3 ) ) )])
+        
+        # add G28 & G92 tests
 
         UTIL.DC_curr_zero = UTIL.Coor()
         UTIL.SC_queue.clear()

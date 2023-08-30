@@ -408,7 +408,7 @@ class UTIL_test(unittest.TestCase):
         testTxt   = 'G28 X0 Y0'
         self.assertEqual( UTIL.gcodeToQEntry( mutPos= testPos, mutSpeed= testSpeed
                                              ,zone= testZone, txt= testTxt)
-                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(4,4,5,4,4,4,4,5)
+                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(4,4,1,1,1,1,1,1)
                                         ,SV= UTIL.Speed(2,2,2,2) ,Z= 3  )
                             ,'G28' ) )
         

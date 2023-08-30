@@ -258,7 +258,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 else:                               raise ConnectionError('TCP not supported') # res,conn = UTIL.PUMP1_tcpip.connect()
 
                 self.TCP_PUMP1_indi_connected.setStyleSheet (css)
-                self.logEntry                               ('GNRL','connected to Pump1.')
+                self.logEntry                               ('GNRL',f"connected to Pump1 at {UTIL.PUMP1_tcpip.PORT}.")
                 self.pump1Conn = True
                 return True
 
@@ -456,31 +456,40 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def watchdogBite(self, dognumber = 0):
         """ close the UI on any biting WD, log info """
 
+        match dognumber:
+            case 1:   wdNum = '1'
+            case _:   wdNum = '(unidentified)'
+        
         if(UTIL.SC_qProcessing):
-            match dognumber:
-                case 1:   wdNum = '1'
-                case _:   wdNum = '(unidentified)'
+            self.logEntry           ('WDOG',f"Watchdog {wdNum} has bitten! Stopping script control & forwarding forced-stop to robot!")
+            self.forcedStopCommand  ()
+            self.stopSCTRLQueue     ()
 
-            self.logEntry('WDOG',f"Watchdog {wdNum} has bitten! Stopping script control & forwarding forced-stop to robot!")
-            self.forcedStopCommand()
-            self.stopSCTRLQueue()
-            watchdogWarning = strdDialog(f"Watchdog {wdNum} has bitten!\n\nScript control was stopped and forced-stop "\
-                                         f"command was send to robot!\nPress OK to keep PRINT_py running or Cancel to "\
-                                         f"exit and close."
-                                        ,'WATCHDOG ALARM')
+            wdTxt = f"Watchdog {wdNum} has bitten!\n\nScript control was stopped and forced-stop "\
+                    f"command was send to robot!\nPress OK to keep PRINT_py running or Cancel to "\
+                    f"exit and close."
+
+        else:
+            self.logEntry           ('WDOG',f"Watchdog {wdNum} has bitten, robot disconnected!")
+
+            wdTxt = f"Watchdog {wdNum} has bitten!\n\nRobot disconnected.\nPress OK to keep PRINT_py running or Cancel to "\
+                    f"exit and close."
+
+        if( UTIL.ROB_tcpip.connected ):
+            watchdogWarning = strdDialog(wdTxt, 'WATCHDOG ALARM')
             watchdogWarning.exec()
+
             if( watchdogWarning.result() ):
                 self.logEntry('WDOG',f"User chose to return to main screen.")
                 self.resetWatchdog(1)
+
             else:
                 self.logEntry('WDOG',f"User chose to close PRINT_py, exiting...")
                 self.close()
 
-        else:
-            UTIL.ROB_tcpip.connected = False
-            self.TCP_ROB_indi_connected.setStyleSheet( "border-radius: 25px;\
-                                                        background-color: #4c4a48;" )
-            self.resetWatchdog(1)
+        self.TCP_ROB_indi_connected.setStyleSheet( "border-radius: 25px;background-color: #4c4a48;" )
+        UTIL.ROB_tcpip.connected = False
+        self.resetWatchdog(1)
 
         
 
@@ -853,7 +862,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             if(not fromFile):       self.SGLC_entry_gcodeSglComm.setText(panTxt)
             return entry, None
         
-        elif( command == 'G92' ):   self.labelUpdate_onNewZero()
+        elif( command == 'G92' ):   
+            self.labelUpdate_onNewZero()
+            return entry, None
 
         # set command ID if given, sorting is done later by "Queue" class
         if(atID):    entry.ID = ID
@@ -1280,7 +1291,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ handle user inputs regarding pump frequency """
 
         mutex.lock()
-        UTIL.PUMP1_liveAd = self.SCTRL_num_liveAd_pump1.value() / 100
+        UTIL.PUMP1_liveAd = self.SCTRL_num_liveAd_pump1.value() / 100.0
         match type:
             case '1':   UTIL.PUMP1_speed += 1
             case '-1':  UTIL.PUMP1_speed -= 1

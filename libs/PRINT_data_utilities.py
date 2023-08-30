@@ -1221,14 +1221,13 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
                 entry.COOR_1.EXT += zero.EXT
             
         case 'G28':
-            entry = QEntry( ID = 0, COOR_1 = zero, SV = speed, Z  = zone)
-            if ('X0'   not in txt):   entry.COOR_1.X   += pos.X
-            if ('Y0'   not in txt):   entry.COOR_1.Y   += pos.Y
-            if ('Z0'   not in txt):   entry.COOR_1.Z   += pos.Z
-            if ('EXT0' not in txt):   entry.COOR_1.EXT += pos.EXT
+            entry = QEntry( ID = 0, COOR_1 = pos, SV = speed, Z  = zone)
+            if ('X0'   in txt):   entry.COOR_1.X   = zero.X
+            if ('Y0'   in txt):   entry.COOR_1.Y   = zero.Y
+            if ('Z0'   in txt):   entry.COOR_1.Z   = zero.Z
+            if ('EXT0' in txt):   entry.COOR_1.EXT = zero.EXT
         
         case 'G92':
-            # return None, KeyError('G92 commands are not supported')
             if ('X0'   in txt):   DC_curr_zero.X   = pos.X
             if ('Y0'   in txt):   DC_curr_zero.Y   = pos.Y
             if ('Z0'   in txt):   DC_curr_zero.Z   = pos.Z
@@ -1396,7 +1395,7 @@ PUMP1_tcpip         = TCPIP( DEF_TCP_PUMP1["IP"]
                             ,DEF_TCP_PUMP1["R_BL"]
                             ,DEF_TCP_PUMP1["W_BL"])
 PUMP1_speed         = 0
-PUMP1_liveAd        = 1
+PUMP1_liveAd        = 1.0
 
 PUMP2_tcpip         = TCPIP( DEF_TCP_PUMP2["IP"]
                             ,DEF_TCP_PUMP2["PORT"]
@@ -1425,4 +1424,4 @@ SC_qProcessing      = False
 STT_datablock       = DataBlock()
 
 TERM_log            = []
-TERM_maxLen         = 2000
+TERM_maxLen         = 400

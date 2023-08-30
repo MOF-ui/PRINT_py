@@ -71,8 +71,8 @@ class PumpCommWorker(QObject):
             standard operations"""
 
         # use modified mtec setter (changed to function), recognizes value change by itself, returns ans and command str
-        newSpeed    = UTIL.PUMP1_speed * UTIL.PUMP1_liveAd
-        res         = self.mtecInterface.setSpeed(newSpeed)
+        newSpeed    = UTIL.PUMP1_speed
+        res         = self.mtecInterface.setSpeed( int(newSpeed * UTIL.PUMP1_liveAd) )
         if (res is not None): 
             command,ans = res[0],res[1]
             self.dataSend.emit(newSpeed,command,ans)
