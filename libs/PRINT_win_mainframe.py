@@ -158,14 +158,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.NC_btt_orientZero.pressed.connect              ( lambda: self.setZero([4,5,6]) )
 
         self.PUMP_btt_setSpeed.pressed.connect              (self.setSpeed)
+        self.SCTRL_num_liveAd_pump1.valueChanged.connect    (self.setSpeed)
         self.PUMP_btt_plus1.pressed.connect                 ( lambda: self.setSpeed('1') )
         self.PUMP_btt_minus1.pressed.connect                ( lambda: self.setSpeed('-1') )
         self.PUMP_btt_stop.pressed.connect                  ( lambda: self.setSpeed('0') )
         self.PUMP_btt_reverse.pressed.connect               ( lambda: self.setSpeed('r') )
 
-        self.SCTRL_btt_forcedStop.pressed.connect           ( lambda: self.forcedStopCommand() )
-        self.SCTRL_btt_startQProcessing.pressed.connect     ( self.startSCTRLQueue )
-        self.SCTRL_btt_holdQProcessing.pressed.connect      ( self.stopSCTRLQueue )
+        self.SCTRL_btt_startQProcessing.pressed.connect     (self.startSCTRLQueue )
+        self.SCTRL_btt_holdQProcessing.pressed.connect      (self.stopSCTRLQueue )
         self.SCTRL_btt_addSIB1_atFront.pressed.connect      ( lambda: self.addSIB(1) )
         self.SCTRL_btt_addSIB1_atEnd.pressed.connect        ( lambda: self.addSIB(1, atEnd = True) )
         self.SCTRL_btt_addSIB2_atFront.pressed.connect      ( lambda: self.addSIB(2) )
@@ -174,13 +174,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_btt_addSIB3_atEnd.pressed.connect        ( lambda: self.addSIB(3, atEnd = True) )
         self.SCTRL_btt_clrQ.pressed.connect                 ( lambda: self.clrQueue(partial = False) )
         self.SCTRL_btt_clrByID.pressed.connect              ( lambda: self.clrQueue(partial = True) )
+        self.SCTRL_btt_forcedStop.pressed.connect           ( lambda: self.forcedStopCommand() )
         
         self.SET_btt_apply.pressed.connect                  (self.applySettings)
         self.SET_btt_default.pressed.connect                (self.loadDefaults)
 
-        self.SGLC_btt_sendFirstQComm.pressed.connect        ( lambda: self.sendCommand(UTIL.SC_queue.popFirstItem()) )
         self.SGLC_btt_gcodeSglComm.pressed.connect          (self.addGcodeSgl)
         self.SGLC_btt_rapidSglComm.pressed.connect          (self.addRapidSgl)
+        self.SGLC_btt_sendFirstQComm.pressed.connect        ( lambda: self.sendCommand(UTIL.SC_queue.popFirstItem()) )
         self.SGLC_btt_gcodeSglComm_addByID.pressed.connect  ( lambda: self.addGcodeSgl( atID = True
                                                                                        ,ID = self.SGLC_num_gcodeSglComm_addByID.value()) )
         self.SGLC_btt_rapidSglComm_addByID.pressed.connect  ( lambda: self.addRapidSgl( atID = True
@@ -358,28 +359,27 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def posUpdate(self, rawDataString, pos, toolSpeed, robo_comm_id):
+    def posUpdate(self, rawDataString, telem):
         """ write robots telemetry to global variables """
 
-        mutex.lock()
-        UTIL.ROB_pos        = pos
-        UTIL.ROB_toolSpeed  = toolSpeed
-        UTIL.ROB_comm_id    = robo_comm_id
-            
-        # prep database entry
-        UTIL.STT_datablock.POS          = pos           - UTIL.DC_curr_zero
-        UTIL.STT_datablock.toolSpeed    = toolSpeed
-        UTIL.STT_datablock.id           = robo_comm_id
-        mutex.unlock()
+        if( telem != UTIL.ROB_last_telem ):
+            mutex.lock()
+            UTIL.ROB_telem      = telem
+            UTIL.ROB_last_telem = telem
+                
+            # prep database entry
+            UTIL.STT_datablock.ROB      =  telem
+            UTIL.STT_datablock.ROB.POS  -= UTIL.DC_curr_zero
+            mutex.unlock()
 
-        # set the fist given position to zero as this is usually the standard position for Rob2
-        if (self.firstPos):
-            self.setZero([1,2,3,4,5,6,8])
-            self.firstPos = False
+            # set the fist given position to zero as this is usually the standard position for Rob2
+            if (self.firstPos):
+                self.setZero([1,2,3,4,5,6,8])
+                self.firstPos = False
 
-        self.logEntry('RTel',f"ID {robo_comm_id},   {pos}   ToolSpeed: {toolSpeed}")
-        self.labelUpdate_onReceive(rawDataString)
-        self.DAQ.dataUpdate()
+            self.logEntry('RTel',f"ID {telem.ID},   {telem.POS}   ToolSpeed: {telem.TOOL_SPEED}")
+            self.labelUpdate_onReceive(rawDataString)
+            self.DAQ.dataUpdate()
     
 
 
@@ -406,16 +406,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def pump1Update(self, telem):
         """ display pump telemetry """
 
-        mutex.lock()
-        UTIL.STT_datablock.PUMP1 = telem
-        mutex.unlock()
+        if( telem != UTIL.PUMP1_last_telem ):
+            mutex.lock()
+            UTIL.PUMP1_last_telem    = telem
+            UTIL.STT_datablock.PUMP1 = telem
+            mutex.unlock()
 
-        self.PUMP_disp_freq.setText ( str( UTIL.STT_datablock.PUMP1.FREQ ) )
-        self.PUMP_disp_volt.setText ( str( UTIL.STT_datablock.PUMP1.VOLT ) )
-        self.PUMP_disp_amps.setText ( str( UTIL.STT_datablock.PUMP1.AMPS ) )
-        self.PUMP_disp_torq.setText ( str( UTIL.STT_datablock.PUMP1.TORQ ) )
+            self.PUMP_disp_freq.setText ( str( UTIL.STT_datablock.PUMP1.FREQ ) )
+            self.PUMP_disp_volt.setText ( str( UTIL.STT_datablock.PUMP1.VOLT ) )
+            self.PUMP_disp_amps.setText ( str( UTIL.STT_datablock.PUMP1.AMPS ) )
+            self.PUMP_disp_torq.setText ( str( UTIL.STT_datablock.PUMP1.TORQ ) )
 
-        self.logEntry('PTel',f"PUMP1, freq: {telem.FREQ}, volt: {telem.VOLT}, amps: {telem.AMPS}, torq: {telem.TORQ}")
+            self.logEntry('PTel',f"PUMP1, freq: {telem.FREQ}, volt: {telem.VOLT}, amps: {telem.AMPS}, torq: {telem.TORQ}")
 
 
 
@@ -576,9 +578,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def labelUpdate_onReceive(self,dataString):
         """ update all QLabels in the UI that may change with newly received data from robot """
 
-        pos         = UTIL.ROB_pos
+        pos         = UTIL.ROB_telem.POS
         zero        = UTIL.DC_curr_zero
-        robID       = UTIL.ROB_comm_id
+        robID       = UTIL.ROB_telem.ID
         comID       = UTIL.SC_curr_comm_id
         try:                    progID = UTIL.SC_queue[0].ID
         except AttributeError:  progID = comID
@@ -602,7 +604,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.NC_disp_zOrient.setText            ( str(pos.Z_ori) )
         self.NC_disp_ext.setText                ( str(pos.EXT) )
 
-        self.TERM_disp_tcpSpeed.setText         ( str(UTIL.ROB_toolSpeed) )
+        self.TERM_disp_tcpSpeed.setText         ( str(UTIL.ROB_telem.TOOL_SPEED) )
         self.TERM_disp_robCommID.setText        ( str(robID) )
         self.TERM_disp_progCommID.setText       ( str(comID) )
 
@@ -621,7 +623,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_disp_elemInQ.setText         ( str(len(UTIL.SC_queue)) )
 
         try:
-            self.SCTRL_disp_buffComms.setText(str( UTIL.SC_queue[0].ID - UTIL.ROB_comm_id - 1 ))
+            self.SCTRL_disp_buffComms.setText(str( UTIL.SC_queue[0].ID - UTIL.ROB_telem.ID - 1 ))
         except AttributeError:  pass
 
 
@@ -939,7 +941,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         if ( (len(UTIL.SC_queue) == 0)  or  not atEnd ):    
             try:                        lineID = UTIL.SC_queue[0].ID
-            except AttributeError:      lineID = UTIL.ROB_comm_id + 1
+            except AttributeError:      lineID = UTIL.ROB_telem.ID + 1
         else:                           lineID = UTIL.SC_queue.lastEntry().ID + 1
         lineID_start    = lineID
         rows            = txt.split('\n')
@@ -1038,7 +1040,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if(dir != '+' and dir != '-'):      raise ValueError
         if(dir == '-'):                     stepWidth = -stepWidth
 
-        newPos = copy.deepcopy(UTIL.ROB_pos)
+        newPos = copy.deepcopy(UTIL.ROB_telem.POS)
 
         match axis:
             case 'X':       newPos.X   += stepWidth
@@ -1068,7 +1070,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def sendNCCommand(self, axis= None):
         """ sets up a command according to NC absolute positioning, gives it to the actual sendCommand function """
 
-        newPos = copy.deepcopy(UTIL.ROB_pos)
+        newPos = copy.deepcopy(UTIL.ROB_telem.POS)
 
         # 7 is a placeholder for Q, which can not be set by hand
         if 1 in axis:   newPos.X     = float(self.NC_float_x.value())
@@ -1102,7 +1104,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             
         # get text 
         speed   = copy.deepcopy(UTIL.DC_speed)
-        pos     = copy.deepcopy(UTIL.ROB_pos)
+        pos     = copy.deepcopy(UTIL.ROB_telem.POS)
         txt     = self.TERM_entry_gcodeInterp.text()
         
         # act according to GCode command
@@ -1257,7 +1259,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ overwrite DC_curr_zero, uses deepcopy to avoid mutual large mutual exclusion blocks """
 
         newZero = copy.deepcopy(UTIL.DC_curr_zero)
-        currPos = copy.deepcopy(UTIL.ROB_pos)
+        currPos = copy.deepcopy(UTIL.ROB_telem.POS)
 
         if axis:
             # 7 is a placeholder for Q, which can not be set by hand

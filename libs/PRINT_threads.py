@@ -108,7 +108,7 @@ class RoboCommWorker(QObject):
 
     queueEmtpy      = pyqtSignal()
     sendElem        = pyqtSignal(UTIL.QEntry)
-    dataUpdated     = pyqtSignal(str, UTIL.Coor, float, int)
+    dataUpdated     = pyqtSignal(str, UTIL.RoboTelemetry)
     logError        = pyqtSignal(str,str)
 
 
@@ -159,10 +159,8 @@ class RoboCommWorker(QObject):
             except AttributeError: pass
             mutex.unlock()
 
-            self.dataUpdated.emit( str(rawData)
-                                  ,pos
-                                  ,toolSpeed
-                                  ,robo_comm_id)
+            telem = UTIL.RoboTelemetry(toolSpeed, robo_comm_id, pos)
+            self.dataUpdated.emit( str(rawData), telem )
             
         elif (ans is not None):
             mutex.lock()
@@ -179,7 +177,7 @@ class RoboCommWorker(QObject):
         if(UTIL.SC_qProcessing):
             if( len(UTIL.SC_queue) == 0 ):  self.queueEmtpy.emit()
 
-            elif( (UTIL.ROB_comm_id + UTIL.ROB_comm_fr) 
+            elif( (UTIL.ROB_telem.ID + UTIL.ROB_comm_fr) 
                 > UTIL.SC_queue[0].ID ):
                 
                 mutex.lock()

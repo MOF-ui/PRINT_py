@@ -83,15 +83,15 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         self.MOT_disp_2kPumpFreq.setText        ( f"{UTIL.STT_datablock.kPumpFreq} Hz" )
         self.MOT_disp_2kPumpAmps.setText        ( f"{UTIL.STT_datablock.kPumpAmps} A" )
 
-        self.ROB_disp_id.setText                ( f"{UTIL.STT_datablock.id}" )
-        self.ROB_disp_tcpSpeed.setText          ( f"{UTIL.STT_datablock.toolSpeed} mm/s" )
-        self.ROB_disp_xPos.setText              ( f"{UTIL.STT_datablock.POS.X} mm" )
-        self.ROB_disp_yPos.setText              ( f"{UTIL.STT_datablock.POS.Y} mm" )
-        self.ROB_disp_zPos.setText              ( f"{UTIL.STT_datablock.POS.Z} mm" )
-        self.ROB_disp_xOri.setText              ( f"{UTIL.STT_datablock.POS.X_ori} mm" )
-        self.ROB_disp_yOri.setText              ( f"{UTIL.STT_datablock.POS.Y_ori} mm" )
-        self.ROB_disp_zOri.setText              ( f"{UTIL.STT_datablock.POS.Z_ori} mm" )
-        self.ROB_disp_extPos.setText            ( f"{UTIL.STT_datablock.POS.EXT}  mm" )
+        self.ROB_disp_id.setText                ( f"{UTIL.STT_datablock.ROB.ID}" )
+        self.ROB_disp_tcpSpeed.setText          ( f"{UTIL.STT_datablock.ROB.TOOL_SPEED} mm/s" )
+        self.ROB_disp_xPos.setText              ( f"{UTIL.STT_datablock.ROB.POS.X} mm" )
+        self.ROB_disp_yPos.setText              ( f"{UTIL.STT_datablock.ROB.POS.Y} mm" )
+        self.ROB_disp_zPos.setText              ( f"{UTIL.STT_datablock.ROB.POS.Z} mm" )
+        self.ROB_disp_xOri.setText              ( f"{UTIL.STT_datablock.ROB.POS.X_ori} mm" )
+        self.ROB_disp_yOri.setText              ( f"{UTIL.STT_datablock.ROB.POS.Y_ori} mm" )
+        self.ROB_disp_zOri.setText              ( f"{UTIL.STT_datablock.ROB.POS.Z_ori} mm" )
+        self.ROB_disp_extPos.setText            ( f"{UTIL.STT_datablock.ROB.POS.EXT}  mm" )
     
     # def toInflux (self):
     #     json_point = None

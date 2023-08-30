@@ -370,7 +370,7 @@ QTabBar::tab:!selected:hover {
 }</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="PRINT_tab">
      <property name="styleSheet">
@@ -510,10 +510,10 @@ border-bottom-right-radius: 0px;</string>
       <widget class="QLabel" name="IO_lbl_commNum">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>210</y>
-         <width>121</width>
-         <height>41</height>
+         <width>141</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -535,8 +535,8 @@ commands found:</string>
         <rect>
          <x>20</x>
          <y>280</y>
-         <width>131</width>
-         <height>41</height>
+         <width>141</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -558,8 +558,8 @@ length [m]:</string>
         <rect>
          <x>20</x>
          <y>350</y>
-         <width>131</width>
-         <height>41</height>
+         <width>141</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -624,10 +624,10 @@ volume [L]:</string>
       <widget class="QLabel" name="IO_lbl_addByID">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>730</y>
-         <width>81</width>
-         <height>41</height>
+         <x>30</x>
+         <y>720</y>
+         <width>91</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -850,9 +850,9 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>470</y>
+         <y>460</y>
          <width>131</width>
-         <height>21</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -941,9 +941,9 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>820</y>
+         <y>810</y>
          <width>131</width>
-         <height>21</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -1250,9 +1250,9 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>770</y>
+         <y>760</y>
          <width>131</width>
-         <height>21</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -1448,13 +1448,13 @@ PROCESSING</string>
         <rect>
          <x>830</x>
          <y>20</y>
-         <width>131</width>
+         <width>151</width>
          <height>41</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true">border: 0px;
-font-size: 12pt;
+font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;
 padding-left: 0px;</string>
@@ -1471,13 +1471,13 @@ padding-left: 0px;</string>
         <rect>
          <x>980</x>
          <y>20</y>
-         <width>131</width>
+         <width>141</width>
          <height>41</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true">border: 0px;
-font-size: 12pt;
+font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;
 padding-left: 0px;</string>
@@ -1503,9 +1503,9 @@ padding-left: 0px;</string>
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>430</y>
-         <width>171</width>
-         <height>21</height>
+         <y>420</y>
+         <width>181</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -1525,9 +1525,9 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>500</y>
-         <width>171</width>
-         <height>21</height>
+         <y>490</y>
+         <width>181</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -2661,7 +2661,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>370</x>
          <y>290</y>
-         <width>121</width>
+         <width>131</width>
          <height>41</height>
         </rect>
        </property>
@@ -2705,7 +2705,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>50</x>
          <y>290</y>
-         <width>121</width>
+         <width>131</width>
          <height>41</height>
         </rect>
        </property>
@@ -2743,7 +2743,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>210</x>
          <y>290</y>
-         <width>121</width>
+         <width>131</width>
          <height>41</height>
         </rect>
        </property>
@@ -3041,7 +3041,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="TERM_lbl_progCommID">
        <property name="geometry">
         <rect>
-         <x>670</x>
+         <x>665</x>
          <y>10</y>
          <width>151</width>
          <height>41</height>
@@ -3049,7 +3049,7 @@ color: #E1E5EE;</string>
        </property>
        <property name="styleSheet">
         <string notr="true">border: 0px;
-font-size: 12pt;
+font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
@@ -3087,7 +3087,7 @@ color: #E1E5EE;</string>
        </property>
        <property name="styleSheet">
         <string notr="true">border: 0px;
-font-size: 12pt;
+font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
@@ -3109,7 +3109,7 @@ color: #E1E5EE;</string>
        </property>
        <property name="styleSheet">
         <string notr="true">border: 0px;
-font-size: 12pt;
+font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
@@ -3408,7 +3408,7 @@ QTabBar::tab:selected {
 }</string>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="TCP_ROB_tab">
         <attribute name="title">
@@ -3418,9 +3418,9 @@ QTabBar::tab:selected {
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>240</y>
+           <y>230</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -3456,9 +3456,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>140</y>
-           <width>131</width>
-           <height>21</height>
+           <y>130</y>
+           <width>141</width>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -3478,9 +3478,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -3500,9 +3500,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>240</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -3522,9 +3522,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -3543,10 +3543,10 @@ color: #E1E5EE;</string>
         <widget class="QLabel" name="TCP_ROB_lbl_writeBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
-           <y>120</y>
+           <x>40</x>
+           <y>110</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -3565,10 +3565,10 @@ color: #E1E5EE;</string>
         <widget class="QLabel" name="TCP_ROB_lbl_readBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
-           <y>220</y>
+           <x>40</x>
+           <y>210</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -3587,9 +3587,9 @@ color: #E1E5EE;</string>
         <widget class="QLabel" name="TCP_ROB_disp_writeBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
+           <x>40</x>
            <y>140</y>
-           <width>571</width>
+           <width>561</width>
            <height>61</height>
           </rect>
          </property>
@@ -3615,9 +3615,9 @@ color: #E1E5EE;</string>
         <widget class="QLabel" name="TCP_ROB_disp_readBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
+           <x>40</x>
            <y>240</y>
-           <width>571</width>
+           <width>561</width>
            <height>61</height>
           </rect>
          </property>
@@ -3638,9 +3638,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>430</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -3830,9 +3830,9 @@ ESTABLISHED</string>
         <widget class="QLabel" name="TCP_PUMP1_disp_readBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
+           <x>40</x>
            <y>240</y>
-           <width>571</width>
+           <width>561</width>
            <height>61</height>
           </rect>
          </property>
@@ -3853,9 +3853,9 @@ ESTABLISHED</string>
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>240</y>
+           <y>230</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -3903,10 +3903,10 @@ color: #E1E5EE;</string>
         <widget class="QLabel" name="TCP_PUMP1_lbl_writeBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
-           <y>120</y>
+           <x>40</x>
+           <y>110</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -3958,9 +3958,9 @@ background-color: #4c4a48;</string>
         <widget class="QLabel" name="TCP_PUMP1_disp_writeBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
+           <x>40</x>
            <y>140</y>
-           <width>571</width>
+           <width>561</width>
            <height>61</height>
           </rect>
          </property>
@@ -3987,9 +3987,9 @@ background-color: #4c4a48;</string>
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4009,9 +4009,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>430</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4044,9 +4044,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>240</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4065,10 +4065,10 @@ color: #E1E5EE;</string>
         <widget class="QLabel" name="TCP_PUMP1_lbl_readBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
-           <y>220</y>
+           <x>40</x>
+           <y>210</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4104,9 +4104,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>140</y>
-           <width>131</width>
-           <height>21</height>
+           <y>130</y>
+           <width>141</width>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4165,9 +4165,9 @@ ESTABLISHED</string>
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4244,9 +4244,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4305,9 +4305,9 @@ ESTABLISHED</string>
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4327,9 +4327,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>430</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4394,9 +4394,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>140</y>
+           <y>130</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4416,9 +4416,9 @@ color: #E1E5EE;</string>
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>240</y>
+           <y>230</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4453,10 +4453,10 @@ color: #E1E5EE;</string>
         <widget class="QLabel" name="TCP_PUMP2_lbl_readBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
-           <y>220</y>
+           <x>40</x>
+           <y>210</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4509,9 +4509,9 @@ background-color: #4c4a48;</string>
          <property name="geometry">
           <rect>
            <x>240</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4546,10 +4546,10 @@ color: #E1E5EE;</string>
         <widget class="QLabel" name="TCP_PUMP2_lbl_writeBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
-           <y>120</y>
+           <x>40</x>
+           <y>110</y>
            <width>131</width>
-           <height>21</height>
+           <height>31</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -4568,9 +4568,9 @@ color: #E1E5EE;</string>
         <widget class="QLabel" name="TCP_PUMP2_disp_writeBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
+           <x>40</x>
            <y>140</y>
-           <width>571</width>
+           <width>561</width>
            <height>61</height>
           </rect>
          </property>
@@ -4609,9 +4609,9 @@ color: #E1E5EE;</string>
         <widget class="QLabel" name="TCP_PUMP2_disp_readBuffer">
          <property name="geometry">
           <rect>
-           <x>30</x>
+           <x>40</x>
            <y>240</y>
-           <width>571</width>
+           <width>561</width>
            <height>61</height>
           </rect>
          </property>
@@ -4792,8 +4792,8 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>54</y>
-         <width>231</width>
+         <y>50</y>
+         <width>261</width>
          <height>31</height>
         </rect>
        </property>
@@ -4841,8 +4841,8 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>190</y>
-         <width>241</width>
+         <y>185</y>
+         <width>281</width>
          <height>31</height>
         </rect>
        </property>
@@ -4913,8 +4913,8 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>333</y>
-         <width>241</width>
+         <y>330</y>
+         <width>261</width>
          <height>31</height>
         </rect>
        </property>
@@ -4992,23 +4992,24 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SET_lbl_logEntry">
        <property name="geometry">
         <rect>
-         <x>470</x>
-         <y>10</y>
+         <x>330</x>
+         <y>30</y>
          <width>131</width>
-         <height>21</height>
+         <height>61</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true">border: 0px;
-font-size: 12pt;
+font-size: 14pt;
 background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>log entry</string>
+        <string>last
+log entry</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
       <widget class="QSpinBox" name="SET_num_accelRamp_dc">
@@ -5030,7 +5031,10 @@ color: #E1E5EE;</string>
         <number>0</number>
        </property>
        <property name="maximum">
-        <number>99999</number>
+        <number>2000</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
        </property>
        <property name="value">
         <number>0</number>
@@ -5042,10 +5046,10 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SET_lbl_accelRamp_dc">
        <property name="geometry">
         <rect>
-         <x>330</x>
-         <y>210</y>
+         <x>340</x>
+         <y>205</y>
          <width>131</width>
-         <height>41</height>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5068,10 +5072,10 @@ ramp [mm/s²]</string>
       <widget class="QLabel" name="SET_lbl_volPerE">
        <property name="geometry">
         <rect>
-         <x>70</x>
-         <y>110</y>
-         <width>81</width>
-         <height>41</height>
+         <x>30</x>
+         <y>104</y>
+         <width>131</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5081,8 +5085,7 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>volume
-per E [L]:</string>
+        <string>volume per E [L]</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -5092,9 +5095,9 @@ per E [L]:</string>
        <property name="geometry">
         <rect>
          <x>610</x>
-         <y>210</y>
-         <width>151</width>
-         <height>41</height>
+         <y>205</y>
+         <width>161</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5117,10 +5120,10 @@ ramp [mm/²]</string>
       <widget class="QLabel" name="SET_lbl_transSpeed_print">
        <property name="geometry">
         <rect>
-         <x>620</x>
-         <y>110</y>
+         <x>630</x>
+         <y>105</y>
          <width>141</width>
-         <height>41</height>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5143,10 +5146,10 @@ speed [mm/s]</string>
       <widget class="QLabel" name="SET_lbl_frToMms">
        <property name="geometry">
         <rect>
-         <x>70</x>
-         <y>160</y>
-         <width>81</width>
-         <height>41</height>
+         <x>20</x>
+         <y>170</y>
+         <width>141</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5156,8 +5159,7 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>feedrate
-to mm/s:</string>
+        <string>feedrate to mm/s</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -5182,7 +5184,10 @@ to mm/s:</string>
         <number>0</number>
        </property>
        <property name="maximum">
-        <number>99999</number>
+        <number>3000</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
        </property>
        <property name="value">
         <number>0</number>
@@ -5194,7 +5199,7 @@ to mm/s:</string>
       <widget class="QLabel" name="SET_lbl_zone">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>80</x>
          <y>260</y>
          <width>81</width>
          <height>41</height>
@@ -5207,7 +5212,7 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>Zone:</string>
+        <string> IO zone</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -5238,7 +5243,10 @@ color: #E1E5EE;</string>
         <number>0</number>
        </property>
        <property name="maximum">
-        <number>99999</number>
+        <number>100000</number>
+       </property>
+       <property name="singleStep">
+        <number>100</number>
        </property>
        <property name="value">
         <number>0</number>
@@ -5266,7 +5274,10 @@ color: #E1E5EE;</string>
         <number>0</number>
        </property>
        <property name="maximum">
-        <number>99999</number>
+        <number>2000</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
        </property>
        <property name="value">
         <number>0</number>
@@ -5294,7 +5305,10 @@ color: #E1E5EE;</string>
         <number>0</number>
        </property>
        <property name="maximum">
-        <number>99999</number>
+        <number>3000</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
        </property>
        <property name="value">
         <number>0</number>
@@ -5306,10 +5320,10 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SET_lbl_orientSpeed_dc">
        <property name="geometry">
         <rect>
-         <x>330</x>
-         <y>160</y>
+         <x>340</x>
+         <y>155</y>
          <width>131</width>
-         <height>41</height>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5332,10 +5346,10 @@ speed [grad/s]</string>
       <widget class="QLabel" name="SET_lbl_ioSplit">
        <property name="geometry">
         <rect>
-         <x>70</x>
-         <y>210</y>
-         <width>81</width>
-         <height>41</height>
+         <x>30</x>
+         <y>206</y>
+         <width>131</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5346,7 +5360,7 @@ color: #E1E5EE;</string>
        </property>
        <property name="text">
         <string>IO split
-file advise:</string>
+file advise</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -5409,9 +5423,9 @@ file advise:</string>
        <property name="geometry">
         <rect>
          <x>610</x>
-         <y>260</y>
-         <width>151</width>
-         <height>41</height>
+         <y>255</y>
+         <width>161</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5435,9 +5449,9 @@ ramp [mm/²]</string>
        <property name="geometry">
         <rect>
          <x>620</x>
-         <y>160</y>
-         <width>141</width>
-         <height>41</height>
+         <y>155</y>
+         <width>151</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5476,7 +5490,10 @@ speed [grad/s]</string>
         <number>0</number>
        </property>
        <property name="maximum">
-        <number>99999</number>
+        <number>3000</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
        </property>
        <property name="value">
         <number>0</number>
@@ -5488,10 +5505,10 @@ speed [grad/s]</string>
       <widget class="QLabel" name="SET_lbl_transSpeed_dc">
        <property name="geometry">
         <rect>
-         <x>330</x>
-         <y>110</y>
+         <x>340</x>
+         <y>105</y>
          <width>131</width>
-         <height>41</height>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5530,7 +5547,10 @@ speed [mm/s]</string>
         <number>0</number>
        </property>
        <property name="maximum">
-        <number>99999</number>
+        <number>3000</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
        </property>
        <property name="value">
         <number>0</number>
@@ -5558,7 +5578,10 @@ speed [mm/s]</string>
         <number>0</number>
        </property>
        <property name="maximum">
-        <number>99999</number>
+        <number>2000</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
        </property>
        <property name="value">
         <number>0</number>
@@ -5570,10 +5593,10 @@ speed [mm/s]</string>
       <widget class="QLabel" name="SET_lbl_decelRamp_dc">
        <property name="geometry">
         <rect>
-         <x>330</x>
-         <y>260</y>
+         <x>340</x>
+         <y>255</y>
          <width>131</width>
-         <height>41</height>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5612,7 +5635,10 @@ ramp [mm/²]</string>
         <number>0</number>
        </property>
        <property name="maximum">
-        <number>99999</number>
+        <number>2000</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
        </property>
        <property name="value">
         <number>0</number>
@@ -5662,8 +5688,14 @@ ramp [mm/²]</string>
        <property name="suffix">
         <string/>
        </property>
+       <property name="decimals">
+        <number>4</number>
+       </property>
        <property name="maximum">
-        <double>9999.000000000000000</double>
+        <double>20.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
        </property>
       </widget>
       <widget class="QDoubleSpinBox" name="SET_float_volPerE">
@@ -5681,8 +5713,14 @@ ramp [mm/²]</string>
        <property name="suffix">
         <string/>
        </property>
+       <property name="decimals">
+        <number>4</number>
+       </property>
        <property name="maximum">
-        <double>9999.000000000000000</double>
+        <double>20.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
        </property>
       </widget>
      </widget>
@@ -5733,7 +5771,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="PUMP_disp_freq">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>110</x>
          <y>180</y>
          <width>111</width>
          <height>41</height>
@@ -5749,10 +5787,10 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="PUMP_lbl_freq">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>180</y>
-         <width>81</width>
-         <height>41</height>
+         <x>20</x>
+         <y>174</y>
+         <width>91</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5773,9 +5811,9 @@ frequency:</string>
        <property name="geometry">
         <rect>
          <x>240</x>
-         <y>180</y>
-         <width>61</width>
-         <height>41</height>
+         <y>174</y>
+         <width>71</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5827,7 +5865,7 @@ voltage:</string>
       <widget class="QLabel" name="PUMP_disp_torq">
        <property name="geometry">
         <rect>
-         <x>730</x>
+         <x>720</x>
          <y>180</y>
          <width>111</width>
          <height>41</height>
@@ -5843,10 +5881,10 @@ voltage:</string>
       <widget class="QLabel" name="PUMP_lbl_amps">
        <property name="geometry">
         <rect>
-         <x>440</x>
-         <y>180</y>
+         <x>450</x>
+         <y>174</y>
          <width>71</width>
-         <height>41</height>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -5867,9 +5905,9 @@ current:</string>
        <property name="geometry">
         <rect>
          <x>650</x>
-         <y>180</y>
+         <y>174</y>
          <width>71</width>
-         <height>41</height>
+         <height>51</height>
         </rect>
        </property>
        <property name="styleSheet">

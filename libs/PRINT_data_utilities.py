@@ -773,7 +773,7 @@ class PumpTelemetry:
 
 
 
-class DataBlock:
+class DaqBlock:
     """ structure for DAQ 
     
     FUNCTIONS:
@@ -796,9 +796,7 @@ class DataBlock:
                  admPumpAmps =      0.0,
                  kPumpFreq =        0.0,
                  kPumpAmps =        0.0,
-                 id =               0,
-                 toolSpeed =        0.0,
-                 POS =              None,
+                 ROB =              None,
                  porosAnalysis =    0.0,
                  distanceFront =    0.0,
                  distanceEnd =      0.0):
@@ -814,8 +812,6 @@ class DataBlock:
         self.admPumpAmps =      float(admPumpAmps)
         self.kPumpFreq =        float(kPumpFreq)
         self.kPumpAmps =        float(kPumpAmps)
-        self.id =               int(id)
-        self.toolSpeed =        float(toolSpeed)
         self.porosAnalysis =    float(porosAnalysis)
         self.distanceFront =    float(distanceFront)
         self.distanceEnd =      float(distanceEnd)
@@ -823,7 +819,7 @@ class DataBlock:
         # handle those beasty mutables
         self.PUMP1  = PumpTelemetry()   if (PUMP1 == None) else PUMP1
         self.PUMP2  = PumpTelemetry()   if (PUMP2 == None) else PUMP2
-        self.POS    = Coor()            if (POS == None) else POS
+        self.ROB    = RoboTelemetry()   if (ROB == None)   else ROB
 
 
 
@@ -832,7 +828,7 @@ class DataBlock:
         return f"ambTemp: {self.ambTemp}    ambHum: {self.ambHum}    delivPumpTemp: {self.delivPumpTemp}    robBaseTemp: {self.robBaseTemp}    "\
                f"kPumpTemp: {self.kPumpTemp}    delivPumpPress: {self.delivPumpPress}    kPumpPress: {self.kPumpPress}    PUMP1: {self.PUMP1}    "\
                f"PUMP2: {self.PUMP2}    admPumpFreq: {self.admPumpFreq}    admPumpAmps: {self.admPumpAmps}    kPumpFreq: {self.kPumpFreq}    "\
-               f"kPumpAmps: {self.kPumpAmps}    id: {self.id}    toolspeed: {self.toolSpeed}    POS: {self.POS}    porosAnalysis: {self.porosAnalysis}    "\
+               f"kPumpAmps: {self.kPumpAmps}    ROB: {self.ROB}    porosAnalysis: {self.porosAnalysis}    "\
                f"distanceFront: {self.distanceFront}    distanceEnd: {self.distanceEnd}"    
     
 
@@ -853,9 +849,7 @@ class DataBlock:
                 and self.admPumpAmps    == other.admPumpAmps
                 and self.kPumpFreq      == other.kPumpFreq
                 and self.kPumpAmps      == other.kPumpAmps
-                and self.id             == other.id
-                and self.toolSpeed      == other.toolSpeed
-                and self.POS            == other.POS
+                and self.ROB            == other.ROB
                 and self.porosAnalysis  == other.porosAnalysis
                 and self.distanceFront  == other.distanceFront
                 and self.distanceEnd    == other.distanceEnd):
@@ -1394,6 +1388,7 @@ PUMP1_tcpip         = TCPIP( DEF_TCP_PUMP1["IP"]
                             ,DEF_TCP_PUMP1["RWTOUT"]
                             ,DEF_TCP_PUMP1["R_BL"]
                             ,DEF_TCP_PUMP1["W_BL"])
+PUMP1_last_telem    = PumpTelemetry()
 PUMP1_speed         = 0
 PUMP1_liveAd        = 1.0
 
@@ -1412,16 +1407,15 @@ ROB_tcpip          = TCPIP( DEF_TCP_ROB["IP"]
                             ,DEF_TCP_ROB["W_BL"])
 ROB_comm_fr         = DEF_ROB_COMM_FR
 ROB_comm_queue      = Queue()
-ROB_pos             = Coor()
-ROB_toolSpeed       = 0
-ROB_comm_id         = 0
+ROB_telem           = RoboTelemetry()
+ROB_last_telem      = RoboTelemetry()
 
 SC_vol_per_e        = DEF_SC_VOL_PER_E
 SC_curr_comm_id     = 1
 SC_queue            = Queue()
 SC_qProcessing      = False
 
-STT_datablock       = DataBlock()
+STT_datablock       = DaqBlock()
 
 TERM_log            = []
 TERM_maxLen         = 400

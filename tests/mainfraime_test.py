@@ -67,9 +67,7 @@ class Mainfraime_test(unittest.TestCase):
         # check first run
         self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor() )
         testFrame.posUpdate( rawDataString= 'ABC'
-                            ,pos= UTIL.Coor(1,2,3,4,5,6,7,8.8)
-                            ,toolSpeed= 0
-                            ,robo_comm_id=0)
+                            ,telem= UTIL.RoboTelemetry( 0, 0, UTIL.Coor(1,2,3,4,5,6,7,8.8) ))
         # check first loop switch, Q is not set by posUpdate
         self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor(1,2,3,4,5,6,0,8.8) )
 
@@ -77,15 +75,13 @@ class Mainfraime_test(unittest.TestCase):
         UTIL.SC_curr_comm_id = 15
         UTIL.DC_curr_zero    = UTIL.Coor(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1)
         testFrame.posUpdate( rawDataString= 'ABC'
-                            ,pos= UTIL.Coor(1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8)
-                            ,toolSpeed= 9.9
-                            ,robo_comm_id= 10)
+                            ,telem= UTIL.RoboTelemetry( 9.9, 10, UTIL.Coor(1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8) ))
         
-        self.assertEqual( UTIL.ROB_pos, UTIL.Coor(1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8) )
+        self.assertEqual( UTIL.ROB_telem.POS, UTIL.Coor(1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8) )
         self.assertEqual( UTIL.STT_datablock.POS, UTIL.Coor(1.0,2.1,3.2,4.3,5.4,6.5,7.6,8.7) )
-        self.assertEqual( UTIL.ROB_toolSpeed, 9.9 )
+        self.assertEqual( UTIL.ROB_telem.TOOL_SPEED, 9.9 )
         self.assertEqual( UTIL.STT_datablock.toolSpeed, 9.9 )
-        self.assertEqual( UTIL.ROB_comm_id, 10 )
+        self.assertEqual( UTIL.ROB_telem.ID, 10 )
         self.assertEqual( UTIL.STT_datablock.id, 10 )
 
         # labelUpdate_onReceive (called from posUpdate)
@@ -113,10 +109,10 @@ class Mainfraime_test(unittest.TestCase):
         self.assertEqual( testFrame.TERM_disp_progCommID.text(),    '15' )
 
         UTIL.DC_curr_zero = UTIL.Coor()
-        UTIL.ROB_pos = UTIL.Coor()
+        UTIL.ROB_telem.POS = UTIL.Coor()
         UTIL.SC_curr_comm_id = 1
-        UTIL.ROB_toolSpeed = 0
-        UTIL.ROB_comm_id = 0
+        UTIL.ROB_telem.TOOL_SPEED = 0
+        UTIL.ROB_telem.ID = 0
         UTIL.SC_queue.clear()
 
 
@@ -407,7 +403,16 @@ class Mainfraime_test(unittest.TestCase):
 
     def test_addSIB (self):
         global testFrame
+        self.maxDiff = 2000
 
+        testFrame.SIB_entry_sib1.setText(f"G1 X1.0 Y2.0 Z3.0 F4000 EXT500\n"
+                                         f"G1 X6.0 Y7.0 Z8.0 F9000 EXT990")
+        testFrame.SIB_entry_sib2.setText("MoveL [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[8,9,10,11],[12,13,14,15,16,17]],v400,z50,tool0  EXT:600\n\
+                                          MoveJ Offs(pHome,7,8,9),[110,120,130,140],z15,tool0 EXT:160")
+        testFrame.SIB_entry_sib3.setText("MoveL [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[8,9,10,11],[12,13,14,15,16,17]],v400,z50,tool0  EXT:600\n\
+                                          MoveJ Offs(pHome,7,8,9),[110,120,130,140],z15,tool0 EXT:160")
+        test = testFrame.SIB_entry_sib1.toPlainText()
+        test = test.split('\n')
         testFrame.addSIB(number= 1, atEnd= False )
         self.assertEqual( UTIL.SC_queue.display()
                          ,[ str( UTIL.QEntry( ID= 1, COOR_1= UTIL.Coor(X= 1, Y= 2, Z= 3, EXT= 500)
@@ -545,14 +550,14 @@ class Mainfraime_test(unittest.TestCase):
         self.assertEqual( testFrame.sendNCCommand([1,2,3])[1]
                          ,UTIL.QEntry( ID= 1, Z=0, COOR_1= UTIL.Coor(X= 1, Y= 2.2, Z= 3) ) )
         
-        UTIL.ROB_pos = UTIL.Coor( 1,1,1,1,1,1,0,1 )
+        UTIL.ROB_telem.POS = UTIL.Coor( 1,1,1,1,1,1,0,1 )
         testFrame.DC_drpd_moveType.setCurrentText('JOINT')
         self.assertEqual( testFrame.sendNCCommand([4,5,6,8])[1]
                          ,UTIL.QEntry( ID= 2, MT= 'J', Z= 0
                                       ,COOR_1= UTIL.Coor( X= 1, Y= 1, Z= 1, X_ori= 4
                                                          ,Y_ori= 5, Z_ori= 6, EXT= 7) ) )
         
-        UTIL.ROB_pos = UTIL.Coor()
+        UTIL.ROB_telem.POS = UTIL.Coor()
         UTIL.SC_curr_comm_id = 1
     
 
@@ -561,7 +566,7 @@ class Mainfraime_test(unittest.TestCase):
         global testFrame
 
         testFrame.TERM_entry_gcodeInterp.setText('G1 Y2.2')
-        UTIL.ROB_pos = UTIL.Coor( 1,1,1,1,1,1,1,1 )
+        UTIL.ROB_telem.POS = UTIL.Coor( 1,1,1,1,1,1,1,1 )
         UTIL.DC_curr_zero = UTIL.Coor( Y= 1 )
 
         self.assertEqual( testFrame.sendGcodeCommand()[1]
@@ -569,13 +574,13 @@ class Mainfraime_test(unittest.TestCase):
                                                                 ,Y_ori= 1, Z_ori= 1, Q= 1, EXT= 1 ) ) )
         
         testFrame.TERM_entry_gcodeInterp.setText('G1 X1 Z3')
-        UTIL.ROB_pos = UTIL.Coor( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
+        UTIL.ROB_telem.POS = UTIL.Coor( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
         UTIL.DC_curr_zero = UTIL.Coor( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
 
         self.assertEqual( testFrame.sendGcodeCommand()[1]
                          ,UTIL.QEntry( ID= 2, COOR_1= UTIL.Coor( 2.1,2.2,6.3,4.4,5.5,6.6,7.7,8.8 ) ) )
         
-        UTIL.ROB_pos = UTIL.Coor()
+        UTIL.ROB_telem.POS = UTIL.Coor()
         UTIL.SC_curr_comm_id = 1
     
 
@@ -632,7 +637,7 @@ class Mainfraime_test(unittest.TestCase):
         global testFrame
 
         UTIL.DC_curr_zero   = UTIL.Coor( 1,2,3,4,5,6,7,8 )
-        UTIL.ROB_pos        = UTIL.Coor()
+        UTIL.ROB_telem.POS  = UTIL.Coor()
         
         testFrame.setZero([1,2,3])
         self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor( 0,0,0,4,5,6,7,8) )
