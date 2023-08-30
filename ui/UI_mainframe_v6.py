@@ -239,7 +239,8 @@ class Ui_MainWindow(object):
 "QFrame#SGLC_frame,\n"
 "QFrame#SIB_frame, \n"
 "QFrame#TERM_frame,\n"
-"QFrame#TCP_frame {\n"
+"QFrame#TCP_frame,\n"
+"QFrame#ZERO_frame {\n"
 "    border-radius: 8px;\n"
 "    background-color: #5D707F;\n"
 "}\n"
@@ -2357,6 +2358,101 @@ class Ui_MainWindow(object):
 "color: #E1E5EE;")
         self.ICQ_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.ICQ_0_frameLabel.setObjectName("ICQ_0_frameLabel")
+        self.ZERO_frame = QtWidgets.QFrame(self.MONITOR_tab)
+        self.ZERO_frame.setGeometry(QtCore.QRect(900, 30, 441, 631))
+        self.ZERO_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.ZERO_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.ZERO_frame.setObjectName("ZERO_frame")
+        self.ZERO_0_frameLabel = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_0_frameLabel.setGeometry(QtCore.QRect(30, 30, 261, 51))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(22)
+        self.ZERO_0_frameLabel.setFont(font)
+        self.ZERO_0_frameLabel.setStyleSheet("border: 0px;\n"
+"font-size: 22pt;\n"
+"padding: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ZERO_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.ZERO_0_frameLabel.setObjectName("ZERO_0_frameLabel")
+        self.ZERO_disp_z = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_disp_z.setGeometry(QtCore.QRect(210, 260, 161, 41))
+        self.ZERO_disp_z.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_disp_z.setObjectName("ZERO_disp_z")
+        self.ZERO_lbl_y_disp = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_lbl_y_disp.setGeometry(QtCore.QRect(80, 190, 121, 41))
+        self.ZERO_lbl_y_disp.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ZERO_lbl_y_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ZERO_lbl_y_disp.setObjectName("ZERO_lbl_y_disp")
+        self.ZERO_lbl_yOrient_disp = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_lbl_yOrient_disp.setGeometry(QtCore.QRect(60, 400, 141, 41))
+        self.ZERO_lbl_yOrient_disp.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ZERO_lbl_yOrient_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ZERO_lbl_yOrient_disp.setObjectName("ZERO_lbl_yOrient_disp")
+        self.ZERO_disp_zOrient = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_disp_zOrient.setGeometry(QtCore.QRect(210, 540, 161, 41))
+        self.ZERO_disp_zOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_disp_zOrient.setObjectName("ZERO_disp_zOrient")
+        self.ZERO_lbl_zOrient_disp = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_lbl_zOrient_disp.setGeometry(QtCore.QRect(60, 540, 141, 41))
+        self.ZERO_lbl_zOrient_disp.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ZERO_lbl_zOrient_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ZERO_lbl_zOrient_disp.setObjectName("ZERO_lbl_zOrient_disp")
+        self.ZERO_lbl_xOrient_disp = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_lbl_xOrient_disp.setGeometry(QtCore.QRect(60, 470, 141, 41))
+        self.ZERO_lbl_xOrient_disp.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ZERO_lbl_xOrient_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ZERO_lbl_xOrient_disp.setObjectName("ZERO_lbl_xOrient_disp")
+        self.ZERO_lbl_ext_disp = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_lbl_ext_disp.setGeometry(QtCore.QRect(80, 330, 121, 41))
+        self.ZERO_lbl_ext_disp.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ZERO_lbl_ext_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ZERO_lbl_ext_disp.setObjectName("ZERO_lbl_ext_disp")
+        self.ZERO_disp_yOrient = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_disp_yOrient.setGeometry(QtCore.QRect(210, 400, 161, 41))
+        self.ZERO_disp_yOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_disp_yOrient.setObjectName("ZERO_disp_yOrient")
+        self.ZERO_disp_ext = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_disp_ext.setGeometry(QtCore.QRect(210, 330, 161, 41))
+        self.ZERO_disp_ext.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_disp_ext.setObjectName("ZERO_disp_ext")
+        self.ZERO_lbl_x_disp = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_lbl_x_disp.setGeometry(QtCore.QRect(80, 120, 121, 41))
+        self.ZERO_lbl_x_disp.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ZERO_lbl_x_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ZERO_lbl_x_disp.setObjectName("ZERO_lbl_x_disp")
+        self.ZERO_disp_xOrient = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_disp_xOrient.setGeometry(QtCore.QRect(210, 470, 161, 41))
+        self.ZERO_disp_xOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_disp_xOrient.setObjectName("ZERO_disp_xOrient")
+        self.ZERO_lbl_z_disp = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_lbl_z_disp.setGeometry(QtCore.QRect(80, 260, 121, 41))
+        self.ZERO_lbl_z_disp.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ZERO_lbl_z_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ZERO_lbl_z_disp.setObjectName("ZERO_lbl_z_disp")
+        self.ZERO_disp_x = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_disp_x.setGeometry(QtCore.QRect(210, 120, 161, 41))
+        self.ZERO_disp_x.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_disp_x.setObjectName("ZERO_disp_x")
+        self.ZERO_disp_y = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_disp_y.setGeometry(QtCore.QRect(210, 190, 161, 41))
+        self.ZERO_disp_y.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_disp_y.setObjectName("ZERO_disp_y")
         self.tab.addTab(self.MONITOR_tab, "")
         MainWindow.setCentralWidget(self.mainframe)
         self.TERM_lbl_gcodeInterp.setBuddy(self.TERM_entry_gcodeInterp)
@@ -2652,6 +2748,21 @@ class Ui_MainWindow(object):
         self.PUMP_lbl_currSpeed.setText(_translate("MainWindow", "current speed:"))
         self.tab.setTabText(self.tab.indexOf(self.SET_tab), _translate("MainWindow", "     SETTINGS     "))
         self.ICQ_0_frameLabel.setText(_translate("MainWindow", "internal command queue"))
+        self.ZERO_0_frameLabel.setText(_translate("MainWindow", "ZERO POSITION"))
+        self.ZERO_disp_z.setText(_translate("MainWindow", "0.0"))
+        self.ZERO_lbl_y_disp.setText(_translate("MainWindow", "Y position"))
+        self.ZERO_lbl_yOrient_disp.setText(_translate("MainWindow", "Y orientation"))
+        self.ZERO_disp_zOrient.setText(_translate("MainWindow", "0.0"))
+        self.ZERO_lbl_zOrient_disp.setText(_translate("MainWindow", "Z orientation"))
+        self.ZERO_lbl_xOrient_disp.setText(_translate("MainWindow", "X orientation"))
+        self.ZERO_lbl_ext_disp.setText(_translate("MainWindow", "EXT position"))
+        self.ZERO_disp_yOrient.setText(_translate("MainWindow", "0.0"))
+        self.ZERO_disp_ext.setText(_translate("MainWindow", "0.0"))
+        self.ZERO_lbl_x_disp.setText(_translate("MainWindow", "X position"))
+        self.ZERO_disp_xOrient.setText(_translate("MainWindow", "0.0"))
+        self.ZERO_lbl_z_disp.setText(_translate("MainWindow", "Z position"))
+        self.ZERO_disp_x.setText(_translate("MainWindow", "0.0"))
+        self.ZERO_disp_y.setText(_translate("MainWindow", "0.0"))
         self.tab.setTabText(self.tab.indexOf(self.MONITOR_tab), _translate("MainWindow", "     SYSTEM MONITOR     "))
 
 
