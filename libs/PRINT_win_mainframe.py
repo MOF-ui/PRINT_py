@@ -101,6 +101,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if(testrun):
             self.logEntry('TEST','testrun, skipping robot connection...')
             self.logEntry('GNRL','setup finished.')
+            self.logEntry('newline')
             return
         
         self.logEntry('GNRL','connect to Robot...') 
@@ -165,7 +166,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.PUMP_btt_reverse.pressed.connect               ( lambda: self.setSpeed('r') )
 
         self.SCTRL_btt_startQProcessing.pressed.connect     (self.startSCTRLQueue )
-        self.SCTRL_btt_holdQProcessing.pressed.connect      (self.stopSCTRLQueue )
+        self.SCTRL_btt_holdQProcessing.pressed.connect      ( lambda: self.stopSCTRLQueue(prepEnd = True) )
         self.SCTRL_btt_addSIB1_atFront.pressed.connect      ( lambda: self.addSIB(1) )
         self.SCTRL_btt_addSIB1_atEnd.pressed.connect        ( lambda: self.addSIB(1, atEnd = True) )
         self.SCTRL_btt_addSIB2_atFront.pressed.connect      ( lambda: self.addSIB(2) )
@@ -207,18 +208,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         
         self.TCP_num_commForerun.setValue       ( UTIL.DEF_ROB_COMM_FR )
 
-        self.SET_float_volPerE.setValue         ( UTIL.DEF_SC_VOL_PER_E )
+        self.SET_float_volPerE.setValue         ( UTIL.DEF_SC_VOL_PER_MM )
         self.SET_float_frToMms.setValue         ( UTIL.DEF_IO_FR_TO_TS )
 
         self.SET_num_zone.setValue              ( UTIL.DEF_IO_ZONE )
-        self.SET_num_transSpeed_dc.setValue     ( UTIL.DEF_DC_SPEED.TS )
-        self.SET_num_orientSpeed_dc.setValue    ( UTIL.DEF_DC_SPEED.OS )
-        self.SET_num_accelRamp_dc.setValue      ( UTIL.DEF_DC_SPEED.ACR )
-        self.SET_num_decelRamp_dc.setValue      ( UTIL.DEF_DC_SPEED.DCR )
-        self.SET_num_transSpeed_print.setValue  ( UTIL.DEF_PRIN_SPEED.TS )
-        self.SET_num_orientSpeed_print.setValue ( UTIL.DEF_PRIN_SPEED.OS )
-        self.SET_num_accelRamp_print.setValue   ( UTIL.DEF_PRIN_SPEED.ACR )
-        self.SET_num_decelRamp_print.setValue   ( UTIL.DEF_PRIN_SPEED.DCR )
+        self.SET_num_transSpeed_dc.setValue     ( UTIL.DEF_DC_SPEED.ts )
+        self.SET_num_orientSpeed_dc.setValue    ( UTIL.DEF_DC_SPEED.os )
+        self.SET_num_accelRamp_dc.setValue      ( UTIL.DEF_DC_SPEED.acr )
+        self.SET_num_decelRamp_dc.setValue      ( UTIL.DEF_DC_SPEED.dcr )
+        self.SET_num_transSpeed_print.setValue  ( UTIL.DEF_PRIN_SPEED.ts )
+        self.SET_num_orientSpeed_print.setValue ( UTIL.DEF_PRIN_SPEED.os )
+        self.SET_num_accelRamp_print.setValue   ( UTIL.DEF_PRIN_SPEED.acr )
+        self.SET_num_decelRamp_print.setValue   ( UTIL.DEF_PRIN_SPEED.dcr )
 
         if(not setup): self.logEntry('SETS','User resetted all properties to default values.')
         
@@ -255,11 +256,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 return False
 
             case 2:
-                if('COM' in UTIL.PUMP1_tcpip.PORT): self.pumpCommThread.start()
+                if('COM' in UTIL.PUMP1_tcpip.port): self.pumpCommThread.start()
                 else:                               raise ConnectionError('TCP not supported') # res,conn = UTIL.PUMP1_tcpip.connect()
 
                 self.TCP_PUMP1_indi_connected.setStyleSheet (css)
-                self.logEntry                               ('GNRL',f"connected to Pump1 at {UTIL.PUMP1_tcpip.PORT}.")
+                self.logEntry                               ('GNRL',f"connected to Pump1 at {UTIL.PUMP1_tcpip.port}.")
                 self.pump1Conn = True
                 return True
 
@@ -300,7 +301,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 self.TCP_ROB_indi_connected.setStyleSheet(css)
 
             case 2:  
-                if( 'COM' in UTIL.PUMP1_tcpip.PORT ):
+                if( 'COM' in UTIL.PUMP1_tcpip.port ):
                     self.pumpCommThread.quit()
                     self.pumpCommThread.wait()
                 else:
@@ -333,25 +334,27 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.roboCommThread = QThread()
         self.roboCommWorker = RoboCommWorker()
-        self.roboCommWorker.moveToThread        (self.roboCommThread)
-        self.roboCommThread.started.connect     (self.roboCommWorker.run)
-        self.roboCommThread.finished.connect    (self.roboCommWorker.stop)
-        self.roboCommThread.finished.connect    (self.roboCommWorker.deleteLater)
-        self.roboCommWorker.logError.connect    (self.logEntry)
-        self.roboCommWorker.dataUpdated.connect ( lambda: self.resetWatchdog(1) )
-        self.roboCommWorker.dataUpdated.connect (self.posUpdate)
-        self.roboCommWorker.queueEmtpy.connect  (self.stopSCTRLQueue)
-        self.roboCommWorker.sendElem.connect    (self.sendCommand)
+        self.roboCommWorker.moveToThread            (self.roboCommThread)
+        self.roboCommThread.started.connect         (self.roboCommWorker.run)
+        self.roboCommThread.finished.connect        (self.roboCommWorker.stop)
+        self.roboCommThread.finished.connect        (self.roboCommWorker.deleteLater)
+        self.roboCommWorker.dataReceived.connect    ( lambda: self.resetWatchdog(1) )
+        self.roboCommWorker.dataReceived.connect    (self.labelUpdate_onTerminalChange)
+        self.roboCommWorker.dataUpdated.connect     (self.posUpdate)
+        self.roboCommWorker.endProcessing.connect   (self.stopSCTRLQueue)
+        self.roboCommWorker.logError.connect        (self.logEntry)
+        self.roboCommWorker.queueEmtpy.connect      ( lambda: self.stopSCTRLQueue(prepEnd= True) )
+        self.roboCommWorker.sendElem.connect        (self.sendCommand)
 
         self.pumpCommThread = QThread()
         self.pumpCommWorker = PumpCommWorker()
-        self.pumpCommWorker.moveToThread        (self.pumpCommThread)
-        self.pumpCommThread.started.connect     (self.pumpCommWorker.run)
-        self.pumpCommThread.finished.connect    (self.pumpCommWorker.stop)
-        self.pumpCommThread.finished.connect    (self.pumpCommWorker.deleteLater)
-        self.pumpCommWorker.logError.connect    (self.logEntry)
-        self.pumpCommWorker.dataSend.connect    (self.pump1Send)
-        self.pumpCommWorker.dataReceived.connect(self.pump1Update)
+        self.pumpCommWorker.moveToThread            (self.pumpCommThread)
+        self.pumpCommThread.started.connect         (self.pumpCommWorker.run)
+        self.pumpCommThread.finished.connect        (self.pumpCommWorker.stop)
+        self.pumpCommThread.finished.connect        (self.pumpCommWorker.deleteLater)
+        self.pumpCommWorker.logError.connect        (self.logEntry)
+        self.pumpCommWorker.dataSend.connect        (self.pump1Send)
+        self.pumpCommWorker.dataReceived.connect    (self.pump1Update)
         
     
 
@@ -362,25 +365,17 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def posUpdate(self, rawDataString, telem):
         """ write robots telemetry to global variables """
 
-        if( telem != UTIL.ROB_last_telem ):
-            mutex.lock()
-            UTIL.ROB_telem      = telem
-            UTIL.ROB_last_telem = telem
-                
-            # prep database entry
-            UTIL.STT_datablock.ROB      =  telem
-            UTIL.STT_datablock.ROB.POS  -= UTIL.DC_curr_zero
-            mutex.unlock()
+        # set the fist given position to zero as this is usually the standard position for Rob2
+        if (self.firstPos):
+            UTIL.ROB_movStartP = copy.deepcopy( UTIL.ROB_telem.Coor )
+            UTIL.ROB_movEndP   = copy.deepcopy( UTIL.ROB_telem.Coor )
+            self.setZero([1,2,3,4,5,6,8])
+            self.firstPos = False
 
-            # set the fist given position to zero as this is usually the standard position for Rob2
-            if (self.firstPos):
-                self.setZero([1,2,3,4,5,6,8])
-                self.firstPos = False
+        self.logEntry('RTel',f"ID {telem.id},   {telem.Coor}   ToolSpeed: {telem.tSpeed}")
+        self.labelUpdate_onReceive(rawDataString)
+        self.DAQ.dataUpdate()
 
-            self.logEntry('RTel',f"ID {telem.ID},   {telem.POS}   ToolSpeed: {telem.TOOL_SPEED}")
-            self.labelUpdate_onReceive(rawDataString)
-            self.DAQ.dataUpdate()
-    
 
 
 
@@ -406,18 +401,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def pump1Update(self, telem):
         """ display pump telemetry """
 
-        if( telem != UTIL.PUMP1_last_telem ):
-            mutex.lock()
-            UTIL.PUMP1_last_telem    = telem
-            UTIL.STT_datablock.PUMP1 = telem
-            mutex.unlock()
+        self.PUMP_disp_freq.setText ( str( UTIL.STT_dataBlock.Pump1.freq ) )
+        self.PUMP_disp_volt.setText ( str( UTIL.STT_dataBlock.Pump1.volt ) )
+        self.PUMP_disp_amps.setText ( str( UTIL.STT_dataBlock.Pump1.amps ) )
+        self.PUMP_disp_torq.setText ( str( UTIL.STT_dataBlock.Pump1.torq ) )
 
-            self.PUMP_disp_freq.setText ( str( UTIL.STT_datablock.PUMP1.FREQ ) )
-            self.PUMP_disp_volt.setText ( str( UTIL.STT_datablock.PUMP1.VOLT ) )
-            self.PUMP_disp_amps.setText ( str( UTIL.STT_datablock.PUMP1.AMPS ) )
-            self.PUMP_disp_torq.setText ( str( UTIL.STT_datablock.PUMP1.TORQ ) )
-
-            self.logEntry('PTel',f"PUMP1, freq: {telem.FREQ}, volt: {telem.VOLT}, amps: {telem.AMPS}, torq: {telem.TORQ}")
+        self.logEntry('PTel',f"PUMP1, freq: {telem.freq}, volt: {telem.volt}, amps: {telem.amps}, torq: {telem.torq}")
 
 
 
@@ -517,26 +506,26 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def applySettings(self):
         """ load default settings to settings display """
         
-        UTIL.ROB_comm_fr       = self.TCP_num_commForerun.value()
+        UTIL.ROB_commFr         = self.TCP_num_commForerun.value()
 
-        UTIL.SC_vol_per_e       = self.SET_float_volPerE.value()
-        UTIL.IO_fr_to_ts        = self.SET_float_frToMms.value()
+        UTIL.SC_volPerMm         = self.SET_float_volPerE.value()
+        UTIL.IO_frToTs          = self.SET_float_frToMms.value()
 
         UTIL.IO_zone            = self.SET_num_zone.value()
-        UTIL.DC_speed.TS        = self.SET_num_transSpeed_dc.value()
-        UTIL.DC_speed.OS        = self.SET_num_orientSpeed_dc.value()
-        UTIL.DC_speed.ACR       = self.SET_num_accelRamp_dc.value()
-        UTIL.DC_speed.DCR       = self.SET_num_decelRamp_dc.value()
-        UTIL.PRIN_speed.TS      = self.SET_num_transSpeed_print.value()
-        UTIL.PRIN_speed.OS      = self.SET_num_orientSpeed_print.value()
-        UTIL.PRIN_speed.ACR     = self.SET_num_accelRamp_print.value()
-        UTIL.PRIN_speed.DCR     = self.SET_num_decelRamp_print.value()
+        UTIL.DC_speed.ts        = self.SET_num_transSpeed_dc.value()
+        UTIL.DC_speed.os        = self.SET_num_orientSpeed_dc.value()
+        UTIL.DC_speed.acr       = self.SET_num_accelRamp_dc.value()
+        UTIL.DC_speed.dcr       = self.SET_num_decelRamp_dc.value()
+        UTIL.PRIN_speed.ts      = self.SET_num_transSpeed_print.value()
+        UTIL.PRIN_speed.os      = self.SET_num_orientSpeed_print.value()
+        UTIL.PRIN_speed.acr     = self.SET_num_accelRamp_print.value()
+        UTIL.PRIN_speed.dcr     = self.SET_num_decelRamp_print.value()
 
-        self.logEntry('SETS',f"Settings updated -- ComFR: {UTIL.ROB_comm_fr}, VolPerE: {UTIL.SC_vol_per_e}"
-                             f", FR2TS: {UTIL.IO_fr_to_ts}, IOZ: {UTIL.IO_zone}, PrinTS: {UTIL.PRIN_speed.TS}"
-                             f", PrinOS: {UTIL.PRIN_speed.OS}, PrinACR: {UTIL.PRIN_speed.ACR}"
-                             f", PrinDCR: {UTIL.PRIN_speed.DCR}, DCTS: {UTIL.DC_speed.TS}"
-                             f", DCOS: {UTIL.DC_speed.OS}, DCACR: {UTIL.DC_speed.ACR}, DCDCR: {UTIL.DC_speed.DCR}")
+        self.logEntry('SETS',f"Settings updated -- ComFR: {UTIL.ROB_commFr}, VolPerE: {UTIL.SC_volPerMm}"
+                             f", FR2TS: {UTIL.IO_frToTs}, IOZ: {UTIL.IO_zone}, PrinTS: {UTIL.PRIN_speed.ts}"
+                             f", PrinOS: {UTIL.PRIN_speed.os}, PrinACR: {UTIL.PRIN_speed.acr}"
+                             f", PrinDCR: {UTIL.PRIN_speed.dcr}, DCTS: {UTIL.DC_speed.ts}"
+                             f", DCOS: {UTIL.DC_speed.os}, DCACR: {UTIL.DC_speed.acr}, DCDCR: {UTIL.DC_speed.dcr}")
 
 
 
@@ -547,14 +536,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                        LOG FUNCTION                                               #
     #####################################################################################################
 
-    def logEntry(self, source='[  ]', text=''):
+    def logEntry(self, source='[    ]', text=''):
         """ set one-line for log entries, safes A LOT of code """
 
         text = text.replace('\n','')
         text = text.replace('\t','')
         if (self.logpath == ''):    return None
         if (source == 'newline'):   text = '\n'
-        else:                       text = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}    {source}:        {text}\n"
+        else:                       text = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}    [{source}]:        {text}\n"
         self.SET_disp_logEntry.setText(text)
 
         try:
@@ -578,10 +567,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def labelUpdate_onReceive(self,dataString):
         """ update all QLabels in the UI that may change with newly received data from robot """
 
-        pos         = UTIL.ROB_telem.POS
-        zero        = UTIL.DC_curr_zero
-        robID       = UTIL.ROB_telem.ID
-        comID       = UTIL.SC_curr_comm_id
+        pos         = UTIL.ROB_telem.Coor
+        zero        = UTIL.DC_currZero
+        robID       = UTIL.ROB_telem.id
+        comID       = UTIL.SC_currCommId
         try:                    progID = UTIL.SC_queue[0].ID
         except AttributeError:  progID = comID
 
@@ -591,24 +580,22 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_disp_progCommID.setText      ( str(comID) )
         self.SCTRL_disp_elemInQ.setText         ( str(len(UTIL.SC_queue)) ) 
 
-        self.DC_disp_x.setText                  ( str( round( pos.X   - zero.X  ,3 )) )
-        self.DC_disp_y.setText                  ( str( round( pos.Y   - zero.Y  ,3 )) )
-        self.DC_disp_z.setText                  ( str( round( pos.Z   - zero.Z  ,3 )) )
-        self.DC_disp_ext.setText                ( str( round( pos.EXT - zero.EXT,3 )) )
+        self.DC_disp_x.setText                  ( str( round( pos.x   - zero.x  ,3 )) )
+        self.DC_disp_y.setText                  ( str( round( pos.y   - zero.y  ,3 )) )
+        self.DC_disp_z.setText                  ( str( round( pos.z   - zero.z  ,3 )) )
+        self.DC_disp_ext.setText                ( str( round( pos.ext - zero.ext,3 )) )
 
-        self.NC_disp_x.setText                  ( str(pos.X) )
-        self.NC_disp_y.setText                  ( str(pos.Y) )
-        self.NC_disp_z.setText                  ( str(pos.Z) )
-        self.NC_disp_xOrient.setText            ( str(pos.X_ori) )
-        self.NC_disp_yOrient.setText            ( str(pos.Y_ori) )
-        self.NC_disp_zOrient.setText            ( str(pos.Z_ori) )
-        self.NC_disp_ext.setText                ( str(pos.EXT) )
+        self.NC_disp_x.setText                  ( str(pos.x) )
+        self.NC_disp_y.setText                  ( str(pos.y) )
+        self.NC_disp_z.setText                  ( str(pos.z) )
+        self.NC_disp_xOrient.setText            ( str(pos.rx) )
+        self.NC_disp_yOrient.setText            ( str(pos.ry) )
+        self.NC_disp_zOrient.setText            ( str(pos.rz) )
+        self.NC_disp_ext.setText                ( str(pos.ext) )
 
-        self.TERM_disp_tcpSpeed.setText         ( str(UTIL.ROB_telem.TOOL_SPEED) )
+        self.TERM_disp_tcpSpeed.setText         ( str(UTIL.ROB_telem.tSpeed) )
         self.TERM_disp_robCommID.setText        ( str(robID) )
         self.TERM_disp_progCommID.setText       ( str(comID) )
-
-        self.labelUpdate_onTerminalChange()
 
 
 
@@ -620,10 +607,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.labelUpdate_onQueueChange()
         self.labelUpdate_onTerminalChange()
-        self.SCTRL_disp_elemInQ.setText         ( str(len(UTIL.SC_queue)) )
+        self.SCTRL_disp_elemInQ.setText  ( str(len(UTIL.SC_queue)) )
 
         try:
-            self.SCTRL_disp_buffComms.setText(str( UTIL.SC_queue[0].ID - UTIL.ROB_telem.ID - 1 ))
+            robId = UTIL.ROB_telem.id    if( UTIL.ROB_telem.id != -1 )   else 0
+            self.SCTRL_disp_buffComms.setText(str( UTIL.SC_queue[0].id - robId - 1 ))
         except AttributeError:  pass
 
 
@@ -649,20 +637,20 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if (self.TERM_chk_autoScroll.isChecked()):  self.TERM_arr_terminal.scrollToBottom()
 
         self.ICQ_arr_terminal.clear()
-        self.ICQ_arr_terminal.addItems  ( UTIL.ROB_comm_queue.display() )
+        self.ICQ_arr_terminal.addItems  ( UTIL.ROB_commQueue.display() )
 
     
 
     def labelUpdate_onNewZero(self):
         """ show when DC_zero has changed """
 
-        self.ZERO_disp_x.setText        ( str( UTIL.DC_curr_zero.X ) )
-        self.ZERO_disp_y.setText        ( str( UTIL.DC_curr_zero.Y ) )
-        self.ZERO_disp_z.setText        ( str( UTIL.DC_curr_zero.Z ) )
-        self.ZERO_disp_xOrient.setText  ( str( UTIL.DC_curr_zero.X_ori ) )
-        self.ZERO_disp_yOrient.setText  ( str( UTIL.DC_curr_zero.Y_ori ) )
-        self.ZERO_disp_zOrient.setText  ( str( UTIL.DC_curr_zero.Z_ori ) )
-        self.ZERO_disp_ext.setText      ( str( UTIL.DC_curr_zero.EXT ) )
+        self.ZERO_disp_x.setText        ( str( UTIL.DC_currZero.x ) )
+        self.ZERO_disp_y.setText        ( str( UTIL.DC_currZero.y ) )
+        self.ZERO_disp_z.setText        ( str( UTIL.DC_currZero.z ) )
+        self.ZERO_disp_xOrient.setText  ( str( UTIL.DC_currZero.rx ) )
+        self.ZERO_disp_yOrient.setText  ( str( UTIL.DC_currZero.ry ) )
+        self.ZERO_disp_zOrient.setText  ( str( UTIL.DC_currZero.rz ) )
+        self.ZERO_disp_ext.setText      ( str( UTIL.DC_currZero.ext ) )
     
 
 
@@ -684,7 +672,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         
         if(ans is None):
             self.IO_disp_filename.setText("no file selected")
-            UTIL.IO_curr_filepath = None
+            UTIL.IO_currFilepath = None
             return None
         
         file    = open(ans,'r')
@@ -698,7 +686,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if(commNum is None):
             self.IO_disp_filename.setText   ('COULD NOT READ FILE!')
             self.logEntry                   ('F-IO', f"Error while opening {ans} file: {res}")
-            UTIL.IO_curr_filepath           = None
+            UTIL.IO_currFilepath           = None
             return None
 
         if(res == 'empty'):
@@ -706,7 +694,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             return None
         
         # display data
-        filamentVol     = filamentLength * UTIL.SC_vol_per_e
+        filamentVol     = filamentLength * UTIL.SC_volPerMm
         filamentLength  = round(filamentLength, 3)
         filamentVol     = round(filamentVol, 3)
 
@@ -716,7 +704,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.IO_disp_estimVol.setText   ( str(filamentVol) )
 
         self.logEntry('F-IO', f"Opened new file at {ans}:   {commNum} commands,   {filamentLength}mm filament, {filamentVol}L")
-        UTIL.IO_curr_filepath = ans
+        UTIL.IO_currFilepath = ans
         return ans
     
 
@@ -727,7 +715,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def loadFile(self, lf_atID = False, testrun = False, testpath = None):
         """ reads the file set in self.openFile, adds all readable G1 commands to command queue (at end or at ID) """
 
-        fpath = testpath if(testrun) else UTIL.IO_curr_filepath
+        fpath = testpath if(testrun) else UTIL.IO_currFilepath
         if (fpath is None):
             self.IO_lbl_loadFile.setText("... no valid file, not executed")
             return False
@@ -777,7 +765,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if(skips == 0):     self.IO_lbl_loadFile.setText("... conversion successful")
         else:               self.IO_lbl_loadFile.setText(f"... {skips} command(s) skipped (syntax)")
         
-        logTxt = f"Loaded new file from {fpath}:   {lineID - lineID_start} commands, {skips} skipped due to syntax"
+        logTxt = f"Loaded new file from {fpath}:   {lineID - lineID_start} commands ({skips} skipped due to syntax)"
         if (lf_atID):   logTxt += f" starting fom {lineID_start}."
         else:           logTxt += f" at the end."
         self.logEntry('F-IO', logTxt)
@@ -799,6 +787,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ set UI indicators, send the boring work of timing the command to our trusty threads """
 
         mutex.lock()
+        UTIL.PUMP1_speed    = 0
         UTIL.SC_qProcessing = True
         mutex.unlock()
         self.logEntry('ComQ','queue processing started')
@@ -816,21 +805,24 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def stopSCTRLQueue(self):
+    def stopSCTRLQueue(self, prepEnd = False):
         """ set UI indicators, turn of threads """
 
-        mutex.lock()
-        UTIL.SC_qProcessing = False
-        mutex.unlock()
-        self.logEntry('ComQ','queue processing stopped')
+        if( prepEnd ):
+            css = "border-radius: 20px; background-color: #ffda1e;"
+        
+        else:
+            mutex.lock()
+            UTIL.SC_qProcessing = False
+            mutex.unlock()
+            self.logEntry('ComQ','queue processing stopped')
 
-        css = "border-radius: 20px; \
-               background-color: #4c4a48;"
+            css = "border-radius: 20px; background-color: #4c4a48;"
+            self.DC_indi_robotMoving.setStyleSheet      (css)
+            self.labelUpdate_onQueueChange()
+
         self.SCTRL_indi_qProcessing.setStyleSheet   (css)
-        self.DC_indi_robotMoving.setStyleSheet      (css)
         self.TCP_indi_qProcessing.setStyleSheet     (css)
-
-        self.labelUpdate_onQueueChange()
 
     
 
@@ -845,9 +837,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # get text and position BEFORE PLANNED COMMAND EXECUTION
         speed   = copy.deepcopy(UTIL.PRIN_speed)
         try:
-            if( not atID ):     pos = copy.deepcopy( UTIL.SC_queue.lastEntry().COOR_1 )
-            else:               pos = copy.deepcopy( UTIL.SC_queue.entryBeforeID(ID).COOR_1 )
-        except AttributeError:  pos = UTIL.DC_curr_zero
+            if( not atID ):     pos = copy.deepcopy( UTIL.SC_queue.lastEntry().Coor1 )
+            else:               pos = copy.deepcopy( UTIL.SC_queue.entryBeforeID(ID).Coor1 )
+        except AttributeError:  pos = UTIL.DC_currZero
         if( not fromFile ):     txt = self.SGLC_entry_gcodeSglComm.toPlainText() 
         else:                   txt = fileText
         
@@ -869,7 +861,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             return entry, None
 
         # set command ID if given, sorting is done later by "Queue" class
-        if(atID):    entry.ID = ID
+        if(atID):    entry.id = ID
 
         mutex.lock()
         res = UTIL.SC_queue.add(entry)
@@ -880,10 +872,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             return None, ValueError
         
         if(not fromFile):    self.logEntry('ComQ',f"single GCode command added -- "
-                                                  f"ID: {entry.ID}  MT: {entry.MT}  PT: {entry.PT}"
-                                                  f"  --  COOR_1: {entry.COOR_1}  --  COOR_2: {entry.COOR_2}"
-                                                  f"  --  SV: {entry.SV}  --  SBT: {entry.SBT}   SC: {entry.SC}"
-                                                  f"  --  Z: {entry.Z}  --  TOOL: {entry.TOOL}")
+                                                  f"ID: {entry.id}  MT: {entry.mt}  PT: {entry.pt}"
+                                                  f"  --  COOR_1: {entry.Coor1}  --  COOR_2: {entry.Coor2}"
+                                                  f"  --  SV: {entry.Speed}  --  SBT: {entry.sbt}   SC: {entry.sc}"
+                                                  f"  --  Z: {entry.z}  --  TOOL: {entry.Tool}")
         self.labelUpdate_onQueueChange()
         return entry, command
 
@@ -905,7 +897,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             return None, err
         
         # set command ID if given, sorting is done later by "Queue" class
-        if(atID):    entry.ID = ID
+        if(atID):    entry.id = ID
 
         mutex.lock()
         res = UTIL.SC_queue.add(entry)
@@ -916,10 +908,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             return None, ValueError
         
         if(not fromFile):    self.logEntry('ComQ',f"single RAPID command added -- "
-                                                  f"ID: {entry.ID}  MT: {entry.MT}  PT: {entry.PT}"
-                                                  f"  --  COOR_1: {entry.COOR_1}  --  COOR_2: {entry.COOR_2}"
-                                                  f"  --  SV: {entry.SV}  --  SBT: {entry.SBT}   SC: {entry.SC}"
-                                                  f"  --  Z: {entry.Z}  --  TOOL: {entry.TOOL}")
+                                                  f"ID: {entry.id}  MT: {entry.mt}  PT: {entry.pt}"
+                                                  f"  --  COOR_1: {entry.Coor1}  --  COOR_2: {entry.Coor2}"
+                                                  f"  --  SV: {entry.Speed}  --  SBT: {entry.sbt}   SC: {entry.sc}"
+                                                  f"  --  Z: {entry.z}  --  TOOL: {entry.Tool}")
 
         # update displays
         self.labelUpdate_onQueueChange()
@@ -940,9 +932,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             case _: return False
 
         if ( (len(UTIL.SC_queue) == 0)  or  not atEnd ):    
-            try:                        lineID = UTIL.SC_queue[0].ID
-            except AttributeError:      lineID = UTIL.ROB_telem.ID + 1
-        else:                           lineID = UTIL.SC_queue.lastEntry().ID + 1
+            try:                        lineID = UTIL.SC_queue[0].id
+            except AttributeError:      lineID = UTIL.ROB_telem.id + 1
+        else:                           lineID = UTIL.SC_queue.lastEntry().id + 1
+
+        if( lineID < 1 ): lineID = 1
         lineID_start    = lineID
         rows            = txt.split('\n')
 
@@ -958,6 +952,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                         case 2: self.SIB_entry_sib2.setText    (f"COMMAND ERROR, ABORTED\n {txt}")
                         case 3: self.SIB_entry_sib3.setText    (f"COMMAND ERROR, ABORTED\n {txt}")
                     self.logEntry(f"SIB{number}",f"ERROR: SIB command import aborted ({err})! false entry: {txt}")
+                    return False
                 else:   lineID += 1
 
             else:
@@ -970,6 +965,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                         case 2: self.SIB_entry_sib2.setText    (f"COMMAND ERROR, ABORTED\n {txt}")
                         case 3: self.SIB_entry_sib3.setText    (f"COMMAND ERROR, ABORTED\n {txt}")
                     self.logEntry(f"SIB{number}",f"ERROR: SIB command import aborted ({command})! false entry: {txt}")
+                    return False
         
         logTxt = f"{lineID - lineID_start} SIB lines added"
         if (atEnd): logTxt += " at end of queue"
@@ -1010,15 +1006,17 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def homeCommand(self):
         """ sets up a command to drive back to DC_curr_zero, gives it to the actual sendCommand function """
 
-        zero    = copy.deepcopy(UTIL.DC_curr_zero)
+        if( UTIL.SC_qProcessing ): return None, None
+
+        zero    = copy.deepcopy(UTIL.DC_currZero)
         readMT  = self.DC_drpd_moveType.currentText()
         mt      = 'L'  if (readMT == 'LINEAR')  else 'J'
 
-        command = UTIL.QEntry( ID       = UTIL.SC_curr_comm_id
-                              ,MT       = mt
-                              ,COOR_1   = zero
-                              ,SV       = copy.deepcopy( UTIL.DC_speed )
-                              ,Z        = 0)
+        command = UTIL.QEntry( id       = UTIL.SC_currCommId
+                              ,mt       = mt
+                              ,Coor1   = zero
+                              ,Speed       = copy.deepcopy( UTIL.DC_speed )
+                              ,z        = 0)
         
         self.logEntry('DCom','sending DC home command...')
         return self.sendCommand(command, DC = True)
@@ -1030,6 +1028,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def sendDCCommand(self, axis= '0', dir= '+'):
         """ sets up a command accourding to the DC frames input, gives it to the actual sendCommand function """
 
+        if( UTIL.SC_qProcessing ): return None, None
+
         stepWidth = self.DC_sld_stepWidth.value()
         match stepWidth:
             case 1:     pass
@@ -1040,24 +1040,24 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if(dir != '+' and dir != '-'):      raise ValueError
         if(dir == '-'):                     stepWidth = -stepWidth
 
-        newPos = copy.deepcopy(UTIL.ROB_telem.POS)
+        newPos = copy.deepcopy(UTIL.ROB_telem.Coor)
 
         match axis:
-            case 'X':       newPos.X   += stepWidth
-            case 'Y':       newPos.Y   += stepWidth
-            case 'Z':       newPos.Z   += stepWidth
-            case 'EXT':     newPos.EXT += stepWidth
+            case 'X':       newPos.x   += stepWidth
+            case 'Y':       newPos.y   += stepWidth
+            case 'Z':       newPos.z   += stepWidth
+            case 'EXT':     newPos.ext += stepWidth
             case _:         raise ValueError
             
         
         readMT  = self.DC_drpd_moveType.currentText()
         mt      = 'L'  if (readMT == 'LINEAR')  else 'J'
 
-        command = UTIL.QEntry( ID       = UTIL.SC_curr_comm_id
-                              ,MT       = mt
-                              ,COOR_1   = newPos
-                              ,SV       = copy.deepcopy( UTIL.DC_speed )
-                              ,Z        = 0)
+        command = UTIL.QEntry( id       = UTIL.SC_currCommId
+                              ,mt       = mt
+                              ,Coor1    = newPos
+                              ,Speed    = copy.deepcopy( UTIL.DC_speed )
+                              ,z        = 0)
         
         self.logEntry('DCom',f"sending DC command: ({command})")
         return self.sendCommand(command, DC = True)
@@ -1070,25 +1070,27 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def sendNCCommand(self, axis= None):
         """ sets up a command according to NC absolute positioning, gives it to the actual sendCommand function """
 
-        newPos = copy.deepcopy(UTIL.ROB_telem.POS)
+        if( UTIL.SC_qProcessing ): return None, None
+
+        newPos = copy.deepcopy(UTIL.ROB_telem.Coor)
 
         # 7 is a placeholder for Q, which can not be set by hand
-        if 1 in axis:   newPos.X     = float(self.NC_float_x.value())
-        if 2 in axis:   newPos.Y     = float(self.NC_float_y.value())
-        if 3 in axis:   newPos.Z     = float(self.NC_float_z.value())
-        if 4 in axis:   newPos.X_ori = float(self.NC_float_xOrient.value())
-        if 5 in axis:   newPos.Y_ori = float(self.NC_float_yOrient.value())
-        if 6 in axis:   newPos.Z_ori = float(self.NC_float_zOrient.value())
-        if 8 in axis:   newPos.EXT   = float(self.NC_float_ext.value())
+        if 1 in axis:   newPos.x    = float(self.NC_float_x.value())
+        if 2 in axis:   newPos.y    = float(self.NC_float_y.value())
+        if 3 in axis:   newPos.z    = float(self.NC_float_z.value())
+        if 4 in axis:   newPos.rx   = float(self.NC_float_xOrient.value())
+        if 5 in axis:   newPos.ry   = float(self.NC_float_yOrient.value())
+        if 6 in axis:   newPos.rz   = float(self.NC_float_zOrient.value())
+        if 8 in axis:   newPos.ext  = float(self.NC_float_ext.value())
 
         readMT  = self.DC_drpd_moveType.currentText()
         mt      = 'L'  if (readMT == 'LINEAR')  else 'J'
 
-        command = UTIL.QEntry( ID       = UTIL.SC_curr_comm_id
-                              ,MT       = mt
-                              ,COOR_1   = newPos
-                              ,SV       = copy.deepcopy( UTIL.DC_speed )
-                              ,Z        = 0)
+        command = UTIL.QEntry( id       = UTIL.SC_currCommId
+                              ,mt       = mt
+                              ,Coor1    = newPos
+                              ,Speed    = copy.deepcopy( UTIL.DC_speed )
+                              ,z        = 0)
         
         self.logEntry('DCom',f"sending NC command: ({newPos})")
         return self.sendCommand(command, DC = True)
@@ -1102,16 +1104,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             uses the current position as it is executed directly, otherwise DONT do that
             if no X, Y, Z or EXT position is given"""
             
+        if( UTIL.SC_qProcessing ): return None, None
+
         # get text 
         speed   = copy.deepcopy(UTIL.DC_speed)
-        pos     = copy.deepcopy(UTIL.ROB_telem.POS)
+        pos     = copy.deepcopy(UTIL.ROB_telem.Coor)
         txt     = self.TERM_entry_gcodeInterp.text()
         
         # act according to GCode command
         entry,command = UTIL.gcodeToQEntry(pos, speed ,UTIL.IO_zone ,txt)
         
-        if   ( command == 'G92'):
-            self.labelUpdate_onNewLabel()
+        if   ( command == 'G92'):       self.labelUpdate_onNewZero()
+
         elif ( (command != 'G1') and (command != 'G28') ):
             if  (command == ';'):       panTxt = f"leading semicolon interpreted as comment:\n{txt}"
             elif(command is None):      panTxt = f"SYNTAX ERROR:\n{txt}"
@@ -1120,7 +1124,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.TERM_entry_gcodeInterp.setText(panTxt)
             return entry, None
         
-        entry.ID = UTIL.SC_curr_comm_id
+        entry.id = UTIL.SC_currCommId
 
         self.logEntry('DCom',f"sending GCode DC command: ({entry})")
         return self.sendCommand(entry, DC = True)
@@ -1131,7 +1135,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def sendRapidCommand(self):
-                # get text and current position, (identify command -- to be added)
+        """ send the GCode interpreter line on the TERM panel to robot, absolute coordinates
+            or relative to "pHome" (DC_currZero) """
+
+        if( UTIL.SC_qProcessing ): return None, None
 
         txt         = self.TERM_entry_rapidInterp.text()
         entry,err   = UTIL.rapidToQEntry(txt)
@@ -1140,7 +1147,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.TERM_entry_rapidInterp.setText(f"SYNTAX ERROR: {err}\n" + txt)
             return None, err
         
-        entry.ID = UTIL.SC_curr_comm_id
+        entry.id = UTIL.SC_currCommId
 
         self.logEntry('DCom',f"sending RAPID DC command: ({entry})")
         return self.sendCommand(entry, DC = True)
@@ -1153,8 +1160,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def forcedStopCommand(self):
         """ sets up non-moving-type commands, gives it to the actual sendCommand function """
         
-        command = UTIL.QEntry( ID = 0
-                              ,MT = 'S')
+        command = UTIL.QEntry( id = 0
+                              ,mt = 'S')
         
         if (self.testrun): return self.sendCommand(command, DC = True)
         FSWarning = strdDialog('WARNING!\n\nRobot will stop after current movement!\n\
@@ -1165,6 +1172,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         if(FSWarning.result()):
             self.logEntry('SysC',f"FORCED STOP (user committed).")
+            if( UTIL.SC_qProcessing ): 
+                self.stopSCTRLQueue()
             return self.sendCommand(command, DC = True)
         
         else:
@@ -1179,14 +1188,16 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def robotStopCommand(self, directly = True):
         """ close connection signal for robot, add it to Queue or gives it to the actual sendCommand function """
 
-        command = UTIL.QEntry( ID = 1
-                              ,MT = 'E')
+        command = UTIL.QEntry( id = 1
+                              ,mt = 'E')
         
         if(directly):
             self.logEntry('SysC',"sending robot stop command directly")
+            if( UTIL.SC_qProcessing ): 
+                self.stopSCTRLQueue()
             return self.sendCommand(command, DC = True)
         else:
-            command.ID = 0
+            command.id = 0
             UTIL.SC_queue.add(command)
             self.logEntry('SysC',"added robot stop command to queue")
             return command
@@ -1214,12 +1225,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             
             mutex.lock()
 
-            UTIL.ROB_comm_queue.add    (command)
-            UTIL.showOnTerminal         (f"SEND:    ID: {command.ID}  MT: {command.MT}  PT: {command.PT} \t|| COOR_1: {command.COOR_1}"\
-                                         f"\n\t\t\t|| COOR_2: {command.COOR_2}"\
-                                         f"\n\t\t\t|| SV:     {command.SV} \t|| SBT: {command.SBT}   SC: {command.SC}   Z: {command.Z}"\
-                                         f"\n\t\t\t|| TOOL:   {command.TOOL}")
-            UTIL.SC_curr_comm_id += 1
+            UTIL.ROB_commQueue.add    (command)
+            UTIL.addToCommProtocol    (f"SEND:    ID: {command.id}  MT: {command.mt}  PT: {command.pt} \t|| COOR_1: {command.Coor1}"\
+                                       f"\n\t\t\t|| COOR_2: {command.Coor2}"\
+                                       f"\n\t\t\t|| SV:     {command.Speed} \t|| SBT: {command.sbt}   SC: {command.sc}   Z: {command.z}"\
+                                       f"\n\t\t\t|| TOOL:   {command.Tool}")
+            UTIL.SC_currCommId += 1
             if (DC): UTIL.SC_queue.increment()
 
             mutex.unlock()
@@ -1228,10 +1239,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.TCP_ROB_disp_bytesWritten.setText  (str(msgLen))
 
             self.labelUpdate_onSend(command)
-            if (not DC): self.logEntry('ComQ',f"Command send  --  ID: {command.ID}  MT: {command.MT}  PT: {command.PT}"
-                                              f"  --  COOR_1: {command.COOR_1}  --  COOR_2: {command.COOR_2}"
-                                              f"  --  SV: {command.SV}  --  SBT: {command.SBT}   SC: {command.SC}"
-                                              f"  --  Z: {command.Z}  --  TOOL: {command.TOOL}")
+            if (not DC): self.logEntry('ComQ',f"Command send  --  ID: {command.id}  MT: {command.mt}  PT: {command.pt}"
+                                              f"  --  COOR_1: {command.Coor1}  --  COOR_2: {command.Coor2}"
+                                              f"  --  SV: {command.Speed}  --  SBT: {command.sbt}   SC: {command.sc}"
+                                              f"  --  Z: {command.z}  --  TOOL: {command.Tool}")
 
         elif (msg == ValueError):
             self.logEntry('CONN','TCPIP class "ROB_tcpip" encountered ValueError in sendCommand, data length: ' + str(msgLen))
@@ -1258,25 +1269,25 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def setZero(self,axis):
         """ overwrite DC_curr_zero, uses deepcopy to avoid mutual large mutual exclusion blocks """
 
-        newZero = copy.deepcopy(UTIL.DC_curr_zero)
-        currPos = copy.deepcopy(UTIL.ROB_telem.POS)
+        newZero = copy.deepcopy(UTIL.DC_currZero)
+        currPos = copy.deepcopy(UTIL.ROB_telem.Coor)
 
         if axis:
             # 7 is a placeholder for Q, which can not be set by hand
-            if 1 in axis:   newZero.X     = currPos.X
-            if 2 in axis:   newZero.Y     = currPos.Y
-            if 3 in axis:   newZero.Z     = currPos.Z
-            if 4 in axis:   newZero.X_ori = currPos.X_ori
-            if 5 in axis:   newZero.Y_ori = currPos.Y_ori
-            if 6 in axis:   newZero.Z_ori = currPos.Z_ori
-            if 8 in axis:   newZero.EXT   = currPos.EXT
+            if 1 in axis:   newZero.x   = currPos.x
+            if 2 in axis:   newZero.y   = currPos.y
+            if 3 in axis:   newZero.z   = currPos.z
+            if 4 in axis:   newZero.rx  = currPos.rx
+            if 5 in axis:   newZero.ry  = currPos.ry
+            if 6 in axis:   newZero.rz  = currPos.rz
+            if 8 in axis:   newZero.ext = currPos.ext
             
             mutex.lock()
-            UTIL.DC_curr_zero = newZero
+            UTIL.DC_currZero = newZero
             mutex.unlock()
         
         self.labelUpdate_onNewZero()
-        self.logEntry('ZERO',f"current zero position updated: ({UTIL.DC_curr_zero})")
+        self.logEntry('ZERO',f"current zero position updated: ({UTIL.DC_currZero})")
 
 
 
@@ -1297,7 +1308,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         match type:
             case '1':   UTIL.PUMP1_speed += 1
             case '-1':  UTIL.PUMP1_speed -= 1
-            case '0':   UTIL.PUMP1_speed = 0
+            case '0':   UTIL.PUMP1_speed =  0
             case 'r':   UTIL.PUMP1_speed *= -1
             case _:     UTIL.PUMP1_speed = self.PUMP_num_setSpeed.value()
         mutex.unlock()
@@ -1328,7 +1339,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.roboCommThread.wait()
 
         # if(self.pump1Conn):
-        if( 'COM' in UTIL.PUMP1_tcpip.PORT ):
+        if( 'COM' in UTIL.PUMP1_tcpip.port ):
             self.pumpCommThread.quit()
             self.pumpCommThread.wait()
         else:
@@ -1378,8 +1389,8 @@ if __name__ == '__main__':
     logpath = UTIL.createLogfile()
 
     # overwrite ROB_tcpip for testing, delete later
-    UTIL.ROB_tcpip.IP = 'localhost'
-    UTIL.ROB_tcpip.PORT = 10001
+    UTIL.ROB_tcpip.ip = 'localhost'
+    UTIL.ROB_tcpip.port = 10001
 
     # start the UI and assign to app
     app = 0                             # leave that here so app doesnt include the remnant of a previous QApplication instance

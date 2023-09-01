@@ -8,6 +8,7 @@
 # python standard libraries
 import os
 import sys
+import copy
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -49,10 +50,12 @@ class PumpCommWorker(QObject):
 
         self.loopTimer = QTimer()
         self.loopTimer.setInterval(250)
-        self.loopTimer.timeout.connect(self.loop)
+        self.loopTimer.timeout.connect(self.send)
+        self.loopTimer.timeout.connect(self.receive)
+        self.loopTimer.timeout.connect(self.mtecInterface.keepAlive)
 
         self.loopTimer.start()
-        self.mtecInterface.serial_port = UTIL.PUMP1_tcpip.PORT
+        self.mtecInterface.serial_port = UTIL.PUMP1_tcpip.port
         self.mtecInterface.connect()
 
 
@@ -66,33 +69,56 @@ class PumpCommWorker(QObject):
 
 
 
-    def loop(self):
-        """ not a real loop but you know what I mean,
-            standard operations"""
+    def send(self):
+        """ send pump speed to pump, uses modified setter in mtec's script (changed to function),
+            which recognizes a value change and returns the machines answer and the original command string,
+            uses user-set pump speed if no script is running """
 
-        # use modified mtec setter (changed to function), recognizes value change by itself, returns ans and command str
-        newSpeed    = UTIL.PUMP1_speed
+        if( UTIL.SC_qProcessing):
+            try:                currCommand = UTIL.ROB_commQueue[0]
+            except IndexError:  currCommand = None
+            pMode = 'None'  if( currCommand is None )  else currCommand.pMode
+            
+            match pMode:
+                case 'None':    newSpeed = UTIL.PUMP1_speed
+                # default: ([mm/s] * [L/mm] / [L/s]) * 100.0 --> [%]
+                case 'default': newSpeed = ( currCommand.Speed.ts * UTIL.SC_volPerMm / UTIL.PUMP1_literPerS ) * 100.0
+                case _:         newSpeed = 0
+                # case 'start':
+                # case 'end':
+
+        else:
+            newSpeed    = UTIL.PUMP1_speed
+
         res         = self.mtecInterface.setSpeed( int(newSpeed * UTIL.PUMP1_liveAd) )
         if (res is not None): 
             command,ans = res[0],res[1]
             self.dataSend.emit(newSpeed,command,ans)
+    
 
-        # keepAlive
-        self.mtecInterface.keepAlive()
+
+    def receive(self):
+        """ request data updates for frequency, voltage, current and torque from pump, pass to mainframe """
 
         # get data 
         freq    = self.mtecInterface.frequency
         volt    = self.mtecInterface.voltage
         amps    = self.mtecInterface.current
         torq    = self.mtecInterface.torque
-        telem   = UTIL.PumpTelemetry(freq,volt,amps,torq)
 
         if(None in [freq, volt, amps, torq]): 
             self.logError('CONN','Pump1 telemetry package broken or not received...')
+        
         else:
+            telem = UTIL.PumpTelemetry(freq,volt,amps,torq)
             telem = round(telem, 3)
-            self.dataReceived.emit(telem)
-            print(telem)
+            
+            if( telem != UTIL.PUMP1_lastTelem ):
+                mutex.lock()
+                UTIL.PUMP1_lastTelem     = telem
+                UTIL.STT_dataBlock.Pump1 = telem
+                mutex.unlock()
+                self.dataReceived.emit(telem)
 
         
 
@@ -106,10 +132,12 @@ class RoboCommWorker(QObject):
         checks the TCPIP connection every 50 ms and writes the result to global vars """
 
 
+    dataReceived    = pyqtSignal()
+    dataUpdated     = pyqtSignal(str, UTIL.RoboTelemetry)
+    endProcessing   = pyqtSignal()
+    logError        = pyqtSignal(str,str)
     queueEmtpy      = pyqtSignal()
     sendElem        = pyqtSignal(UTIL.QEntry)
-    dataUpdated     = pyqtSignal(str, UTIL.RoboTelemetry)
-    logError        = pyqtSignal(str,str)
 
 
 
@@ -135,58 +163,69 @@ class RoboCommWorker(QObject):
     def receive(self):
         """ receive 36-byte data block, write to ROB vars """
 
-        ans,rawData,state = UTIL.ROB_tcpip.receive()
+        telem,rawData,state = UTIL.ROB_tcpip.receive()
 
         if (state == True):
-            
-            if(ans is not None): ans = round(ans, 2)
-            print(f"RECV:    {ans}")
-            pos             = UTIL.Coor( ans.POS.X
-                                        ,ans.POS.Y
-                                        ,ans.POS.Z
-                                        ,ans.POS.X_ori
-                                        ,ans.POS.Y_ori
-                                        ,ans.POS.Z_ori
-                                        ,0
-                                        ,ans.POS.EXT)
-            toolSpeed       = ans.TOOL_SPEED
-            robo_comm_id    = ans.ID
+            if(telem is not None): 
+                telem = round(telem, 2)
+            self.dataReceived.emit()
 
             mutex.lock()
-            UTIL.showOnTerminal(f"RECV:    ID {robo_comm_id},   {pos}   ToolSpeed: {toolSpeed}")
-            try:
-                while (UTIL.ROB_comm_queue[0].ID < robo_comm_id):  UTIL.ROB_comm_queue.popFirstItem()
-            except AttributeError: pass
-            mutex.unlock()
+            UTIL.addToCommProtocol(f"RECV:    ID {telem.id},   {telem.Coor}   ToolSpeed: {telem.tSpeed}")
 
-            telem = UTIL.RoboTelemetry(toolSpeed, robo_comm_id, pos)
-            self.dataUpdated.emit( str(rawData), telem )
+            if ( len(UTIL.ROB_commQueue) > 0 ):
+                while (UTIL.ROB_commQueue[0].id < telem.id): 
+                    UTIL.ROB_commQueue.popFirstItem()
+
+            if( telem != UTIL.ROB_lastTelem ):
+
+                # check if robot is processing a new command (length check to skip in first loop)
+                if( (telem.id != UTIL.ROB_lastTelem) and (len(UTIL.ROB_commQueue) > 0) ):
+                    UTIL.ROB_movStartP  = UTIL.ROB_movEndP
+                    UTIL.ROB_movEndP    = copy.deepcopy( UTIL.ROB_commQueue[0] )
+
+                # set new values to globals
+                UTIL.ROB_telem      = copy.deepcopy(telem)
+                UTIL.ROB_lastTelem  = copy.deepcopy(telem)
+
+                # prep database entry
+                UTIL.STT_dataBlock.Robo      =  telem
+                UTIL.STT_dataBlock.Robo.Coor -= UTIL.DC_currZero
+                self.dataUpdated.emit( str(rawData), telem )
+
+            mutex.unlock()
+            print(f"RECV:    {telem}")
             
-        elif (ans is not None):
-            mutex.lock()
-            UTIL.showOnTerminal(f"RECV:    error ({ans}) from TCPIP class ROB_tcpip, data: {rawData}")
-            mutex.unlock()
+        elif (telem is not None):
+            self.logError.emit('CONN', f"error ({telem}) from TCPIP class ROB_tcpip, data: {rawData}")
 
-            self.logError.emit('CONN', f"error ({ans}) from TCPIP class ROB_tcpip, data: {rawData}")
+            mutex.lock()
+            UTIL.addToCommProtocol(f"RECV:    error ({telem}) from TCPIP class ROB_tcpip, data: {rawData}")
+            mutex.unlock()
         
     
     
     def send(self):
         """  signal mainframe to send queue element if qProcessing and robot queue has space """
 
-        if(UTIL.SC_qProcessing):
-            if( len(UTIL.SC_queue) == 0 ):  self.queueEmtpy.emit()
+        lenSc  = len(UTIL.SC_queue)
+        lenRob = len(UTIL.ROB_commQueue)
+        robId  = UTIL.ROB_telem.id
 
-            elif( (UTIL.ROB_telem.ID + UTIL.ROB_comm_fr) 
-                > UTIL.SC_queue[0].ID ):
-                
-                mutex.lock()
+        if( UTIL.SC_qProcessing ):
+            
+            if( lenSc > 0):
+                if( (robId + UTIL.ROB_commFr) > UTIL.SC_queue[0].id ):
 
-                elem = UTIL.SC_queue.popFirstItem()
-                if (elem == IndexError):    self.queueEmtpy.emit()
-                else:                       self.sendElem.emit(elem)
+                    mutex.lock()
+                    self.sendElem.emit( UTIL.SC_queue.popFirstItem() )
+                    mutex.unlock()
+            
+            else:
+                if( lenRob == 0 ):  self.endProcessing.emit()
+                else:               self.queueEmtpy.emit()
+
                 
-                mutex.unlock()
 
 
 
