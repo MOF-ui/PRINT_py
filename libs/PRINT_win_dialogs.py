@@ -114,21 +114,21 @@ class ConnDialog(QDialog,Ui_ConnDialog):
     def setDefault(self):
         self.TCP_ROB_entry_ip.setText           ( str(self.DEF_robTcp["IP"]) )
         self.TCP_ROB_entry_port.setText         ( str(self.DEF_robTcp["PORT"]) )
-        self.TCP_ROB_num_tio_conn.setValue      ( int(self.DEF_robTcp["CTOUT"]) )
+        self.TCP_ROB_num_tio_conn.setValue      ( int(self.DEF_robTcp["C_TOUT"]) )
         self.TCP_ROB_num_bytesToRead.setValue   ( int(self.DEF_robTcp["R_BL"]) )
-        self.TCP_ROB_num_tio_rw.setValue        ( int(self.DEF_robTcp["RWTOUT"]) )
+        self.TCP_ROB_num_tio_rw.setValue        ( int(self.DEF_robTcp["RW_TOUT"]) )
         
         self.TCP_PUMP1_entry_ip.setText         ( str(self.DEF_pump1Tcp["IP"]) )
         self.TCP_PUMP1_entry_port.setText       ( str(self.DEF_pump1Tcp["PORT"]) )
-        self.TCP_PUMP1_num_tio_conn.setValue    ( int(self.DEF_pump1Tcp["CTOUT"]) )
+        self.TCP_PUMP1_num_tio_conn.setValue    ( int(self.DEF_pump1Tcp["C_TOUT"]) )
         self.TCP_PUMP1_num_bytesToRead.setValue ( int(self.DEF_pump1Tcp["R_BL"]) )
-        self.TCP_PUMP1_num_tio_rw.setValue      ( int(self.DEF_pump1Tcp["RWTOUT"]) )
+        self.TCP_PUMP1_num_tio_rw.setValue      ( int(self.DEF_pump1Tcp["RW_TOUT"]) )
         
         self.TCP_PUMP2_entry_ip.setText         ( str(self.DEF_pump2Tcp["IP"]) )
         self.TCP_PUMP2_entry_port.setText       ( str(self.DEF_pump2Tcp["PORT"]) )
-        self.TCP_PUMP2_num_tio_conn.setValue    ( int(self.DEF_pump2Tcp["CTOUT"]) )
+        self.TCP_PUMP2_num_tio_conn.setValue    ( int(self.DEF_pump2Tcp["C_TOUT"]) )
         self.TCP_PUMP2_num_bytesToRead.setValue ( int(self.DEF_pump2Tcp["R_BL"]) )
-        self.TCP_PUMP2_num_tio_rw.setValue      ( int(self.DEF_pump2Tcp["RWTOUT"]) )
+        self.TCP_PUMP2_num_tio_rw.setValue      ( int(self.DEF_pump2Tcp["RW_TOUT"]) )
 
 
 
@@ -142,23 +142,23 @@ class ConnDialog(QDialog,Ui_ConnDialog):
 
         self.SET_robTcp["IP"]       = self.TCP_ROB_entry_ip.text()
         self.SET_robTcp["PORT"]     = self.TCP_ROB_entry_port.text()
-        self.SET_robTcp["CTOUT"]    = self.TCP_ROB_num_tio_conn.value()     / 1000
+        self.SET_robTcp["C_TOUT"]   = self.TCP_ROB_num_tio_conn.value()     / 1000
         self.SET_robTcp["R_BL"]     = self.TCP_ROB_num_bytesToRead.value()
-        self.SET_robTcp["RWTOUT"]   = self.TCP_ROB_num_tio_rw.value()       / 1000
+        self.SET_robTcp["RW_TOUT"]  = self.TCP_ROB_num_tio_rw.value()       / 1000
         self.SET_robTcp["W_BL"]     = self.DEF_robTcp["W_BL"]
 
         self.SET_pump1Tcp["IP"]     = self.TCP_PUMP1_entry_ip.text()
         self.SET_pump1Tcp["PORT"]   = self.TCP_PUMP1_entry_port.text()
-        self.SET_pump1Tcp["CTOUT"]  = self.TCP_PUMP1_num_tio_conn.value()   / 1000
+        self.SET_pump1Tcp["C_TOUT"] = self.TCP_PUMP1_num_tio_conn.value()   / 1000
         self.SET_pump1Tcp["R_BL"]   = self.TCP_PUMP1_num_bytesToRead.value()
-        self.SET_pump1Tcp["RWTOUT"] = self.TCP_PUMP1_num_tio_rw.value()     / 1000
+        self.SET_pump1Tcp["RW_TOUT"]= self.TCP_PUMP1_num_tio_rw.value()     / 1000
         self.SET_pump1Tcp["W_BL"]   = self.DEF_pump2Tcp["W_BL"] 
 
         self.SET_pump2Tcp["IP"]     = self.TCP_PUMP2_entry_ip.text()
         self.SET_pump2Tcp["PORT"]   = self.TCP_PUMP2_entry_port.text()
-        self.SET_pump2Tcp["CTOUT"]  = self.TCP_PUMP2_num_tio_conn.value()   / 1000
+        self.SET_pump2Tcp["C_TOUT"] = self.TCP_PUMP2_num_tio_conn.value()   / 1000
         self.SET_pump2Tcp["R_BL"]   = self.TCP_PUMP2_num_bytesToRead.value()
-        self.SET_pump2Tcp["RWTOUT"] = self.TCP_PUMP2_num_tio_rw.value()     / 1000
+        self.SET_pump2Tcp["RW_TOUT"]= self.TCP_PUMP2_num_tio_rw.value()     / 1000
         self.SET_pump2Tcp["W_BL"]   = self.DEF_pump2Tcp["W_BL"]
 
 
