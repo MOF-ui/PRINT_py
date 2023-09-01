@@ -22,17 +22,17 @@ from datetime import datetime
 #                                    CLASSES
 #############################################################################################
 
-class Coor:
+class Coordinate:
     """standard 7-axis coordinate block (8 attributes, as quaterion positioning is possible)
 
     ATTRIBUTES:
-        X, Y, Z:
+        x, y, z:
             position in cartesian coordinates
-        X_ori, Y_ori, Z_ori:
+        rx, ry, rz:
             angle relative to cartesian coordinates
-        Q:
+        q:
             additional var for fourth quaternion coordinate
-        EXT:
+        ext:
             external axis position
 
     FUNCTIONS:
@@ -45,54 +45,54 @@ class Coor:
     """
 
     def __init__(self,
-                 X  	= 0.0, 
-                 Y  	= 0.0, 
-                 Z  	= 0.0, 
-                 X_ori  = 0.0, 
-                 Y_ori  = 0.0, 
-                 Z_ori  = 0.0, 
-                 Q      = 0.0, 
-                 EXT    = 0.0):
+                 x  	= 0.0, 
+                 y  	= 0.0, 
+                 z  	= 0.0, 
+                 rx     = 0.0, 
+                 ry     = 0.0, 
+                 rz     = 0.0, 
+                 q      = 0.0, 
+                 ext    = 0.0):
         
-        self.X      = float(X)
-        self.Y      = float(Y)
-        self.Z      = float(Z)
-        self.X_ori  = float(X_ori)
-        self.Y_ori  = float(Y_ori)
-        self.Z_ori  = float(Z_ori)
-        self.Q      = float(Q)
-        self.EXT    = float(EXT)
+        self.x      = float(x)
+        self.y      = float(y)
+        self.z      = float(z)
+        self.rx     = float(rx)
+        self.ry     = float(ry)
+        self.rz     = float(rz)
+        self.q      = float(q)
+        self.ext    = float(ext)
     
 
 
     def __str__(self):
 
-        return f"X: {self.X}   Y: {self.Y}   Z: {self.Z}   Rx: {self.X_ori}   Ry: {self.Y_ori}   Rz: {self.Z_ori}   " \
-               f"Q: {self.Q}   EXT: {self.EXT}"
+        return f"X: {self.x}   Y: {self.y}   Z: {self.z}   Rx: {self.rx}   Ry: {self.ry}   Rz: {self.rz}   " \
+               f"Q: {self.q}   EXT: {self.ext}"
     
 
 
     def __add__(self,summand):
 
         try:
-            return round( Coor( (self.X        + summand.X)
-                               ,(self.Y        + summand.Y)
-                               ,(self.Z        + summand.Z)
-                               ,(self.X_ori    + summand.X_ori)
-                               ,(self.Y_ori    + summand.Y_ori)
-                               ,(self.Z_ori    + summand.Z_ori)
-                               ,(self.Q        + summand.Q)
-                               ,(self.EXT      + summand.EXT) )
+            return round( Coordinate( (self.x        + summand.x)
+                                      ,(self.y        + summand.y)
+                                      ,(self.z        + summand.z)
+                                      ,(self.rx       + summand.rx)
+                                      ,(self.ry       + summand.ry)
+                                      ,(self.rz       + summand.rz)
+                                      ,(self.q        + summand.q)
+                                      ,(self.ext      + summand.ext) )
                          , 6)
         except AttributeError:
-            return round( Coor( (self.X        + summand)
-                               ,(self.Y        + summand)
-                               ,(self.Z        + summand)
-                               ,(self.X_ori    + summand)
-                               ,(self.Y_ori    + summand)
-                               ,(self.Z_ori    + summand)
-                               ,(self.Q        + summand)
-                               ,(self.EXT      + summand) )
+            return round( Coordinate( (self.x        + summand)
+                                      ,(self.y        + summand)
+                                      ,(self.z        + summand)
+                                      ,(self.rx       + summand)
+                                      ,(self.ry       + summand)
+                                      ,(self.rz       + summand)
+                                      ,(self.q        + summand)
+                                      ,(self.ext      + summand) )
                          , 6)
     
 
@@ -100,52 +100,52 @@ class Coor:
     def __sub__(self,subtrahend):
 
         try:
-            return round( Coor( (self.X        - subtrahend.X)
-                               ,(self.Y        - subtrahend.Y)
-                               ,(self.Z        - subtrahend.Z)
-                               ,(self.X_ori    - subtrahend.X_ori)
-                               ,(self.Y_ori    - subtrahend.Y_ori)
-                               ,(self.Z_ori    - subtrahend.Z_ori)
-                               ,(self.Q        - subtrahend.Q)
-                               ,(self.EXT      - subtrahend.EXT) )
+            return round( Coordinate( (self.x        - subtrahend.x)
+                                      ,(self.y        - subtrahend.y)
+                                      ,(self.z        - subtrahend.z)
+                                      ,(self.rx       - subtrahend.rx)
+                                      ,(self.ry       - subtrahend.ry)
+                                      ,(self.rz       - subtrahend.rz)
+                                      ,(self.q        - subtrahend.q)
+                                      ,(self.ext      - subtrahend.ext) )
                         , 6)
         except AttributeError:
-            return round( Coor( (self.X        - subtrahend)
-                               ,(self.Y        - subtrahend)
-                               ,(self.Z        - subtrahend)
-                               ,(self.X_ori    - subtrahend)
-                               ,(self.Y_ori    - subtrahend)
-                               ,(self.Z_ori    - subtrahend)
-                               ,(self.Q        - subtrahend)
-                               ,(self.EXT      - subtrahend) )
+            return round( Coordinate( (self.x        - subtrahend)
+                                      ,(self.y        - subtrahend)
+                                      ,(self.z        - subtrahend)
+                                      ,(self.rx       - subtrahend)
+                                      ,(self.ry       - subtrahend)
+                                      ,(self.rz       - subtrahend)
+                                      ,(self.q        - subtrahend)
+                                      ,(self.ext      - subtrahend) )
                         , 6)
     
 
 
     def __round__(self, digits):
         
-        return Coor( round(self.X    , digits) 
-                    ,round(self.Y    , digits)
-                    ,round(self.Z    , digits)
-                    ,round(self.X_ori, digits)
-                    ,round(self.Y_ori, digits)
-                    ,round(self.Z_ori, digits)
-                    ,round(self.Q    , digits)
-                    ,round(self.EXT  , digits) )
+        return Coordinate( round(self.x,   digits) 
+                           ,round(self.y,   digits)
+                           ,round(self.z,   digits)
+                           ,round(self.rx,  digits)
+                           ,round(self.ry,  digits)
+                           ,round(self.rz,  digits)
+                           ,round(self.q,   digits)
+                           ,round(self.ext, digits) )
     
 
 
     def __eq__(self,other):
 
         try:
-            if(     self.X     == other.X
-                and self.Y     == other.Y
-                and self.Z     == other.Z
-                and self.X_ori == other.X_ori
-                and self.Y_ori == other.Y_ori
-                and self.Z_ori == other.Z_ori
-                and self.Q     == other.Q
-                and self.EXT   == other.EXT):
+            if(     self.x     == other.x
+                and self.y     == other.y
+                and self.z     == other.z
+                and self.rx    == other.rx
+                and self.ry    == other.ry
+                and self.rz    == other.rz
+                and self.q     == other.q
+                and self.ext   == other.ext):
                 return True
             else: return False
 
@@ -156,18 +156,18 @@ class Coor:
 
 
 
-class Speed:
+class SpeedVector:
     """standard speed vector (4 attributes).
 
     ATTRIBUTES:
-        TS:
-            transition speed
-        OR:
-            orientation speed
-        ACR:
+        acr:
             acceleration ramp
-        DCR:
+        dcr:
             deceleration ramp
+        ts:
+            transition speed
+        os:
+            orientation speed
     
     FUNCTIONS:
         __init__\n
@@ -178,30 +178,30 @@ class Speed:
     """
 
     def __init__(self, 
-                 ACR    = 50, 
-                 DCR    = 50, 
-                 TS     = 200, 
-                 OS     = 50):
+                 acr    = 50, 
+                 dcr    = 50, 
+                 ts     = 200, 
+                 os     = 50):
         
-        self.ACR    = int( round( ACR , 0) )
-        self.DCR    = int( round( DCR , 0) )
-        self.TS     = int( round( TS  , 0) )
-        self.OS     = int( round( OS  , 0) )
+        self.acr    = int( round( acr, 0) )
+        self.dcr    = int( round( dcr, 0) )
+        self.ts     = int( round( ts,  0) )
+        self.os     = int( round( os,  0) )
 
 
 
     def __str__(self):
 
-        return f"TS: {self.TS}   OS: {self.OS}   ACR: {self.ACR}   DCR: {self.DCR}"
+        return f"TS: {self.ts}   OS: {self.os}   ACR: {self.acr}   DCR: {self.dcr}"
     
 
 
     def __mul__(self,other):
 
-        return Speed( TS = int(  round( self.TS *  other, 0) ) 
-                     ,OS = int(  round( self.OS *  other, 0) ) 
-                     ,ACR = int( round( self.ACR * other, 0) ) 
-                     ,DCR = int( round( self.DCR * other, 0) ) )
+        return SpeedVector( ts  = int( round( self.ts *  other, 0) ) 
+                           ,os  = int( round( self.os *  other, 0) ) 
+                           ,acr = int( round( self.acr * other, 0) ) 
+                           ,dcr = int( round( self.dcr * other, 0) ) )
     
 
 
@@ -214,10 +214,10 @@ class Speed:
     def __eq__(self,other):
 
         try:
-            if(     self.ACR == other.ACR
-                and self.DCR == other.DCR
-                and self.TS  == other.TS
-                and self.OS  == other.OS):
+            if(     self.acr == other.acr
+                and self.dcr == other.dcr
+                and self.ts  == other.ts
+                and self.os  == other.os):
                 return True
             else: return False
 
@@ -231,37 +231,37 @@ class ToolCommand:
     """standard tool command according to Jonas' protocol
 
     ATTRIBUTES:
-        M1_ID:
+        m1_id:
             motor 1 ID (fiber pivoting)
-        M1_STEPS:
+        m1_steps:
             motor 1 steps/position
-        M2_ID:
+        m2_id:
             motor 2 ID (fiber delivery)
-        M2_STEPS:
+        m2_steps:
             motor 2 steps/position
-        M3_ID:
+        m3_id:
             motor 3 ID (mortar pump)
-        M3_STEPS:
+        M3_steps:
             motor 3 steps/position
-        PNMTC_CLAMP_ID:
+        pnmtcClamp_id:
             pneumatic fiber clamp ID
-        PNMTC_CLAMP_YN:
+        pnmtcClamp_yn:
             pneumatic fiber clamp on/off
-        KNIFE_ID:
+        knife_id:
             knife delivery ID
-        KNIFE_YN:
+        knife_steps:
             knife delivery on/off
-        M4_ID:
+        m4_id:
             motor 4 ID (rotation knife)
-        M4_STEPS:
+        m4_steps:
             motor 4 steps/position
-        PNMTC_FIBER_ID:
+        pnmtcFiber_id:
             pneumatic fiber conveyer ID
-        PNMTC_FIBER_YN:
+        pnmtcFiber_yn:
             pneumatic fiber conveyer on/off
-        TIME_ID:
+        time_id:
             time ID
-        TIME_TIME:
+        time_time:
             current time in milli seconds at EE
         
     FUNCTIONS:
@@ -271,70 +271,70 @@ class ToolCommand:
     """
 
     def __init__(self,
-                 M1_ID          = 0,
-                 M1_STEPS       = 0,
-                 M2_ID          = 0,
-                 M2_STEPS       = 0,
-                 M3_ID          = 0,
-                 M3_STEPS       = 0,
-                 PNMTC_CLAMP_ID = 0,
-                 PNMTC_CLAMP_YN = 0,
-                 KNIFE_ID       = 0,
-                 KNIFE_YN       = 0,
-                 M4_ID          = 0,
-                 M4_STEPS       = 0,
-                 PNMTC_FIBER_ID = 0,
-                 PNMTC_FIBER_YN = 0,
-                 TIME_ID        = 0,
-                 TIME_TIME      = 0):
+                 m1_id          = 0,
+                 m1_steps       = 0,
+                 m2_id          = 0,
+                 m2_steps       = 0,
+                 m3_id          = 0,
+                 m3_steps       = 0,
+                 pnmtcClamp_id  = 0,
+                 pnmtcClamp_yn  = 0,
+                 knife_id       = 0,
+                 knife_yn       = 0,
+                 m4_id          = 0,
+                 m4_steps       = 0,
+                 pnmtcFiber_id  = 0,
+                 pnmtcFiber_yn  = 0,
+                 time_id        = 0,
+                 time_time      = 0):
         
-        self.M1_ID          = int(M1_ID)
-        self.M1_STEPS       = int(M1_STEPS)
-        self.M2_ID          = int(M2_ID)
-        self.M2_STEPS       = int(M2_STEPS)
-        self.M3_ID          = int(M3_ID)
-        self.M3_STEPS       = int(M3_STEPS)
-        self.PNMTC_CLAMP_ID = int(PNMTC_CLAMP_ID)
-        self.PNMTC_CLAMP_YN = bool(PNMTC_CLAMP_YN)
-        self.KNIFE_ID       = int(KNIFE_ID)
-        self.KNIFE_YN       = bool(KNIFE_YN)
-        self.M4_ID          = int(M4_ID)
-        self.M4_STEPS       = bool(M4_STEPS)
-        self.PNMTC_FIBER_ID = int(PNMTC_FIBER_ID)
-        self.PNMTC_FIBER_YN = bool(PNMTC_FIBER_YN)
-        self.TIME_ID        = int(TIME_ID)
-        self.TIME_TIME      = int(TIME_TIME)
+        self.m1_id          = int (m1_id)
+        self.m1_steps       = int (m1_steps)
+        self.m2_id          = int (m2_id)
+        self.m2_steps       = int (m2_steps)
+        self.m3_id          = int (m3_id)
+        self.m3_steps       = int (m3_steps)
+        self.pnmtcClamp_id  = int (pnmtcClamp_id)
+        self.pnmtcClamp_yn  = bool(pnmtcClamp_yn)
+        self.knife_id       = int (knife_id)
+        self.knife_yn       = bool(knife_yn)
+        self.m4_id          = int (m4_id)
+        self.m4_steps       = bool(m4_steps)
+        self.pnmtcFiber_id  = int (pnmtcFiber_id)
+        self.pnmtcFiber_yn  = bool(pnmtcFiber_yn)
+        self.time_id        = int (time_id)
+        self.time_time      = int (time_time)
 
 
 
     def __str__(self):
 
-        return  f"M1: {self.M1_ID}, {self.M1_STEPS}   M2: {self.M2_ID}, {self.M2_STEPS}   M3: {self.M3_ID}, {self.M3_STEPS}   "\
-                f"P_C: {self.PNMTC_CLAMP_ID}, {self.PNMTC_CLAMP_YN}   KN: {self.KNIFE_ID}, {self.KNIFE_YN}   "\
-                f"M4: {self.M4_ID}, {self.M4_STEPS}   P_F: {self.PNMTC_FIBER_ID}, {self.PNMTC_FIBER_YN}   "\
-                f"TIME: {self.TIME_ID}, {self.TIME_TIME}"
+        return  f"M1: {self.m1_id}, {self.m1_steps}   M2: {self.m2_id}, {self.m2_steps}   M3: {self.m3_id}, {self.m3_steps}   "\
+                f"P_C: {self.pnmtcClamp_id}, {self.pnmtcClamp_yn}   KN: {self.knife_id}, {self.knife_yn}   "\
+                f"M4: {self.m4_id}, {self.m4_steps}   P_F: {self.pnmtcFiber_id}, {self.pnmtcFiber_yn}   "\
+                f"TIME: {self.time_id}, {self.time_time}"
     
 
 
     def __eq__(self,other):
 
         try:
-            if(     self.M1_ID          == other.M1_ID
-                and self.M1_STEPS       == other.M1_STEPS
-                and self.M2_ID          == other.M2_ID
-                and self.M2_STEPS       == other.M2_STEPS
-                and self.M3_ID          == other.M3_ID
-                and self.M3_STEPS       == other.M3_STEPS
-                and self.PNMTC_CLAMP_ID == other.PNMTC_CLAMP_ID
-                and self.PNMTC_CLAMP_YN == other.PNMTC_CLAMP_YN
-                and self.KNIFE_ID       == other.KNIFE_ID
-                and self.KNIFE_YN       == other.KNIFE_YN
-                and self.M4_ID          == other.M4_ID
-                and self.M4_STEPS       == other.M4_STEPS
-                and self.PNMTC_FIBER_ID == other.PNMTC_FIBER_ID
-                and self.PNMTC_FIBER_YN == other.PNMTC_FIBER_YN
-                and self.TIME_ID        == other.TIME_ID
-                and self.TIME_TIME      == other.TIME_TIME):
+            if(     self.m1_id          == other.m1_id
+                and self.m1_steps       == other.m1_steps
+                and self.m2_id          == other.m2_id
+                and self.m2_steps       == other.m2_steps
+                and self.m3_id          == other.m3_id
+                and self.m3_steps       == other.m3_steps
+                and self.pnmtcClamp_id  == other.pnmtcClamp_id
+                and self.pnmtcClamp_yn  == other.pnmtcClamp_yn
+                and self.knife_id       == other.knife_id
+                and self.knife_yn       == other.knife_yn
+                and self.m4_id          == other.m4_id
+                and self.m4_steps       == other.m4_steps
+                and self.pnmtcFiber_id  == other.pnmtcFiber_id
+                and self.pnmtcFiber_yn  == other.pnmtcFiber_yn
+                and self.time_id        == other.time_id
+                and self.time_time      == other.time_time):
                 return True
             else: return False
 
@@ -349,26 +349,26 @@ class QEntry:
     """standard 159 byte command queue entry for TCP robot according to the protocol running on the robot
     
     ATTRIBUTES:
-        ID: 
+        id: 
             command ID, list number in robot internal queue
-        MT:
+        mt:
             type of movement or special command (L = linear, J = joint, C = circular, S = stop after current movement
             & delete robot internal queue, E = end TCP protocol on robot)
-        PT:
+        pt:
             position type, type of rotation given (E = Euler angles, Q = quaternion, A = axis positioning)
-        COOR_1:
+        Coor1:
             coordinates of the first given point
-        COOR_2:
+        Coor2:
             coordinates of the second given point
-        SV:
+        Speed:
             speed vector for given movement
-        SBT:
+        sbt:
             time to calculate speed by
-        SC:
+        sc:
             speed command, set movement speed by movement time (SBT) or speed vector (SV), (T = time, V = vector)
-        Z:
+        z:
             zone, endpoint precision
-        TOOL:
+        Tool:
             tool command in Jonas' standard format
         
     FUNCTIONS:
@@ -378,54 +378,58 @@ class QEntry:
     """
 
     def __init__(self,
-                 ID     = 0,
-                 MT     = "L",
-                 PT     = "E",
-                 COOR_1 = None,
-                 COOR_2 = None,
-                 SV     = None,
-                 SBT    = 0,
-                 SC     = "V",
-                 Z      = 10,
-                 TOOL   = None):
+                 id     = 0,
+                 mt     = "L",
+                 pt     = "E",
+                 Coor1  = None,
+                 Coor2  = None,
+                 Speed  = None,
+                 sbt    = 0,
+                 sc     = "V",
+                 z      = 10,
+                 Tool   = None,
+                 pMode  = None):
         
-        self.ID     = int(ID)
-        self.MT     = str(MT)
-        self.PT     = str(PT)
-        self.SBT    = int(SBT)
-        self.SC     = str(SC)
-        self.Z      = int(Z)
+        self.id     = int(id)
+        self.mt     = str(mt)
+        self.pt     = str(pt)
+        self.sbt    = int(sbt)
+        self.sc     = str(sc)
+        self.z      = int(z)
+        self.pMode  = str(pMode)
 
         # handle those beasty mutables
-        self.COOR_1 = Coor()        if (COOR_1 == None) else COOR_1
-        self.COOR_2 = Coor()        if (COOR_2 == None) else COOR_2
-        self.SV     = Speed()       if (SV == None)     else SV
-        self.TOOL   = ToolCommand() if (TOOL == None)   else TOOL
+        self.Coor1  = Coordinate() if (Coor1 == None) else Coor1
+        self.Coor2  = Coordinate() if (Coor2 == None) else Coor2
+        self.Speed  = SpeedVector() if (Speed == None) else Speed
+        self.Tool   = ToolCommand() if (Tool == None)  else Tool
     
 
 
     def __str__(self):
         
-        return  f"ID: {self.ID}  MT: {self.MT}  PT: {self.PT} \t|| COOR_1: {self.COOR_1}"\
-                f"\n\t\t|| COOR_2: {self.COOR_2}"\
-                f"\n\t\t|| SV:     {self.SV} \t|| SBT: {self.SBT}   SC: {self.SC}   Z: {self.Z}"\
-                f"\n\t\t|| TOOL:   {self.TOOL}"
+        return  f"ID: {self.id}  MT: {self.mt}  PT: {self.pt} \t|| COOR_1: {self.Coor1}"\
+                f"\n\t\t|| COOR_2: {self.Coor2}"\
+                f"\n\t\t|| SV:     {self.Speed} \t|| SBT: {self.sbt}   SC: {self.sc}   Z: {self.z}"\
+                f"\n\t\t|| TOOL:   {self.Tool}"\
+                f"\n\t\t|| PMODE:  {self.pMode}"
     
 
 
     def __eq__(self,other):
 
         try:
-            if(     self.ID     == other.ID
-                and self.MT     == other.MT
-                and self.PT     == other.PT
-                and self.COOR_1 == other.COOR_1
-                and self.COOR_2 == other.COOR_2
-                and self.SV     == other.SV
-                and self.SBT    == other.SBT
-                and self.SC     == other.SC
-                and self.Z      == other.Z
-                and self.TOOL   == other.TOOL):
+            if(     self.id     == other.id
+                and self.mt     == other.mt
+                and self.pt     == other.pt
+                and self.Coor1  == other.Coor1
+                and self.Coor2  == other.Coor2
+                and self.Speed  == other.Speed
+                and self.sbt    == other.sbt
+                and self.sc     == other.sc
+                and self.z      == other.z
+                and self.Tool   == other.Tool
+                and self.pMode  == other.pMode):
                 return True
             else: return False
 
@@ -441,7 +445,7 @@ class Queue:
     
         ATTRIBUTES:
             queue:
-                a list of QEntry elements, careful: list index does not match QEntry.ID
+                a list of QEntry elements, careful: list index does not match QEntry.id
 
         FUNCTIONS:
             __init__\n
@@ -494,6 +498,7 @@ class Queue:
                 i   += 1
                 ans += f"Element {i}: {x}\n"
             return ans
+        
         return "Queue is empty!"
     
 
@@ -525,10 +530,10 @@ class Queue:
         length = len(self.queue)
         i      = 0
 
-        if (length == 0):  raise AttributeError
+        if (length <= 0):  raise AttributeError
 
         for entry in range(length):
-            if (self.queue[entry].ID == ID): break
+            if (self.queue[entry].id == ID): break
             else:                            i += 1
         
         if ( (i < 1) or (i >= length) ): 
@@ -553,7 +558,7 @@ class Queue:
         """ increments all QEntry.ID to handle DC commands send before the queue """
 
         for i in self.queue:
-            i.ID += 1
+            i.id += 1
 
 
 
@@ -563,28 +568,30 @@ class Queue:
         newEntry = copy.deepcopy(entry)
         lastItem = len(self.queue) - 1 
         if(lastItem < 0):
-            global SC_curr_comm_id
+            global SC_currCommId
 
-            newEntry.ID = SC_curr_comm_id
+            newEntry.id = SC_currCommId
             self.queue.append(newEntry)
             return None
         
-        lastID  = self.queue[lastItem].ID
-        firstID = self.queue[0].ID
-        if( (newEntry.ID == 0) or (newEntry.ID > lastID) ):
-            newEntry.ID = lastID + 1
+        lastID  = self.queue[lastItem].id
+        firstID = self.queue[0].id
+        
+        if( (newEntry.id == 0) or (newEntry.id > lastID) ):
+            newEntry.id = lastID + 1
             self.queue.append(newEntry)
 
-        elif( newEntry.ID < 0 ):     return ValueError
+        elif( newEntry.id < 0 ):
+            return ValueError
 
         else:
-            if( newEntry.ID < firstID ):  newEntry.ID = firstID
+            if( newEntry.id < firstID ):  newEntry.id = firstID
             
-            frontSkip = newEntry.ID - self.queue[0].ID
+            frontSkip = newEntry.id - self.queue[0].id
             self.queue.insert(frontSkip,newEntry)
             for i in range(lastItem + 1 - frontSkip):
                 i += 1
-                self.queue[i + frontSkip].ID += 1
+                self.queue[i + frontSkip].id += 1
 
         return None
     
@@ -599,8 +606,8 @@ class Queue:
 
         ids     = re.findall('\d+',ID)
         idNum   = len(ids)
-        firstID = self.queue[0].ID
-        lastID  = self.queue[len(self.queue) - 1].ID
+        firstID = self.queue[0].id
+        lastID  = self.queue[len(self.queue) - 1].id
         
         match idNum:
 
@@ -611,12 +618,12 @@ class Queue:
 
                 i = 0
                 for entry in self.queue:
-                    if(entry.ID == id1):    break
+                    if(entry.id == id1):    break
                     else:                   i += 1
                 
                 self.queue.__delitem__(i)
                 while (i < len(self.queue)):
-                    self.queue[i].ID -= 1
+                    self.queue[i].id -= 1
                     i += 1
 
             case 2:
@@ -630,16 +637,16 @@ class Queue:
                     return ValueError
                 
                 idDist = (id2 - id1) + 1
-                i = 0
+                i      = 0
                 for entry in self.queue:
-                    if(entry.ID == id1):    break
+                    if(entry.id == id1):    break
                     else:                   i += 1
                 
                 for n in range(idDist):
                     self.queue.__delitem__(i)
                 
                 while ( i < len(self.queue) ):
-                    self.queue[i].ID -= idDist
+                    self.queue[i].id -= idDist
                     i += 1
 
             case _: 
@@ -663,7 +670,14 @@ class Queue:
 
 class RoboTelemetry:
     """ class used to store the standard 36 byte telemetry data comming from the robot 
-    
+
+    ATTRIBUTES:
+        tSpeed:
+            speed with that the tool center point (TCP) is moving
+        id:
+            command ID the robot is currently processing
+        Coor:
+            current coordinate of the TCP, see Coordinates class
     
     FUNCTIONS:
         __init__\n
@@ -673,40 +687,40 @@ class RoboTelemetry:
     """
 
     def __init__(self,
-                 TOOL_SPEED  = 0.0,
-                 ID          = -1,
-                 POS         = None):
+                 tSpeed = 0.0,
+                 id     = -1,
+                 Coor   = None):
         
-        self.TOOL_SPEED = float(TOOL_SPEED)
-        self.ID         = int(ID)
+        self.tSpeed = float(tSpeed)
+        self.id     = int(id)
 
         # handle those beasty mutables
-        self.POS = Coor()   if (POS == None) else POS
+        self.Coor = Coordinate()   if (Coor == None) else Coor
 
 
 
 
     def __str__(self):
 
-        return  f"ID: {self.ID}   X: {self.POS.X}   Y: {self.POS.Y}   Z: {self.POS.Z}   Rx: {self.POS.X_ori}   Ry: {self.POS.Y_ori}   Rz: {self.POS.Z_ori}   "\
-                f"EXT:   {self.POS.EXT}   TOOL_SPEED: {self.TOOL_SPEED}"
+        return  f"ID: {self.id}   X: {self.Coor.x}   Y: {self.Coor.y}   Z: {self.Coor.z}   Rx: {self.Coor.rx}   Ry: {self.Coor.ry}   Rz: {self.Coor.rz}   "\
+                f"EXT:   {self.Coor.ext}   TOOL_SPEED: {self.tSpeed}"
     
 
 
     def __round__(self, digits):
 
-        return RoboTelemetry( round(self.TOOL_SPEED, digits) 
-                             ,self.ID
-                             ,round(self.POS,        digits))
+        return RoboTelemetry( round(self.tSpeed, digits) 
+                             ,self.id
+                             ,round(self.Coor,   digits))
     
 
 
     def __eq__(self, other):
 
         try:
-            if(     self.TOOL_SPEED == other.TOOL_SPEED
-                and self.ID         == other.ID
-                and self.POS        == other.POS):
+            if(     self.tSpeed == other.tSpeed
+                and self.id     == other.id
+                and self.Coor   == other.Coor):
                 return True
             else: return False
 
@@ -720,6 +734,16 @@ class RoboTelemetry:
 
 class PumpTelemetry:
     """ class used to store the standard telemetry data the pump 
+
+    ATTRIBUTES:
+        freq:
+            motor frequency (currently only given as 0 - 100%)
+        volt:
+            voltage at motor coil (I thought in V, but the values seem to high)
+        amps:
+            current in motor coil (unit unknown, as for volt)
+        torq:
+            torque, probably in Nm
     
     FUNCTIONS:
         __init__\n
@@ -729,40 +753,40 @@ class PumpTelemetry:
     """
 
     def __init__(self,
-                 FREQ = 0.0,
-                 VOLT = 0.0,
-                 AMPS = 0.0,
-                 TORQ = 0.0):
+                 freq = 0.0,
+                 volt = 0.0,
+                 amps = 0.0,
+                 torq = 0.0):
         
-        self.FREQ = float(FREQ)
-        self.VOLT = float(VOLT)
-        self.AMPS = float(AMPS)
-        self.TORQ = float(TORQ)
+        self.freq = float(freq)
+        self.volt = float(volt)
+        self.amps = float(amps)
+        self.torq = float(torq)
 
 
 
     def __str__(self):
 
-        return  f"FREQ: {self.FREQ}   VOLT: {self.VOLT}   AMPS: {self.AMPS}   TORQ: {self.TORQ}"
+        return  f"FREQ: {self.freq}   VOLT: {self.volt}   AMPS: {self.amps}   TORQ: {self.torq}"
     
 
 
     def __round__(self, digits):
 
-        return PumpTelemetry( round(self.FREQ, digits)
-                             ,round(self.VOLT, digits)
-                             ,round(self.AMPS, digits)
-                             ,round(self.TORQ, digits) )
+        return PumpTelemetry( round(self.freq, digits)
+                             ,round(self.volt, digits)
+                             ,round(self.amps, digits)
+                             ,round(self.torq, digits) )
     
 
 
     def __eq__(self, other):
 
         try:
-            if(     self.FREQ == other.FREQ
-                and self.VOLT == other.VOLT
-                and self.AMPS == other.AMPS
-                and self.TORQ == other.TORQ):
+            if(     self.freq == other.freq
+                and self.volt == other.volt
+                and self.amps == other.amps
+                and self.torq == other.torq):
                 return True
             else: return False
 
@@ -774,8 +798,43 @@ class PumpTelemetry:
 
 
 class DaqBlock:
-    """ structure for DAQ 
-    
+    """ structure for DAQ
+    ATTRIBUTES:
+        amb_temp:
+            ambient temperatur [°C]
+        amb_hum:
+            ambient humidity [%]
+        delivPump_temp:
+            temperature behind pump1's moineur pump [°C]
+        robBase_temp:
+            temperature of the mortar tube at the second coupling [°C]
+        kPump_temp:
+            temperature behind the 2K pump [°C]
+        delivPump_press:
+            pressure behind pump1's moineur pump [bar]
+        kPump_press:
+            pressure in front of 2K pump [bar]
+        Pump1:
+            PumpTelemetry datablock for pump1
+        Pump2:
+            PumpTelemetry datablock for pump2
+        admPump_freq:
+            frequency of the admixture delivery pump
+        admPump_amps:
+            current of the admixture delivery pump
+        kPump_freq:
+            frequency of the 2K pump
+        kPump_amps:
+            current of the 2K pump
+        Robo:
+            RoboTelemetry datablock
+        porosAnalysis:
+            porosity analysis (not specified yet)
+        distanceFront:
+            deposition layer height in front of the nozzle
+        distanceEnd:
+            deposition layer height behind the nozzle
+
     FUNCTIONS:
         __init__\n
         __str__\n
@@ -783,52 +842,52 @@ class DaqBlock:
     """
 
     def __init__(self,
-                 ambTemp =          0.0,
-                 ambHum =           0.0,
-                 delivPumpTemp =    0.0,
-                 robBaseTemp =      0.0,
-                 kPumpTemp =        0.0,
-                 delivPumpPress =   0.0,
-                 kPumpPress =       0.0,
-                 PUMP1 =            None,
-                 PUMP2 =            None,
-                 admPumpFreq =      0.0,
-                 admPumpAmps =      0.0,
-                 kPumpFreq =        0.0,
-                 kPumpAmps =        0.0,
-                 ROB =              None,
+                 amb_temp =         0.0,
+                 amb_hum =          0.0,
+                 delivPump_temp =   0.0,
+                 robBase_temp =     0.0,
+                 kPump_temp =       0.0,
+                 delivPump_press =  0.0,
+                 kPump_press =      0.0,
+                 Pump1 =            None,
+                 Pump2 =            None,
+                 admPump_freq =     0.0,
+                 admPump_amps =     0.0,
+                 kPump_freq =       0.0,
+                 kPump_amps =       0.0,
+                 Robo =             None,
                  porosAnalysis =    0.0,
                  distanceFront =    0.0,
                  distanceEnd =      0.0):
         
-        self.ambTemp =          float(ambTemp)
-        self.ambHum =           float(ambHum)
-        self.delivPumpTemp =    float(delivPumpTemp)
-        self.robBaseTemp =      float(robBaseTemp)
-        self.kPumpTemp =        float(kPumpTemp)
-        self.delivPumpPress =   float(delivPumpPress)
-        self.kPumpPress =       float(kPumpPress)
-        self.admPumpFreq =      float(admPumpFreq)
-        self.admPumpAmps =      float(admPumpAmps)
-        self.kPumpFreq =        float(kPumpFreq)
-        self.kPumpAmps =        float(kPumpAmps)
+        self.amb_temp =         float(amb_temp)
+        self.amb_hum =          float(amb_hum)
+        self.delivPump_temp =   float(delivPump_temp)
+        self.robBase_temp =     float(robBase_temp)
+        self.kPump_temp =       float(kPump_temp)
+        self.delivPump_press =  float(delivPump_press)
+        self.kPump_press =      float(kPump_press)
+        self.admPump_freq =     float(admPump_freq)
+        self.admPump_amps =     float(admPump_amps)
+        self.kPump_freq =       float(kPump_freq)
+        self.kPump_amps =       float(kPump_amps)
         self.porosAnalysis =    float(porosAnalysis)
         self.distanceFront =    float(distanceFront)
         self.distanceEnd =      float(distanceEnd)
 
         # handle those beasty mutables
-        self.PUMP1  = PumpTelemetry()   if (PUMP1 == None) else PUMP1
-        self.PUMP2  = PumpTelemetry()   if (PUMP2 == None) else PUMP2
-        self.ROB    = RoboTelemetry()   if (ROB == None)   else ROB
+        self.Pump1  = PumpTelemetry()   if (Pump1 == None) else Pump1
+        self.Pump2  = PumpTelemetry()   if (Pump2 == None) else Pump2
+        self.Robo   = RoboTelemetry()   if (Robo  == None) else Robo
 
 
 
     def __str__(self):
 
-        return f"ambTemp: {self.ambTemp}    ambHum: {self.ambHum}    delivPumpTemp: {self.delivPumpTemp}    robBaseTemp: {self.robBaseTemp}    "\
-               f"kPumpTemp: {self.kPumpTemp}    delivPumpPress: {self.delivPumpPress}    kPumpPress: {self.kPumpPress}    PUMP1: {self.PUMP1}    "\
-               f"PUMP2: {self.PUMP2}    admPumpFreq: {self.admPumpFreq}    admPumpAmps: {self.admPumpAmps}    kPumpFreq: {self.kPumpFreq}    "\
-               f"kPumpAmps: {self.kPumpAmps}    ROB: {self.ROB}    porosAnalysis: {self.porosAnalysis}    "\
+        return f"ambTemp: {self.amb_temp}    ambHum: {self.amb_hum}    delivPumpTemp: {self.delivPump_temp}    robBaseTemp: {self.robBase_temp}    "\
+               f"kPumpTemp: {self.kPump_temp}    delivPumpPress: {self.delivPump_press}    kPumpPress: {self.kPump_press}    PUMP1: {self.Pump1}    "\
+               f"PUMP2: {self.Pump2}    admPumpFreq: {self.admPump_freq}    admPumpAmps: {self.admPump_amps}    kPumpFreq: {self.kPump_freq}    "\
+               f"kPumpAmps: {self.kPump_amps}    ROB: {self.Robo}    porosAnalysis: {self.porosAnalysis}    "\
                f"distanceFront: {self.distanceFront}    distanceEnd: {self.distanceEnd}"    
     
 
@@ -836,23 +895,23 @@ class DaqBlock:
     def __eq__(self, other):
 
         try:
-            if(     self.ambTemp        == other.ambTemp
-                and self.ambHum         == other.ambHum
-                and self.delivPumpTemp  == other.delivPumpTemp
-                and self.robBaseTemp    == other.robBaseTemp
-                and self.kPumpTemp      == other.kPumpTemp
-                and self.delivPumpPress == other.delivPumpPress
-                and self.kPumpPress     == other.kPumpPress
-                and self.PUMP1          == other.PUMP1
-                and self.PUMP2          == other.PUMP2
-                and self.admPumpFreq    == other.admPumpFreq
-                and self.admPumpAmps    == other.admPumpAmps
-                and self.kPumpFreq      == other.kPumpFreq
-                and self.kPumpAmps      == other.kPumpAmps
-                and self.ROB            == other.ROB
-                and self.porosAnalysis  == other.porosAnalysis
-                and self.distanceFront  == other.distanceFront
-                and self.distanceEnd    == other.distanceEnd):
+            if(     self.amb_temp        == other.amb_temp
+                and self.amb_hum         == other.amb_hum
+                and self.delivPump_temp  == other.delivPump_temp
+                and self.robBase_temp    == other.robBase_temp
+                and self.kPump_temp      == other.kPump_temp
+                and self.delivPump_press == other.delivPump_press
+                and self.kPump_press     == other.kPump_press
+                and self.Pump1           == other.pump1
+                and self.Pump2           == other.pump2
+                and self.admPump_freq    == other.admPump_freq
+                and self.admPump_amps    == other.admPump_amps
+                and self.kPump_freq      == other.kPump_freq
+                and self.kPump_amps      == other.kPump_amps
+                and self.Robo            == other.robo
+                and self.porosAnalysis   == other.porosAnalysis
+                and self.distanceFront   == other.distanceFront
+                and self.distanceEnd     == other.distanceEnd):
                 return True
             else: return False
 
@@ -894,29 +953,29 @@ class TCPIP:
     
 
     def __init__(self, 
-                 IP         = "",
+                 ip         = "",
                  PORT       = 0,
                  C_TOUT     = 1.0,
                  RW_TOUT    = 1,
                  R_BL       = 0,
                  W_BL       = 0):
         
-        self.IP         = str(IP)
-        self.PORT       = str(PORT)
-        self.C_TOUT     = float(C_TOUT)
-        self.RW_TOUT    = float(RW_TOUT)
-        self.R_BL       = int(R_BL)
-        self.W_BL       = int(W_BL)
+        self.ip         = str(ip)
+        self.port       = str(PORT)
+        self.c_tout     = float(C_TOUT)
+        self.rw_tout    = float(RW_TOUT)
+        self.r_bl       = int(R_BL)
+        self.w_bl       = int(W_BL)
 
         self.connected  = False
-        self.sock       = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.telemetry  = RoboTelemetry()
+        self.Socket     = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.Telemetry  = RoboTelemetry()
     
 
     def __str__(self):
 
-        return  f"IP: {self.IP}   PORT: {self.PORT}   C_TOUT: {self.C_TOUT}   RW_TOUT: {self.RW_TOUT}   "\
-                f"R_BL: {self.R_BL}   W_BL: {self.W_BL}"
+        return  f"IP: {self.ip}   PORT: {self.port}   C_TOUT: {self.c_tout}   RW_TOUT: {self.rw_tout}   "\
+                f"R_BL: {self.r_bl}   W_BL: {self.w_bl}"
     
 
 
@@ -924,27 +983,27 @@ class TCPIP:
         if(self.connected): 
             raise PermissionError('params not changeable while connected to server!')
         
-        self.IP         = str  ( paramDict["IP"] )
-        self.PORT       = str  ( paramDict["PORT"] )
-        self.C_TOUT     = float( paramDict["CTOUT"] )
-        self.RW_TOUT    = float( paramDict["RWTOUT"] )
-        self.R_BL       = int  ( paramDict["R_BL"] )
-        self.W_BL       = int  ( paramDict["W_BL"] )
+        self.ip         = str  ( paramDict["IP"] )
+        self.port       = str  ( paramDict["PORT"] )
+        self.c_tout     = float( paramDict["C_TOUT"] )
+        self.rw_tout    = float( paramDict["RW_TOUT"] )
+        self.r_bl       = int  ( paramDict["R_BL"] )
+        self.w_bl       = int  ( paramDict["W_BL"] )
 
 
 
     def connect(self):
         """ tries to connect to the IP and PORT given, returns errors if not possible """
 
-        try:                server_address = (self.IP, int(self.PORT))
+        try:                server_address = (self.ip, int(self.port))
         except ValueError:  raise ConnectionError('requested TCP/IP connection via COM-Port!')
         
-        self.sock.settimeout(self.C_TOUT)
+        self.Socket.settimeout(self.c_tout)
 
         try:
-            self.sock.connect(server_address)
+            self.Socket.connect(server_address)
             self.connected = True
-            self.sock.settimeout(self.RW_TOUT)
+            self.Socket.settimeout(self.rw_tout)
             return True,server_address
         
         except TimeoutError:
@@ -965,55 +1024,55 @@ class TCPIP:
 
         try:
             message = struct.pack('<iccffffffffffffffffiiiiiciiiiiiiiiiiiiiiii'
-                                  ,entry.ID
-                                  ,bytes(entry.MT,"utf-8")
-                                  ,bytes(entry.PT,"utf-8")
-                                  ,entry.COOR_1.X
-                                  ,entry.COOR_1.Y
-                                  ,entry.COOR_1.Z
-                                  ,entry.COOR_1.X_ori
-                                  ,entry.COOR_1.Y_ori
-                                  ,entry.COOR_1.Z_ori
-                                  ,entry.COOR_1.Q
-                                  ,entry.COOR_1.EXT
-                                  ,entry.COOR_2.X
-                                  ,entry.COOR_2.Y
-                                  ,entry.COOR_2.Z
-                                  ,entry.COOR_2.X_ori
-                                  ,entry.COOR_2.Y_ori
-                                  ,entry.COOR_2.Z_ori
-                                  ,entry.COOR_2.Q
-                                  ,entry.COOR_2.EXT
-                                  ,entry.SV.ACR
-                                  ,entry.SV.DCR
-                                  ,entry.SV.TS
-                                  ,entry.SV.OS
-                                  ,entry.SBT
-                                  ,bytes(entry.SC,"utf-8")
-                                  ,entry.Z
-                                  ,entry.TOOL.M1_ID
-                                  ,entry.TOOL.M1_STEPS
-                                  ,entry.TOOL.M2_ID
-                                  ,entry.TOOL.M2_STEPS
-                                  ,entry.TOOL.M3_ID
-                                  ,entry.TOOL.M3_STEPS
-                                  ,entry.TOOL.PNMTC_CLAMP_ID
-                                  ,entry.TOOL.PNMTC_CLAMP_YN
-                                  ,entry.TOOL.KNIFE_ID
-                                  ,entry.TOOL.KNIFE_YN
-                                  ,entry.TOOL.M4_ID
-                                  ,entry.TOOL.M4_STEPS
-                                  ,entry.TOOL.PNMTC_FIBER_ID
-                                  ,entry.TOOL.PNMTC_FIBER_YN
-                                  ,entry.TOOL.TIME_ID
-                                  ,entry.TOOL.TIME_TIME)
+                                  ,entry.id
+                                  ,bytes(entry.mt,"utf-8")
+                                  ,bytes(entry.pt,"utf-8")
+                                  ,entry.Coor1.x
+                                  ,entry.Coor1.y
+                                  ,entry.Coor1.z
+                                  ,entry.Coor1.rx
+                                  ,entry.Coor1.ry
+                                  ,entry.Coor1.rz
+                                  ,entry.Coor1.q
+                                  ,entry.Coor1.ext
+                                  ,entry.Coor2.x
+                                  ,entry.Coor2.y
+                                  ,entry.Coor2.z
+                                  ,entry.Coor2.rx
+                                  ,entry.Coor2.ry
+                                  ,entry.Coor2.rz
+                                  ,entry.Coor2.q
+                                  ,entry.Coor2.ext
+                                  ,entry.Speed.acr
+                                  ,entry.Speed.dcr
+                                  ,entry.Speed.ts
+                                  ,entry.Speed.os
+                                  ,entry.sbt
+                                  ,bytes(entry.sc,"utf-8")
+                                  ,entry.z
+                                  ,entry.Tool.m1_id
+                                  ,entry.Tool.m1_steps
+                                  ,entry.Tool.m2_id
+                                  ,entry.Tool.m2_steps
+                                  ,entry.Tool.m3_id
+                                  ,entry.Tool.m3_steps
+                                  ,entry.Tool.pnmtcClamp_id
+                                  ,entry.Tool.pnmtcClamp_yn
+                                  ,entry.Tool.knife_id
+                                  ,entry.Tool.knife_yn
+                                  ,entry.Tool.m4_id
+                                  ,entry.Tool.m4_steps
+                                  ,entry.Tool.pnmtcFiber_id
+                                  ,entry.Tool.pnmtcFiber_yn
+                                  ,entry.Tool.time_id
+                                  ,entry.Tool.time_time)
             
-            if(len(message) != self.W_BL):  return ValueError,len(message) 
+            if(len(message) != self.w_bl):  return ValueError,len(message) 
             
-            try:                self.sock.sendall(message)
+            try:                self.Socket.sendall(message)
             except OSError:     return OSError,None
             
-            print(f"SEND:    {entry.ID}, length: {len(message)}")
+            print(f"SEND:    {entry.id}, length: {len(message)}")
             return True,len(message)
         
         except Exception as err:
@@ -1027,31 +1086,31 @@ class TCPIP:
         data = ""
 
         try:
-            while ( len(data) < self.R_BL ):        data = self.sock.recv(self.R_BL)
+            while ( len(data) < self.r_bl ):        data = self.Socket.recv(self.r_bl)
         except TimeoutError:        return None, None, False
         except Exception as err:    return err, data, False
 
-        if len(data) != self.R_BL:       return ValueError,data,False
+        if len(data) != self.r_bl:       return ValueError,data,False
         else:
-            self.telemetry.TOOL_SPEED  = struct.unpack('<f',data[0:4])[0]
-            self.telemetry.ID          = struct.unpack('<i',data[4:8])[0]
-            self.telemetry.POS.X       = struct.unpack('<f',data[8:12])[0]
-            self.telemetry.POS.Y       = struct.unpack('<f',data[12:16])[0]
-            self.telemetry.POS.Z       = struct.unpack('<f',data[16:20])[0]
-            self.telemetry.POS.X_ori   = struct.unpack('<f',data[20:24])[0]
-            self.telemetry.POS.Y_ori   = struct.unpack('<f',data[24:28])[0]
-            self.telemetry.POS.Z_ori   = struct.unpack('<f',data[28:32])[0]
-            self.telemetry.POS.EXT     = struct.unpack('<f',data[32:36])[0]
-            return self.telemetry,data,True
+            self.Telemetry.tSpeed   = struct.unpack('<f',data[0:4])[0]
+            self.Telemetry.id       = struct.unpack('<i',data[4:8])[0]
+            self.Telemetry.Coor.x   = struct.unpack('<f',data[8:12])[0]
+            self.Telemetry.Coor.y   = struct.unpack('<f',data[12:16])[0]
+            self.Telemetry.Coor.z   = struct.unpack('<f',data[16:20])[0]
+            self.Telemetry.Coor.rx  = struct.unpack('<f',data[20:24])[0]
+            self.Telemetry.Coor.ry  = struct.unpack('<f',data[24:28])[0]
+            self.Telemetry.Coor.rz  = struct.unpack('<f',data[28:32])[0]
+            self.Telemetry.Coor.ext = struct.unpack('<f',data[32:36])[0]
+            return self.Telemetry,data,True
             
 
 
     def close(self, end= False):
         """ close TCP connection """
         
-        self.sock.close()
+        self.Socket.close()
         self.connected  = False
-        if(not end): self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if(not end): self.Socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
 
@@ -1082,30 +1141,30 @@ def preCheckGcodeFile(txt=''):
         ignores Z movement for now, slicing only in x-y-plane yet """
     
     try:
-        if (txt == ''):    return 0, 0, 'empty'
+        if (txt == ''):   return 0, 0, 'empty'
 
         rows            = txt.split('\n')
-        X               = 0.0
-        Y               = 0.0
-        Z               = 0.0
+        x               = 0.0
+        y               = 0.0
+        z               = 0.0
         commNum         = 0
         filamentLength  = 0.0
 
         for row in rows:
             if ( len( re.findall('G\d+', row) ) > 0 ):   commNum += 1
 
-            X_new = float( reShort('X\d+[,.]\d+', row, 'X' + str(X), 'X\d+')[0][1:] )
-            Y_new = float( reShort('Y\d+[,.]\d+', row, 'Y' + str(Y), 'Y\d+')[0][1:] )
-            Z_new = float( reShort('Z\d+[,.]\d+', row, 'Z' + str(Z), 'Z\d+')[0][1:] )
+            xNew = float( reShort('X\d+[,.]\d+', row, 'X' + str(x), 'X\d+')[0][1:] )
+            yNew = float( reShort('Y\d+[,.]\d+', row, 'Y' + str(y), 'Y\d+')[0][1:] )
+            zNew = float( reShort('Z\d+[,.]\d+', row, 'Z' + str(z), 'Z\d+')[0][1:] )
 
             # do the Pythagoras for me, baby
-            filamentLength += m.sqrt( m.pow( (X_new - X), 2 ) 
-                                     +m.pow( (Y_new - Y), 2 ) 
-                                     +m.pow( (Z_new - Z), 2 ) )
+            filamentLength += m.sqrt( m.pow( (xNew - x), 2 ) 
+                                     +m.pow( (yNew - y), 2 ) 
+                                     +m.pow( (zNew - z), 2 ) )
 
-            X = X_new
-            Y = Y_new
-            Z = Z_new
+            x = xNew
+            y = yNew
+            z = zNew
 
     except Exception as e:
         return None, None, e
@@ -1119,12 +1178,12 @@ def preCheckRapidFile(txt=''):
         does not handle Offs commands yet """
     
     try:
-        if (txt == ''):    return 0, 0, 'empty'
+        if (txt == ''):   return 0, 0, 'empty'
 
         rows            = txt.split('\n')
-        X               = 0.0
-        Y               = 0.0
-        Z               = 0.0
+        x               = 0.0
+        y               = 0.0
+        z               = 0.0
         commNum         = 0
         filamentLength  = 0.0
 
@@ -1133,18 +1192,18 @@ def preCheckRapidFile(txt=''):
             # and 'MoveJ Offs(pHome [...]'
             if ( ('Move' in row) and (' p' not in row) ):   
                 commNum += 1
-                X_new = float( re.findall('\d+\.\d+', row)[0] )
-                Y_new = float( re.findall('\d+\.\d+', row)[1] )
-                Z_new = float( re.findall('\d+\.\d+', row)[2] )
+                xNew = float( re.findall('\d+\.\d+', row)[0] )
+                yNew = float( re.findall('\d+\.\d+', row)[1] )
+                zNew = float( re.findall('\d+\.\d+', row)[2] )
 
                 # do the Pythagoras for me, baby
-                filamentLength += m.sqrt( m.pow( (X_new - X), 2 ) 
-                                         +m.pow( (Y_new - Y), 2 ) 
-                                         +m.pow( (Z_new - Z), 2 ) )
+                filamentLength += m.sqrt( m.pow( (xNew - x), 2 ) 
+                                         +m.pow( (yNew - y), 2 ) 
+                                         +m.pow( (zNew - z), 2 ) )
 
-                X = X_new
-                Y = Y_new
-                Z = Z_new
+                x = xNew
+                y = yNew
+                z = zNew
 
     except Exception as e:
         return None, None, e
@@ -1173,12 +1232,12 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
     """ converts a single line of GCode G1 command to a QEntry, can be used in loops for multiline code,
         "pos" should be the pos before this command is executed (before its EXECUTED, not before its added  
         to SC_queue) as its the fallback option if no new X, Y, Z or EXT posistion is passed"""
-    global DC_curr_zero
+    global DC_currZero
 
     # handle mutuables here
     pos   = copy.deepcopy(mutPos)
     speed = copy.deepcopy(mutSpeed)
-    zero  = copy.deepcopy(DC_curr_zero)
+    zero  = copy.deepcopy(DC_currZero)
 
     try:                command = reShort('^G\d+', txt, 0, '^;')[0]
     except IndexError:  return None, None
@@ -1187,45 +1246,45 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
     match command:
         
         case 'G1':
-            entry = QEntry(ID=0, COOR_1=pos, SV=speed, Z=zone)
+            entry = QEntry(id=0, Coor1=pos, Speed=speed, z=zone)
                 
-            X,res                       = reShort('X\d+[,.]\d+', txt, pos.X, 'X\d+')
+            x,res = reShort('X\d+[,.]\d+', txt, pos.x, 'X\d+')
             if(res): 
-                entry.COOR_1.X =  float( X[1:] .replace(',','.') )
-                entry.COOR_1.X += zero.X
+                entry.Coor1.x =  float( x[1:] .replace(',','.') )
+                entry.Coor1.x += zero.x
 
-            Y,res                       = reShort('Y\d+[,.]\d+', txt, pos.Y, 'Y\d+')
+            y,res = reShort('Y\d+[,.]\d+', txt, pos.y, 'Y\d+')
             if(res): 
-                entry.COOR_1.Y =  float( Y[1:] .replace(',','.') )
-                entry.COOR_1.Y += zero.Y
+                entry.Coor1.y =  float( y[1:] .replace(',','.') )
+                entry.Coor1.y += zero.y
 
-            Z,res                       = reShort('Z\d+[,.]\d+', txt, pos.Z, 'Z\d+')
+            z,res = reShort('Z\d+[,.]\d+', txt, pos.z, 'Z\d+')
             if(res): 
-                entry.COOR_1.Z =  float( Z[1:] .replace(',','.') )
-                entry.COOR_1.Z += zero.Z
+                entry.Coor1.z =  float( z[1:] .replace(',','.') )
+                entry.Coor1.z += zero.z
             
-            F,res                       = reShort('F\d+[,.]\d+', txt, speed.TS, 'F\d+')
+            fr,res  = reShort('F\d+[,.]\d+', txt, speed.ts, 'F\d+')
             if(res):
-                F                       = float( F[1:] .replace(',','.') )
-                entry.SV.TS             = int(F * IO_fr_to_ts)
+                fr              = float( fr[1:] .replace(',','.') )
+                entry.Speed.ts  = int(fr * IO_frToTs)
 
-            EXT,res                     = reShort('EXT\d+[,.]\d+', txt, pos.EXT, 'EXT\d+')
+            ext,res = reShort('EXT\d+[,.]\d+', txt, pos.ext, 'EXT\d+')
             if(res): 
-                entry.COOR_1.EXT =  float( EXT[3:] .replace(',','.') )
-                entry.COOR_1.EXT += zero.EXT
+                entry.Coor1.ext =  float( ext[3:] .replace(',','.') )
+                entry.Coor1.ext += zero.ext
             
         case 'G28':
-            entry = QEntry( ID = 0, COOR_1 = pos, SV = speed, Z  = zone)
-            if ('X0'   in txt):   entry.COOR_1.X   = zero.X
-            if ('Y0'   in txt):   entry.COOR_1.Y   = zero.Y
-            if ('Z0'   in txt):   entry.COOR_1.Z   = zero.Z
-            if ('EXT0' in txt):   entry.COOR_1.EXT = zero.EXT
+            entry = QEntry( id = 0, Coor1 = pos, Speed = speed, z  = zone)
+            if ('X0'   in txt):   entry.Coor1.x   = zero.x
+            if ('Y0'   in txt):   entry.Coor1.y   = zero.y
+            if ('Z0'   in txt):   entry.Coor1.z   = zero.z
+            if ('EXT0' in txt):   entry.Coor1.ext = zero.ext
         
         case 'G92':
-            if ('X0'   in txt):   DC_curr_zero.X   = pos.X
-            if ('Y0'   in txt):   DC_curr_zero.Y   = pos.Y
-            if ('Z0'   in txt):   DC_curr_zero.Z   = pos.Z
-            if ('EXT0' in txt):   DC_curr_zero.EXT = pos.EXT
+            if ('X0'   in txt):   DC_currZero.x   = pos.x
+            if ('Y0'   in txt):   DC_currZero.y   = pos.y
+            if ('Z0'   in txt):   DC_currZero.z   = pos.z
+            if ('EXT0' in txt):   DC_currZero.ext = pos.ext
             return None, command
         
         case ';':
@@ -1241,50 +1300,50 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
 def rapidToQEntry(txt = ''):
     """ converts a single line of MoveL, MoveJ, MoveC or Move* Offs command (no Reltool) to a QEntry (relative to
         DC_curr_zero), can be used in loops for multiline code, returns entry and any Exceptions"""
-    global DC_curr_zero
+    global DC_currZero
     
-    entry = QEntry(ID=0)
+    entry = QEntry(id=0)
     try:
-        entry.MT        = re.findall('Move[J,L,C]', txt, 0)[0][4]
-        ext, res        = reShort('EXT:\d+\.\d+',txt,'error','EXT:\d+')
-        ext             = float(ext[4:])
+        entry.mt    = re.findall('Move[J,L,C]', txt, 0)[0][4]
+        ext, res    = reShort('EXT:\d+\.\d+',txt,'error','EXT:\d+')
+        ext         = float(ext[4:])
         
         if( 'Offs' in txt):
-            res_coor            = [ DC_curr_zero.X
-                                   ,DC_curr_zero.Y
-                                   ,DC_curr_zero.Z
-                                   ,DC_curr_zero.X_ori
-                                   ,DC_curr_zero.Y_ori
-                                   ,DC_curr_zero.Z_ori
-                                   ,DC_curr_zero.Q]
+            res_coor            = [ DC_currZero.x
+                                   ,DC_currZero.y
+                                   ,DC_currZero.z
+                                   ,DC_currZero.rx
+                                   ,DC_currZero.ry
+                                   ,DC_currZero.rz
+                                   ,DC_currZero.q]
             xyzOff              = re.findall('pHome,\d+\.\d+,\d+\.\d+,\d+\.\d+',txt)[0]
             xyzOff              = re.findall('\d+\.\d+', xyzOff)
             for i in range(3):  res_coor[i] += float(xyzOff[i])
-            ext                 += DC_curr_zero.EXT
+            ext                 += DC_currZero.ext
 
         else:
-            entry.PT = 'Q'
+            entry.pt = 'Q'
             res_coor = []
             xyzOff              = re.findall('\d+\.\d+',txt)
             for i in range(7):  res_coor.append(float(xyzOff[i]))
         res_speed       = re.findall('\d+,\d+,\d+,\d+(?=\],z)',txt)[0]
         res_speed       = re.findall('\d+',res_speed)
 
-        entry.COOR_1.X      = res_coor[0]
-        entry.COOR_1.Y      = res_coor[1]
-        entry.COOR_1.Z      = res_coor[2]
-        entry.COOR_1.X_ori  = res_coor[3]
-        entry.COOR_1.Y_ori  = res_coor[4]
-        entry.COOR_1.Z_ori  = res_coor[5]
-        entry.COOR_1.Q      = res_coor[6]
-        entry.COOR_1.EXT    = ext
-        entry.SV.TS         = int(res_speed[0])
-        entry.SV.OS         = int(res_speed[1])
-        entry.SV.ACR        = int(res_speed[2])
-        entry.SV.DCR        = int(res_speed[3])
+        entry.Coor1.x   = res_coor[0]
+        entry.Coor1.y   = res_coor[1]
+        entry.Coor1.z   = res_coor[2]
+        entry.Coor1.rx  = res_coor[3]
+        entry.Coor1.ry  = res_coor[4]
+        entry.Coor1.rz  = res_coor[5]
+        entry.Coor1.q   = res_coor[6]
+        entry.Coor1.ext = ext
+        entry.Speed.ts  = int(res_speed[0])
+        entry.Speed.os  = int(res_speed[1])
+        entry.Speed.acr = int(res_speed[2])
+        entry.Speed.dcr = int(res_speed[3])
 
-        zone,res            = reShort('z\d+',txt,10)
-        entry.Z             = int( zone[1:] )
+        zone,res        = reShort('z\d+',txt,10)
+        entry.z         = int( zone[1:] )
 
         # for later, if tool is implemented
         tool    = reShort(',[^,]*$',txt,'tool0')[0]
@@ -1307,7 +1366,7 @@ def createLogfile():
         logpath.mkdir( parents=True, exist_ok=True )
 
         logpath = logpath / Path(str(datetime.now().strftime('%Y-%m-%d_%H%M%S')) + ".txt")
-        text    = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}    GNRL:        program booting, starting GUI...\n"
+        text    = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}    [GNRL]:        program booting, starting GUI...\n"
 
         logfile = open(logpath,'x')
         logfile.write(text)
@@ -1321,7 +1380,7 @@ def createLogfile():
 
 
 
-def showOnTerminal(txt):
+def addToCommProtocol(txt):
     """ puts entries in terminal list an keep its length below TERM_maxLen"""
     global TERM_log
     global TERM_maxLen
@@ -1343,79 +1402,82 @@ def showOnTerminal(txt):
 # for safety reasons, it can only be changed here, but only if you know what your doing!)
 DEF_TCP_ROB =      { "IP":       "192.168.125.1"
                     ,"PORT":     10001
-                    ,"CTOUT":    60000
-                    ,"RWTOUT":   10
+                    ,"C_TOUT":   60000
+                    ,"RW_TOUT":  10
                     ,"R_BL":     36
                     ,"W_BL":     159 }
 
 DEF_TCP_PUMP1 =    { "IP":       ""
                     ,"PORT":     "COM3"
-                    ,"CTOUT":    0
-                    ,"RWTOUT":   0
+                    ,"C_TOUT":   0
+                    ,"RW_TOUT":  0
                     ,"R_BL":     0
                     ,"W_BL":     0  }
 
 DEF_TCP_PUMP2 =    { "IP":       ""
                     ,"PORT":     "COM4"
-                    ,"CTOUT":    0
-                    ,"RWTOUT":   0
+                    ,"C_TOUT":   0
+                    ,"RW_TOUT":  0
                     ,"R_BL":     0
                     ,"W_BL":     0  }
 
 # default user settings
-DEF_DC_SPEED        = Speed()
+DEF_DC_SPEED        = SpeedVector()
 DEF_IO_ZONE         = 10
 DEF_IO_FR_TO_TS     = 0.1
-DEF_PRIN_SPEED      = Speed()
+DEF_PRIN_SPEED      = SpeedVector()
 DEF_ROB_COMM_FR     = 10
-DEF_SC_VOL_PER_E    = 1.0
+DEF_SC_VOL_PER_MM   = 0.1
 
 
 
 ############################ global variables
-DC_curr_zero        = Coor()
+DC_currZero         = Coordinate()
 DC_speed            = copy.deepcopy(DEF_DC_SPEED)
 
 IO_zone             = DEF_IO_ZONE
-IO_curr_filepath    = None
-IO_fr_to_ts         = DEF_IO_FR_TO_TS
+IO_currFilepath     = None
+IO_frToTs           = DEF_IO_FR_TO_TS
 
 PRIN_speed          = copy.deepcopy(DEF_PRIN_SPEED)
 
 PUMP1_tcpip         = TCPIP( DEF_TCP_PUMP1["IP"]
                             ,DEF_TCP_PUMP1["PORT"]
-                            ,DEF_TCP_PUMP1["CTOUT"]
-                            ,DEF_TCP_PUMP1["RWTOUT"]
+                            ,DEF_TCP_PUMP1["C_TOUT"]
+                            ,DEF_TCP_PUMP1["RW_TOUT"]
                             ,DEF_TCP_PUMP1["R_BL"]
                             ,DEF_TCP_PUMP1["W_BL"])
-PUMP1_last_telem    = PumpTelemetry()
+PUMP1_lastTelem     = PumpTelemetry()
+PUMP1_literPerS     = 0.5
 PUMP1_speed         = 0
 PUMP1_liveAd        = 1.0
 
 PUMP2_tcpip         = TCPIP( DEF_TCP_PUMP2["IP"]
                             ,DEF_TCP_PUMP2["PORT"]
-                            ,DEF_TCP_PUMP2["CTOUT"]
-                            ,DEF_TCP_PUMP2["RWTOUT"]
+                            ,DEF_TCP_PUMP2["C_TOUT"]
+                            ,DEF_TCP_PUMP2["RW_TOUT"]
                             ,DEF_TCP_PUMP2["R_BL"]
                             ,DEF_TCP_PUMP2["W_BL"])
 
 ROB_tcpip          = TCPIP( DEF_TCP_ROB["IP"]
-                            ,DEF_TCP_ROB["PORT"]
-                            ,DEF_TCP_ROB["CTOUT"]
-                            ,DEF_TCP_ROB["RWTOUT"]
-                            ,DEF_TCP_ROB["R_BL"]
-                            ,DEF_TCP_ROB["W_BL"])
-ROB_comm_fr         = DEF_ROB_COMM_FR
-ROB_comm_queue      = Queue()
+                           ,DEF_TCP_ROB["PORT"]
+                           ,DEF_TCP_ROB["C_TOUT"]
+                           ,DEF_TCP_ROB["RW_TOUT"]
+                           ,DEF_TCP_ROB["R_BL"]
+                           ,DEF_TCP_ROB["W_BL"])
+ROB_commFr          = DEF_ROB_COMM_FR
+ROB_commQueue       = Queue()
 ROB_telem           = RoboTelemetry()
-ROB_last_telem      = RoboTelemetry()
+ROB_lastTelem       = RoboTelemetry()
+ROB_movStartP       = Coordinate()
+ROB_movEndP         = Coordinate()
 
-SC_vol_per_e        = DEF_SC_VOL_PER_E
-SC_curr_comm_id     = 1
+SC_volPerMm         = DEF_SC_VOL_PER_MM
+SC_currCommId       = 1
 SC_queue            = Queue()
 SC_qProcessing      = False
 
-STT_datablock       = DaqBlock()
+STT_dataBlock       = DaqBlock()
 
 TERM_log            = []
 TERM_maxLen         = 400
