@@ -140,14 +140,14 @@ else:
 
 
 # overwrite ROBO_tcpip for testing, delete later
-UTIL.ROB_tcpip.IP      = 'localhost'
-UTIL.ROB_tcpip.PORT    = 10001
+UTIL.ROB_tcpip.ip      = 'localhost'
+UTIL.ROB_tcpip.port    = 10001
 
 
 # get the go from user
 welcText =  f"STARTING PRINT APP...\n\n" \
-            f"You're about to establish a TCP connection with the robot at {UTIL.ROB_tcpip.IP}.\n" \
-            f"This can take up to {UTIL.ROB_tcpip.C_TOUT} s. You may begin.\n\n"
+            f"You're about to establish a TCP connection with the robot at {UTIL.ROB_tcpip.ip}.\n" \
+            f"This can take up to {UTIL.ROB_tcpip.c_tout} s. You may begin.\n\n"
 
 welcChoice = strdDialog(welcText, 'Welcome to PRINT_py', standalone=True)
 if(not welcChoice):    exit()
