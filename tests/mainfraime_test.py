@@ -1,3 +1,6 @@
+# test win_mainframe
+
+############################################# IMPORTS #################################################
 
 import os
 import sys
@@ -697,6 +700,8 @@ class Mainfraime_test(unittest.TestCase):
 
 
 
+
+#############################################  MAIN  ##################################################
 
 # create test logfile and 0_BT_testfiles
 desk    = os.environ['USERPROFILE']

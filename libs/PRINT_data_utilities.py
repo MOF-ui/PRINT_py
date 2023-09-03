@@ -1449,8 +1449,9 @@ PUMP1_tcpip         = TCPIP( DEF_TCP_PUMP1["IP"]
                             ,DEF_TCP_PUMP1["W_BL"])
 PUMP1_lastTelem     = PumpTelemetry()
 PUMP1_literPerS     = 0.5
-PUMP1_speed         = 0
 PUMP1_liveAd        = 1.0
+PUMP1_retractSpeed  = -50.0
+PUMP1_speed         = 0
 
 PUMP2_tcpip         = TCPIP( DEF_TCP_PUMP2["IP"]
                             ,DEF_TCP_PUMP2["PORT"]

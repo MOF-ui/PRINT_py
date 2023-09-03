@@ -24,6 +24,7 @@ from mtec.mtec_mod import MtecMod
 
 # import my own libs
 import libs.PRINT_data_utilities as UTIL
+import libs.PRINT_pump_utilities as PUTIL
 
 
 
@@ -74,26 +75,18 @@ class PumpCommWorker(QObject):
             which recognizes a value change and returns the machines answer and the original command string,
             uses user-set pump speed if no script is running """
 
-        if( UTIL.SC_qProcessing):
-            try:                currCommand = UTIL.ROB_commQueue[0]
-            except IndexError:  currCommand = None
-            pMode = 'None'  if( currCommand is None )  else currCommand.pMode
-            
-            match pMode:
-                case 'None':    newSpeed = UTIL.PUMP1_speed
-                # default: ([mm/s] * [L/mm] / [L/s]) * 100.0 --> [%]
-                case 'default': newSpeed = ( currCommand.Speed.ts * UTIL.SC_volPerMm / UTIL.PUMP1_literPerS ) * 100.0
-                case _:         newSpeed = 0
-                # case 'start':
-                # case 'end':
+        if( UTIL.SC_qProcessing):   newSpeed = PUTIL.calcSpeed()
+        else:                       newSpeed = UTIL.PUMP1_speed
 
+        if( newSpeed is not None):
+            res = self.mtecInterface.setSpeed( int(newSpeed * UTIL.PUMP1_liveAd) )
+
+            if (res is not None): 
+                command,ans = res[0],res[1]
+                self.dataSend.emit(newSpeed,command,ans)
+        
         else:
-            newSpeed    = UTIL.PUMP1_speed
-
-        res         = self.mtecInterface.setSpeed( int(newSpeed * UTIL.PUMP1_liveAd) )
-        if (res is not None): 
-            command,ans = res[0],res[1]
-            self.dataSend.emit(newSpeed,command,ans)
+            self.logError.emit('CONN','Pump1 - Error during speed calculation for queue processing')
     
 
 
