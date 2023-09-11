@@ -62,6 +62,7 @@ def calcSpeed():
             speed = 0
 
     # check value domain for speed
+    if( speed is None ):  return None
     if( speed >  100.0 ): speed =  100.0
     if( speed < -100.0 ): speed = -100.0
 
@@ -103,12 +104,11 @@ def profileMode( command= None, profile= None ):
 
     # as more complex pump scripts should only apply to linear movements, 
     # the remaining travel distance can be calculated using pythagoras
-    end  = copy.deepcopy( UTIL.ROB_movEndP )
-    curr = copy.deepcopy( UTIL.ROB_telem.Coor.x )
+    curr = copy.deepcopy( UTIL.ROB_telem.Coor )
 
-    distRemainng    = m.sqrt(  m.pow(end.x - curr.x, 2)
-                             + m.pow(end.y - curr.y, 2)
-                             + m.pow(end.z - curr.z, 2) )
+    distRemainng    = m.sqrt(  m.pow(command.Coor1.x - curr.x, 2)
+                             + m.pow(command.Coor1.y - curr.y, 2)
+                             + m.pow(command.Coor1.z - curr.z, 2) )
 
     # get the remaining time ( [mm] / [mm/s] = [s] )
     timeRemainung   = distRemainng / command.Speed.ts
@@ -117,7 +117,7 @@ def profileMode( command= None, profile= None ):
     settings    = None
     prevSett    = None
     for item in profile:
-        if( item['until'] < timeRemainung ):
+        if( item['until'] <= timeRemainung ):
             settings = copy.deepcopy(item)
             break
         prevSett = item
@@ -129,7 +129,7 @@ def profileMode( command= None, profile= None ):
 
     match settings['mode']:
         case 'instant': speed = base
-        case 'diff':    speed += ( base - speed ) * DIFF_CONST
+        case 'diff':    speed += round(( base - speed ) * DIFF_CONST, 0)
         case 'linear':  
             # if settDur is 0.0 this is the first setting, need to calculate time from the 
             # movements starting point
@@ -141,16 +141,16 @@ def profileMode( command= None, profile= None ):
 
             else:
                 strt        = copy.deepcopy( UTIL.ROB_movStartP )
-                distTotal   = m.sqrt(  m.pow(end.x - strt.x, 2)
-                                     + m.pow(end.y - strt.y, 2)
-                                     + m.pow(end.z - strt.z, 2) )
+                distTotal   = m.sqrt(  m.pow(command.Coor1.x - strt.x, 2)
+                                     + m.pow(command.Coor1.y - strt.y, 2)
+                                     + m.pow(command.Coor1.z - strt.z, 2) )
 
                 # get the remaining time ( [mm] / [mm/s] = [s] )
                 timeNull = distTotal / command.Speed.ts
                 baseNull = preceedingSpeed
 
-            slope = ( baseNull - base ) / ( timeNull - settings['until'] )
-            speed = timeRemainung * slope + baseNull
+            slope = ( base - baseNull ) / ( settings['until'] - timeNull )
+            speed = timeRemainung * slope + base
 
     return speed    
     
@@ -159,18 +159,21 @@ def profileMode( command= None, profile= None ):
 
 
 def getBaseSpeed(base = 'default', fallback = 0.0):
+    global retractSpeed
 
-    base = 0.0
     match base:
         case 'zero':    baseSpeed = 0.0
         case 'max':     baseSpeed = 100.0
         case 'min':     baseSpeed = -100.0
         case 'default': baseSpeed = fallback
-        case 'retract': baseSpeed = UTIL.PUMP1_retractSpeed
+        case 'retract': baseSpeed = retractSpeed
         case 'conn':    
-            try:                nextCommand = UTIL.ROB_commQueue[1]
-            except IndexError:  nextCommand = None
-            baseSpeed = ( nextCommand.Speed.ts * UTIL.SC_volPerMm / UTIL.PUMP1_literPerS ) * 100.0
+            try:
+                nextCommand = UTIL.ROB_commQueue[1]
+                baseSpeed = ( nextCommand.Speed.ts * UTIL.SC_volPerMm / UTIL.PUMP1_literPerS ) * 100.0
+            except AttributeError:  
+                baseSpeed = fallback
+        case _: return None
         
     return baseSpeed
 
@@ -192,6 +195,7 @@ END_SUPP_PTS    = [   { 'until': 5.0,   'base': 'default',  'mode': 'instant' },
                       { 'until': 1.0,   'base': 'retract',  'mode': 'diff'    },
                       { 'until': 0.0,   'base': 'zero',     'mode': 'instant' } ]
 
+retractSpeed    = -50.0
 
 preceedingCom   = None
 preceedingSpeed = 0.0

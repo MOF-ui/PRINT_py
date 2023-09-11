@@ -173,7 +173,7 @@ class RoboCommWorker(QObject):
             if( telem != UTIL.ROB_lastTelem ):
 
                 # check if robot is processing a new command (length check to skip in first loop)
-                if( (telem.id != UTIL.ROB_lastTelem) and (len(UTIL.ROB_commQueue) > 0) ):
+                if( (telem.id != UTIL.ROB_lastTelem.id) and (len(UTIL.ROB_commQueue) > 0) ):
                     UTIL.ROB_movStartP  = UTIL.ROB_movEndP
                     UTIL.ROB_movEndP    = copy.deepcopy( UTIL.ROB_commQueue[0] )
 
@@ -182,8 +182,9 @@ class RoboCommWorker(QObject):
                 UTIL.ROB_lastTelem  = copy.deepcopy(telem)
 
                 # prep database entry
-                UTIL.STT_dataBlock.Robo      =  telem
-                UTIL.STT_dataBlock.Robo.Coor -= UTIL.DC_currZero
+                zero = copy.deepcopy(UTIL.DC_currZero)
+                UTIL.STT_dataBlock.Robo      =  copy.deepcopy(telem)
+                UTIL.STT_dataBlock.Robo.Coor -= zero
                 self.dataUpdated.emit( str(rawData), telem )
 
             mutex.unlock()

@@ -1427,7 +1427,7 @@ DEF_IO_ZONE         = 10
 DEF_IO_FR_TO_TS     = 0.1
 DEF_PRIN_SPEED      = SpeedVector()
 DEF_ROB_COMM_FR     = 10
-DEF_SC_VOL_PER_MM   = 0.1
+DEF_SC_VOL_PER_MM   = 0.01
 
 
 
@@ -1450,7 +1450,6 @@ PUMP1_tcpip         = TCPIP( DEF_TCP_PUMP1["IP"]
 PUMP1_lastTelem     = PumpTelemetry()
 PUMP1_literPerS     = 0.5
 PUMP1_liveAd        = 1.0
-PUMP1_retractSpeed  = -50.0
 PUMP1_speed         = 0
 
 PUMP2_tcpip         = TCPIP( DEF_TCP_PUMP2["IP"]

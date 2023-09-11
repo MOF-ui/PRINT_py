@@ -1,5 +1,5 @@
 
-# one test to rule them all (/both)
+# one test to rule them all
 
 ############################################# IMPORTS #################################################
 
@@ -10,6 +10,7 @@ import unittest
 # comment out tests you dont want to run here
 from mainfraime_test            import Mainfraime_test
 from util_test                  import UTIL_test
+from putil_test                 import PUTIL_test
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))

@@ -257,6 +257,9 @@ class Mainfraime_test(unittest.TestCase):
         global gcodeTestpath
         global rapidTestpath
 
+        currSetting         = UTIL.SC_volPerMm
+        UTIL.SC_volPerMm    = 0.1
+        
         testFrame.openFile( testrun= True, testpath= gcodeTestpath )
         self.assertEqual  ( UTIL.IO_currFilepath, gcodeTestpath )
         self.assertEqual  ( testFrame.IO_disp_filename.text(), gcodeTestpath.name )
@@ -271,6 +274,8 @@ class Mainfraime_test(unittest.TestCase):
         self.assertEqual  ( testFrame.IO_disp_commNum.text(),  '2' )
         self.assertEqual  ( testFrame.IO_disp_estimLen.text(), '3.0' )
         self.assertEqual  ( testFrame.IO_disp_estimVol.text(), '0.3' )
+
+        UTIL.SC_volPerMm = currSetting
     
 
 

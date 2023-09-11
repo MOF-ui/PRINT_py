@@ -49,7 +49,96 @@ class PUTIL_test(unittest.TestCase):
         UTIL.ROB_commQueue.add( testEntry )
         self.assertEqual( PUTIL.calcSpeed(), 23.4 )
 
-        UTIL.SC_volPerMm = 1 
+
+        UTIL.ROB_commQueue.clear()
+    
+
+    def test_defaultMode(self):
+        """  """
+
+        UTIL.SC_volPerMm     = 0.01
+        UTIL.PUMP1_literPerS = 10
+
+        # None
+        self.assertIsNone( PUTIL.defaultMode( None ) )
+
+        # lastDefCommand
+        testEntry               = UTIL.QEntry( Coor1= UTIL.Coordinate(x= 10) )
+        PUTIL.lastDefCommand    = UTIL.QEntry( Coor1= UTIL.Coordinate(x= 10) )
+        PUTIL.lastSpeed         = 45
+
+        self.assertEqual( PUTIL.defaultMode( testEntry), 45 )
+
+        # newCommand ( default Speed.ts for QEntry is 200 )
+        testEntry = UTIL.QEntry( Coor1= UTIL.Coordinate(x= 11) )
+
+        self.assertEqual( PUTIL.defaultMode( testEntry ), 20 )
+
+    
+
+    def test_profileMode(self): 
+        """  """
+        
+        UTIL.ROB_commQueue.add( UTIL.QEntry() )
+        UTIL.ROB_commQueue.add( UTIL.QEntry() )
+        UTIL.ROB_telem.Coor   = UTIL.Coordinate()
+        PUTIL.START_SUPP_PTS  = [   { 'until': 3.0,   'base': 'zero',     'mode': 'instant' },
+                                    { 'until': 1.0,   'base': 'max',      'mode': 'diff'    },
+                                    { 'until': 0.0,   'base': 'conn',     'mode': 'linear'  } ]
+
+        PUTIL.END_SUPP_PTS    = [   { 'until': 5.0,   'base': 'default',  'mode': 'instant' },
+                                    { 'until': 1.0,   'base': 'retract',  'mode': 'instant' },
+                                    { 'until': 0.0,   'base': 'zero',     'mode': 'instant' } ]
+
+
+        # START_SUPP_PTS
+        testEntry       = UTIL.QEntry( Coor1= UTIL.Coordinate(x= 10)
+                                      ,Speed= UTIL.SpeedVector(ts= 1) )
+        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 0 )
+
+        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 5 )
+        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 0 )
+
+        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 8 )
+        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 25.1 )
+
+        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 9.5 )
+        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 60.0 )
+        
+        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 10 )
+        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 20.0 )
+
+        # END_SUPP_PTS
+        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 4 )
+        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.END_SUPP_PTS ), 0.1 )
+
+        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 6 )
+        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.END_SUPP_PTS ), -50 )
+
+        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 10 )
+        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.END_SUPP_PTS ), 0 )
+
+
+        UTIL.ROB_commQueue.clear()
+        
+    
+
+
+    def test_getBaseSpeed(self):
+        """  """
+
+        self.assertEqual( PUTIL.getBaseSpeed('zero',    12), 0    )
+        self.assertEqual( PUTIL.getBaseSpeed('max',     12), 100  )
+        self.assertEqual( PUTIL.getBaseSpeed('min',     12), -100 )
+        self.assertEqual( PUTIL.getBaseSpeed('default', 12), 12   )
+        self.assertEqual( PUTIL.getBaseSpeed('retract', 12), -50   )
+        self.assertEqual( PUTIL.getBaseSpeed('conn',    12), 12   )
+
+        UTIL.ROB_commQueue.add( UTIL.QEntry() )
+        UTIL.ROB_commQueue.add( UTIL.QEntry() )
+        self.assertEqual( PUTIL.getBaseSpeed('conn',    12), 20   )
+
+
 
 
 
