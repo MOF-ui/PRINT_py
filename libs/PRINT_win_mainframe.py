@@ -341,6 +341,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.roboCommWorker.dataReceived.connect    ( lambda: self.resetWatchdog(1) )
         self.roboCommWorker.dataReceived.connect    (self.labelUpdate_onTerminalChange)
         self.roboCommWorker.dataUpdated.connect     (self.posUpdate)
+        self.roboCommWorker.endDcMoving.connect     ( lambda: self.switchRobMoving(end= True) )
         self.roboCommWorker.endProcessing.connect   (self.stopSCTRLQueue)
         self.roboCommWorker.logError.connect        (self.logEntry)
         self.roboCommWorker.queueEmtpy.connect      ( lambda: self.stopSCTRLQueue(prepEnd= True) )
@@ -789,14 +790,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         mutex.lock()
         UTIL.PUMP1_speed    = 0
         UTIL.SC_qProcessing = True
+        UTIL.SC_qPrepEnd    = False
         mutex.unlock()
         self.logEntry('ComQ','queue processing started')
 
-        css = "border-radius: 20px; \
-               background-color: #00aaff;"
+        css = "border-radius: 20px; background-color: #00aaff;"
         self.SCTRL_indi_qProcessing.setStyleSheet   (css)
-        self.DC_indi_robotMoving.setStyleSheet      (css)
         self.TCP_indi_qProcessing.setStyleSheet     (css)
+        self.switchRobMoving()
 
         self.labelUpdate_onQueueChange()
 
@@ -806,20 +807,23 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def stopSCTRLQueue(self, prepEnd = False):
-        """ set UI indicators, turn of threads """
+        """ set UI indicators, turn off threads """
 
         if( prepEnd ):
             css = "border-radius: 20px; background-color: #ffda1e;"
+            UTIL.SC_qPrepEnd = True
         
         else:
             mutex.lock()
+            UTIL.PUMP1_speed    = 0
+            UTIL.SC_qPrepEnd    = False
             UTIL.SC_qProcessing = False
             mutex.unlock()
             self.logEntry('ComQ','queue processing stopped')
 
-            css = "border-radius: 20px; background-color: #4c4a48;"
-            self.DC_indi_robotMoving.setStyleSheet      (css)
             self.labelUpdate_onQueueChange()
+            self.switchRobMoving(end= True)
+            css = "border-radius: 20px; background-color: #4c4a48;"
 
         self.SCTRL_indi_qProcessing.setStyleSheet   (css)
         self.TCP_indi_qProcessing.setStyleSheet     (css)
@@ -1003,10 +1007,25 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          DC COMMANDS                                              #
     #####################################################################################################
 
+    def switchRobMoving(self, end= False):
+        """ change UTIL.DC_robMoving """
+
+        mutex.lock()
+        if( end ):
+            UTIL.DC_robMoving = False
+            self.DC_indi_robotMoving.setStyleSheet("border-radius: 25px; background-color: #4c4a48;")
+        else:
+            UTIL.DC_robMoving = True
+            self.DC_indi_robotMoving.setStyleSheet("border-radius: 25px; background-color: #00aaff;")
+        mutex.unlock()
+
+
+
     def homeCommand(self):
         """ sets up a command to drive back to DC_curr_zero, gives it to the actual sendCommand function """
 
-        if( UTIL.SC_qProcessing ): return None, None
+        if( UTIL.DC_robMoving ): return None, None
+        self.switchRobMoving()
 
         zero    = copy.deepcopy(UTIL.DC_currZero)
         readMT  = self.DC_drpd_moveType.currentText()
@@ -1028,7 +1047,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def sendDCCommand(self, axis= '0', dir= '+'):
         """ sets up a command accourding to the DC frames input, gives it to the actual sendCommand function """
 
-        if( UTIL.SC_qProcessing ): return None, None
+        if( UTIL.DC_robMoving ): return None, None
+        self.switchRobMoving()
 
         stepWidth = self.DC_sld_stepWidth.value()
         match stepWidth:
@@ -1070,7 +1090,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def sendNCCommand(self, axis= None):
         """ sets up a command according to NC absolute positioning, gives it to the actual sendCommand function """
 
-        if( UTIL.SC_qProcessing ): return None, None
+        if( UTIL.DC_robMoving ): return None, None
+        self.switchRobMoving()
 
         newPos = copy.deepcopy(UTIL.ROB_telem.Coor)
 
@@ -1104,7 +1125,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             uses the current position as it is executed directly, otherwise DONT do that
             if no X, Y, Z or EXT position is given"""
             
-        if( UTIL.SC_qProcessing ): return None, None
+        if( UTIL.DC_robMoving ): return None, None
+        self.switchRobMoving()
 
         # get text 
         speed   = copy.deepcopy(UTIL.DC_speed)
@@ -1138,7 +1160,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ send the GCode interpreter line on the TERM panel to robot, absolute coordinates
             or relative to "pHome" (DC_currZero) """
 
-        if( UTIL.SC_qProcessing ): return None, None
+        if( UTIL.DC_robMoving ): return None, None
+        self.switchRobMoving()
 
         txt         = self.TERM_entry_rapidInterp.text()
         entry,err   = UTIL.rapidToQEntry(txt)
@@ -1242,7 +1265,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             if (not DC): self.logEntry('ComQ',f"Command send  --  ID: {command.id}  MT: {command.mt}  PT: {command.pt}"
                                               f"  --  COOR_1: {command.Coor1}  --  COOR_2: {command.Coor2}"
                                               f"  --  SV: {command.Speed}  --  SBT: {command.sbt}   SC: {command.sc}"
-                                              f"  --  Z: {command.z}  --  TOOL: {command.Tool}")
+                                              f"  --  Z: {command.z}  --  TOOL: {command.Tool}  --  PMOD: {command.pMode}")
 
         elif (msg == ValueError):
             self.logEntry('CONN','TCPIP class "ROB_tcpip" encountered ValueError in sendCommand, data length: ' + str(msgLen))
