@@ -1405,7 +1405,7 @@ if __name__ == '__main__':
     import libs.PRINT_data_utilities as UTIL
 
     # import PyQT UIs (converted from .ui to .py)
-    from ui.UI_mainframe_v5 import Ui_MainWindow
+    from ui.UI_mainframe_v6 import Ui_MainWindow
 
 
 
