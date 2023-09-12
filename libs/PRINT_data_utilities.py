@@ -1434,6 +1434,7 @@ DEF_SC_VOL_PER_MM   = 0.01
 ############################ global variables
 DC_currZero         = Coordinate()
 DC_speed            = copy.deepcopy(DEF_DC_SPEED)
+DC_robMoving        = True
 
 IO_zone             = DEF_IO_ZONE
 IO_currFilepath     = None
@@ -1476,6 +1477,7 @@ SC_volPerMm         = DEF_SC_VOL_PER_MM
 SC_currCommId       = 1
 SC_queue            = Queue()
 SC_qProcessing      = False
+SC_qPrepEnd         = False
 
 STT_dataBlock       = DaqBlock()
 
