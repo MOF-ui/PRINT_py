@@ -9,6 +9,7 @@
 import os
 import sys
 import copy
+import math as m
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -127,6 +128,7 @@ class RoboCommWorker(QObject):
 
     dataReceived    = pyqtSignal()
     dataUpdated     = pyqtSignal(str, UTIL.RoboTelemetry)
+    endDcMoving     = pyqtSignal()
     endProcessing   = pyqtSignal()
     logError        = pyqtSignal(str,str)
     queueEmtpy      = pyqtSignal()
@@ -166,10 +168,13 @@ class RoboCommWorker(QObject):
             mutex.lock()
             UTIL.addToCommProtocol(f"RECV:    ID {telem.id},   {telem.Coor}   ToolSpeed: {telem.tSpeed}")
 
-            if ( len(UTIL.ROB_commQueue) > 0 ):
-                while (UTIL.ROB_commQueue[0].id < telem.id): 
-                    UTIL.ROB_commQueue.popFirstItem()
-
+            # delete all finished command from ROB_commQueue
+            try:
+                while (UTIL.ROB_commQueue[0].id < telem.id):  UTIL.ROB_commQueue.popFirstItem()
+            except AttributeError:
+                pass
+            
+            # refresh data only if new
             if( telem != UTIL.ROB_lastTelem ):
 
                 # check if robot is processing a new command (length check to skip in first loop)
@@ -186,9 +191,18 @@ class RoboCommWorker(QObject):
                 UTIL.STT_dataBlock.Robo      =  copy.deepcopy(telem)
                 UTIL.STT_dataBlock.Robo.Coor -= zero
                 self.dataUpdated.emit( str(rawData), telem )
+                
+                print(f"RECV:    {telem}")
 
             mutex.unlock()
-            print(f"RECV:    {telem}")
+
+            # reset robMoving indicator if near end, skip if queue is processed
+            if( UTIL.DC_robMoving and not UTIL.SC_qProcessing ):
+                checkDist = self.checkRobCommZeroDist()
+                if( checkDist is not None ):
+                    if( checkDist < 1 ): self.endDcMoving.emit()
+
+
             
         elif (telem is not None):
             self.logError.emit('CONN', f"error ({telem}) from TCPIP class ROB_tcpip, data: {rawData}")
@@ -206,9 +220,17 @@ class RoboCommWorker(QObject):
         lenRob = len(UTIL.ROB_commQueue)
         robId  = UTIL.ROB_telem.id
 
-        if( UTIL.SC_qProcessing ):
+        # if qProcessing is ending, define end as being in 1mm range of the last robtarget
+        if( UTIL.SC_qPrepEnd ):
+            checkDist = self.checkRobCommZeroDist()
+            if( checkDist is not None ):
+                if( checkDist < 1 ): self.endProcessing.emit()
+
+        # if qProcessing is active and not ending, pop first queue item if robot is nearer than ROB_commFr
+        # if no entries in SC_queue left, end qProcessing (immediately if ROB_commQueue is empty as well)
+        elif( UTIL.SC_qProcessing ):
             
-            if( lenSc > 0):
+            if( lenSc > 0 ):
                 if( (robId + UTIL.ROB_commFr) > UTIL.SC_queue[0].id ):
 
                     mutex.lock()
@@ -218,8 +240,18 @@ class RoboCommWorker(QObject):
             else:
                 if( lenRob == 0 ):  self.endProcessing.emit()
                 else:               self.queueEmtpy.emit()
-
-                
+        
+    
+    
+    def checkRobCommZeroDist(self):
+        """ calculates distance between next entry in ROB_commQueue and current position """
+        if( len(UTIL.ROB_commQueue) == 1 ):
+            return  m.sqrt(  m.pow( UTIL.ROB_commQueue[0].Coor1.x - UTIL.ROB_telem.Coor.x, 2 )
+                        + m.pow( UTIL.ROB_commQueue[0].Coor1.y - UTIL.ROB_telem.Coor.y, 2 )
+                        + m.pow( UTIL.ROB_commQueue[0].Coor1.z - UTIL.ROB_telem.Coor.z, 2 )
+                        + m.pow( UTIL.ROB_commQueue[0].Coor1.ext - UTIL.ROB_telem.Coor.ext, 2 ) )
+        else:
+            return None
 
 
 
