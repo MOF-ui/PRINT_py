@@ -109,8 +109,8 @@ from PyQt5.QtWidgets import QApplication
 
 
 # import my own libs and UIs
-from libs.PRINT_win_dialogs import strdDialog, connDialog
-from libs.PRINT_win_mainframe import Mainframe
+from libs.PRINT_win_dialogs     import strdDialog, connDialog
+from libs.PRINT_win_mainframe   import Mainframe
 import libs.PRINT_data_utilities as UTIL
 
 
@@ -140,8 +140,8 @@ else:
 
 
 # overwrite ROBO_tcpip for testing, delete later
-UTIL.ROB_tcpip.ip      = 'localhost'
-UTIL.ROB_tcpip.port    = 10001
+# UTIL.ROB_tcpip.ip      = 'localhost'
+# UTIL.ROB_tcpip.port    = 10001
 
 
 # get the go from user
