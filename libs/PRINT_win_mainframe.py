@@ -492,7 +492,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ close the UI on any biting WD, log info """
 
         match dognumber:
-            
+
             case 1:   wdNum = '1'
 
             case 2:
@@ -808,7 +808,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ handles convFinished emit from loadFileWorker """
         
         # pause watchdog if list addition takes to long 
-        self.killWatchdog(1)
+        try:                    self.killWatchdog(1)
+        except AttributeError:  pass
 
         # add new list to SC_queue
         UTIL.SC_queue.addList(comList)
