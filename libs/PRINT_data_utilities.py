@@ -399,10 +399,10 @@ class QEntry:
         self.pMode  = str(pMode)
 
         # handle those beasty mutables
-        self.Coor1  = Coordinate() if (Coor1 == None) else Coor1
-        self.Coor2  = Coordinate() if (Coor2 == None) else Coor2
-        self.Speed  = SpeedVector() if (Speed == None) else Speed
-        self.Tool   = ToolCommand() if (Tool == None)  else Tool
+        self.Coor1  = Coordinate()  if (Coor1 is None) else Coor1
+        self.Coor2  = Coordinate()  if (Coor2 is None) else Coor2
+        self.Speed  = SpeedVector() if (Speed is None) else Speed
+        self.Tool   = ToolCommand() if (Tool is None)  else Tool
     
 
 
@@ -472,7 +472,7 @@ class Queue:
 
     def __init__(self,queue = None):
 
-        self.queue = [] if (queue == None) else queue
+        self.queue = [] if (queue is None) else queue
 
 
 
@@ -562,7 +562,7 @@ class Queue:
 
 
 
-    def add(self, entry):
+    def add(self, entry, threadCall= False):
         """ adds a new QEntry to queue, checks if QEntry.ID makes sense, places QEntry in queue according to the ID given """
 
         newEntry = copy.deepcopy(entry)
@@ -570,7 +570,9 @@ class Queue:
         if(lastItem < 0):
             global SC_currCommId
 
-            newEntry.id = SC_currCommId
+            if( not threadCall ):
+                newEntry.id = SC_currCommId
+
             self.queue.append(newEntry)
             return None
         
@@ -578,7 +580,8 @@ class Queue:
         firstID = self.queue[0].id
         
         if( (newEntry.id == 0) or (newEntry.id > lastID) ):
-            newEntry.id = lastID + 1
+            if( not threadCall ): 
+                newEntry.id = lastID + 1
             self.queue.append(newEntry)
 
         elif( newEntry.id < 0 ):
@@ -587,13 +590,66 @@ class Queue:
         else:
             if( newEntry.id < firstID ):  newEntry.id = firstID
             
-            frontSkip = newEntry.id - self.queue[0].id
+            frontSkip = newEntry.id - firstID
             self.queue.insert(frontSkip,newEntry)
             for i in range(lastItem + 1 - frontSkip):
                 i += 1
                 self.queue[i + frontSkip].id += 1
 
         return None
+    
+
+
+    def addList(self, list):
+        """ adds another queue, hopefully less time-consuming than a for loop with self.add """
+
+        newList = copy.deepcopy(list)
+
+        try:                        nlFirstID = newList[0].id
+        except Exception as err:    return err
+        
+        lastItem    = len(self.queue) - 1 
+        lenNewList  = len(newList)
+        
+        if( lastItem < 0 ):
+            global SC_currCommId
+            if( nlFirstID != SC_currCommId ):
+                i = 0
+                for entry in newList.queue:
+                    entry.id = SC_currCommId + i
+                    i += 1
+
+            self.queue.extend(newList.queue)
+            return None
+        
+        lastID  = self.queue[lastItem].id
+        firstID = self.queue[0].id
+        
+        if( nlFirstID == (lastID + 1) ):
+            self.queue.extend(newList.queue)
+
+        elif( nlFirstID == 0 ):
+            i = 1
+            for entry in newList.queue:
+                entry.id = lastID + i
+                i += 1
+            self.queue.extend(newList.queue)
+        
+        else:
+            if( nlFirstID < firstID ): 
+                i = 0
+                for entry in newList.queue:
+                    entry.id = firstID + i
+                    i += 1
+            
+            frontSkip = newList[0].id - firstID
+            self.queue[frontSkip:frontSkip] = newList.queue
+            for i in range(lastItem + 1 - frontSkip):
+                i += lenNewList
+                self.queue[i + frontSkip].id += lenNewList
+
+        return None
+
     
 
 
@@ -695,7 +751,7 @@ class RoboTelemetry:
         self.id     = int(id)
 
         # handle those beasty mutables
-        self.Coor = Coordinate()   if (Coor == None) else Coor
+        self.Coor = Coordinate()   if (Coor is None) else Coor
 
 
 
@@ -876,9 +932,9 @@ class DaqBlock:
         self.distanceEnd =      float(distanceEnd)
 
         # handle those beasty mutables
-        self.Pump1  = PumpTelemetry()   if (Pump1 == None) else Pump1
-        self.Pump2  = PumpTelemetry()   if (Pump2 == None) else Pump2
-        self.Robo   = RoboTelemetry()   if (Robo  == None) else Robo
+        self.Pump1  = PumpTelemetry()   if (Pump1 is None) else Pump1
+        self.Pump2  = PumpTelemetry()   if (Pump2 is None) else Pump2
+        self.Robo   = RoboTelemetry()   if (Robo  is None) else Robo
 
 
 
@@ -1434,7 +1490,7 @@ DEF_SC_VOL_PER_MM   = 0.01
 ############################ global variables
 DC_currZero         = Coordinate()
 DC_speed            = copy.deepcopy(DEF_DC_SPEED)
-DC_robMoving        = True
+DC_robMoving        = False
 
 IO_zone             = DEF_IO_ZONE
 IO_currFilepath     = None
