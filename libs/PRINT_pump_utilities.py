@@ -67,7 +67,7 @@ def calcSpeed():
     if( speed < -100.0 ): speed = -100.0
 
     lastSpeed = speed
-    return int( speed )
+    return int( round( speed, 0) )
 
 
 
