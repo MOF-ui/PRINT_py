@@ -38,9 +38,9 @@ import libs.PRINT_pump_utilities as PUTIL
 class PumpCommWorker(QObject):
     """ manages data updates and keepalive commands to pump """
 
-    dataReceived    = pyqtSignal(UTIL.PumpTelemetry)
-    dataSend        = pyqtSignal(int, str, int)
-    logError        = pyqtSignal(str, str)
+    dataReceived    = pyqtSignal( UTIL.PumpTelemetry )
+    dataSend        = pyqtSignal( int, str, int )
+    logError        = pyqtSignal( str, str )
 
     mtecInterface   = MtecMod('01')
 
@@ -127,12 +127,12 @@ class RoboCommWorker(QObject):
 
 
     dataReceived    = pyqtSignal()
-    dataUpdated     = pyqtSignal(str, UTIL.RoboTelemetry)
+    dataUpdated     = pyqtSignal( str, UTIL.RoboTelemetry )
     endDcMoving     = pyqtSignal()
     endProcessing   = pyqtSignal()
-    logError        = pyqtSignal(str,str)
+    logError        = pyqtSignal( str, str )
     queueEmtpy      = pyqtSignal()
-    sendElem        = pyqtSignal(UTIL.QEntry)
+    sendElem        = pyqtSignal( UTIL.QEntry )
 
 
 
@@ -252,6 +252,106 @@ class RoboCommWorker(QObject):
                         + m.pow( UTIL.ROB_commQueue[0].Coor1.ext - UTIL.ROB_telem.Coor.ext, 2 ) )
         else:
             return None
+        
+
+
+
+
+
+
+class LoadFileWorker(QObject):
+    """ worker converts .gcode or .mod into QEntries, outsourced to worker as 
+        these files can have more than 10000 lines """
+    
+    convFinished    = pyqtSignal( UTIL.Queue, int, int, int )
+    convFailed      = pyqtSignal( str )
+    comList         = UTIL.Queue()
+
+
+    def start(self, filePath, lineID = 0):
+        
+        # get file type and content
+        file    = open(filePath,'r')
+        txt     = file.read()
+        file.close()
+
+        # init vars
+        self.comList.clear()
+        rows    = txt.split('\n')
+        skips   = 0
+        startID = lineID
+
+        # iterate over file rows
+        if (filePath.suffix == '.gcode'):
+            for row in rows:
+                entry,command = self.gcodeConv(ID= lineID, txt= row)
+
+                if(    (command == 'G92') 
+                      or (command == ';') 
+                      or (command is None) ) :  skips  += 1
+                elif( (command == 'G1')  
+                      or (command == 'G28') ):  lineID += 1
+                elif(command == ValueError): 
+                    self.convFailed.emit( f"VALUE ERROR: {command}" )
+                    return
+                else:                           
+                    self.convFailed.emit( f"{command}!, ABORTED" )
+                    return
+
+        else:
+            for row in rows:
+                entry,err = self.rapidConv(ID= lineID, txt= row)
+
+                if( err == ValueError ):        
+                    self.convFailed.emit( f"VALUE ERROR: {command}" )
+                    return
+                elif(entry is None):            skips += 1
+                else:                           lineID += 1    
+        
+        self.convFinished.emit( self.comList, lineID, startID, skips )
+
+
+
+
+    def gcodeConv(self, ID, txt):
+
+        # get text and position BEFORE PLANNED COMMAND EXECUTION
+        speed   = copy.deepcopy(UTIL.PRIN_speed)
+        try:
+            if( len(self.comList) == 0 ):   pos = copy.deepcopy( UTIL.SC_queue.entryBeforeID(ID).Coor1 )
+            else:                           pos = copy.deepcopy( self.comList.lastEntry().Coor1 )
+        except AttributeError:              pos = UTIL.DC_currZero
+        
+        # act according to GCode command
+        entry,command = UTIL.gcodeToQEntry(pos, speed, UTIL.IO_zone ,txt)
+
+        if ( (command != 'G1') and (command != 'G28') ):    
+            return entry, command
+
+        entry.id    = ID
+        res         = self.comList.add(entry, threadCall= True)
+        
+        if(res == ValueError):
+            return None, ValueError
+        
+        return entry, command
+    
+
+
+
+    def rapidConv(self, ID, txt):
+                
+        entry,err   = UTIL.rapidToQEntry(txt)
+        if( entry == None ):
+            return None, err
+        
+        entry.id    = ID
+        res         = self.comList.add(entry, threadCall= True)
+
+        if(res == ValueError):
+            return None, ValueError
+
+        return entry, None
 
 
 

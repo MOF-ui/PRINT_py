@@ -31,7 +31,7 @@ from ui.UI_mainframe_v6 import Ui_MainWindow
 # import my own libs
 from libs.PRINT_win_daq import daqWindow
 from libs.PRINT_win_dialogs import strdDialog, fileDialog
-from libs.PRINT_threads import RoboCommWorker,PumpCommWorker
+from libs.PRINT_threads import RoboCommWorker,PumpCommWorker, LoadFileWorker
 import libs.PRINT_data_utilities as UTIL
 
 
@@ -61,11 +61,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         super().__init__(parent)
         
+        # UI SETUP
         self.setupUi(self)
         self.setWindowTitle("---   PRINT_py  -  Main Window  ---")
         self.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
         self.testrun = testrun
 
+        # LOGFILE SETUP
         if(lpath is None):
             logWarning = strdDialog('No path for logfile!\n\nPress OK to continue anyways or\n\
                                      Cancel to exit the program.'
@@ -83,6 +85,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.logpath = lpath
             self.logEntry('GNRL','main GUI running.')
 
+        # DAQ SETUP
         self.DAQ = daqWindow()
         self.DAQTimer = QTimer()
         self.DAQTimer.setInterval(1000)
@@ -91,6 +94,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if (not testrun): self.DAQ.show()
         self.logEntry('GNRL','DAQ GUI running.')
 
+        # LOAD THREADS, SIGNALS & DEFAULT SETTINGS
         self.logEntry('GNRL','init threading...')
         self.connectThreads()
         self.logEntry('GNRL','connecting mainsignals...')
@@ -98,32 +102,32 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.logEntry('GNRL','load default settings...')
         self.loadDefaults(setup= True)
 
+        # TESTRUN OPTION
         if(testrun):
             self.logEntry('TEST','testrun, skipping robot connection...')
             self.logEntry('GNRL','setup finished.')
             self.logEntry('newline')
             return
         
+        # ROBOT CONNECTION SETUP
         self.logEntry('GNRL','connect to Robot...') 
         res = self.connectTCP(1)
+
+        # if connection fails, suicide after the actual .exec is finished, exit without chrash
         if(res == False):
             self.logEntry('GNRL','failed, exiting...')
-            # suicide after the actual .exec is finished, exit without chrash
             QTimer.singleShot(0, self.close)
             return
 
-        self.logEntry('GNRL','start threading and setup robot TCP connection watchdog...')
-        self.roboCommThread.start()
-        self.setWatchdog()
-
-        # connect pumps if told so
+        # PUMP CONNECTIONS SETUP
         if (connDef[0]): 
             self.logEntry('GNRL','connect to pump1...')
             self.connectTCP(2)
-        # if (connDef[1]):  
-            # self.logEntry('GNRL','connect to pump2...')
-            # self.connectTCP(3)
+        if (connDef[1]):  
+            self.logEntry('GNRL','connect to pump2...')
+            self.connectTCP(3)
 
+        # FINISH SETUP
         self.logEntry('GNRL','setup finished.')
         self.logEntry('newline')
 
@@ -149,7 +153,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.IO_btt_newFile.pressed.connect                 (self.openFile)
         self.IO_btt_loadFile.pressed.connect                (self.loadFile)
-        self.IO_btt_addByID.pressed.connect                 ( lambda: self.loadFile(lf_adID = True) )
+        self.IO_btt_addByID.pressed.connect                 ( lambda: self.loadFile(lf_atID= True) )
         self.IO_btt_xyzZero.pressed.connect                 ( lambda: self.setZero([1,2,3]) )
         self.IO_btt_extZero.pressed.connect                 ( lambda: self.setZero([8]) )
 
@@ -246,6 +250,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 self.TCP_ROB_indi_connected.setStyleSheet(css)
                 
                 if (res == True):
+                    # if successful, start threading and watchdog
+                    self.roboCommThread.start()
+                    self.setWatchdog(1)
+
                     self.logEntry('CONN',f"connected to {conn[0]} at {conn[1]}.")
                     return True
                 
@@ -256,23 +264,33 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 return False
 
             case 2:
-                if('COM' in UTIL.PUMP1_tcpip.port): self.pumpCommThread.start()
-                else:                               raise ConnectionError('TCP not supported') # res,conn = UTIL.PUMP1_tcpip.connect()
+                if('COM' in UTIL.PUMP1_tcpip.port): 
+                    # no check if connection is possible (done via mtec lib), start threading and WD in good hope
+                    self.pumpCommThread.start()
+                    self.setWatchdog(2)
+                else:
+                    raise ConnectionError('TCP not supported') 
+                    # res,conn = UTIL.PUMP1_tcpip.connect()
 
-                self.TCP_PUMP1_indi_connected.setStyleSheet (css)
-                self.logEntry                               ('GNRL',f"connected to Pump1 at {UTIL.PUMP1_tcpip.port}.")
+                self.logEntry('GNRL',f"connected to Pump1 at {UTIL.PUMP1_tcpip.port}.")
+                self.TCP_PUMP1_indi_connected.setStyleSheet(css)
                 self.pump1Conn = True
                 return True
 
             case 3:  
-                raise ConnectionError('Pump2 not supported')
-                # if('COM' in UTIL.PUMP2_tcpip.PORT): self.pumpCommThread_2.start()
-                # else:                               raise ConnectionError('TCP not supported') # res,conn = UTIL.PUMP1_tcpip.connect()
+                raise ConnectionError('PUMP2 not supported, yet')
+            #     if('COM' in UTIL.PUMP2_tcpip.port): 
+            #         # no check if connection is possible (done via mtec lib), start threading and WD in good hope
+            #         self.pumpTwoCommThread.start()
+            #         self.setWatchdog(3)
+            #     else:
+            #         raise ConnectionError('TCP not supported') 
+            #         # res,conn = UTIL.PUMP1_tcpip.connect()
 
-                # self.TCP_PUMP2_indi_connected.setStyleSheet (css)
-                # self.logEntry                               ('GNRL','connected to Pump2.')
-                # self.pump2Conn = True
-                # return True
+            #     self.logEntry('GNRL',f"connected to Pump2 at {UTIL.PUMP2_tcpip.port}.")
+            #     self.TCP_PUMP2_indi_connected.setStyleSheet(css)
+            #     self.pump2Conn = True
+            #     return True
 
             case _:
                 return False        
@@ -287,14 +305,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ disconnect works, reconnect crashes the app, problem probably lies here
             should also send E command to robot on disconnect """
 
-        css = ("border-radius: 25px; \
-                background-color: #4c4a48;")
+        css = ("border-radius: 25px; background-color: #4c4a48;")
 
         match TCPslot:
 
             case 1:  
+                self.roboCommThread.quit()
+                self.roboCommThread.wait()
                 self.killWatchdog(1)
-                self.receiveWorker.pause()
                 UTIL.ROB_tcpip.close()
 
                 self.logEntry('CONN',f"user disconnected robot.")
@@ -304,6 +322,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 if( 'COM' in UTIL.PUMP1_tcpip.port ):
                     self.pumpCommThread.quit()
                     self.pumpCommThread.wait()
+                    self.killWatchdog(2)
                 else:
                     raise ConnectionError('TCP not supported, unable to disconnect') # UTIL.PUMP1_tcpip.close()
                 
@@ -356,6 +375,15 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.pumpCommWorker.logError.connect        (self.logEntry)
         self.pumpCommWorker.dataSend.connect        (self.pump1Send)
         self.pumpCommWorker.dataReceived.connect    (self.pump1Update)
+        self.pumpCommWorker.dataReceived.connect    ( lambda: self.resetWatchdog(2) )
+
+        self.loadFileThread = QThread()
+        self.loadFileWorker = LoadFileWorker()
+        self.loadFileWorker.moveToThread            (self.loadFileThread)
+        self.loadFileThread.finished.connect        (self.loadFileWorker.deleteLater)
+        self.loadFileWorker.convFailed.connect      (self.loadFileFailed)
+        self.loadFileWorker.convFinished.connect    (self.loadFileFinished)
+
         
     
 
@@ -419,37 +447,64 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          WATCHDOGS                                                #
     #####################################################################################################
 
-    def setWatchdog(self):
-        """ set Watchdog, just one to check the robots TCP connection for now (receiveWD) at least every 10 sec """
+    def setWatchdog(self, dognumber= 0):
+        """ set Watchdog, check data updates from robot and pump occure at least every 10 sec """
 
-        self.receiveWD = QTimer()
-        self.receiveWD.setSingleShot    (True)
-        self.receiveWD.setInterval      (10000)
-        self.receiveWD.timeout.connect  (lambda: self.watchdogBite(1))
+        match dognumber:
+            case 1:
+                self.robReceiveWD = QTimer()
+                self.robReceiveWD.setSingleShot    (True)
+                self.robReceiveWD.setInterval      (10000)
+                self.robReceiveWD.timeout.connect  (lambda: self.watchdogBite(1))
 
-        self.receiveWD.start()
-        self.logEntry('WDOG','Watchdog 1 (receiveWD) started.')
+                self.robReceiveWD.start()
+                self.logEntry('WDOG','Watchdog 1 (robReceiveWD) started.')
+
+            case 2: 
+                self.pumpOneReceiveWD = QTimer()
+                self.pumpOneReceiveWD.setSingleShot    (True)
+                self.pumpOneReceiveWD.setInterval      (10000)
+                self.pumpOneReceiveWD.timeout.connect  (lambda: self.watchdogBite(2))
+
+                self.pumpOneReceiveWD.start()
+                self.logEntry('WDOG','Watchdog 2 (pumpOneReceiveWD) started.')
+
+            case _:
+                self.logEntry('WDOG','Watchdog setting failed, invalid dog number given')
+
         
 
 
 
-
-    def resetWatchdog(self, dognumber=0):
-        """ reset the Watchdogs, receiveWD on every newly received data block """
+    def resetWatchdog(self, dognumber= 0):
+        """ reset the Watchdogs, robReceiveWD on every newly received data block """
 
         match dognumber:
-            case 1:   self.receiveWD.start()
+            case 1:   self.robReceiveWD.start()
+            case 2:   self.pumpOneReceiveWD.start()
             case _:   self.logEntry('WDOG','Watchdog reset failed, invalid dog number given')
 
 
 
 
 
-    def watchdogBite(self, dognumber = 0):
+    def watchdogBite(self, dognumber= 0):
         """ close the UI on any biting WD, log info """
 
         match dognumber:
+            
             case 1:   wdNum = '1'
+
+            case 2:
+                watchdogWarning = strdDialog(f"Watchdog 2 (Pump 1) has bitten, connection lost, pump offline"
+                                             ,'WATCHDOG ALARM')
+                watchdogWarning.exec()
+
+                self.TCP_PUMP1_indi_connected.setStyleSheet( "border-radius: 25px;background-color: #4c4a48;" )
+                UTIL.PUMP1_tcpip.connected = False
+                self.killWatchdog(2)
+                return
+
             case _:   wdNum = '(unidentified)'
         
         if(UTIL.SC_qProcessing):
@@ -462,7 +517,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                     f"exit and close."
 
         else:
-            self.logEntry           ('WDOG',f"Watchdog {wdNum} has bitten, robot disconnected!")
 
             wdTxt = f"Watchdog {wdNum} has bitten!\n\nRobot disconnected.\nPress OK to keep PRINT_py running or Cancel to "\
                     f"exit and close."
@@ -473,26 +527,29 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             if( watchdogWarning.result() ):
                 self.logEntry('WDOG',f"User chose to return to main screen.")
-                self.resetWatchdog(1)
 
             else:
                 self.logEntry('WDOG',f"User chose to close PRINT_py, exiting...")
                 self.close()
 
+            if( not UTIL.SC_qProcessing): 
+                self.logEntry('WDOG',f"Watchdog {wdNum} has bitten, robot disconnected!")
+
         self.TCP_ROB_indi_connected.setStyleSheet( "border-radius: 25px;background-color: #4c4a48;" )
         UTIL.ROB_tcpip.connected = False
-        self.resetWatchdog(1)
+        self.killWatchdog(1)
 
         
 
 
 
-    # def killWatchdog(self, dognumber = 0):
-    #     """ put them to sleep (dont do this to real dogs) """
+    def killWatchdog(self, dognumber= 0):
+        """ put them to sleep (dont do this to real dogs) """
 
-    #     match dognumber:
-    #         case 1:   self.receiveWD.stop()
-    #         case _:   pass
+        match dognumber:
+            case 1:   self.robReceiveWD.stop()
+            case 2:   self.pumpOneReceiveWD.stop()
+            case _:   pass
 
 
 
@@ -714,63 +771,64 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def loadFile(self, lf_atID = False, testrun = False, testpath = None):
-        """ reads the file set in self.openFile, adds all readable G1 commands to command queue (at end or at ID) """
+        """ reads the file set in self.openFile, adds all readable commands to command queue (at end or at ID)
+            outsourced to loadFileWorker """
 
-        fpath = testpath if(testrun) else UTIL.IO_currFilepath
-        if (fpath is None):
+        if( not self.loadFileThread.isRunning ): self.loadFileThread.start()
+
+        startID = self.IO_num_addByID.value() if(lf_atID) else 0
+        fpath   = testpath if(testrun) else UTIL.IO_currFilepath
+        if ( (fpath is None) 
+             or not ( (fpath.suffix == '.gcode') or (fpath.suffix == '.mod') ) ):
             self.IO_lbl_loadFile.setText("... no valid file, not executed")
             return False
+
+        self.IO_lbl_loadFile.setText("... conversion running ...")
+        self.logEntry('F-IO',f"started to load file from {fpath}, task passed to loadFileThread...")
+        self.loadFileWorker.start( filePath= fpath, lineID= startID )
+
+
+
+
+
+
+    def loadFileFailed(self, txt):
+        """ handles convFailed emit from loadFileWorker """
+
+        self.IO_lbl_loadFile.setText    (txt)
+        self.logEntry                   ('F-IO',f"ERROR: file IO from aborted! {txt}")
+        self.loadFileThread.quit()
+    
+
+
+
+
+
+    def loadFileFinished(self, comList, lineID, startID, skips):
+        """ handles convFinished emit from loadFileWorker """
         
-        # get file type and content
-        file        = open(fpath,'r')
-        txt         = file.read()
-        file.close()
+        # pause watchdog if list addition takes to long 
+        self.killWatchdog(1)
 
-        # iterate over all lines in the file, add valid commands found to command queue
-        rows            = txt.split('\n')
-        lineID          = self.IO_num_addByID.value() if(lf_atID) else 0
-        lineID_start    = lineID
-        skips           = 0
+        # add new list to SC_queue
+        UTIL.SC_queue.addList(comList)
 
-
-        if (fpath.suffix == '.gcode'):
-            for row in rows:
-                entry,command = self.addGcodeSgl(atID= lf_atID, ID= lineID, fromFile= True, fileText= row)
-
-                if(command == ValueError):
-                    self.IO_lbl_loadFile.setText    ("VALUE ERROR, ABORTED")
-                    self.logEntry                   ('F-IO',f"ERROR: file IO from {fpath} aborted! false entry: {entry}")
-                    return False
-                elif(command is None):              skips  += 1
-                elif( (command == 'G1')  
-                      or (command == 'G28')
-                      or (command == 'G92') ):      lineID += 1
-                else:
-                    self.IO_lbl_loadFile.setText    (f"{command}!, ABORTED")
-                    self.logEntry                   ('F-IO',f"ERROR: file IO from {fpath} aborted! {command}")
-
-        else:
-            for row in rows:
-                entry,err = self.addRapidSgl(atID= lf_atID, ID= lineID, fromFile= True, fileText= row)
-
-                if( err == ValueError ):
-                    self.IO_lbl_loadFile.setText    ("VALUE ERROR, ABORTED")
-                    self.logEntry                   ('F-IO',f"ERROR: file IO from {fpath} aborted! false entry: {entry}")
-                    return False
-                elif(entry is None):    skips += 1
-                else:                   lineID += 1
+        # revive watchdog
+        self.setWatchdog(1)
         
         # update labels, return True if you made it here
+        self.labelUpdate_onQueueChange()
+        self.labelUpdate_onNewZero()
         self.IO_num_addByID.setValue( lineID )
 
         if(skips == 0):     self.IO_lbl_loadFile.setText("... conversion successful")
         else:               self.IO_lbl_loadFile.setText(f"... {skips} command(s) skipped (syntax)")
         
-        logTxt = f"Loaded new file from {fpath}:   {lineID - lineID_start} commands ({skips} skipped due to syntax)"
-        if (lf_atID):   logTxt += f" starting fom {lineID_start}."
-        else:           logTxt += f" at the end."
+        logTxt = f"File loading finished:   {lineID - startID} commands added ({skips} skipped due to syntax),"
+        if (startID != 0):  logTxt += f" starting fom {startID}."
+        else:               logTxt += f" at the end."
         self.logEntry('F-IO', logTxt)
-        return True
+        self.loadFileThread.quit()
         
 
 
