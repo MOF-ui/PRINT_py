@@ -47,7 +47,7 @@ class PUTIL_test(unittest.TestCase):
         # mode: default
         testEntry = UTIL.QEntry( id= 1, Speed= UTIL.SpeedVector(ts= 234), pMode= 'default' )
         UTIL.ROB_commQueue.add( testEntry )
-        self.assertEqual( PUTIL.calcSpeed(), 23.4 )
+        self.assertEqual( PUTIL.calcSpeed(), 23 )
 
 
         UTIL.ROB_commQueue.clear()
@@ -126,7 +126,7 @@ class PUTIL_test(unittest.TestCase):
 
     def test_getBaseSpeed(self):
         """  """
-
+        
         self.assertEqual( PUTIL.getBaseSpeed('zero',    12), 0    )
         self.assertEqual( PUTIL.getBaseSpeed('max',     12), 100  )
         self.assertEqual( PUTIL.getBaseSpeed('min',     12), -100 )

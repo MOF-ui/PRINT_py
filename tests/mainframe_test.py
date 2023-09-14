@@ -23,7 +23,7 @@ from libs.PRINT_threads import RoboCommWorker, PumpCommWorker
 
 
 
-class Mainfraime_test(unittest.TestCase):
+class Mainframe_test(unittest.TestCase):
 
     def assertIsFile (self, path):
         """ program file exist error """
@@ -287,6 +287,7 @@ class Mainfraime_test(unittest.TestCase):
 
         # GCode
         testFrame.loadFile( lf_atID= False, testrun= True, testpath= gcodeTestpath )
+        testFrame.loadFileThread.wait()
         self.assertEqual( testFrame.IO_lbl_loadFile.text()
                          ,f"... {1} command(s) skipped (syntax)")
         self.assertEqual( testFrame.IO_num_addByID.value(), 2)
@@ -297,6 +298,7 @@ class Mainfraime_test(unittest.TestCase):
         # GCode at ID
         testFrame.IO_num_addByID.setValue(2)
         testFrame.loadFile( lf_atID= True, testrun= True, testpath= gcodeTestpath )
+        testFrame.loadFileThread.wait()
         self.assertEqual( testFrame.IO_lbl_loadFile.text()
                          ,f"... {1} command(s) skipped (syntax)")
         self.assertEqual( testFrame.IO_num_addByID.value(), 4)
@@ -520,14 +522,18 @@ class Mainfraime_test(unittest.TestCase):
         self.assertEqual( testFrame.homeCommand()[1]
                          ,UTIL.QEntry( id= 1, z= 0, Coor1= UTIL.Coordinate( x= 1, y= 2.2, z= 3, rx= 4 
                                                                             ,ry= 5, rz= 6, q= 7, ext= 8) ) )
+        self.assertTrue( UTIL.DC_robMoving )
+
+        UTIL.DC_robMoving = False
         testFrame.DC_drpd_moveType.setCurrentText('JOINT')
         self.assertEqual( testFrame.homeCommand()[1]
                          ,UTIL.QEntry( id= 2, z= 0, mt= 'J'
                                           ,Coor1= UTIL.Coordinate( x= 1, y= 2.2, z= 3, rx= 4 
                                                                    ,ry= 5, rz= 6, q= 7, ext= 8) ) )
         
-        UTIL.DC_currZero = UTIL.Coordinate()
-        UTIL.SC_currCommId = 1
+        UTIL.DC_currZero    = UTIL.Coordinate()
+        UTIL.SC_currCommId  = 1
+        UTIL.DC_robMoving   = False
         UTIL.SC_queue.clear()
 
     
@@ -539,20 +545,25 @@ class Mainfraime_test(unittest.TestCase):
         testFrame.DC_drpd_moveType.setCurrentText('LINEAR')
         self.assertEqual( str(testFrame.sendDCCommand(axis= 'X', dir= '+')[1])
                          ,str(UTIL.QEntry( id= 1, z=0, Coor1= UTIL.Coordinate(x=1) ) ))
-
+        
+        UTIL.DC_robMoving = False
         testFrame.DC_sld_stepWidth.setValue(2)
         testFrame.DC_drpd_moveType.setCurrentText('JOINT')
         self.assertEqual( testFrame.sendDCCommand(axis= 'Y', dir= '-')[1]
                          ,UTIL.QEntry( id= 2, mt='J',z=0, Coor1= UTIL.Coordinate(y= -10) ) )
 
+        UTIL.DC_robMoving = False
         testFrame.DC_sld_stepWidth.setValue(3)
         self.assertEqual( testFrame.sendDCCommand(axis= 'Z', dir= '+')[1]
                          ,UTIL.QEntry( id= 3, mt='J',z=0, Coor1= UTIL.Coordinate(z= 100) ) )
         
+        UTIL.DC_robMoving = False
         self.assertRaises( ValueError, testFrame.sendDCCommand, axis= 'A', dir= '+' )
+        UTIL.DC_robMoving = False
         self.assertRaises( ValueError, testFrame.sendDCCommand, axis= 'X', dir= '/' )
 
-        UTIL.SC_currCommId = 1
+        UTIL.DC_robMoving   = False
+        UTIL.SC_currCommId  = 1
     
 
 
@@ -571,6 +582,7 @@ class Mainfraime_test(unittest.TestCase):
         self.assertEqual( testFrame.sendNCCommand([1,2,3])[1]
                          ,UTIL.QEntry( id= 1, z=0, Coor1= UTIL.Coordinate(x= 1, y= 2.2, z= 3) ) )
         
+        UTIL.DC_robMoving = False
         UTIL.ROB_telem.Coor = UTIL.Coordinate( 1,1,1,1,1,1,0,1 )
         testFrame.DC_drpd_moveType.setCurrentText('JOINT')
         self.assertEqual( testFrame.sendNCCommand([4,5,6,8])[1]
@@ -578,6 +590,7 @@ class Mainfraime_test(unittest.TestCase):
                                       ,Coor1= UTIL.Coordinate( x= 1, y= 1, z= 1, rx= 4
                                                                ,ry= 5, rz= 6, ext= 7) ) )
         
+        UTIL.DC_robMoving = False
         UTIL.ROB_telem.Coor = UTIL.Coordinate()
         UTIL.SC_currCommId = 1
     
@@ -594,13 +607,16 @@ class Mainfraime_test(unittest.TestCase):
                          ,UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate( x= 1, y= 3.2, z= 1, rx= 1
                                                                       ,ry= 1, rz= 1, q= 1, ext= 1 ) ) )
         
+        UTIL.DC_robMoving = False
         testFrame.TERM_entry_gcodeInterp.setText('G1 X1 Z3')
         UTIL.ROB_telem.Coor = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
         UTIL.DC_currZero = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
 
+        UTIL.DC_robMoving = False
         self.assertEqual( testFrame.sendGcodeCommand()[1]
                          ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate( 2.1,2.2,6.3,4.4,5.5,6.6,7.7,8.8 ) ) )
         
+        UTIL.DC_robMoving = False
         UTIL.ROB_telem.Coor = UTIL.Coordinate()
         UTIL.SC_currCommId = 1
     

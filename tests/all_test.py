@@ -8,7 +8,7 @@ import sys
 import unittest
 
 # comment out tests you dont want to run here
-from mainfraime_test            import Mainfraime_test
+from mainframe_test            import Mainframe_test
 from util_test                  import UTIL_test
 from putil_test                 import PUTIL_test
 
