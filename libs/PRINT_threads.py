@@ -17,15 +17,15 @@ parent_dir  = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 # PyQt stuff
-from PyQt5.QtCore import QObject,QTimer,QMutex,pyqtSignal
+from PyQt5.QtCore   import QObject,QTimer,QMutex,pyqtSignal
 
 
 # import interface for Toshiba frequency modulator by M-TEC
-from mtec.mtec_mod import MtecMod
+from mtec.mtec_mod  import MtecMod
 
 # import my own libs
-import libs.PRINT_data_utilities as UTIL
-import libs.PRINT_pump_utilities as PUTIL
+import libs.PRINT_data_utilities    as UTIL
+import libs.PRINT_pump_utilities    as PUTIL
 
 
 
@@ -246,10 +246,10 @@ class RoboCommWorker(QObject):
     def checkRobCommZeroDist(self):
         """ calculates distance between next entry in ROB_commQueue and current position """
         if( len(UTIL.ROB_commQueue) == 1 ):
-            return  m.sqrt(  m.pow( UTIL.ROB_commQueue[0].Coor1.x - UTIL.ROB_telem.Coor.x, 2 )
-                        + m.pow( UTIL.ROB_commQueue[0].Coor1.y - UTIL.ROB_telem.Coor.y, 2 )
-                        + m.pow( UTIL.ROB_commQueue[0].Coor1.z - UTIL.ROB_telem.Coor.z, 2 )
-                        + m.pow( UTIL.ROB_commQueue[0].Coor1.ext - UTIL.ROB_telem.Coor.ext, 2 ) )
+            return  m.sqrt(  m.pow( UTIL.ROB_commQueue[0].Coor1.x   - UTIL.ROB_telem.Coor.x, 2 )
+                           + m.pow( UTIL.ROB_commQueue[0].Coor1.y   - UTIL.ROB_telem.Coor.y, 2 )
+                           + m.pow( UTIL.ROB_commQueue[0].Coor1.z   - UTIL.ROB_telem.Coor.z, 2 )
+                           + m.pow( UTIL.ROB_commQueue[0].Coor1.ext - UTIL.ROB_telem.Coor.ext, 2 ) )
         else:
             return None
         
@@ -263,14 +263,20 @@ class LoadFileWorker(QObject):
     """ worker converts .gcode or .mod into QEntries, outsourced to worker as 
         these files can have more than 10000 lines """
     
-    convFinished    = pyqtSignal( UTIL.Queue, int, int, int )
+    convFinished    = pyqtSignal( int, int, int )
     convFailed      = pyqtSignal( str )
     comList         = UTIL.Queue()
 
 
-    def start(self, filePath, lineID = 0):
-        
-        # get file type and content
+    def start(self):
+        """ """
+        global LFW_filePath
+        global LFW_lineID
+
+        filePath = LFW_filePath
+        lineID   = LFW_lineID
+
+        if( filePath is None ): self.convFailed.emit( "No filepath given!" )
         file    = open(filePath,'r')
         txt     = file.read()
         file.close()
@@ -308,7 +314,8 @@ class LoadFileWorker(QObject):
                 elif(entry is None):            skips += 1
                 else:                           lineID += 1    
         
-        self.convFinished.emit( self.comList, lineID, startID, skips )
+        UTIL.SC_queue.addList( self.comList )
+        self.convFinished.emit( lineID, startID, skips )
 
 
 
@@ -361,4 +368,7 @@ class LoadFileWorker(QObject):
 
 ####################################################   MAIN  ####################################################
 
-mutex = QMutex()
+mutex           = QMutex()
+
+LFW_filePath    = None
+LFW_lineID      = 0
