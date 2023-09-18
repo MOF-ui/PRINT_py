@@ -656,9 +656,12 @@ class Queue:
     def clear(self, all = True, ID = ''):
         """ deletes single or multiple QEntry from queue, adjusts following ID accordingly """
 
-        if(all):
+        if( all ):
             self.queue = []
             return self.queue
+
+        if( len(self.queue) == 0 ):
+            return None
 
         ids     = re.findall('\d+',ID)
         idNum   = len(ids)
