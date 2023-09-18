@@ -9,8 +9,8 @@
 import os
 import sys
 import copy
-from pathlib import Path
-from datetime import datetime
+from pathlib    import Path
+from datetime   import datetime
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -19,9 +19,9 @@ sys.path.append(parent_dir)
 
 
 # PyQt stuff
-from PyQt5.QtCore import Qt
-from PyQt5.QtCore import QTimer, QMutex, QThread
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtCore       import Qt
+from PyQt5.QtCore       import QTimer, QMutex, QThread
+from PyQt5.QtWidgets    import QApplication, QMainWindow
 
 
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
@@ -29,10 +29,10 @@ from ui.UI_mainframe_v6 import Ui_MainWindow
 
 
 # import my own libs
-from libs.PRINT_win_daq import daqWindow
+from libs.PRINT_win_daq     import daqWindow
 from libs.PRINT_win_dialogs import strdDialog, fileDialog
-from libs.PRINT_threads import RoboCommWorker,PumpCommWorker, LoadFileWorker
-import libs.PRINT_data_utilities as UTIL
+import libs.PRINT_threads           as WORKERS
+import libs.PRINT_data_utilities    as UTIL
 
 
 
@@ -147,38 +147,39 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.DC_btt_zMinus.pressed.connect                  ( lambda: self.sendDCCommand('Z','-') )
         self.DC_btt_extPlus.pressed.connect                 ( lambda: self.sendDCCommand('EXT','+') )
         self.DC_btt_extMinus.pressed.connect                ( lambda: self.sendDCCommand('EXT','-') )
-        self.DC_btt_xyzZero.pressed.connect                 ( lambda: self.setZero([1,2,3]) )
-        self.DC_btt_extZero.pressed.connect                 ( lambda: self.setZero([8]) )
+        self.DC_btt_xyzZero.pressed.connect                 ( lambda: self.setZero      ([1,2,3]) )
+        self.DC_btt_extZero.pressed.connect                 ( lambda: self.setZero      ([8]) )
         self.DC_btt_home.pressed.connect                    (self.homeCommand)
 
         self.IO_btt_newFile.pressed.connect                 (self.openFile)
         self.IO_btt_loadFile.pressed.connect                (self.loadFile)
         self.IO_btt_addByID.pressed.connect                 ( lambda: self.loadFile(lf_atID= True) )
-        self.IO_btt_xyzZero.pressed.connect                 ( lambda: self.setZero([1,2,3]) )
-        self.IO_btt_extZero.pressed.connect                 ( lambda: self.setZero([8]) )
+        self.IO_btt_xyzextZero.pressed.connect              ( lambda: self.setZero ([1,2,3,8]) )
+        self.IO_btt_orientZero.pressed.connect              ( lambda: self.setZero ([4,5,6]) )
 
+        self.NC_btt_getValues.pressed.connect               (self.valuesToDcSpinbox)
         self.NC_btt_xyzSend.pressed.connect                 ( lambda: self.sendNCCommand([1,2,3]) )
         self.NC_btt_xyzExtSend.pressed.connect              ( lambda: self.sendNCCommand([1,2,3,8]) )
         self.NC_btt_orientSend.pressed.connect              ( lambda: self.sendNCCommand([4,5,6]) )
-        self.NC_btt_orientZero.pressed.connect              ( lambda: self.setZero([4,5,6]) )
+        self.NC_btt_orientZero.pressed.connect              ( lambda: self.setZero      ([4,5,6]) )
 
-        self.PUMP_btt_setSpeed.pressed.connect              (self.setSpeed)
         self.SCTRL_num_liveAd_pump1.valueChanged.connect    (self.setSpeed)
+        self.PUMP_btt_setSpeed.pressed.connect              (self.setSpeed)
         self.PUMP_btt_plus1.pressed.connect                 ( lambda: self.setSpeed('1') )
         self.PUMP_btt_minus1.pressed.connect                ( lambda: self.setSpeed('-1') )
         self.PUMP_btt_stop.pressed.connect                  ( lambda: self.setSpeed('0') )
         self.PUMP_btt_reverse.pressed.connect               ( lambda: self.setSpeed('r') )
 
         self.SCTRL_btt_startQProcessing.pressed.connect     (self.startSCTRLQueue )
-        self.SCTRL_btt_holdQProcessing.pressed.connect      ( lambda: self.stopSCTRLQueue(prepEnd = True) )
-        self.SCTRL_btt_addSIB1_atFront.pressed.connect      ( lambda: self.addSIB(1) )
-        self.SCTRL_btt_addSIB1_atEnd.pressed.connect        ( lambda: self.addSIB(1, atEnd = True) )
-        self.SCTRL_btt_addSIB2_atFront.pressed.connect      ( lambda: self.addSIB(2) )
-        self.SCTRL_btt_addSIB2_atEnd.pressed.connect        ( lambda: self.addSIB(2, atEnd = True) )
-        self.SCTRL_btt_addSIB3_atFront.pressed.connect      ( lambda: self.addSIB(3) )
-        self.SCTRL_btt_addSIB3_atEnd.pressed.connect        ( lambda: self.addSIB(3, atEnd = True) )
-        self.SCTRL_btt_clrQ.pressed.connect                 ( lambda: self.clrQueue(partial = False) )
-        self.SCTRL_btt_clrByID.pressed.connect              ( lambda: self.clrQueue(partial = True) )
+        self.SCTRL_btt_holdQProcessing.pressed.connect      ( lambda: self.stopSCTRLQueue   (prepEnd = True) )
+        self.SCTRL_btt_addSIB1_atFront.pressed.connect      ( lambda: self.addSIB           (1) )
+        self.SCTRL_btt_addSIB2_atFront.pressed.connect      ( lambda: self.addSIB           (2) )
+        self.SCTRL_btt_addSIB3_atFront.pressed.connect      ( lambda: self.addSIB           (3) )
+        self.SCTRL_btt_addSIB1_atEnd.pressed.connect        ( lambda: self.addSIB           (1, atEnd = True) )
+        self.SCTRL_btt_addSIB2_atEnd.pressed.connect        ( lambda: self.addSIB           (2, atEnd = True) )
+        self.SCTRL_btt_addSIB3_atEnd.pressed.connect        ( lambda: self.addSIB           (3, atEnd = True) )
+        self.SCTRL_btt_clrQ.pressed.connect                 ( lambda: self.clrQueue         (partial = False) )
+        self.SCTRL_btt_clrByID.pressed.connect              ( lambda: self.clrQueue         (partial = True) )
         self.SCTRL_btt_forcedStop.pressed.connect           ( lambda: self.forcedStopCommand() )
         
         self.SET_btt_apply.pressed.connect                  (self.applySettings)
@@ -186,7 +187,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.SGLC_btt_gcodeSglComm.pressed.connect          (self.addGcodeSgl)
         self.SGLC_btt_rapidSglComm.pressed.connect          (self.addRapidSgl)
-        self.SGLC_btt_sendFirstQComm.pressed.connect        ( lambda: self.sendCommand(UTIL.SC_queue.popFirstItem()) )
+        self.SGLC_btt_sendFirstQComm.pressed.connect        ( lambda: self.sendCommand( UTIL.SC_queue.popFirstItem() ) )
         self.SGLC_btt_gcodeSglComm_addByID.pressed.connect  ( lambda: self.addGcodeSgl( atID = True
                                                                                        ,ID = self.SGLC_num_gcodeSglComm_addByID.value()) )
         self.SGLC_btt_rapidSglComm_addByID.pressed.connect  ( lambda: self.addRapidSgl( atID = True
@@ -202,6 +203,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.TERM_btt_gcodeInterp.pressed.connect           (self.sendGcodeCommand)
         self.TERM_btt_rapidInterp.pressed.connect           (self.sendRapidCommand)
 
+        self.ZERO_btt_newZero.pressed.connect               ( lambda: self.setZero( axis= [1,2,3,4,5,6,8], fromSysMonitor= True ) )
+
 
 
 
@@ -212,7 +215,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         
         self.TCP_num_commForerun.setValue       ( UTIL.DEF_ROB_COMM_FR )
 
-        self.SET_float_volPerE.setValue         ( UTIL.DEF_SC_VOL_PER_MM )
+        self.SET_float_volPerMM.setValue         ( UTIL.DEF_SC_VOL_PER_MM )
         self.SET_float_frToMms.setValue         ( UTIL.DEF_IO_FR_TO_TS )
 
         self.SET_num_zone.setValue              ( UTIL.DEF_IO_ZONE )
@@ -352,7 +355,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """load all threads from PRINT_threads and set signal-slot-connections"""
 
         self.roboCommThread = QThread()
-        self.roboCommWorker = RoboCommWorker()
+        self.roboCommWorker = WORKERS.RoboCommWorker()
         self.roboCommWorker.moveToThread            (self.roboCommThread)
         self.roboCommThread.started.connect         (self.roboCommWorker.run)
         self.roboCommThread.finished.connect        (self.roboCommWorker.stop)
@@ -367,7 +370,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.roboCommWorker.sendElem.connect        (self.sendCommand)
 
         self.pumpCommThread = QThread()
-        self.pumpCommWorker = PumpCommWorker()
+        self.pumpCommWorker = WORKERS.PumpCommWorker()
         self.pumpCommWorker.moveToThread            (self.pumpCommThread)
         self.pumpCommThread.started.connect         (self.pumpCommWorker.run)
         self.pumpCommThread.finished.connect        (self.pumpCommWorker.stop)
@@ -378,9 +381,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.pumpCommWorker.dataReceived.connect    ( lambda: self.resetWatchdog(2) )
 
         self.loadFileThread = QThread()
-        self.loadFileWorker = LoadFileWorker()
+        self.loadFileWorker = WORKERS.LoadFileWorker()
         self.loadFileWorker.moveToThread            (self.loadFileThread)
-        self.loadFileThread.finished.connect        (self.loadFileWorker.deleteLater)
+        self.loadFileThread.started.connect         (self.loadFileWorker.start)
         self.loadFileWorker.convFailed.connect      (self.loadFileFailed)
         self.loadFileWorker.convFinished.connect    (self.loadFileFinished)
 
@@ -566,10 +569,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         
         UTIL.ROB_commFr         = self.TCP_num_commForerun.value()
 
-        UTIL.SC_volPerMm         = self.SET_float_volPerE.value()
+        UTIL.SC_volPerMm        = self.SET_float_volPerMM.value()
         UTIL.IO_frToTs          = self.SET_float_frToMms.value()
-
+        UTIL.PUMP1_literPerS    = self.SET_float_pumpVolFlow.value()
         UTIL.IO_zone            = self.SET_num_zone.value()
+
         UTIL.DC_speed.ts        = self.SET_num_transSpeed_dc.value()
         UTIL.DC_speed.os        = self.SET_num_orientSpeed_dc.value()
         UTIL.DC_speed.acr       = self.SET_num_accelRamp_dc.value()
@@ -579,10 +583,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         UTIL.PRIN_speed.acr     = self.SET_num_accelRamp_print.value()
         UTIL.PRIN_speed.dcr     = self.SET_num_decelRamp_print.value()
 
-        self.logEntry('SETS',f"Settings updated -- ComFR: {UTIL.ROB_commFr}, VolPerE: {UTIL.SC_volPerMm}"
-                             f", FR2TS: {UTIL.IO_frToTs}, IOZ: {UTIL.IO_zone}, PrinTS: {UTIL.PRIN_speed.ts}"
-                             f", PrinOS: {UTIL.PRIN_speed.os}, PrinACR: {UTIL.PRIN_speed.acr}"
-                             f", PrinDCR: {UTIL.PRIN_speed.dcr}, DCTS: {UTIL.DC_speed.ts}"
+        self.logEntry('SETS',f"Settings updated -- ComFR: {UTIL.ROB_commFr}, VolPerMM: {UTIL.SC_volPerMm}"
+                             f", FR2TS: {UTIL.IO_frToTs}, PVF: {UTIL.PUMP1_literPerS} IOZ: {UTIL.IO_zone}"
+                             f", PrinTS: {UTIL.PRIN_speed.ts}, PrinOS: {UTIL.PRIN_speed.os}"
+                             f", PrinACR: {UTIL.PRIN_speed.acr} PrinDCR: {UTIL.PRIN_speed.dcr}, DCTS: {UTIL.DC_speed.ts}"
                              f", DCOS: {UTIL.DC_speed.os}, DCACR: {UTIL.DC_speed.acr}, DCDCR: {UTIL.DC_speed.dcr}")
 
 
@@ -625,10 +629,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def labelUpdate_onReceive(self,dataString):
         """ update all QLabels in the UI that may change with newly received data from robot """
 
-        pos         = UTIL.ROB_telem.Coor
-        zero        = UTIL.DC_currZero
-        robID       = UTIL.ROB_telem.id
-        comID       = UTIL.SC_currCommId
+        pos     = UTIL.ROB_telem.Coor
+        zero    = UTIL.DC_currZero
+        robID   = UTIL.ROB_telem.id
+        comID   = UTIL.SC_currCommId
+        start   = UTIL.ROB_movStartP
+        end     = UTIL.ROB_movEndP
         try:                    progID = UTIL.SC_queue[0].ID
         except AttributeError:  progID = comID
 
@@ -654,6 +660,19 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.TERM_disp_tcpSpeed.setText         ( str(UTIL.ROB_telem.tSpeed) )
         self.TERM_disp_robCommID.setText        ( str(robID) )
         self.TERM_disp_progCommID.setText       ( str(comID) )
+
+        if(    (start.rx != end.rx) 
+            or (start.ry != end.ry) 
+            or (start.rz != end.rz) ):  self.TRANS_indi_newOrient.setStyleSheet( "border-radius: 15px; background-color: #4c4a48;" )
+        else:                           self.TRANS_indi_newOrient.setStyleSheet( "border-radius: 15px; background-color: #00aaff;" )
+        self.TRANS_disp_xStart.setText          ( str(start.x) )
+        self.TRANS_disp_yStart.setText          ( str(start.y) )
+        self.TRANS_disp_zStart.setText          ( str(start.z) )
+        self.TRANS_disp_extStart.setText        ( str(start.ext) )
+        self.TRANS_disp_xEnd.setText            ( str(end.x) )
+        self.TRANS_disp_yEnd.setText            ( str(end.y) )
+        self.TRANS_disp_zEnd.setText            ( str(end.z) )
+        self.TRANS_disp_extEnd.setText          ( str(end.ext) )
 
 
 
@@ -709,6 +728,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ZERO_disp_yOrient.setText  ( str( UTIL.DC_currZero.ry ) )
         self.ZERO_disp_zOrient.setText  ( str( UTIL.DC_currZero.rz ) )
         self.ZERO_disp_ext.setText      ( str( UTIL.DC_currZero.ext ) )
+
+        self.ZERO_float_x.setValue      ( UTIL.DC_currZero.x )
+        self.ZERO_float_y.setValue      ( UTIL.DC_currZero.y )
+        self.ZERO_float_z.setValue      ( UTIL.DC_currZero.z )
+        self.ZERO_float_rx.setValue     ( UTIL.DC_currZero.rx )
+        self.ZERO_float_ry.setValue     ( UTIL.DC_currZero.ry )
+        self.ZERO_float_rz.setValue     ( UTIL.DC_currZero.rz )
+        self.ZERO_float_ext.setValue    ( UTIL.DC_currZero.ext )
     
 
 
@@ -770,22 +797,29 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def loadFile(self, lf_atID = False, testrun = False, testpath = None):
+    def loadFile(self, lf_atID = False, testrun= False):
         """ reads the file set in self.openFile, adds all readable commands to command queue (at end or at ID)
             outsourced to loadFileWorker """
 
-        if( not self.loadFileThread.isRunning ): self.loadFileThread.start()
-
+        # get user input
         startID = self.IO_num_addByID.value() if(lf_atID) else 0
-        fpath   = testpath if(testrun) else UTIL.IO_currFilepath
+        fpath   = UTIL.IO_currFilepath
+        
         if ( (fpath is None) 
              or not ( (fpath.suffix == '.gcode') or (fpath.suffix == '.mod') ) ):
             self.IO_lbl_loadFile.setText("... no valid file, not executed")
-            return False
+            return
 
         self.IO_lbl_loadFile.setText("... conversion running ...")
         self.logEntry('F-IO',f"started to load file from {fpath}, task passed to loadFileThread...")
-        self.loadFileWorker.start( filePath= fpath, lineID= startID )
+
+        # set up THREADS vars and start
+        mutex.lock()
+        WORKERS.LFW_filePath = fpath
+        WORKERS.LFW_lineID   = startID
+        mutex.unlock()
+
+        if( not testrun ):  self.loadFileThread.start()
 
 
 
@@ -797,6 +831,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.IO_lbl_loadFile.setText    (txt)
         self.logEntry                   ('F-IO',f"ERROR: file IO from aborted! {txt}")
+
+        # reset THREADS vars and exit
+        mutex.lock()
+        WORKERS.LFW_filePath = None
+        WORKERS.LFW_lineID   = 0
+        mutex.unlock()
+
         self.loadFileThread.quit()
     
 
@@ -804,20 +845,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def loadFileFinished(self, comList, lineID, startID, skips):
+    def loadFileFinished(self, lineID, startID, skips):
         """ handles convFinished emit from loadFileWorker """
         
-        # pause watchdog if list addition takes to long 
-        try:                    self.killWatchdog(1)
-        except AttributeError:  pass
-
-        # add new list to SC_queue
-        UTIL.SC_queue.addList(comList)
-
-        # revive watchdog
-        self.setWatchdog(1)
-        
-        # update labels, return True if you made it here
+        # update labels, log entry if you made it here
         self.labelUpdate_onQueueChange()
         self.labelUpdate_onNewZero()
         self.IO_num_addByID.setValue( lineID )
@@ -829,6 +860,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if (startID != 0):  logTxt += f" starting fom {startID}."
         else:               logTxt += f" at the end."
         self.logEntry('F-IO', logTxt)
+
+        # reset THREADS vars and exit
+        mutex.lock()
+        WORKERS.LFW_filePath = None
+        WORKERS.LFW_lineID   = 0
+        mutex.unlock()
+
         self.loadFileThread.quit()
         
 
@@ -1065,6 +1103,20 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #####################################################################################################
     #                                          DC COMMANDS                                              #
     #####################################################################################################
+
+    def valuesToDcSpinbox(self):
+        """ button function to help the user adjust a postion via numeric control, copys the current position
+            to the set coordinates spinboxes """
+
+        self.NC_float_x.setValue        ( UTIL.ROB_telem.Coor.x )
+        self.NC_float_y.setValue        ( UTIL.ROB_telem.Coor.y )
+        self.NC_float_z.setValue        ( UTIL.ROB_telem.Coor.z )
+        self.NC_float_xOrient.setValue  ( UTIL.ROB_telem.Coor.rx )
+        self.NC_float_yOrient.setValue  ( UTIL.ROB_telem.Coor.ry )
+        self.NC_float_zOrient.setValue  ( UTIL.ROB_telem.Coor.rz )
+        self.NC_float_ext.setValue      ( UTIL.ROB_telem.Coor.ext )
+
+
 
     def switchRobMoving(self, end= False):
         """ change UTIL.DC_robMoving """
@@ -1348,11 +1400,20 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def setZero(self,axis):
+    def setZero(self, axis, fromSysMonitor= False):
         """ overwrite DC_curr_zero, uses deepcopy to avoid mutual large mutual exclusion blocks """
 
         newZero = copy.deepcopy(UTIL.DC_currZero)
-        currPos = copy.deepcopy(UTIL.ROB_telem.Coor)
+        if( fromSysMonitor ):   
+            currPos = UTIL.Coordinate( x=   self.ZERO_float_x.value()
+                                      ,y=   self.ZERO_float_y.value()
+                                      ,z=   self.ZERO_float_z.value()
+                                      ,rx=  self.ZERO_float_rx.value()
+                                      ,ry=  self.ZERO_float_ry.value()
+                                      ,rz=  self.ZERO_float_rz.value()
+                                      ,ext= self.ZERO_float_ext.value() )
+        else:
+            currPos = copy.deepcopy(UTIL.ROB_telem.Coor)
 
         if axis:
             # 7 is a placeholder for Q, which can not be set by hand
@@ -1412,20 +1473,20 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.logEntry('GNRL','end threading, delete threads...')
         
         if(UTIL.ROB_tcpip.connected):
-            self.logEntry('CONN','closing TCP connections...')
-            self.robotStopCommand()
+            self.logEntry               ('CONN','closing robot TCP connection...')
+            self.robotStopCommand       ()
+            UTIL.ROB_tcpip.close        ( end= True )
+            self.roboCommThread.quit    ()
+            self.roboCommThread.wait    ()
 
-            UTIL.ROB_tcpip.close( end= True )
-        
-        self.roboCommThread.quit()
-        self.roboCommThread.wait()
-
-        # if(self.pump1Conn):
-        if( 'COM' in UTIL.PUMP1_tcpip.port ):
-            self.pumpCommThread.quit()
-            self.pumpCommThread.wait()
-        else:
-            raise ConnectionError('TCP not supported, unable to disconnect') # UTIL.PUMP1_tcpip.close()
+        if(self.pump1Conn):
+            self.logEntry               ('CONN','closing pump connections...')
+            
+            if( 'COM' in UTIL.PUMP1_tcpip.port ):
+                self.pumpCommThread.quit()
+                self.pumpCommThread.wait()
+            else:
+                raise ConnectionError('TCP not supported, unable to disconnect') # UTIL.PUMP1_tcpip.close()
 
         # if(self.pump2Conn):
         #     if( 'COM' in UTIL.PUMP2_tcpip.PORT ):
@@ -1436,6 +1497,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.roboCommThread.deleteLater()
         self.pumpCommThread.deleteLater()
+        self.loadFileThread.deleteLater()
 
         self.logEntry('GNRL','exiting GUI.')
         self.DAQTimer.stop()

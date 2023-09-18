@@ -8,9 +8,10 @@ import sys
 import unittest
 
 # comment out tests you dont want to run here
-from mainframe_test            import Mainframe_test
-from util_test                  import UTIL_test
-from putil_test                 import PUTIL_test
+from mainframe_test     import Mainframe_test
+from util_test          import UTIL_test
+from putil_test         import PUTIL_test
+from thread_test        import Thread_test
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))

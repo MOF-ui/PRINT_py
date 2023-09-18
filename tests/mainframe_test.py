@@ -7,21 +7,25 @@ import sys
 import unittest
 import pathlib as pl
 
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import QThread
-from datetime import datetime
+from PyQt5.QtWidgets    import QApplication
+from PyQt5.QtCore       import QThread
+from datetime           import datetime
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir  = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
-import libs.PRINT_data_utilities as UTIL
-import libs.PRINT_win_mainframe as MF
+import libs.PRINT_data_utilities    as UTIL
+import libs.PRINT_win_mainframe     as MF
+
 from libs.PRINT_win_daq import DAQWindow as DAQ
 from libs.PRINT_threads import RoboCommWorker, PumpCommWorker
 
 
+
+
+########################################## TEST CLASS ##############################################
 
 class Mainframe_test(unittest.TestCase):
 
@@ -30,310 +34,6 @@ class Mainframe_test(unittest.TestCase):
 
         if not pl.Path(path).resolve().is_file():
             raise AssertionError(f"No such file: {path}")
-
-
-
-    def test_init (self):
-        global testFrame
-        global logpath
-
-        # general values
-        self.assertEqual     (testFrame.logpath,    logpath)
-        self.assertEqual     (testFrame.pump1Conn,  False)
-        self.assertEqual     (testFrame.pump2Conn,  False)
-        self.assertIsInstance(testFrame.DAQ,        DAQ)
-
-        # logfile
-        self.assertIsFile   (logpath)
-        logfileCheck        = open(logpath,'r')
-        logfileCheckTxt     = logfileCheck.read()
-        logfileCheck.close()
-        self.assertIn('setup finished.',logfileCheckTxt)
-
-        # defaults test with 'applySettings'
-        
-        # threads
-        self.assertIsInstance( testFrame.roboCommThread, QThread )
-        self.assertIsInstance( testFrame.pumpCommThread, QThread )
-        self.assertIsInstance( testFrame.roboCommWorker, RoboCommWorker )
-        self.assertIsInstance( testFrame.pumpCommWorker, PumpCommWorker )
-
-
-
-    def test_posUpdate (self):
-        """ tests labelUpdate_onReceive as well """
-        global testFrame
-
-        # primary function
-        UTIL.DC_currZero = UTIL.Coordinate()
-
-        # check first loop switch, Q is not set by posUpdate
-        UTIL.ROB_telem = UTIL.RoboTelemetry( 0, 0, UTIL.Coordinate(1,2,3,4,5,6,7,8.8) )
-        self.assertEqual    ( UTIL.DC_currZero, UTIL.Coordinate() )
-        testFrame.posUpdate ( rawDataString= 'ABC', telem= UTIL.RoboTelemetry() )
-        self.assertEqual    ( UTIL.DC_currZero, UTIL.Coordinate(1,2,3,4,5,6,0,8.8) )
-
-        # check loop run
-        UTIL.SC_currCommId = 15
-        UTIL.DC_currZero    = UTIL.Coordinate(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1)
-        UTIL.ROB_telem      = UTIL.RoboTelemetry( 9.9, 10, UTIL.Coordinate(1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8) ) 
-        testFrame.posUpdate( rawDataString= 'ABC', telem= UTIL.RoboTelemetry() )
-        
-        # following is outsourced to RobCommWorker from now 
-        # self.assertEqual( UTIL.ROB_telem.Coor, UTIL.Coordinate(1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8) )
-        # self.assertEqual( UTIL.STT_dataBlock.Robo.Coor, UTIL.Coordinate(1.0,2.1,3.2,4.3,5.4,6.5,7.6,8.7) )
-        # self.assertEqual( UTIL.ROB_telem.tSpeed, 9.9 )
-        # self.assertEqual( UTIL.STT_dataBlock.Robo.tSpeed, 9.9 )
-        # self.assertEqual( UTIL.ROB_telem.id, 10 )
-        # self.assertEqual( UTIL.STT_dataBlock.Robo.id, 10 )
-
-        # labelUpdate_onReceive (called from posUpdate)
-        self.assertEqual( testFrame.TCP_ROB_disp_readBuffer.text(), 'ABC' )
-        self.assertEqual( testFrame.SCTRL_disp_buffComms.text(),    '5' )
-        self.assertEqual( testFrame.SCTRL_disp_robCommID.text(),    '10' )
-        self.assertEqual( testFrame.SCTRL_disp_progCommID.text(),   '15' )
-        self.assertEqual( testFrame.SCTRL_disp_elemInQ.text(),      '0' )
-
-        self.assertEqual( testFrame.DC_disp_x.text(),               '1.0' )
-        self.assertEqual( testFrame.DC_disp_y.text(),               '2.1' )
-        self.assertEqual( testFrame.DC_disp_z.text(),               '3.2' )
-        self.assertEqual( testFrame.DC_disp_ext.text(),             '8.7' )
-        
-        self.assertEqual( testFrame.NC_disp_x.text(),               '1.1' )
-        self.assertEqual( testFrame.NC_disp_y.text(),               '2.2' )
-        self.assertEqual( testFrame.NC_disp_z.text(),               '3.3' )
-        self.assertEqual( testFrame.NC_disp_xOrient.text(),         '4.4' )
-        self.assertEqual( testFrame.NC_disp_yOrient.text(),         '5.5' )
-        self.assertEqual( testFrame.NC_disp_zOrient.text(),         '6.6' )
-        self.assertEqual( testFrame.NC_disp_ext.text(),             '8.8' )
-        
-        self.assertEqual( testFrame.TERM_disp_tcpSpeed.text(),      '9.9' )
-        self.assertEqual( testFrame.TERM_disp_robCommID.text(),     '10' )
-        self.assertEqual( testFrame.TERM_disp_progCommID.text(),    '15' )
-
-        UTIL.DC_currZero        = UTIL.Coordinate()
-        UTIL.ROB_telem          = UTIL.RoboTelemetry()
-        UTIL.SC_currCommId      = 1
-        UTIL.SC_queue.clear()
-
-
-
-    def test_pump1Send (self):
-        global testFrame
-
-        testFrame.pump1Send(newSpeed= 1.1, command= 'ABC', ans= 'DEF')
-
-        self.assertEqual( UTIL.PUMP1_speed, 1.1)
-        self.assertEqual( testFrame.TCP_PUMP1_disp_writeBuffer.text(),  'ABC')
-        self.assertEqual( testFrame.TCP_PUMP1_disp_bytesWritten.text(), '3')
-        self.assertEqual( testFrame.TCP_PUMP1_disp_readBuffer.text(),   'DEF')
-        self.assertEqual( testFrame.PUMP_disp_currSpeed.text(),         '1.1%')
-
-
-
-    def test_pump1Update (self):
-        global testFrame
-        
-        UTIL.STT_dataBlock.Pump1 = UTIL.PumpTelemetry(1.1,2.2,3.3,4.4)
-        testFrame.pump1Update(telem= UTIL.STT_dataBlock.Pump1)
-
-        self.assertEqual( testFrame.PUMP_disp_freq.text(), '1.1' )
-        self.assertEqual( testFrame.PUMP_disp_volt.text(), '2.2' )
-        self.assertEqual( testFrame.PUMP_disp_amps.text(), '3.3' )
-        self.assertEqual( testFrame.PUMP_disp_torq.text(), '4.4' )
-
-        UTIL.STT_dataBlock.Pump1 = UTIL.PumpTelemetry()
-    
-
-
-    def test_applySettings (self):
-        """ test default settings loading in '__init__' as well """
-        global testFrame
-
-        # check if defaults were loaded
-        self.assertEqual( testFrame.TCP_num_commForerun.value()     ,UTIL.DEF_ROB_COMM_FR)
-        self.assertEqual( testFrame.SET_float_volPerE.value()       ,UTIL.DEF_SC_VOL_PER_MM)
-        self.assertEqual( testFrame.SET_float_frToMms.value()       ,UTIL.DEF_IO_FR_TO_TS)
-        self.assertEqual( testFrame.SET_num_zone.value()            ,UTIL.DEF_IO_ZONE)
-        self.assertEqual( testFrame.SET_num_transSpeed_dc.value()   ,UTIL.DEF_DC_SPEED.ts)
-        self.assertEqual( testFrame.SET_num_orientSpeed_dc.value()  ,UTIL.DEF_DC_SPEED.os)
-        self.assertEqual( testFrame.SET_num_accelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.acr)
-        self.assertEqual( testFrame.SET_num_decelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.dcr)
-        self.assertEqual( testFrame.SET_num_transSpeed_print.value(),UTIL.DEF_PRIN_SPEED.ts)
-        self.assertEqual( testFrame.SET_num_orientSpeed_print.value()
-                         ,UTIL.DEF_PRIN_SPEED.os)
-        self.assertEqual( testFrame.SET_num_accelRamp_print.value(),UTIL.DEF_PRIN_SPEED.acr)
-        self.assertEqual( testFrame.SET_num_decelRamp_print.value(),UTIL.DEF_PRIN_SPEED.dcr)
-
-        # test setting by user
-        testFrame.TCP_num_commForerun.setValue      (1)
-        testFrame.SET_float_volPerE.setValue        (2.2)
-        testFrame.SET_float_frToMms.setValue        (3.3)
-        testFrame.SET_num_zone.setValue             (4)
-        testFrame.SET_num_transSpeed_dc.setValue    (5)
-        testFrame.SET_num_orientSpeed_dc.setValue   (6)
-        testFrame.SET_num_accelRamp_dc.setValue     (7)
-        testFrame.SET_num_decelRamp_dc.setValue     (8)
-        testFrame.SET_num_transSpeed_print.setValue (9)
-        testFrame.SET_num_orientSpeed_print.setValue(10)
-        testFrame.SET_num_accelRamp_print.setValue  (11)
-        testFrame.SET_num_decelRamp_print.setValue  (12)
-        testFrame.applySettings()
-
-        self.assertEqual( UTIL.ROB_commFr,     1 )
-        self.assertEqual( UTIL.SC_volPerMm,    2.2 )
-        self.assertEqual( UTIL.IO_frToTs,     3.3 )
-        self.assertEqual( UTIL.IO_zone,         4 )
-        self.assertEqual( UTIL.DC_speed.ts,     5 )
-        self.assertEqual( UTIL.DC_speed.os,     6 )
-        self.assertEqual( UTIL.DC_speed.acr,    7 )
-        self.assertEqual( UTIL.DC_speed.dcr,    8 )
-        self.assertEqual( UTIL.PRIN_speed.ts,   9 )
-        self.assertEqual( UTIL.PRIN_speed.os,   10 )
-        self.assertEqual( UTIL.PRIN_speed.acr,  11 )
-        self.assertEqual( UTIL.PRIN_speed.dcr,  12 )
-
-        # test resetting by user
-        testFrame.loadDefaults()
-        testFrame.applySettings()
-        self.assertEqual( testFrame.TCP_num_commForerun.value()     ,UTIL.DEF_ROB_COMM_FR)
-        self.assertEqual( testFrame.SET_float_volPerE.value()       ,UTIL.DEF_SC_VOL_PER_MM)
-        self.assertEqual( testFrame.SET_float_frToMms.value()       ,UTIL.DEF_IO_FR_TO_TS)
-        self.assertEqual( testFrame.SET_num_zone.value()            ,UTIL.DEF_IO_ZONE)
-        self.assertEqual( testFrame.SET_num_transSpeed_dc.value()   ,UTIL.DEF_DC_SPEED.ts)
-        self.assertEqual( testFrame.SET_num_orientSpeed_dc.value()  ,UTIL.DEF_DC_SPEED.os)
-        self.assertEqual( testFrame.SET_num_accelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.acr)
-        self.assertEqual( testFrame.SET_num_decelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.dcr)
-        self.assertEqual( testFrame.SET_num_transSpeed_print.value(),UTIL.DEF_PRIN_SPEED.ts)
-        self.assertEqual( testFrame.SET_num_orientSpeed_print.value()
-                         ,UTIL.DEF_PRIN_SPEED.os)
-        self.assertEqual( testFrame.SET_num_accelRamp_print.value(),UTIL.DEF_PRIN_SPEED.acr)
-        self.assertEqual( testFrame.SET_num_decelRamp_print.value(),UTIL.DEF_PRIN_SPEED.dcr)
-
-
-
-    def test_labelUpdate_onSend (self):
-        """ test labelUpdate_onQueueChange as well """
-        global testFrame
-
-        UTIL.DC_currZero = UTIL.Coordinate()
-
-        testFrame.SGLC_entry_gcodeSglComm.setText('G1 X2.2 Y1')
-        testFrame.addGcodeSgl()
-        testFrame.labelUpdate_onSend(entry= None)
-
-        self.assertEqual( testFrame.SCTRL_disp_elemInQ.text(),  '1' )
-        self.assertEqual( testFrame.SCTRL_disp_buffComms.text(),'0' )
-
-        # secondarily calls labelUpdate_onQueueChange
-        self.assertEqual( testFrame.SCTRL_arr_queue.item(0).text()
-                         ,str(UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2.2, y= 1) )) )
-        
-        UTIL.SC_queue.clear()
-    
-
-
-    def test_labelUpdate_onNewZero (self):
-        """ rababer rababer """
-        global testFrame
-
-        UTIL.DC_currZero = UTIL.Coordinate(1.1,2,3,4,5,6,7,8)
-        testFrame.labelUpdate_onNewZero()
-        
-        self.assertEqual( testFrame.ZERO_disp_x.text(), '1.1' )
-        self.assertEqual( testFrame.ZERO_disp_y.text(), '2.0' )
-        self.assertEqual( testFrame.ZERO_disp_z.text(), '3.0' )
-        self.assertEqual( testFrame.ZERO_disp_xOrient.text(), '4.0' )
-        self.assertEqual( testFrame.ZERO_disp_yOrient.text(), '5.0' )
-        self.assertEqual( testFrame.ZERO_disp_zOrient.text(), '6.0' )
-        self.assertEqual( testFrame.ZERO_disp_ext.text(), '8.0' )
-
-        UTIL.DC_currZero = UTIL.Coordinate()
-        
-    
-
-    def test_openFile (self):
-        global testFrame
-        global gcodeTestpath
-        global rapidTestpath
-
-        currSetting         = UTIL.SC_volPerMm
-        UTIL.SC_volPerMm    = 0.1
-        
-        testFrame.openFile( testrun= True, testpath= gcodeTestpath )
-        self.assertEqual  ( UTIL.IO_currFilepath, gcodeTestpath )
-        self.assertEqual  ( testFrame.IO_disp_filename.text(), gcodeTestpath.name )
-        self.assertEqual  ( testFrame.IO_disp_commNum.text(),  '2' )
-        self.assertEqual  ( testFrame.IO_disp_estimLen.text(), '3.0' )
-        self.assertEqual  ( testFrame.IO_disp_estimVol.text(), '0.3' )
-
-
-        testFrame.openFile(testrun= True, testpath= rapidTestpath)
-        self.assertEqual  ( UTIL.IO_currFilepath, rapidTestpath )
-        self.assertEqual  ( testFrame.IO_disp_filename.text(), rapidTestpath.name )
-        self.assertEqual  ( testFrame.IO_disp_commNum.text(),  '2' )
-        self.assertEqual  ( testFrame.IO_disp_estimLen.text(), '3.0' )
-        self.assertEqual  ( testFrame.IO_disp_estimVol.text(), '0.3' )
-
-        UTIL.SC_volPerMm = currSetting
-    
-
-
-    def test_loadFile (self):
-        global testFrame
-        
-        UTIL.SC_currCommId = 1
-        UTIL.DC_currZero = UTIL.Coordinate()
-
-        # GCode
-        testFrame.loadFile( lf_atID= False, testrun= True, testpath= gcodeTestpath )
-        testFrame.loadFileThread.wait()
-        self.assertEqual( testFrame.IO_lbl_loadFile.text()
-                         ,f"... {1} command(s) skipped (syntax)")
-        self.assertEqual( testFrame.IO_num_addByID.value(), 2)
-        self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id=1, Coor1= UTIL.Coordinate(y= 2, z= 0) ) )
-                           ,str( UTIL.QEntry( id=2, Coor1= UTIL.Coordinate(y= 2, z= 1) ) )])
-
-        # GCode at ID
-        testFrame.IO_num_addByID.setValue(2)
-        testFrame.loadFile( lf_atID= True, testrun= True, testpath= gcodeTestpath )
-        testFrame.loadFileThread.wait()
-        self.assertEqual( testFrame.IO_lbl_loadFile.text()
-                         ,f"... {1} command(s) skipped (syntax)")
-        self.assertEqual( testFrame.IO_num_addByID.value(), 4)
-        self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id=1, Coor1= UTIL.Coordinate(y= 2, z= 0) ) )
-                           ,str( UTIL.QEntry( id=2, Coor1= UTIL.Coordinate(y= 2, z= 0) ) )
-                           ,str( UTIL.QEntry( id=3, Coor1= UTIL.Coordinate(y= 2, z= 1) ) )
-                           ,str( UTIL.QEntry( id=4, Coor1= UTIL.Coordinate(y= 2, z= 1) ) )])
-
-        # RAPID
-        UTIL.SC_queue.clear()
-        UTIL.SC_currCommId = 1
-
-        testFrame.loadFile( lf_atID= False, testrun= True, testpath= rapidTestpath )
-        self.assertEqual( testFrame.IO_lbl_loadFile.text()
-                         ,f"... {4} command(s) skipped (syntax)")
-        self.assertEqual( testFrame.IO_num_addByID.value(), 2)
-        self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id=1, Coor1= UTIL.Coordinate(y= 2, z= 0, ext= 11) ) )
-                           ,str( UTIL.QEntry( id=2, Coor1= UTIL.Coordinate(y= 2, z= 1, ext= 11) ) )])
-
-        # RAPID at ID
-        testFrame.IO_num_addByID.setValue(2)
-        testFrame.loadFile( lf_atID= True, testrun= True, testpath= rapidTestpath )
-        self.assertEqual( testFrame.IO_lbl_loadFile.text()
-                         ,f"... {4} command(s) skipped (syntax)")
-        self.assertEqual( testFrame.IO_num_addByID.value(), 4)
-        self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id=1, Coor1= UTIL.Coordinate(y= 2, z= 0, ext= 11) ) )
-                           ,str( UTIL.QEntry( id=2, Coor1= UTIL.Coordinate(y= 2, z= 0, ext= 11) ) )
-                           ,str( UTIL.QEntry( id=3, Coor1= UTIL.Coordinate(y= 2, z= 1, ext= 11) ) )
-                           ,str( UTIL.QEntry( id=4, Coor1= UTIL.Coordinate(y= 2, z= 1, ext= 11) ) )])
-        
-        UTIL.SC_queue.clear()
-        UTIL.SC_currCommId = 1
     
 
 
@@ -485,6 +185,72 @@ class Mainframe_test(unittest.TestCase):
     
 
 
+    def test_applySettings (self):
+        """ test default settings loading in '__init__' as well """
+        global testFrame
+
+        # check if defaults were loaded
+        self.assertEqual( testFrame.TCP_num_commForerun.value()     ,UTIL.DEF_ROB_COMM_FR)
+        self.assertEqual( testFrame.SET_float_volPerMM.value()       ,UTIL.DEF_SC_VOL_PER_MM)
+        self.assertEqual( testFrame.SET_float_frToMms.value()       ,UTIL.DEF_IO_FR_TO_TS)
+        self.assertEqual( testFrame.SET_num_zone.value()            ,UTIL.DEF_IO_ZONE)
+        self.assertEqual( testFrame.SET_num_transSpeed_dc.value()   ,UTIL.DEF_DC_SPEED.ts)
+        self.assertEqual( testFrame.SET_num_orientSpeed_dc.value()  ,UTIL.DEF_DC_SPEED.os)
+        self.assertEqual( testFrame.SET_num_accelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.acr)
+        self.assertEqual( testFrame.SET_num_decelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.dcr)
+        self.assertEqual( testFrame.SET_num_transSpeed_print.value(),UTIL.DEF_PRIN_SPEED.ts)
+        self.assertEqual( testFrame.SET_num_orientSpeed_print.value()
+                         ,UTIL.DEF_PRIN_SPEED.os)
+        self.assertEqual( testFrame.SET_num_accelRamp_print.value(),UTIL.DEF_PRIN_SPEED.acr)
+        self.assertEqual( testFrame.SET_num_decelRamp_print.value(),UTIL.DEF_PRIN_SPEED.dcr)
+
+        # test setting by user
+        testFrame.TCP_num_commForerun.setValue      (1)
+        testFrame.SET_float_volPerMM.setValue        (2.2)
+        testFrame.SET_float_frToMms.setValue        (3.3)
+        testFrame.SET_num_zone.setValue             (4)
+        testFrame.SET_num_transSpeed_dc.setValue    (5)
+        testFrame.SET_num_orientSpeed_dc.setValue   (6)
+        testFrame.SET_num_accelRamp_dc.setValue     (7)
+        testFrame.SET_num_decelRamp_dc.setValue     (8)
+        testFrame.SET_num_transSpeed_print.setValue (9)
+        testFrame.SET_num_orientSpeed_print.setValue(10)
+        testFrame.SET_num_accelRamp_print.setValue  (11)
+        testFrame.SET_num_decelRamp_print.setValue  (12)
+        testFrame.applySettings()
+
+        self.assertEqual( UTIL.ROB_commFr,     1 )
+        self.assertEqual( UTIL.SC_volPerMm,    2.2 )
+        self.assertEqual( UTIL.IO_frToTs,     3.3 )
+        self.assertEqual( UTIL.IO_zone,         4 )
+        self.assertEqual( UTIL.DC_speed.ts,     5 )
+        self.assertEqual( UTIL.DC_speed.os,     6 )
+        self.assertEqual( UTIL.DC_speed.acr,    7 )
+        self.assertEqual( UTIL.DC_speed.dcr,    8 )
+        self.assertEqual( UTIL.PRIN_speed.ts,   9 )
+        self.assertEqual( UTIL.PRIN_speed.os,   10 )
+        self.assertEqual( UTIL.PRIN_speed.acr,  11 )
+        self.assertEqual( UTIL.PRIN_speed.dcr,  12 )
+
+        # test resetting by user
+        testFrame.loadDefaults()
+        testFrame.applySettings()
+        self.assertEqual( testFrame.TCP_num_commForerun.value()     ,UTIL.DEF_ROB_COMM_FR)
+        self.assertEqual( testFrame.SET_float_volPerMM.value()       ,UTIL.DEF_SC_VOL_PER_MM)
+        self.assertEqual( testFrame.SET_float_frToMms.value()       ,UTIL.DEF_IO_FR_TO_TS)
+        self.assertEqual( testFrame.SET_num_zone.value()            ,UTIL.DEF_IO_ZONE)
+        self.assertEqual( testFrame.SET_num_transSpeed_dc.value()   ,UTIL.DEF_DC_SPEED.ts)
+        self.assertEqual( testFrame.SET_num_orientSpeed_dc.value()  ,UTIL.DEF_DC_SPEED.os)
+        self.assertEqual( testFrame.SET_num_accelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.acr)
+        self.assertEqual( testFrame.SET_num_decelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.dcr)
+        self.assertEqual( testFrame.SET_num_transSpeed_print.value(),UTIL.DEF_PRIN_SPEED.ts)
+        self.assertEqual( testFrame.SET_num_orientSpeed_print.value()
+                         ,UTIL.DEF_PRIN_SPEED.os)
+        self.assertEqual( testFrame.SET_num_accelRamp_print.value(),UTIL.DEF_PRIN_SPEED.acr)
+        self.assertEqual( testFrame.SET_num_decelRamp_print.value(),UTIL.DEF_PRIN_SPEED.dcr)
+    
+
+
     def test_clrQueue (self):
         global testFrame
 
@@ -536,6 +302,229 @@ class Mainframe_test(unittest.TestCase):
         UTIL.DC_robMoving   = False
         UTIL.SC_queue.clear()
 
+
+
+    def test_init (self):
+        global testFrame
+        global logpath
+
+        # general values
+        self.assertEqual     (testFrame.logpath,    logpath)
+        self.assertEqual     (testFrame.pump1Conn,  False)
+        self.assertEqual     (testFrame.pump2Conn,  False)
+        self.assertIsInstance(testFrame.DAQ,        DAQ)
+
+        # logfile
+        self.assertIsFile   (logpath)
+        logfileCheck        = open(logpath,'r')
+        logfileCheckTxt     = logfileCheck.read()
+        logfileCheck.close()
+        self.assertIn('setup finished.',logfileCheckTxt)
+
+        # defaults test with 'applySettings'
+        
+        # threads
+        self.assertIsInstance( testFrame.roboCommThread, QThread )
+        self.assertIsInstance( testFrame.pumpCommThread, QThread )
+        self.assertIsInstance( testFrame.roboCommWorker, RoboCommWorker )
+        self.assertIsInstance( testFrame.pumpCommWorker, PumpCommWorker )
+    
+
+
+    def test_labelUpdate_onNewZero (self):
+        """ rababer rababer """
+        global testFrame
+
+        UTIL.DC_currZero = UTIL.Coordinate(1.1,2,3,4,5,6,7,8)
+        testFrame.labelUpdate_onNewZero()
+        
+        self.assertEqual( testFrame.ZERO_disp_x.text(), '1.1' )
+        self.assertEqual( testFrame.ZERO_disp_y.text(), '2.0' )
+        self.assertEqual( testFrame.ZERO_disp_z.text(), '3.0' )
+        self.assertEqual( testFrame.ZERO_disp_xOrient.text(), '4.0' )
+        self.assertEqual( testFrame.ZERO_disp_yOrient.text(), '5.0' )
+        self.assertEqual( testFrame.ZERO_disp_zOrient.text(), '6.0' )
+        self.assertEqual( testFrame.ZERO_disp_ext.text(), '8.0' )
+
+        UTIL.DC_currZero = UTIL.Coordinate()
+
+
+
+    def test_labelUpdate_onSend (self):
+        """ test labelUpdate_onQueueChange as well """
+        global testFrame
+
+        UTIL.DC_currZero = UTIL.Coordinate()
+
+        testFrame.SGLC_entry_gcodeSglComm.setText('G1 X2.2 Y1')
+        testFrame.addGcodeSgl()
+        testFrame.labelUpdate_onSend(entry= None)
+
+        self.assertEqual( testFrame.SCTRL_disp_elemInQ.text(),  '1' )
+        self.assertEqual( testFrame.SCTRL_disp_buffComms.text(),'0' )
+
+        # secondarily calls labelUpdate_onQueueChange
+        self.assertEqual( testFrame.SCTRL_arr_queue.item(0).text()
+                         ,str(UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2.2, y= 1) )) )
+        
+        UTIL.SC_queue.clear()
+    
+
+
+    def test_loadFile (self):
+        
+        UTIL.IO_currFilepath = pl.Path( 'test.abc' )
+        testFrame.loadFile  ()
+        self.assertEqual    ( testFrame.IO_lbl_loadFile.text(), "... no valid file, not executed" )
+        
+        UTIL.IO_currFilepath = pl.Path( 'test.mod' )
+        testFrame.loadFile  (testrun= True)
+        self.assertEqual    ( testFrame.IO_lbl_loadFile.text(), "... conversion running ..." )
+
+        UTIL.IO_currFilepath = None
+    
+
+
+    def loadFileFinished(self):
+        """ no need to test loadFileFailed, skip to loadFileFinished """
+
+        testFrame.loadFileFinished( lineID= 1, startID= 2, skips= 3 )
+        self.assertEqual( testFrame.IO_num_addByID.value(), 1 )
+        self.assertEqual( "... 3 command(s) skipped (syntax)" )
+
+
+
+    def test_openFile (self):
+        global testFrame
+        global gcodeTestpath
+        global rapidTestpath
+
+        currSetting         = UTIL.SC_volPerMm
+        UTIL.SC_volPerMm    = 0.1
+        
+        testFrame.openFile( testrun= True, testpath= gcodeTestpath )
+        self.assertEqual  ( UTIL.IO_currFilepath, gcodeTestpath )
+        self.assertEqual  ( testFrame.IO_disp_filename.text(), gcodeTestpath.name )
+        self.assertEqual  ( testFrame.IO_disp_commNum.text(),  '2' )
+        self.assertEqual  ( testFrame.IO_disp_estimLen.text(), '3.0' )
+        self.assertEqual  ( testFrame.IO_disp_estimVol.text(), '0.3' )
+
+
+        testFrame.openFile(testrun= True, testpath= rapidTestpath)
+        self.assertEqual  ( UTIL.IO_currFilepath, rapidTestpath )
+        self.assertEqual  ( testFrame.IO_disp_filename.text(), rapidTestpath.name )
+        self.assertEqual  ( testFrame.IO_disp_commNum.text(),  '2' )
+        self.assertEqual  ( testFrame.IO_disp_estimLen.text(), '3.0' )
+        self.assertEqual  ( testFrame.IO_disp_estimVol.text(), '0.3' )
+
+        UTIL.SC_volPerMm = currSetting
+
+
+
+    def test_posUpdate (self):
+        """ tests labelUpdate_onReceive as well """
+        global testFrame
+
+        # primary function
+        UTIL.DC_currZero = UTIL.Coordinate()
+
+        # check first loop switch, Q is not set by posUpdate
+        UTIL.ROB_telem = UTIL.RoboTelemetry( 0, 0, UTIL.Coordinate(1,2,3,4,5,6,7,8.8) )
+        self.assertEqual    ( UTIL.DC_currZero, UTIL.Coordinate() )
+        testFrame.posUpdate ( rawDataString= 'ABC', telem= UTIL.RoboTelemetry() )
+        self.assertEqual    ( UTIL.DC_currZero, UTIL.Coordinate(1,2,3,4,5,6,0,8.8) )
+
+        # check loop run
+        UTIL.SC_currCommId = 15
+        UTIL.DC_currZero    = UTIL.Coordinate(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1)
+        UTIL.ROB_telem      = UTIL.RoboTelemetry( 9.9, 10, UTIL.Coordinate(1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8) ) 
+        testFrame.posUpdate( rawDataString= 'ABC', telem= UTIL.RoboTelemetry() )
+        
+        # following is outsourced to RobCommWorker from now 
+        # self.assertEqual( UTIL.ROB_telem.Coor, UTIL.Coordinate(1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8) )
+        # self.assertEqual( UTIL.STT_dataBlock.Robo.Coor, UTIL.Coordinate(1.0,2.1,3.2,4.3,5.4,6.5,7.6,8.7) )
+        # self.assertEqual( UTIL.ROB_telem.tSpeed, 9.9 )
+        # self.assertEqual( UTIL.STT_dataBlock.Robo.tSpeed, 9.9 )
+        # self.assertEqual( UTIL.ROB_telem.id, 10 )
+        # self.assertEqual( UTIL.STT_dataBlock.Robo.id, 10 )
+
+        # labelUpdate_onReceive (called from posUpdate)
+        self.assertEqual( testFrame.TCP_ROB_disp_readBuffer.text(), 'ABC' )
+        self.assertEqual( testFrame.SCTRL_disp_buffComms.text(),    '5' )
+        self.assertEqual( testFrame.SCTRL_disp_robCommID.text(),    '10' )
+        self.assertEqual( testFrame.SCTRL_disp_progCommID.text(),   '15' )
+        self.assertEqual( testFrame.SCTRL_disp_elemInQ.text(),      '0' )
+
+        self.assertEqual( testFrame.DC_disp_x.text(),               '1.0' )
+        self.assertEqual( testFrame.DC_disp_y.text(),               '2.1' )
+        self.assertEqual( testFrame.DC_disp_z.text(),               '3.2' )
+        self.assertEqual( testFrame.DC_disp_ext.text(),             '8.7' )
+        
+        self.assertEqual( testFrame.NC_disp_x.text(),               '1.1' )
+        self.assertEqual( testFrame.NC_disp_y.text(),               '2.2' )
+        self.assertEqual( testFrame.NC_disp_z.text(),               '3.3' )
+        self.assertEqual( testFrame.NC_disp_xOrient.text(),         '4.4' )
+        self.assertEqual( testFrame.NC_disp_yOrient.text(),         '5.5' )
+        self.assertEqual( testFrame.NC_disp_zOrient.text(),         '6.6' )
+        self.assertEqual( testFrame.NC_disp_ext.text(),             '8.8' )
+        
+        self.assertEqual( testFrame.TERM_disp_tcpSpeed.text(),      '9.9' )
+        self.assertEqual( testFrame.TERM_disp_robCommID.text(),     '10' )
+        self.assertEqual( testFrame.TERM_disp_progCommID.text(),    '15' )
+
+        UTIL.DC_currZero        = UTIL.Coordinate()
+        UTIL.ROB_telem          = UTIL.RoboTelemetry()
+        UTIL.SC_currCommId      = 1
+        UTIL.SC_queue.clear()
+
+
+
+    def test_pump1Send (self):
+        global testFrame
+
+        testFrame.pump1Send(newSpeed= 1.1, command= 'ABC', ans= 'DEF')
+
+        self.assertEqual( UTIL.PUMP1_speed, 1.1)
+        self.assertEqual( testFrame.TCP_PUMP1_disp_writeBuffer.text(),  'ABC')
+        self.assertEqual( testFrame.TCP_PUMP1_disp_bytesWritten.text(), '3')
+        self.assertEqual( testFrame.TCP_PUMP1_disp_readBuffer.text(),   'DEF')
+        self.assertEqual( testFrame.PUMP_disp_currSpeed.text(),         '1.1%')
+
+
+
+    def test_pump1Update (self):
+        global testFrame
+        
+        UTIL.STT_dataBlock.Pump1 = UTIL.PumpTelemetry(1.1,2.2,3.3,4.4)
+        testFrame.pump1Update(telem= UTIL.STT_dataBlock.Pump1)
+
+        self.assertEqual( testFrame.PUMP_disp_freq.text(), '1.1' )
+        self.assertEqual( testFrame.PUMP_disp_volt.text(), '2.2' )
+        self.assertEqual( testFrame.PUMP_disp_amps.text(), '3.3' )
+        self.assertEqual( testFrame.PUMP_disp_torq.text(), '4.4' )
+
+        UTIL.STT_dataBlock.Pump1 = UTIL.PumpTelemetry()
+    
+
+
+    def test_sendCommand (self):
+        global testFrame
+
+        UTIL.ROB_commQueue.clear()
+        UTIL.SC_queue.add( UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(y= 1.1)) )
+
+        testFrame.sendCommand( command= UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2))
+                              ,DC= True )
+        self.assertEqual( UTIL.ROB_commQueue.display()
+                         ,[str(UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2)))] )
+        self.assertEqual( UTIL.SC_queue.display()
+                         ,[str(UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(y= 1.1)))] )
+        self.assertEqual( UTIL.SC_currCommId, 2 )
+
+        UTIL.ROB_commQueue.clear()
+        UTIL.SC_currCommId = 1
+        UTIL.SC_queue.clear()
+
     
 
     def test_sendDCCommand (self):
@@ -564,6 +553,32 @@ class Mainframe_test(unittest.TestCase):
 
         UTIL.DC_robMoving   = False
         UTIL.SC_currCommId  = 1
+    
+
+
+    def test_sendGcodeCommand (self):
+        global testFrame
+
+        testFrame.TERM_entry_gcodeInterp.setText('G1 Y2.2')
+        UTIL.ROB_telem.Coor = UTIL.Coordinate( 1,1,1,1,1,1,1,1 )
+        UTIL.DC_currZero = UTIL.Coordinate( y= 1 )
+
+        self.assertEqual( testFrame.sendGcodeCommand()[1]
+                         ,UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate( x= 1, y= 3.2, z= 1, rx= 1
+                                                                      ,ry= 1, rz= 1, q= 1, ext= 1 ) ) )
+        
+        UTIL.DC_robMoving = False
+        testFrame.TERM_entry_gcodeInterp.setText('G1 X1 Z3')
+        UTIL.ROB_telem.Coor = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
+        UTIL.DC_currZero = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
+
+        UTIL.DC_robMoving = False
+        self.assertEqual( testFrame.sendGcodeCommand()[1]
+                         ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate( 2.1,2.2,6.3,4.4,5.5,6.6,7.7,8.8 ) ) )
+        
+        UTIL.DC_robMoving = False
+        UTIL.ROB_telem.Coor = UTIL.Coordinate()
+        UTIL.SC_currCommId = 1
     
 
 
@@ -596,32 +611,6 @@ class Mainframe_test(unittest.TestCase):
     
 
 
-    def test_sendGcodeCommand (self):
-        global testFrame
-
-        testFrame.TERM_entry_gcodeInterp.setText('G1 Y2.2')
-        UTIL.ROB_telem.Coor = UTIL.Coordinate( 1,1,1,1,1,1,1,1 )
-        UTIL.DC_currZero = UTIL.Coordinate( y= 1 )
-
-        self.assertEqual( testFrame.sendGcodeCommand()[1]
-                         ,UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate( x= 1, y= 3.2, z= 1, rx= 1
-                                                                      ,ry= 1, rz= 1, q= 1, ext= 1 ) ) )
-        
-        UTIL.DC_robMoving = False
-        testFrame.TERM_entry_gcodeInterp.setText('G1 X1 Z3')
-        UTIL.ROB_telem.Coor = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
-        UTIL.DC_currZero = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
-
-        UTIL.DC_robMoving = False
-        self.assertEqual( testFrame.sendGcodeCommand()[1]
-                         ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate( 2.1,2.2,6.3,4.4,5.5,6.6,7.7,8.8 ) ) )
-        
-        UTIL.DC_robMoving = False
-        UTIL.ROB_telem.Coor = UTIL.Coordinate()
-        UTIL.SC_currCommId = 1
-    
-
-
     def test_sendRapidCommand (self):
         global testFrame
 
@@ -633,56 +622,6 @@ class Mainframe_test(unittest.TestCase):
                                                                ,ry= 5, rz= 6, q= 7, ext= 600 ) ))
         
         UTIL.SC_currCommId = 1
-    
-
-
-    def test_systemStopCommands (self):
-        global testFrame
-
-        self.assertEqual( testFrame.forcedStopCommand()[1], UTIL.QEntry( id= 0, mt= 'S' ) )
-        self.assertEqual( testFrame.robotStopCommand()[1],  UTIL.QEntry( id= 1, mt= 'E' ) )
-        testFrame.robotStopCommand(directly= False)
-        self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str(UTIL.QEntry( id= 3, mt= 'E' ))] )
-        
-        UTIL.SC_currCommId = 1
-        UTIL.SC_queue.clear()
-    
-
-
-    def test_sendCommand (self):
-        global testFrame
-
-        UTIL.ROB_commQueue.clear()
-        UTIL.SC_queue.add( UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(y= 1.1)) )
-
-        testFrame.sendCommand( command= UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2))
-                              ,DC= True )
-        self.assertEqual( UTIL.ROB_commQueue.display()
-                         ,[str(UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2)))] )
-        self.assertEqual( UTIL.SC_queue.display()
-                         ,[str(UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(y= 1.1)))] )
-        self.assertEqual( UTIL.SC_currCommId, 2 )
-
-        UTIL.ROB_commQueue.clear()
-        UTIL.SC_currCommId = 1
-        UTIL.SC_queue.clear()
-    
-
-
-    def test_setZero (self):
-        global testFrame
-
-        UTIL.DC_currZero   = UTIL.Coordinate( 1,2,3,4,5,6,7,8 )
-        UTIL.ROB_telem.Coor  = UTIL.Coordinate()
-        
-        testFrame.setZero([1,2,3])
-        self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate( 0,0,0,4,5,6,7,8) )
-        
-        testFrame.setZero([4,5,6,8])
-        self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate( 0,0,0,0,0,0,7,0) )
-
-        UTIL.DC_currZero = UTIL.Coordinate()
     
 
 
@@ -704,6 +643,36 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual  ( UTIL.PUMP1_speed, 5 )
 
         UTIL.PUMP1_speed = 0
+    
+
+
+    def test_setZero (self):
+        global testFrame
+
+        UTIL.DC_currZero   = UTIL.Coordinate( 1,2,3,4,5,6,7,8 )
+        UTIL.ROB_telem.Coor  = UTIL.Coordinate()
+        
+        testFrame.setZero([1,2,3])
+        self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate( 0,0,0,4,5,6,7,8) )
+        
+        testFrame.setZero([4,5,6,8])
+        self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate( 0,0,0,0,0,0,7,0) )
+
+        UTIL.DC_currZero = UTIL.Coordinate()
+    
+
+
+    def test_systemStopCommands (self):
+        global testFrame
+
+        self.assertEqual( testFrame.forcedStopCommand()[1], UTIL.QEntry( id= 0, mt= 'S' ) )
+        self.assertEqual( testFrame.robotStopCommand()[1],  UTIL.QEntry( id= 1, mt= 'E' ) )
+        testFrame.robotStopCommand(directly= False)
+        self.assertEqual( UTIL.SC_queue.display()
+                         ,[ str(UTIL.QEntry( id= 3, mt= 'E' ))] )
+        
+        UTIL.SC_currCommId = 1
+        UTIL.SC_queue.clear()
 
 
 
