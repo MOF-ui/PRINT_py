@@ -1482,10 +1482,16 @@ DEF_TCP_PUMP2 =    { "IP":       ""
 
 # default user settings
 DEF_DC_SPEED        = SpeedVector()
+
 DEF_IO_ZONE         = 10
 DEF_IO_FR_TO_TS     = 0.1
+
 DEF_PRIN_SPEED      = SpeedVector()
+
+DEF_PUMP_LPS        = 0.5
+
 DEF_ROB_COMM_FR     = 10
+
 DEF_SC_VOL_PER_MM   = 0.01
 
 
@@ -1495,9 +1501,9 @@ DC_currZero         = Coordinate()
 DC_speed            = copy.deepcopy(DEF_DC_SPEED)
 DC_robMoving        = False
 
-IO_zone             = DEF_IO_ZONE
 IO_currFilepath     = None
 IO_frToTs           = DEF_IO_FR_TO_TS
+IO_zone             = DEF_IO_ZONE
 
 PRIN_speed          = copy.deepcopy(DEF_PRIN_SPEED)
 
@@ -1508,7 +1514,7 @@ PUMP1_tcpip         = TCPIP( DEF_TCP_PUMP1["IP"]
                             ,DEF_TCP_PUMP1["R_BL"]
                             ,DEF_TCP_PUMP1["W_BL"])
 PUMP1_lastTelem     = PumpTelemetry()
-PUMP1_literPerS     = 0.5
+PUMP1_literPerS     = DEF_PUMP_LPS
 PUMP1_liveAd        = 1.0
 PUMP1_speed         = 0
 
@@ -1531,6 +1537,7 @@ ROB_telem           = RoboTelemetry()
 ROB_lastTelem       = RoboTelemetry()
 ROB_movStartP       = Coordinate()
 ROB_movEndP         = Coordinate()
+ROB_liveAd          = 1.0
 
 SC_volPerMm         = DEF_SC_VOL_PER_MM
 SC_currCommId       = 1

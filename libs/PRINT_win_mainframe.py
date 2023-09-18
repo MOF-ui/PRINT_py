@@ -21,7 +21,7 @@ sys.path.append(parent_dir)
 # PyQt stuff
 from PyQt5.QtCore       import Qt
 from PyQt5.QtCore       import QTimer, QMutex, QThread
-from PyQt5.QtWidgets    import QApplication, QMainWindow
+from PyQt5.QtWidgets    import QApplication, QMainWindow, QShortcut
 
 
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
@@ -97,8 +97,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # LOAD THREADS, SIGNALS & DEFAULT SETTINGS
         self.logEntry('GNRL','init threading...')
         self.connectThreads()
-        self.logEntry('GNRL','connecting mainsignals...')
+        self.logEntry('GNRL','connecting signals...')
         self.connectMainSignals()
+        self.connectShortSignals()
         self.logEntry('GNRL','load default settings...')
         self.loadDefaults(setup= True)
 
@@ -137,8 +138,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def connectMainSignals(self):
-        """ create signal-slot-links"""
+        """ create signal-slot-links for UI buttons """
 
+        # DIRECT CONTROL
         self.DC_btt_xPlus.pressed.connect                   ( lambda: self.sendDCCommand('X','+') )
         self.DC_btt_xMinus.pressed.connect                  ( lambda: self.sendDCCommand('X','-') )
         self.DC_btt_yPlus.pressed.connect                   ( lambda: self.sendDCCommand('Y','+') )
@@ -149,28 +151,33 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.DC_btt_extMinus.pressed.connect                ( lambda: self.sendDCCommand('EXT','-') )
         self.DC_btt_xyzZero.pressed.connect                 ( lambda: self.setZero      ([1,2,3]) )
         self.DC_btt_extZero.pressed.connect                 ( lambda: self.setZero      ([8]) )
-        self.DC_btt_home.pressed.connect                    (self.homeCommand)
+        self.DC_btt_home.pressed.connect                    ( self.homeCommand )
 
-        self.IO_btt_newFile.pressed.connect                 (self.openFile)
-        self.IO_btt_loadFile.pressed.connect                (self.loadFile)
+        # FILE IO
+        self.IO_btt_newFile.pressed.connect                 ( self.openFile )
+        self.IO_btt_loadFile.pressed.connect                ( self.loadFile )
         self.IO_btt_addByID.pressed.connect                 ( lambda: self.loadFile(lf_atID= True) )
         self.IO_btt_xyzextZero.pressed.connect              ( lambda: self.setZero ([1,2,3,8]) )
         self.IO_btt_orientZero.pressed.connect              ( lambda: self.setZero ([4,5,6]) )
 
-        self.NC_btt_getValues.pressed.connect               (self.valuesToDcSpinbox)
+        # NUMERIC CONTROL
+        self.NC_btt_getValues.pressed.connect               ( self.valuesToDcSpinbox )
         self.NC_btt_xyzSend.pressed.connect                 ( lambda: self.sendNCCommand([1,2,3]) )
         self.NC_btt_xyzExtSend.pressed.connect              ( lambda: self.sendNCCommand([1,2,3,8]) )
         self.NC_btt_orientSend.pressed.connect              ( lambda: self.sendNCCommand([4,5,6]) )
         self.NC_btt_orientZero.pressed.connect              ( lambda: self.setZero      ([4,5,6]) )
 
-        self.SCTRL_num_liveAd_pump1.valueChanged.connect    (self.setSpeed)
-        self.PUMP_btt_setSpeed.pressed.connect              (self.setSpeed)
+        # PUMP CONTROL
+        self.SCTRL_num_liveAd_pump1.valueChanged.connect    ( self.setSpeed )
+        self.PUMP_btt_setSpeed.pressed.connect              ( self.setSpeed )
         self.PUMP_btt_plus1.pressed.connect                 ( lambda: self.setSpeed('1') )
         self.PUMP_btt_minus1.pressed.connect                ( lambda: self.setSpeed('-1') )
         self.PUMP_btt_stop.pressed.connect                  ( lambda: self.setSpeed('0') )
         self.PUMP_btt_reverse.pressed.connect               ( lambda: self.setSpeed('r') )
 
-        self.SCTRL_btt_startQProcessing.pressed.connect     (self.startSCTRLQueue )
+        # SCRIPT CONTROL
+        self.SCTRL_btt_forcedStop.pressed.connect           ( self.forcedStopCommand )
+        self.SCTRL_btt_startQProcessing.pressed.connect     ( self.startSCTRLQueue )
         self.SCTRL_btt_holdQProcessing.pressed.connect      ( lambda: self.stopSCTRLQueue   (prepEnd = True) )
         self.SCTRL_btt_addSIB1_atFront.pressed.connect      ( lambda: self.addSIB           (1) )
         self.SCTRL_btt_addSIB2_atFront.pressed.connect      ( lambda: self.addSIB           (2) )
@@ -180,19 +187,22 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_btt_addSIB3_atEnd.pressed.connect        ( lambda: self.addSIB           (3, atEnd = True) )
         self.SCTRL_btt_clrQ.pressed.connect                 ( lambda: self.clrQueue         (partial = False) )
         self.SCTRL_btt_clrByID.pressed.connect              ( lambda: self.clrQueue         (partial = True) )
-        self.SCTRL_btt_forcedStop.pressed.connect           ( lambda: self.forcedStopCommand() )
         
-        self.SET_btt_apply.pressed.connect                  (self.applySettings)
-        self.SET_btt_default.pressed.connect                (self.loadDefaults)
+        # SETTINGS
+        self.SET_btt_apply.pressed.connect                  ( self.applySettings )
+        self.SET_btt_default.pressed.connect                ( self.loadDefaults )
+        self.TCP_num_commForerun.valueChanged.connect       ( self.updateCommForerun )
 
-        self.SGLC_btt_gcodeSglComm.pressed.connect          (self.addGcodeSgl)
-        self.SGLC_btt_rapidSglComm.pressed.connect          (self.addRapidSgl)
+        # SINGLE COMMAND
+        self.SGLC_btt_gcodeSglComm.pressed.connect          ( self.addGcodeSgl )
+        self.SGLC_btt_rapidSglComm.pressed.connect          ( self.addRapidSgl )
         self.SGLC_btt_sendFirstQComm.pressed.connect        ( lambda: self.sendCommand( UTIL.SC_queue.popFirstItem() ) )
         self.SGLC_btt_gcodeSglComm_addByID.pressed.connect  ( lambda: self.addGcodeSgl( atID = True
                                                                                        ,ID = self.SGLC_num_gcodeSglComm_addByID.value()) )
         self.SGLC_btt_rapidSglComm_addByID.pressed.connect  ( lambda: self.addRapidSgl( atID = True
                                                                                        ,ID = self.SGLC_num_rapidSglComm_addByID.value()) )
 
+        # CONNECTIONS
         # self.TCP_ROB_btt_reconn.pressed.connect             ( lambda: self.connectTCP(1) )
         # self.TCP_PUMP1_btt_reconn.pressed.connect           ( lambda: self.connectTCP(2) )
         # self.TCP_PUMP2_btt_reconn.pressed.connect           ( lambda: self.connectTCP(3) )
@@ -200,10 +210,68 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.TCP_PUMP1_btt_discon.pressed.connect           ( lambda: self.disconnectTCP(2) )
         self.TCP_PUMP2_btt_discon.pressed.connect           ( lambda: self.disconnectTCP(3) )
         
-        self.TERM_btt_gcodeInterp.pressed.connect           (self.sendGcodeCommand)
-        self.TERM_btt_rapidInterp.pressed.connect           (self.sendRapidCommand)
+        # TERMINAL
+        self.TERM_btt_gcodeInterp.pressed.connect           ( self.sendGcodeCommand )
+        self.TERM_btt_rapidInterp.pressed.connect           ( self.sendRapidCommand )
 
+        # ZERO
         self.ZERO_btt_newZero.pressed.connect               ( lambda: self.setZero( axis= [1,2,3,4,5,6,8], fromSysMonitor= True ) )
+
+
+
+
+
+
+    def connectShortSignals(self, setup = False):
+        """ create shortcuts and connect them to slots """
+
+        # CREATE SIGNALS
+        self.ctrl_A     = QShortcut( 'Ctrl+A', self )
+        self.ctrl_E     = QShortcut( 'Ctrl+E', self )
+        self.ctrl_F     = QShortcut( 'Ctrl+F', self )
+        self.ctrl_I     = QShortcut( 'Ctrl+I', self )
+        self.ctrl_J     = QShortcut( 'Ctrl+J', self )
+        self.ctrl_K     = QShortcut( 'Ctrl+K', self )
+        self.ctrl_L     = QShortcut( 'Ctrl+L', self )
+        self.ctrl_M     = QShortcut( 'Ctrl+M', self )
+        self.ctrl_N     = QShortcut( 'Ctrl+N', self )
+        self.ctrl_O     = QShortcut( 'Ctrl+O', self )
+        self.ctrl_OE    = QShortcut( 'Ctrl+Ö', self )
+        self.ctrl_P     = QShortcut( 'Ctrl+P', self )
+        self.ctrl_Q     = QShortcut( 'Ctrl+Q', self )
+        self.ctrl_R     = QShortcut( 'Ctrl+R', self )
+        self.ctrl_S     = QShortcut( 'Ctrl+S', self )
+        self.ctrl_T     = QShortcut( 'Ctrl+T', self )
+        self.ctrl_U     = QShortcut( 'Ctrl+U', self )
+        self.ctrl_Raute = QShortcut( 'Ctrl+#', self )
+
+        # SCRIPT CONTROL
+        self.ctrl_S.activated.connect       ( self.startSCTRLQueue )
+        self.ctrl_A.activated.connect       ( lambda: self.stopSCTRLQueue (prepEnd = True) )
+        self.ctrl_F.activated.connect       ( lambda: self.sendCommand    ( UTIL.SC_queue.popFirstItem() ) )
+        self.ctrl_Raute.activated.connect   ( lambda: self.clrQueue(partial = False) )
+        self.ctrl_Q.activated.connect       ( self.forcedStopCommand )
+
+        # DIRECT CONTROL
+        self.ctrl_U.activated.connect       ( lambda: self.sendDCCommand('X','+') )
+        self.ctrl_J.activated.connect       ( lambda: self.sendDCCommand('X','-') )
+        self.ctrl_I.activated.connect       ( lambda: self.sendDCCommand('Y','+') )
+        self.ctrl_K.activated.connect       ( lambda: self.sendDCCommand('Y','-') )
+        self.ctrl_O.activated.connect       ( lambda: self.sendDCCommand('Z','+') )
+        self.ctrl_L.activated.connect       ( lambda: self.sendDCCommand('Z','-') )
+        self.ctrl_P.activated.connect       ( lambda: self.sendDCCommand('EXT','+') )
+        self.ctrl_OE.activated.connect      ( lambda: self.sendDCCommand('EXT','-') )
+        
+        # NUMERIC CONTROL
+        self.ctrl_T.activated.connect       ( self.valuesToDcSpinbox )
+
+        # FILE IO
+        self.ctrl_N.activated.connect       ( self.openFile )
+        self.ctrl_M.activated.connect       ( self.loadFile )
+
+        # PUMP CONTROL
+        self.ctrl_E.activated.connect       ( lambda: self.setSpeed('0') )
+        self.ctrl_R.activated.connect       ( lambda: self.setSpeed('-1') )
 
 
 
@@ -212,12 +280,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
     def loadDefaults(self, setup = False):
         """ load default settings to settings display """
-        
-        self.TCP_num_commForerun.setValue       ( UTIL.DEF_ROB_COMM_FR )
 
-        self.SET_float_volPerMM.setValue         ( UTIL.DEF_SC_VOL_PER_MM )
+        self.SET_float_volPerMM.setValue        ( UTIL.DEF_SC_VOL_PER_MM )
         self.SET_float_frToMms.setValue         ( UTIL.DEF_IO_FR_TO_TS )
-
+        self.SET_float_pumpVolFlow.setValue     ( UTIL.DEF_PUMP_LPS )
         self.SET_num_zone.setValue              ( UTIL.DEF_IO_ZONE )
         self.SET_num_transSpeed_dc.setValue     ( UTIL.DEF_DC_SPEED.ts )
         self.SET_num_orientSpeed_dc.setValue    ( UTIL.DEF_DC_SPEED.os )
@@ -228,7 +294,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SET_num_accelRamp_print.setValue   ( UTIL.DEF_PRIN_SPEED.acr )
         self.SET_num_decelRamp_print.setValue   ( UTIL.DEF_PRIN_SPEED.dcr )
 
-        if(not setup): self.logEntry('SETS','User resetted all properties to default values.')
+        if(not setup): 
+            self.logEntry('SETS','User resetted all properties to default values.')
+        else:
+            self.TCP_num_commForerun.setValue   ( UTIL.DEF_ROB_COMM_FR )
         
 
 
@@ -247,7 +316,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 background-color: #00aaff;")
 
         match TCPslot:
-
             case 1:  
                 res,conn = UTIL.ROB_tcpip.connect()
                 self.TCP_ROB_indi_connected.setStyleSheet(css)
@@ -311,7 +379,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         css = ("border-radius: 25px; background-color: #4c4a48;")
 
         match TCPslot:
-
             case 1:  
                 self.roboCommThread.quit()
                 self.roboCommThread.wait()
@@ -495,7 +562,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ close the UI on any biting WD, log info """
 
         match dognumber:
-
             case 1:   wdNum = '1'
 
             case 2:
@@ -564,16 +630,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          SETTINGS                                                 #
     #####################################################################################################
 
+    def updateCommForerun(self):
+        UTIL.ROB_commFr         = self.TCP_num_commForerun.value()
+
+
+
     def applySettings(self):
         """ load default settings to settings display """
         
-        UTIL.ROB_commFr         = self.TCP_num_commForerun.value()
-
         UTIL.SC_volPerMm        = self.SET_float_volPerMM.value()
         UTIL.IO_frToTs          = self.SET_float_frToMms.value()
         UTIL.PUMP1_literPerS    = self.SET_float_pumpVolFlow.value()
         UTIL.IO_zone            = self.SET_num_zone.value()
-
         UTIL.DC_speed.ts        = self.SET_num_transSpeed_dc.value()
         UTIL.DC_speed.os        = self.SET_num_orientSpeed_dc.value()
         UTIL.DC_speed.acr       = self.SET_num_accelRamp_dc.value()
@@ -604,15 +672,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         text = text.replace('\n','')
         text = text.replace('\t','')
         if (self.logpath == ''):    return None
+
         if (source == 'newline'):   text = '\n'
         else:                       text = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}    [{source}]:        {text}\n"
+
+        try:                        logfile = open(self.logpath,'a')
+        except FileExistsError:     pass
+
         self.SET_disp_logEntry.setText(text)
-
-        try:
-            logfile = open(self.logpath,'a')
-        except FileExistsError:
-            pass
-
         logfile.write(text)
         logfile.close()
 
@@ -638,17 +705,20 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         try:                    progID = UTIL.SC_queue[0].ID
         except AttributeError:  progID = comID
 
-        self.TCP_ROB_disp_readBuffer.setText    (dataString)  
+        # SCRIPT  CONTROL
+        self.TCP_ROB_disp_readBuffer.setText    ( dataString )  
         self.SCTRL_disp_buffComms.setText       ( str(progID - robID) )
         self.SCTRL_disp_robCommID.setText       ( str(robID) )
         self.SCTRL_disp_progCommID.setText      ( str(comID) )
         self.SCTRL_disp_elemInQ.setText         ( str(len(UTIL.SC_queue)) ) 
 
+        # DIRECT CONTROL
         self.DC_disp_x.setText                  ( str( round( pos.x   - zero.x  ,3 )) )
         self.DC_disp_y.setText                  ( str( round( pos.y   - zero.y  ,3 )) )
         self.DC_disp_z.setText                  ( str( round( pos.z   - zero.z  ,3 )) )
         self.DC_disp_ext.setText                ( str( round( pos.ext - zero.ext,3 )) )
 
+        # NUMERIC CONTROL
         self.NC_disp_x.setText                  ( str(pos.x) )
         self.NC_disp_y.setText                  ( str(pos.y) )
         self.NC_disp_z.setText                  ( str(pos.z) )
@@ -657,10 +727,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.NC_disp_zOrient.setText            ( str(pos.rz) )
         self.NC_disp_ext.setText                ( str(pos.ext) )
 
+        # TERMINAL
         self.TERM_disp_tcpSpeed.setText         ( str(UTIL.ROB_telem.tSpeed) )
         self.TERM_disp_robCommID.setText        ( str(robID) )
         self.TERM_disp_progCommID.setText       ( str(comID) )
 
+        # CURRENT TRANSITION
         if(    (start.rx != end.rx) 
             or (start.ry != end.ry) 
             or (start.rz != end.rz) ):  self.TRANS_indi_newOrient.setStyleSheet( "border-radius: 15px; background-color: #4c4a48;" )
@@ -941,20 +1013,21 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             if( not atID ):     pos = copy.deepcopy( UTIL.SC_queue.lastEntry().Coor1 )
             else:               pos = copy.deepcopy( UTIL.SC_queue.entryBeforeID(ID).Coor1 )
         except AttributeError:  pos = UTIL.DC_currZero
+
         if( not fromFile ):     txt = self.SGLC_entry_gcodeSglComm.toPlainText() 
         else:                   txt = fileText
         
         # act according to GCode command
         entry,command = UTIL.gcodeToQEntry(pos, speed ,UTIL.IO_zone ,txt)
+        
         if ( (command != 'G1') and (command != 'G28') and (command != 'G92') ):
-
-            if(command == ';'):     panTxt = f"leading semicolon interpreted as comment:\n{txt}"
-            elif(command is None):  panTxt = f"SYNTAX ERROR:\n{txt}"
+            if(command == ';'):         panTxt = f"leading semicolon interpreted as comment:\n{txt}"
+            elif(command is None):      panTxt = f"SYNTAX ERROR:\n{txt}"
             else:                   
-                if(not fromFile):   self.SGLC_entry_gcodeSglComm.setText(f"{command}\n{txt}")
+                if(not fromFile):       self.SGLC_entry_gcodeSglComm.setText(f"{command}\n{txt}")
                 return entry, command
             
-            if(not fromFile):       self.SGLC_entry_gcodeSglComm.setText(panTxt)
+            if(not fromFile):           self.SGLC_entry_gcodeSglComm.setText(panTxt)
             return entry, None
         
         elif( command == 'G92' ):   

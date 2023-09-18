@@ -180,7 +180,7 @@ class RoboCommWorker(QObject):
                 # check if robot is processing a new command (length check to skip in first loop)
                 if( (telem.id != UTIL.ROB_lastTelem.id) and (len(UTIL.ROB_commQueue) > 0) ):
                     UTIL.ROB_movStartP  = UTIL.ROB_movEndP
-                    UTIL.ROB_movEndP    = copy.deepcopy( UTIL.ROB_commQueue[0] )
+                    UTIL.ROB_movEndP    = copy.deepcopy( UTIL.ROB_commQueue[0].Coor1 )
 
                 # set new values to globals
                 UTIL.ROB_telem      = copy.deepcopy(telem)
