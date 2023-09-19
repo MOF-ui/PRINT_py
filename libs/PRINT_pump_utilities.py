@@ -57,6 +57,9 @@ def calcSpeed():
 
         case 'end':
             speed = profileMode( command= currCommand, profile= END_SUPP_PTS )
+        
+        case 'zero':
+            speed = 0
 
         case _:        
             speed = 0

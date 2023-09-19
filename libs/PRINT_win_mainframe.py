@@ -187,6 +187,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_btt_addSIB3_atEnd.pressed.connect        ( lambda: self.addSIB           (3, atEnd = True) )
         self.SCTRL_btt_clrQ.pressed.connect                 ( lambda: self.clrQueue         (partial = False) )
         self.SCTRL_btt_clrByID.pressed.connect              ( lambda: self.clrQueue         (partial = True) )
+        self.SCTRL_chk_autoScroll.stateChanged.connect      ( lambda: self.SCTRL_arr_queue.scrollToBottom() )
+        self.ICQ_chk_autoScroll.stateChanged.connect        ( lambda: self.ICQ_arr_terminal.scrollToBottom() )
         
         # SETTINGS
         self.SET_btt_apply.pressed.connect                  ( self.applySettings )
@@ -773,6 +775,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.SCTRL_arr_queue.clear()
         self.SCTRL_arr_queue.addItems( UTIL.SC_queue.display() )
+        if (self.SCTRL_chk_autoScroll.isChecked()):  self.SCTRL_arr_queue.scrollToBottom()
 
     
 
@@ -787,6 +790,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.ICQ_arr_terminal.clear()
         self.ICQ_arr_terminal.addItems  ( UTIL.ROB_commQueue.display() )
+        if (self.ICQ_chk_autoScroll.isChecked()):  self.ICQ_arr_terminal.scrollToBottom()
 
     
 
@@ -872,9 +876,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def loadFile(self, lf_atID = False, testrun= False):
         """ reads the file set in self.openFile, adds all readable commands to command queue (at end or at ID)
             outsourced to loadFileWorker """
+        
+        if( WORKERS.LFW_running ): return
 
         # get user input
         startID = self.IO_num_addByID.value() if(lf_atID) else 0
+        pCtrl   = self.IO_chk_autoPCtrl.isChecked()
         fpath   = UTIL.IO_currFilepath
         
         if ( (fpath is None) 
@@ -889,9 +896,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         mutex.lock()
         WORKERS.LFW_filePath = fpath
         WORKERS.LFW_lineID   = startID
+        WORKERS.LFW_pCtrl    = pCtrl
         mutex.unlock()
 
-        if( not testrun ):  self.loadFileThread.start()
+        if( not testrun ):  
+            self.loadFileThread.start()
+            self.IO_btt_loadFile.setStyleSheet( ' font-size: 16pt; background-color: #a28230;' )
 
 
 
@@ -908,8 +918,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         mutex.lock()
         WORKERS.LFW_filePath = None
         WORKERS.LFW_lineID   = 0
+        WORKERS.LFW_pCtrl    = False
         mutex.unlock()
 
+        self.IO_btt_loadFile.setStyleSheet( ' font-size: 16pt;' )
         self.loadFileThread.quit()
     
 
@@ -937,8 +949,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         mutex.lock()
         WORKERS.LFW_filePath = None
         WORKERS.LFW_lineID   = 0
+        WORKERS.LFW_pCtrl    = False
         mutex.unlock()
 
+        self.IO_btt_loadFile.setStyleSheet( ' font-size: 16pt;' )
         self.loadFileThread.quit()
         
 

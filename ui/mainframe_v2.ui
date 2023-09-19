@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1925</width>
-    <height>1090</height>
+    <width>1929</width>
+    <height>1099</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -726,6 +726,39 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
+      <widget class="QCheckBox" name="IO_chk_autoPCtrl">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>670</y>
+         <width>231</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+    background-color: #f2f4f3;
+    border-radius: 4px;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #ffba00;
+    image: url(:/images/right.png);
+}
+
+QWidget {
+	background-color: #5d707f;
+	font-size: 12pt;
+	color: #f2f4f3;
+}
+</string>
+       </property>
+       <property name="text">
+        <string>use automatic pump control</string>
+       </property>
+      </widget>
       <zorder>IO_lbl_newFile</zorder>
       <zorder>IO_lbl_loadFile</zorder>
       <zorder>IO_0_frameLabel</zorder>
@@ -743,6 +776,7 @@ color: #E1E5EE;</string>
       <zorder>IO_lbl_addByID</zorder>
       <zorder>IO_btt_addByID</zorder>
       <zorder>IO_btt_loadFile</zorder>
+      <zorder>IO_chk_autoPCtrl</zorder>
      </widget>
      <widget class="QFrame" name="SGLC_frame">
       <property name="geometry">
@@ -1342,7 +1376,7 @@ background-color: #ffba00;</string>
        <property name="geometry">
         <rect>
          <x>310</x>
-         <y>100</y>
+         <y>110</y>
          <width>231</width>
          <height>31</height>
         </rect>
@@ -1497,9 +1531,9 @@ padding-left: 0px;</string>
        <property name="geometry">
         <rect>
          <x>310</x>
-         <y>130</y>
+         <y>140</y>
          <width>801</width>
-         <height>751</height>
+         <height>741</height>
         </rect>
        </property>
        <item>
@@ -1629,6 +1663,28 @@ color: #E1E5EE;</string>
         <string>add SIB3</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="SCTRL_chk_autoScroll">
+       <property name="geometry">
+        <rect>
+         <x>970</x>
+         <y>115</y>
+         <width>141</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: #5d707f;
+font-size: 12pt;
+color: #f2f4f3;
+</string>
+       </property>
+       <property name="text">
+        <string>enable auto scroll</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
       <zorder>SCTRL_lbl_elemInQ</zorder>
       <zorder>SCTRL_lbl_buffComms</zorder>
       <zorder>SCRTL_lbl_queue</zorder>
@@ -1659,6 +1715,7 @@ color: #E1E5EE;</string>
       <zorder>SCTRL_num_liveAd_pump1</zorder>
       <zorder>SCTRL_btt_addSIB3_atEnd</zorder>
       <zorder>SCTRL_btt_addSIB3_atFront</zorder>
+      <zorder>SCTRL_chk_autoScroll</zorder>
      </widget>
      <zorder>SGLC_frame</zorder>
      <zorder>SCRTL_frame</zorder>
@@ -3324,11 +3381,9 @@ color: #E1E5EE;</string>
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">QWidget {
-	background-color: #5d707f;
-	font-size: 12pt;
-	color: #f2f4f3;
-}
+        <string notr="true">background-color: #5d707f;
+font-size: 12pt;
+color: #f2f4f3;
 </string>
        </property>
        <property name="text">
@@ -6178,6 +6233,28 @@ color: #E1E5EE;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ICQ_chk_autoScroll">
+       <property name="geometry">
+        <rect>
+         <x>650</x>
+         <y>70</y>
+         <width>141</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: #5d707f;
+font-size: 12pt;
+color: #f2f4f3;
+</string>
+       </property>
+       <property name="text">
+        <string>enable auto scroll</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
       </widget>
      </widget>

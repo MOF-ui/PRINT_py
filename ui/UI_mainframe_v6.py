@@ -15,7 +15,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
-        MainWindow.resize(1925, 1090)
+        MainWindow.resize(1929, 1099)
         MainWindow.setMinimumSize(QtCore.QSize(600, 400))
         MainWindow.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
@@ -442,6 +442,27 @@ class Ui_MainWindow(object):
 "color: #E1E5EE;")
         self.IO_lbl_newFile.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.IO_lbl_newFile.setObjectName("IO_lbl_newFile")
+        self.IO_chk_autoPCtrl = QtWidgets.QCheckBox(self.IO_frame)
+        self.IO_chk_autoPCtrl.setGeometry(QtCore.QRect(50, 670, 231, 31))
+        self.IO_chk_autoPCtrl.setStyleSheet("QCheckBox::indicator {\n"
+"    width: 20px;\n"
+"    height: 20px;\n"
+"    background-color: #f2f4f3;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QCheckBox::indicator:checked {\n"
+"    background-color: #ffba00;\n"
+"    image: url(:/images/right.png);\n"
+"}\n"
+"\n"
+"QWidget {\n"
+"    background-color: #5d707f;\n"
+"    font-size: 12pt;\n"
+"    color: #f2f4f3;\n"
+"}\n"
+"")
+        self.IO_chk_autoPCtrl.setObjectName("IO_chk_autoPCtrl")
         self.IO_lbl_newFile.raise_()
         self.IO_lbl_loadFile.raise_()
         self.IO_0_frameLabel.raise_()
@@ -459,6 +480,7 @@ class Ui_MainWindow(object):
         self.IO_lbl_addByID.raise_()
         self.IO_btt_addByID.raise_()
         self.IO_btt_loadFile.raise_()
+        self.IO_chk_autoPCtrl.raise_()
         self.SGLC_frame = QtWidgets.QFrame(self.PRINT_tab)
         self.SGLC_frame.setGeometry(QtCore.QRect(360, 20, 311, 911))
         self.SGLC_frame.setMouseTracking(False)
@@ -654,7 +676,7 @@ class Ui_MainWindow(object):
         self.SCTRL_btt_addSIB1_atFront.setGeometry(QtCore.QRect(60, 620, 101, 31))
         self.SCTRL_btt_addSIB1_atFront.setObjectName("SCTRL_btt_addSIB1_atFront")
         self.SCRTL_lbl_queue = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCRTL_lbl_queue.setGeometry(QtCore.QRect(310, 100, 231, 31))
+        self.SCRTL_lbl_queue.setGeometry(QtCore.QRect(310, 110, 231, 31))
         self.SCRTL_lbl_queue.setStyleSheet("border: 0px;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
@@ -705,7 +727,7 @@ class Ui_MainWindow(object):
         self.SCTRL_lbl_elemInQ.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.SCTRL_lbl_elemInQ.setObjectName("SCTRL_lbl_elemInQ")
         self.SCTRL_arr_queue = QtWidgets.QListWidget(self.SCRTL_frame)
-        self.SCTRL_arr_queue.setGeometry(QtCore.QRect(310, 130, 801, 751))
+        self.SCTRL_arr_queue.setGeometry(QtCore.QRect(310, 140, 801, 741))
         self.SCTRL_arr_queue.setObjectName("SCTRL_arr_queue")
         item = QtWidgets.QListWidgetItem()
         self.SCTRL_arr_queue.addItem(item)
@@ -746,6 +768,14 @@ class Ui_MainWindow(object):
         self.SCTRL_btt_addSIB3_atFront = QtWidgets.QPushButton(self.SCRTL_frame)
         self.SCTRL_btt_addSIB3_atFront.setGeometry(QtCore.QRect(60, 700, 101, 31))
         self.SCTRL_btt_addSIB3_atFront.setObjectName("SCTRL_btt_addSIB3_atFront")
+        self.SCTRL_chk_autoScroll = QtWidgets.QCheckBox(self.SCRTL_frame)
+        self.SCTRL_chk_autoScroll.setGeometry(QtCore.QRect(970, 115, 141, 20))
+        self.SCTRL_chk_autoScroll.setStyleSheet("background-color: #5d707f;\n"
+"font-size: 12pt;\n"
+"color: #f2f4f3;\n"
+"")
+        self.SCTRL_chk_autoScroll.setChecked(False)
+        self.SCTRL_chk_autoScroll.setObjectName("SCTRL_chk_autoScroll")
         self.SCTRL_lbl_elemInQ.raise_()
         self.SCTRL_lbl_buffComms.raise_()
         self.SCRTL_lbl_queue.raise_()
@@ -776,6 +806,7 @@ class Ui_MainWindow(object):
         self.SCTRL_num_liveAd_pump1.raise_()
         self.SCTRL_btt_addSIB3_atEnd.raise_()
         self.SCTRL_btt_addSIB3_atFront.raise_()
+        self.SCTRL_chk_autoScroll.raise_()
         self.SGLC_frame.raise_()
         self.SCRTL_frame.raise_()
         self.IO_frame.raise_()
@@ -1374,11 +1405,9 @@ class Ui_MainWindow(object):
         self.TERM_btt_rapidInterp.setObjectName("TERM_btt_rapidInterp")
         self.TERM_chk_autoScroll = QtWidgets.QCheckBox(self.TERM_frame)
         self.TERM_chk_autoScroll.setGeometry(QtCore.QRect(670, 115, 141, 20))
-        self.TERM_chk_autoScroll.setStyleSheet("QWidget {\n"
-"    background-color: #5d707f;\n"
-"    font-size: 12pt;\n"
-"    color: #f2f4f3;\n"
-"}\n"
+        self.TERM_chk_autoScroll.setStyleSheet("background-color: #5d707f;\n"
+"font-size: 12pt;\n"
+"color: #f2f4f3;\n"
 "")
         self.TERM_chk_autoScroll.setChecked(True)
         self.TERM_chk_autoScroll.setObjectName("TERM_chk_autoScroll")
@@ -2380,6 +2409,14 @@ class Ui_MainWindow(object):
 "color: #E1E5EE;")
         self.ICQ_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.ICQ_0_frameLabel.setObjectName("ICQ_0_frameLabel")
+        self.ICQ_chk_autoScroll = QtWidgets.QCheckBox(self.ICQ_frame)
+        self.ICQ_chk_autoScroll.setGeometry(QtCore.QRect(650, 70, 141, 27))
+        self.ICQ_chk_autoScroll.setStyleSheet("background-color: #5d707f;\n"
+"font-size: 12pt;\n"
+"color: #f2f4f3;\n"
+"")
+        self.ICQ_chk_autoScroll.setChecked(False)
+        self.ICQ_chk_autoScroll.setObjectName("ICQ_chk_autoScroll")
         self.ZERO_frame = QtWidgets.QFrame(self.MONITOR_tab)
         self.ZERO_frame.setGeometry(QtCore.QRect(900, 20, 631, 621))
         self.ZERO_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -2793,6 +2830,7 @@ class Ui_MainWindow(object):
         self.IO_btt_loadFile.setText(_translate("MainWindow", "load && add to queue"))
         self.IO_lbl_loadFile.setText(_translate("MainWindow", "... not executed"))
         self.IO_lbl_newFile.setText(_translate("MainWindow", "GCode/RAPID file"))
+        self.IO_chk_autoPCtrl.setText(_translate("MainWindow", "use automatic pump control"))
         self.SGLC_0_frameLabel.setText(_translate("MainWindow", "SINGLE COMMAND"))
         self.SGLC_lbl_gcodeSglComm.setText(_translate("MainWindow", "GCode single command"))
         self.SGLC_btt_gcodeSglComm.setText(_translate("MainWindow", "add to queue"))
@@ -2846,6 +2884,7 @@ class Ui_MainWindow(object):
         self.SCTRL_num_liveAd_pump1.setSuffix(_translate("MainWindow", "%"))
         self.SCTRL_btt_addSIB3_atEnd.setText(_translate("MainWindow", "at end"))
         self.SCTRL_btt_addSIB3_atFront.setText(_translate("MainWindow", "add SIB3"))
+        self.SCTRL_chk_autoScroll.setText(_translate("MainWindow", "enable auto scroll"))
         self.tab.setTabText(self.tab.indexOf(self.PRINT_tab), _translate("MainWindow", "     PRINTING     "))
         self.DC_0_frameLabel.setText(_translate("MainWindow", "DC TRANSITION"))
         self.DC_drpd_moveType.setItemText(0, _translate("MainWindow", "LINEAR"))
@@ -3059,6 +3098,7 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Queue is empty!"))
         self.ICQ_arr_terminal.setSortingEnabled(__sortingEnabled)
         self.ICQ_0_frameLabel.setText(_translate("MainWindow", "INTERNAL COMMAND QUEUE"))
+        self.ICQ_chk_autoScroll.setText(_translate("MainWindow", "enable auto scroll"))
         self.ZERO_0_frameLabel.setText(_translate("MainWindow", "ZERO POSITION"))
         self.ZERO_disp_z.setText(_translate("MainWindow", "0.0"))
         self.ZERO_lbl_y_disp.setText(_translate("MainWindow", "Y"))
@@ -3090,7 +3130,6 @@ class Ui_MainWindow(object):
         self.TRANS_disp_xEnd.setText(_translate("MainWindow", "0.0"))
         self.TRANS_lbl_newOrient.setText(_translate("MainWindow", "NEW ORIENTATION"))
         self.tab.setTabText(self.tab.indexOf(self.MONITOR_tab), _translate("MainWindow", "     SYSTEM MONITOR     "))
-
 
 
 

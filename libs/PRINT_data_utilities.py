@@ -580,9 +580,12 @@ class Queue:
         firstID = self.queue[0].id
         
         if( (newEntry.id == 0) or (newEntry.id > lastID) ):
-            if( not threadCall ): 
+            if( threadCall and (newEntry.id == 0) ): 
+                self.increment()
+                self.queue.insert(0, newEntry)
+            else:
                 newEntry.id = lastID + 1
-            self.queue.append(newEntry)
+                self.queue.append(newEntry)
 
         elif( newEntry.id < 0 ):
             return ValueError

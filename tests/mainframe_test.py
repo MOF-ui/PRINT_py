@@ -152,7 +152,7 @@ class Mainframe_test(unittest.TestCase):
                                              ,Speed= UTIL.SpeedVector(ts= 900) ) )  
                            ,str( UTIL.QEntry( id= 3, pt= 'Q'
                                              ,Coor1= UTIL.Coordinate( x= 1.1, y= 2.2, z= 3.3, rx= 4.4, ry= 5.5
-                                                                      ,rz= 6.6, q=7.7, ext= 600)
+                                                                     ,rz= 6.6, q= 7.7, ext= 600)
                                              ,Speed= UTIL.SpeedVector(ts= 18, os= 19, acr= 20, dcr= 21), z= 50 ) )  
                            ,str( UTIL.QEntry( id= 4, mt= 'J'
                                              ,Coor1= UTIL.Coordinate( x= 8, y= 8, z= 9, ext= 160)
@@ -163,7 +163,7 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual( UTIL.SC_queue.display()
                          ,[ str( UTIL.QEntry( id= 1, pt= 'Q'
                                              ,Coor1= UTIL.Coordinate( x= 1.1, y= 2.2, z= 3.3, rx= 4.4, ry= 5.5
-                                                                      ,rz= 6.6, q=7.7, ext= 600)
+                                                                     ,rz= 6.6, q= 7.7, ext= 600)
                                              ,Speed= UTIL.SpeedVector(ts= 18, os= 19, acr= 20, dcr= 21), z= 50 ) )
                            ,str( UTIL.QEntry( id= 2, mt= 'J'
                                              ,Coor1= UTIL.Coordinate( x= 8, y= 8, z= 9, ext= 160)
@@ -174,7 +174,7 @@ class Mainframe_test(unittest.TestCase):
                                              ,Speed= UTIL.SpeedVector(ts= 900) ) )  
                            ,str( UTIL.QEntry( id= 5, pt= 'Q'
                                              ,Coor1= UTIL.Coordinate( x= 1.1, y= 2.2, z= 3.3, rx= 4.4, ry= 5.5
-                                                                      ,rz= 6.6, q=7.7, ext= 600)
+                                                                     ,rz= 6.6, q= 7.7, ext= 600)
                                              ,Speed= UTIL.SpeedVector(ts= 18, os= 19, acr= 20, dcr= 21), z= 50 ) )
                            ,str( UTIL.QEntry( id= 6, mt= 'J'
                                              ,Coor1= UTIL.Coordinate( x= 8, y= 8, z= 9, ext= 160)
@@ -186,27 +186,26 @@ class Mainframe_test(unittest.TestCase):
 
 
     def test_applySettings (self):
-        """ test default settings loading in '__init__' as well """
+        """ tests default settings loading in '__init__' and 'updateCommForerun' as well """
         global testFrame
 
         # check if defaults were loaded
-        self.assertEqual( testFrame.TCP_num_commForerun.value()     ,UTIL.DEF_ROB_COMM_FR)
+        self.assertEqual( testFrame.TCP_num_commForerun.value()      ,UTIL.DEF_ROB_COMM_FR)
         self.assertEqual( testFrame.SET_float_volPerMM.value()       ,UTIL.DEF_SC_VOL_PER_MM)
-        self.assertEqual( testFrame.SET_float_frToMms.value()       ,UTIL.DEF_IO_FR_TO_TS)
-        self.assertEqual( testFrame.SET_num_zone.value()            ,UTIL.DEF_IO_ZONE)
-        self.assertEqual( testFrame.SET_num_transSpeed_dc.value()   ,UTIL.DEF_DC_SPEED.ts)
-        self.assertEqual( testFrame.SET_num_orientSpeed_dc.value()  ,UTIL.DEF_DC_SPEED.os)
-        self.assertEqual( testFrame.SET_num_accelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.acr)
-        self.assertEqual( testFrame.SET_num_decelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.dcr)
-        self.assertEqual( testFrame.SET_num_transSpeed_print.value(),UTIL.DEF_PRIN_SPEED.ts)
-        self.assertEqual( testFrame.SET_num_orientSpeed_print.value()
-                         ,UTIL.DEF_PRIN_SPEED.os)
-        self.assertEqual( testFrame.SET_num_accelRamp_print.value(),UTIL.DEF_PRIN_SPEED.acr)
-        self.assertEqual( testFrame.SET_num_decelRamp_print.value(),UTIL.DEF_PRIN_SPEED.dcr)
+        self.assertEqual( testFrame.SET_float_frToMms.value()        ,UTIL.DEF_IO_FR_TO_TS)
+        self.assertEqual( testFrame.SET_num_zone.value()             ,UTIL.DEF_IO_ZONE)
+        self.assertEqual( testFrame.SET_num_transSpeed_dc.value()    ,UTIL.DEF_DC_SPEED.ts)
+        self.assertEqual( testFrame.SET_num_orientSpeed_dc.value()   ,UTIL.DEF_DC_SPEED.os)
+        self.assertEqual( testFrame.SET_num_accelRamp_dc.value()     ,UTIL.DEF_DC_SPEED.acr)
+        self.assertEqual( testFrame.SET_num_decelRamp_dc.value()     ,UTIL.DEF_DC_SPEED.dcr)
+        self.assertEqual( testFrame.SET_num_transSpeed_print.value() ,UTIL.DEF_PRIN_SPEED.ts)
+        self.assertEqual( testFrame.SET_num_orientSpeed_print.value(),UTIL.DEF_PRIN_SPEED.os)
+        self.assertEqual( testFrame.SET_num_accelRamp_print.value()  ,UTIL.DEF_PRIN_SPEED.acr)
+        self.assertEqual( testFrame.SET_num_decelRamp_print.value()  ,UTIL.DEF_PRIN_SPEED.dcr)
 
         # test setting by user
         testFrame.TCP_num_commForerun.setValue      (1)
-        testFrame.SET_float_volPerMM.setValue        (2.2)
+        testFrame.SET_float_volPerMM.setValue       (2.2)
         testFrame.SET_float_frToMms.setValue        (3.3)
         testFrame.SET_num_zone.setValue             (4)
         testFrame.SET_num_transSpeed_dc.setValue    (5)
@@ -218,10 +217,11 @@ class Mainframe_test(unittest.TestCase):
         testFrame.SET_num_accelRamp_print.setValue  (11)
         testFrame.SET_num_decelRamp_print.setValue  (12)
         testFrame.applySettings()
+        testFrame.updateCommForerun()
 
-        self.assertEqual( UTIL.ROB_commFr,     1 )
-        self.assertEqual( UTIL.SC_volPerMm,    2.2 )
-        self.assertEqual( UTIL.IO_frToTs,     3.3 )
+        self.assertEqual( UTIL.ROB_commFr,      1 )
+        self.assertEqual( UTIL.SC_volPerMm,     2.2 )
+        self.assertEqual( UTIL.IO_frToTs,       3.3 )
         self.assertEqual( UTIL.IO_zone,         4 )
         self.assertEqual( UTIL.DC_speed.ts,     5 )
         self.assertEqual( UTIL.DC_speed.os,     6 )
@@ -233,21 +233,22 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual( UTIL.PRIN_speed.dcr,  12 )
 
         # test resetting by user
+        testFrame.TCP_num_commForerun.setValue(10)
         testFrame.loadDefaults()
         testFrame.applySettings()
-        self.assertEqual( testFrame.TCP_num_commForerun.value()     ,UTIL.DEF_ROB_COMM_FR)
-        self.assertEqual( testFrame.SET_float_volPerMM.value()       ,UTIL.DEF_SC_VOL_PER_MM)
-        self.assertEqual( testFrame.SET_float_frToMms.value()       ,UTIL.DEF_IO_FR_TO_TS)
-        self.assertEqual( testFrame.SET_num_zone.value()            ,UTIL.DEF_IO_ZONE)
-        self.assertEqual( testFrame.SET_num_transSpeed_dc.value()   ,UTIL.DEF_DC_SPEED.ts)
-        self.assertEqual( testFrame.SET_num_orientSpeed_dc.value()  ,UTIL.DEF_DC_SPEED.os)
-        self.assertEqual( testFrame.SET_num_accelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.acr)
-        self.assertEqual( testFrame.SET_num_decelRamp_dc.value()    ,UTIL.DEF_DC_SPEED.dcr)
-        self.assertEqual( testFrame.SET_num_transSpeed_print.value(),UTIL.DEF_PRIN_SPEED.ts)
-        self.assertEqual( testFrame.SET_num_orientSpeed_print.value()
-                         ,UTIL.DEF_PRIN_SPEED.os)
-        self.assertEqual( testFrame.SET_num_accelRamp_print.value(),UTIL.DEF_PRIN_SPEED.acr)
-        self.assertEqual( testFrame.SET_num_decelRamp_print.value(),UTIL.DEF_PRIN_SPEED.dcr)
+        testFrame.updateCommForerun()
+        self.assertEqual( testFrame.TCP_num_commForerun.value()      ,UTIL.DEF_ROB_COMM_FR )
+        self.assertEqual( testFrame.SET_float_volPerMM.value()       ,UTIL.DEF_SC_VOL_PER_MM )
+        self.assertEqual( testFrame.SET_float_frToMms.value()        ,UTIL.DEF_IO_FR_TO_TS )
+        self.assertEqual( testFrame.SET_num_zone.value()             ,UTIL.DEF_IO_ZONE )
+        self.assertEqual( testFrame.SET_num_transSpeed_dc.value()    ,UTIL.DEF_DC_SPEED.ts )
+        self.assertEqual( testFrame.SET_num_orientSpeed_dc.value()   ,UTIL.DEF_DC_SPEED.os )
+        self.assertEqual( testFrame.SET_num_accelRamp_dc.value()     ,UTIL.DEF_DC_SPEED.acr )
+        self.assertEqual( testFrame.SET_num_decelRamp_dc.value()     ,UTIL.DEF_DC_SPEED.dcr )
+        self.assertEqual( testFrame.SET_num_transSpeed_print.value() ,UTIL.DEF_PRIN_SPEED.ts )
+        self.assertEqual( testFrame.SET_num_orientSpeed_print.value(),UTIL.DEF_PRIN_SPEED.os )
+        self.assertEqual( testFrame.SET_num_accelRamp_print.value()  ,UTIL.DEF_PRIN_SPEED.acr )
+        self.assertEqual( testFrame.SET_num_decelRamp_print.value()  ,UTIL.DEF_PRIN_SPEED.dcr )
     
 
 
@@ -287,7 +288,7 @@ class Mainframe_test(unittest.TestCase):
         testFrame.DC_drpd_moveType.setCurrentText('LINEAR')
         self.assertEqual( testFrame.homeCommand()[1]
                          ,UTIL.QEntry( id= 1, z= 0, Coor1= UTIL.Coordinate( x= 1, y= 2.2, z= 3, rx= 4 
-                                                                            ,ry= 5, rz= 6, q= 7, ext= 8) ) )
+                                                                           ,ry= 5, rz= 6, q= 7, ext= 8) ) )
         self.assertTrue( UTIL.DC_robMoving )
 
         UTIL.DC_robMoving = False
@@ -295,7 +296,7 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual( testFrame.homeCommand()[1]
                          ,UTIL.QEntry( id= 2, z= 0, mt= 'J'
                                           ,Coor1= UTIL.Coordinate( x= 1, y= 2.2, z= 3, rx= 4 
-                                                                   ,ry= 5, rz= 6, q= 7, ext= 8) ) )
+                                                                  ,ry= 5, rz= 6, q= 7, ext= 8) ) )
         
         UTIL.DC_currZero    = UTIL.Coordinate()
         UTIL.SC_currCommId  = 1
@@ -513,8 +514,7 @@ class Mainframe_test(unittest.TestCase):
         UTIL.ROB_commQueue.clear()
         UTIL.SC_queue.add( UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(y= 1.1)) )
 
-        testFrame.sendCommand( command= UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2))
-                              ,DC= True )
+        testFrame.sendCommand( command= UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2)), DC= True )
         self.assertEqual( UTIL.ROB_commQueue.display()
                          ,[str(UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2)))] )
         self.assertEqual( UTIL.SC_queue.display()
@@ -565,7 +565,7 @@ class Mainframe_test(unittest.TestCase):
 
         self.assertEqual( testFrame.sendGcodeCommand()[1]
                          ,UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate( x= 1, y= 3.2, z= 1, rx= 1
-                                                                      ,ry= 1, rz= 1, q= 1, ext= 1 ) ) )
+                                                                     ,ry= 1, rz= 1, q= 1, ext= 1 ) ) )
         
         UTIL.DC_robMoving = False
         testFrame.TERM_entry_gcodeInterp.setText('G1 X1 Z3')
@@ -603,7 +603,7 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual( testFrame.sendNCCommand([4,5,6,8])[1]
                          ,UTIL.QEntry( id= 2, mt= 'J', z= 0
                                       ,Coor1= UTIL.Coordinate( x= 1, y= 1, z= 1, rx= 4
-                                                               ,ry= 5, rz= 6, ext= 7) ) )
+                                                              ,ry= 5, rz= 6, ext= 7) ) )
         
         UTIL.DC_robMoving = False
         UTIL.ROB_telem.Coor = UTIL.Coordinate()
@@ -619,7 +619,7 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual( testFrame.sendRapidCommand()[1]
                          ,UTIL.QEntry( id= 1, pt= 'Q', z= 50
                                       ,Coor1= UTIL.Coordinate( x= 1, y= 2, z= 3, rx= 4
-                                                               ,ry= 5, rz= 6, q= 7, ext= 600 ) ))
+                                                              ,ry= 5, rz= 6, q= 7, ext= 600 ) ))
         
         UTIL.SC_currCommId = 1
     
@@ -652,11 +652,22 @@ class Mainframe_test(unittest.TestCase):
         UTIL.DC_currZero   = UTIL.Coordinate( 1,2,3,4,5,6,7,8 )
         UTIL.ROB_telem.Coor  = UTIL.Coordinate()
         
-        testFrame.setZero([1,2,3])
-        self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate( 0,0,0,4,5,6,7,8) )
+        testFrame.setZero( [1,2,3] )
+        self.assertEqual ( UTIL.DC_currZero, UTIL.Coordinate( 0,0,0,4,5,6,7,8) )
         
-        testFrame.setZero([4,5,6,8])
-        self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate( 0,0,0,0,0,0,7,0) )
+        testFrame.setZero( [4,5,6,8] )
+        self.assertEqual ( UTIL.DC_currZero, UTIL.Coordinate( 0,0,0,0,0,0,7,0) )
+
+        testFrame.ZERO_float_x.setValue  (1)
+        testFrame.ZERO_float_y.setValue  (2)
+        testFrame.ZERO_float_z.setValue  (3)
+        testFrame.ZERO_float_rx.setValue (4)
+        testFrame.ZERO_float_ry.setValue (5)
+        testFrame.ZERO_float_rz.setValue (6)
+        testFrame.ZERO_float_ext.setValue(7)
+        testFrame.setZero( [1,2,3,4,5,6,8], fromSysMonitor= True )
+        self.assertEqual ( UTIL.DC_currZero, UTIL.Coordinate( 1,2,3,4,5,6,7,7) )
+
 
         UTIL.DC_currZero = UTIL.Coordinate()
     

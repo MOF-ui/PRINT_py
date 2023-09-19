@@ -272,11 +272,17 @@ class LoadFileWorker(QObject):
         """ """
         global LFW_filePath
         global LFW_lineID
+        global LFW_pCtrl
+        global LFW_running
 
-        filePath = LFW_filePath
-        lineID   = LFW_lineID
-
-        if( filePath is None ): self.convFailed.emit( "No filepath given!" )
+        LFW_running = True
+        lineID      = LFW_lineID
+        filePath    = LFW_filePath
+        if( filePath is None ): 
+            self.convFailed.emit( "No filepath given!" )
+            LFW_running = False
+            return
+        
         file    = open(filePath,'r')
         txt     = file.read()
         file.close()
@@ -290,7 +296,7 @@ class LoadFileWorker(QObject):
         # iterate over file rows
         if (filePath.suffix == '.gcode'):
             for row in rows:
-                entry,command = self.gcodeConv(ID= lineID, txt= row)
+                entry,command = self.gcodeConv( ID= lineID, txt= row) 
 
                 if(    (command == 'G92') 
                       or (command == ';') 
@@ -299,23 +305,53 @@ class LoadFileWorker(QObject):
                       or (command == 'G28') ):  lineID += 1
                 elif(command == ValueError): 
                     self.convFailed.emit( f"VALUE ERROR: {command}" )
+                    LFW_running = False
                     return
                 else:                           
                     self.convFailed.emit( f"{command}!, ABORTED" )
+                    LFW_running = False
                     return
 
         else:
             for row in rows:
-                entry,err = self.rapidConv(ID= lineID, txt= row)
+                entry,err = self.rapidConv( ID= lineID, txt= row)
 
                 if( err == ValueError ):        
                     self.convFailed.emit( f"VALUE ERROR: {command}" )
+                    LFW_running = False
                     return
                 elif(entry is None):            skips += 1
                 else:                           lineID += 1    
         
+        if( len(self.comList) == 0 ): 
+            self.convFailed.emit( "No commands found!" )
+            LFW_running = False
+            return
+
+        # automatic pump control
+        if( LFW_pCtrl ):
+            # set all entries to pmode=default
+            for i in self.comList.queue:
+                i.pMode = 'default'
+
+            # add a 3mm long startvector with a speed of 3mm/s (so 3s of approach), with pMode=start
+            startVector = copy.deepcopy( self.comList[0] )
+            startVector.id          =  startID
+            startVector.Coor1.x     += 3
+            startVector.Coor1.y     += 3
+            startVector.pMode       =  'zero'
+            startVector.Speed       =  UTIL.SpeedVector( acr= 50, dcr= 50, ts= 200, os=100 )
+
+            self.comList[0].Speed   =  UTIL.SpeedVector( acr= 1, dcr= 1, ts= 1, os=1 )
+            self.comList[0].pMode   =  'start'
+            self.comList.add( startVector, threadCall= True )
+
+            # set the last entry to pMode=end
+            self.comList[ len(self.comList) - 1 ].pMode = 'end'
+
         UTIL.SC_queue.addList( self.comList )
         self.convFinished.emit( lineID, startID, skips )
+        LFW_running = False
 
 
 
@@ -334,7 +370,7 @@ class LoadFileWorker(QObject):
 
         if ( (command != 'G1') and (command != 'G28') ):    
             return entry, command
-
+        
         entry.id    = ID
         res         = self.comList.add(entry, threadCall= True)
         
@@ -372,3 +408,5 @@ mutex           = QMutex()
 
 LFW_filePath    = None
 LFW_lineID      = 0
+LFW_pCtrl       = False
+LFW_running     = False
