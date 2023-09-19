@@ -38,6 +38,7 @@ import libs.PRINT_pump_utilities    as PUTIL
 class PumpCommWorker(QObject):
     """ manages data updates and keepalive commands to pump """
 
+    connActive      = pyqtSignal()
     dataReceived    = pyqtSignal( UTIL.PumpTelemetry )
     dataSend        = pyqtSignal( int, str, int )
     logError        = pyqtSignal( str, str )
@@ -113,6 +114,8 @@ class PumpCommWorker(QObject):
                 UTIL.STT_dataBlock.Pump1 = telem
                 mutex.unlock()
                 self.dataReceived.emit(telem)
+            
+            self.connActive.emit()
 
         
 
@@ -162,7 +165,7 @@ class RoboCommWorker(QObject):
 
         if (state == True):
             if(telem is not None): 
-                telem = round(telem, 2)
+                telem = round(telem, 1)
             self.dataReceived.emit()
 
             mutex.lock()
@@ -274,6 +277,7 @@ class LoadFileWorker(QObject):
         global LFW_lineID
         global LFW_pCtrl
         global LFW_running
+        global LFW_preRunTime
 
         LFW_running = True
         lineID      = LFW_lineID
@@ -337,8 +341,8 @@ class LoadFileWorker(QObject):
             # add a 3mm long startvector with a speed of 3mm/s (so 3s of approach), with pMode=start
             startVector = copy.deepcopy( self.comList[0] )
             startVector.id          =  startID
-            startVector.Coor1.x     += 3
-            startVector.Coor1.y     += 3
+            startVector.Coor1.x     += LFW_preRunTime
+            startVector.Coor1.y     += LFW_preRunTime
             startVector.pMode       =  'zero'
             startVector.Speed       =  UTIL.SpeedVector( acr= 50, dcr= 50, ts= 200, os=100 )
 
@@ -410,3 +414,4 @@ LFW_filePath    = None
 LFW_lineID      = 0
 LFW_pCtrl       = False
 LFW_running     = False
+LFW_preRunTime  = 5

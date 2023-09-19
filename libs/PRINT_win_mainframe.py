@@ -168,12 +168,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.NC_btt_orientZero.pressed.connect              ( lambda: self.setZero      ([4,5,6]) )
 
         # PUMP CONTROL
-        self.SCTRL_num_liveAd_pump1.valueChanged.connect    ( self.setSpeed )
         self.PUMP_btt_setSpeed.pressed.connect              ( self.setSpeed )
         self.PUMP_btt_plus1.pressed.connect                 ( lambda: self.setSpeed('1') )
         self.PUMP_btt_minus1.pressed.connect                ( lambda: self.setSpeed('-1') )
         self.PUMP_btt_stop.pressed.connect                  ( lambda: self.setSpeed('0') )
         self.PUMP_btt_reverse.pressed.connect               ( lambda: self.setSpeed('r') )
+        self.SCTRL_num_liveAd_pump1.valueChanged.connect    ( lambda: self.setSpeed('c') )
 
         # SCRIPT CONTROL
         self.SCTRL_btt_forcedStop.pressed.connect           ( self.forcedStopCommand )
@@ -447,7 +447,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.pumpCommWorker.logError.connect        (self.logEntry)
         self.pumpCommWorker.dataSend.connect        (self.pump1Send)
         self.pumpCommWorker.dataReceived.connect    (self.pump1Update)
-        self.pumpCommWorker.dataReceived.connect    ( lambda: self.resetWatchdog(2) )
+        self.pumpCommWorker.connActive.connect      ( lambda: self.resetWatchdog(2) )
 
         self.loadFileThread = QThread()
         self.loadFileWorker = WORKERS.LoadFileWorker()
@@ -466,8 +466,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def posUpdate(self, rawDataString, telem):
         """ write robots telemetry to global variables """
 
-        # set the fist given position to zero as this is usually the standard position for Rob2
+        # set the fist given position to zero as this is usually the standard position for Rob2, take current ID
         if (self.firstPos):
+            # UTIL.SC_currCommId = telem.id + 1
             UTIL.ROB_movStartP = copy.deepcopy( UTIL.ROB_telem.Coor )
             UTIL.ROB_movEndP   = copy.deepcopy( UTIL.ROB_telem.Coor )
             self.setZero([1,2,3,4,5,6,8])
@@ -491,7 +492,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.TCP_PUMP1_disp_writeBuffer.setText     ( str(command) )
         self.TCP_PUMP1_disp_bytesWritten.setText    ( str(len(command)) )
         self.TCP_PUMP1_disp_readBuffer.setText      ( str(ans) )
-        self.PUMP_disp_currSpeed.setText            ( f"{UTIL.PUMP1_speed}%" )
     
         self.logEntry('PMP1',f"speed set to {UTIL.PUMP1_speed}, command: {command}")
 
@@ -502,10 +502,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def pump1Update(self, telem):
         """ display pump telemetry """
 
-        self.PUMP_disp_freq.setText ( str( UTIL.STT_dataBlock.Pump1.freq ) )
-        self.PUMP_disp_volt.setText ( str( UTIL.STT_dataBlock.Pump1.volt ) )
-        self.PUMP_disp_amps.setText ( str( UTIL.STT_dataBlock.Pump1.amps ) )
-        self.PUMP_disp_torq.setText ( str( UTIL.STT_dataBlock.Pump1.torq ) )
+        self.PUMP_disp_freq.setText         ( str( UTIL.STT_dataBlock.Pump1.freq ) )
+        self.PUMP_disp_volt.setText         ( str( UTIL.STT_dataBlock.Pump1.volt ) )
+        self.PUMP_disp_amps.setText         ( str( UTIL.STT_dataBlock.Pump1.amps ) )
+        self.PUMP_disp_torq.setText         ( str( UTIL.STT_dataBlock.Pump1.torq ) )
+        self.PUMP_disp_currSpeed.setText    ( f"{telem.freq}%" )
 
         self.logEntry('PTel',f"PUMP1, freq: {telem.freq}, volt: {telem.volt}, amps: {telem.amps}, torq: {telem.torq}")
 
@@ -1381,7 +1382,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def forcedStopCommand(self):
         """ sets up non-moving-type commands, gives it to the actual sendCommand function """
         
-        command = UTIL.QEntry( id = 0
+        command = UTIL.QEntry( id = 1
                               ,mt = 'S')
         
         if (self.testrun): return self.sendCommand(command, DC = True)
@@ -1394,8 +1395,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if(FSWarning.result()):
             self.logEntry('SysC',f"FORCED STOP (user committed).")
             if( UTIL.SC_qProcessing ): 
+                ans = self.sendCommand(command, DC = True)
                 self.stopSCTRLQueue()
-            return self.sendCommand(command, DC = True)
+
+                mutex.lock()
+                UTIL.SC_currCommId = UTIL.ROB_telem.id
+                mutex.unlock()
+                
+                return ans
         
         else:
             self.logEntry('SysC',f"user denied FS-Dialog, continuing...")
@@ -1540,6 +1547,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             case '-1':  UTIL.PUMP1_speed -= 1
             case '0':   UTIL.PUMP1_speed =  0
             case 'r':   UTIL.PUMP1_speed *= -1
+            case 'c':   pass
             case _:     UTIL.PUMP1_speed = self.PUMP_num_setSpeed.value()
         mutex.unlock()
 
@@ -1584,6 +1592,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.roboCommThread.deleteLater()
         self.pumpCommThread.deleteLater()
+        self.loadFileWorker.deleteLater()
+        self.loadFileThread.quit()
+        self.loadFileThread.wait()
         self.loadFileThread.deleteLater()
 
         self.logEntry('GNRL','exiting GUI.')

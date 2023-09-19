@@ -190,7 +190,7 @@ def getBaseSpeed(base = 'default', fallback = 0.0):
 #############################################################################################
 
 DIFF_CONST      = 0.25
-START_SUPP_PTS  = [   { 'until': 3.0,   'base': 'zero',     'mode': 'instant' },
+START_SUPP_PTS  = [   { 'until': 5.0,   'base': 'zero',     'mode': 'instant' },
                       { 'until': 1.0,   'base': 'max',      'mode': 'diff'    },
                       { 'until': 0.0,   'base': 'conn',     'mode': 'linear'  } ]
 
