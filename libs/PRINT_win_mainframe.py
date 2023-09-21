@@ -1446,8 +1446,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         
         if (command == IndexError): return None
         # if (not DC):                command.SV *= self.SCTRL_num_liveAd_robot.value() / 100.0
+        if( command.id > 3000 ): 
+            command.id -= 3000
+            if( command.id > 3000 ): command.id -= 3000
+
         if (self.testrun):          msg, msgLen = True, 1
+
         else:                       msg, msgLen = UTIL.ROB_tcpip.send(command)
+
 
         if (msg == True):
             

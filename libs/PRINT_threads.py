@@ -100,9 +100,9 @@ class PumpCommWorker(QObject):
         volt    = self.mtecInterface.voltage
         amps    = self.mtecInterface.current
         torq    = self.mtecInterface.torque
-
+ 
         if(None in [freq, volt, amps, torq]): 
-            self.logError('CONN','Pump1 telemetry package broken or not received...')
+            self.logError.emit('CONN','Pump1 telemetry package broken or not received...')
         
         else:
             telem = UTIL.PumpTelemetry(freq,volt,amps,torq)
