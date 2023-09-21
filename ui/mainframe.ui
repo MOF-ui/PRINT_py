@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1929</width>
-    <height>1099</height>
+    <width>1933</width>
+    <height>1108</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -371,7 +371,7 @@ QTabBar::tab:!selected:hover {
 }</string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="PRINT_tab">
      <property name="styleSheet">
@@ -6178,7 +6178,7 @@ color: #E1E5EE;</string>
        <rect>
         <x>30</x>
         <y>20</y>
-        <width>831</width>
+        <width>1191</width>
         <height>911</height>
        </rect>
       </property>
@@ -6193,7 +6193,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>40</x>
          <y>100</y>
-         <width>751</width>
+         <width>1111</width>
          <height>771</height>
         </rect>
        </property>
@@ -6238,7 +6238,7 @@ color: #E1E5EE;</string>
       <widget class="QCheckBox" name="ICQ_chk_autoScroll">
        <property name="geometry">
         <rect>
-         <x>650</x>
+         <x>1000</x>
          <y>70</y>
          <width>141</width>
          <height>27</height>
@@ -6261,7 +6261,7 @@ color: #f2f4f3;
      <widget class="QFrame" name="ZERO_frame">
       <property name="geometry">
        <rect>
-        <x>900</x>
+        <x>1260</x>
         <y>20</y>
         <width>631</width>
         <height>621</height>
@@ -6753,7 +6753,7 @@ color: #E1E5EE;</string>
      <widget class="QFrame" name="TRANS_frame">
       <property name="geometry">
        <rect>
-        <x>900</x>
+        <x>1260</x>
         <y>680</y>
         <width>631</width>
         <height>251</height>

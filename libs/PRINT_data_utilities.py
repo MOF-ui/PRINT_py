@@ -76,24 +76,24 @@ class Coordinate:
 
         try:
             return round( Coordinate( (self.x        + summand.x)
-                                      ,(self.y        + summand.y)
-                                      ,(self.z        + summand.z)
-                                      ,(self.rx       + summand.rx)
-                                      ,(self.ry       + summand.ry)
-                                      ,(self.rz       + summand.rz)
-                                      ,(self.q        + summand.q)
-                                      ,(self.ext      + summand.ext) )
-                         , 6)
+                                     ,(self.y        + summand.y)
+                                     ,(self.z        + summand.z)
+                                     ,(self.rx       + summand.rx)
+                                     ,(self.ry       + summand.ry)
+                                     ,(self.rz       + summand.rz)
+                                     ,(self.q        + summand.q)
+                                     ,(self.ext      + summand.ext) )
+                         , 2)
         except AttributeError:
             return round( Coordinate( (self.x        + summand)
-                                      ,(self.y        + summand)
-                                      ,(self.z        + summand)
-                                      ,(self.rx       + summand)
-                                      ,(self.ry       + summand)
-                                      ,(self.rz       + summand)
-                                      ,(self.q        + summand)
-                                      ,(self.ext      + summand) )
-                         , 6)
+                                     ,(self.y        + summand)
+                                     ,(self.z        + summand)
+                                     ,(self.rx       + summand)
+                                     ,(self.ry       + summand)
+                                     ,(self.rz       + summand)
+                                     ,(self.q        + summand)
+                                     ,(self.ext      + summand) )
+                         , 2)
     
 
 
@@ -101,37 +101,37 @@ class Coordinate:
 
         try:
             return round( Coordinate( (self.x        - subtrahend.x)
-                                      ,(self.y        - subtrahend.y)
-                                      ,(self.z        - subtrahend.z)
-                                      ,(self.rx       - subtrahend.rx)
-                                      ,(self.ry       - subtrahend.ry)
-                                      ,(self.rz       - subtrahend.rz)
-                                      ,(self.q        - subtrahend.q)
-                                      ,(self.ext      - subtrahend.ext) )
-                        , 6)
+                                     ,(self.y        - subtrahend.y)
+                                     ,(self.z        - subtrahend.z)
+                                     ,(self.rx       - subtrahend.rx)
+                                     ,(self.ry       - subtrahend.ry)
+                                     ,(self.rz       - subtrahend.rz)
+                                     ,(self.q        - subtrahend.q)
+                                     ,(self.ext      - subtrahend.ext) )
+                        , 2)
         except AttributeError:
             return round( Coordinate( (self.x        - subtrahend)
-                                      ,(self.y        - subtrahend)
-                                      ,(self.z        - subtrahend)
-                                      ,(self.rx       - subtrahend)
-                                      ,(self.ry       - subtrahend)
-                                      ,(self.rz       - subtrahend)
-                                      ,(self.q        - subtrahend)
-                                      ,(self.ext      - subtrahend) )
-                        , 6)
+                                     ,(self.y        - subtrahend)
+                                     ,(self.z        - subtrahend)
+                                     ,(self.rx       - subtrahend)
+                                     ,(self.ry       - subtrahend)
+                                     ,(self.rz       - subtrahend)
+                                     ,(self.q        - subtrahend)
+                                     ,(self.ext      - subtrahend) )
+                        , 2)
     
 
 
     def __round__(self, digits):
         
         return Coordinate( round(self.x,   digits) 
-                           ,round(self.y,   digits)
-                           ,round(self.z,   digits)
-                           ,round(self.rx,  digits)
-                           ,round(self.ry,  digits)
-                           ,round(self.rz,  digits)
-                           ,round(self.q,   digits)
-                           ,round(self.ext, digits) )
+                          ,round(self.y,   digits)
+                          ,round(self.z,   digits)
+                          ,round(self.rx,  digits)
+                          ,round(self.ry,  digits)
+                          ,round(self.rz,  digits)
+                          ,round(self.q,   digits)
+                          ,round(self.ext, digits) )
     
 
 
@@ -375,6 +375,9 @@ class QEntry:
         __init__\n
         __str__\n
         __eq__
+
+        printShort:
+            prints only most important parameters
     """
 
     def __init__(self,
@@ -435,6 +438,12 @@ class QEntry:
 
         except AttributeError:
             return False
+    
+
+
+    def printShort(self):
+
+        return  f"ID: {self.id} -- {self.mt}, {self.pt} -- COOR_1: {self.Coor1} -- SV: {self.Speed} -- PMODE:  {self.pMode}"
 
 
 
@@ -548,7 +557,7 @@ class Queue:
 
         if (len(self.queue) != 0):
             ans = []
-            for x in self.queue: ans.append( str(x) )
+            for x in self.queue: ans.append( x.printShort() )
             return ans
         return ["Queue is empty!"]
 
@@ -1082,7 +1091,7 @@ class TCPIP:
         """ sends data to server, packing according to robots protocol, additional function for pump needed """
 
         message = [] 
-        if( not self.connected ): return ConnectionError, None
+        if( not self.connected ): return ConnectionError, 0
 
         try:
             message = struct.pack('<iccffffffffffffffffiiiiiciiiiiiiiiiiiiiiii'
@@ -1129,16 +1138,16 @@ class TCPIP:
                                   ,entry.Tool.time_id
                                   ,entry.Tool.time_time)
             
-            if(len(message) != self.w_bl):  return ValueError,len(message) 
+            if(len(message) != self.w_bl):  return ValueError, len(message) 
             
             try:                self.Socket.sendall(message)
-            except OSError:     return OSError,None
+            except OSError:     return OSError, 0
             
             print(f"SEND:    {entry.id}, length: {len(message)}")
-            return True,len(message)
+            return True, len(message)
         
         except Exception as err:
-            return err,None
+            return err, 0
 
 
 
@@ -1335,6 +1344,8 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
                 entry.Coor1.ext =  float( ext[3:] .replace(',','.') )
                 entry.Coor1.ext += zero.ext
             
+            entry.Coor1 = round( entry.Coor1, 2 )
+            
         case 'G28':
             entry = QEntry( id = 0, Coor1 = pos, Speed = speed, z  = zone)
             if ('X0'   in txt):   entry.Coor1.x   = zero.x
@@ -1445,11 +1456,11 @@ def createLogfile():
 def addToCommProtocol(txt):
     """ puts entries in terminal list an keep its length below TERM_maxLen"""
     global TERM_log
-    global TERM_maxLen
+    global DEF_TERM_MAX_LINES
 
     TERM_log.append(txt)
 
-    if ( len(TERM_log) > TERM_maxLen ):   TERM_log.__delitem__(0)
+    if ( len(TERM_log) > DEF_TERM_MAX_LINES ):   TERM_log.__delitem__(0)
     
 
 
@@ -1465,7 +1476,7 @@ def addToCommProtocol(txt):
 DEF_TCP_ROB =      { "IP":       "192.168.125.1"
                     ,"PORT":     10001
                     ,"C_TOUT":   60000
-                    ,"RW_TOUT":  10
+                    ,"RW_TOUT":  5
                     ,"R_BL":     36
                     ,"W_BL":     159 }
 
@@ -1489,6 +1500,8 @@ DEF_DC_SPEED        = SpeedVector()
 DEF_IO_ZONE         = 10
 DEF_IO_FR_TO_TS     = 0.1
 
+DEF_ICQ_MAX_LINES   = 200
+
 DEF_PRIN_SPEED      = SpeedVector()
 
 DEF_PUMP_LPS        = 0.5
@@ -1496,7 +1509,9 @@ DEF_PUMP_LPS        = 0.5
 DEF_ROB_COMM_FR     = 10
 
 DEF_SC_VOL_PER_MM   = 0.01
+DEF_SC_MAX_LINES    = 400
 
+DEF_TERM_MAX_LINES  = 400
 
 
 ############################ global variables
@@ -1540,6 +1555,7 @@ ROB_telem           = RoboTelemetry()
 ROB_lastTelem       = RoboTelemetry()
 ROB_movStartP       = Coordinate()
 ROB_movEndP         = Coordinate()
+ROB_sendList        = []
 ROB_liveAd          = 1.0
 
 SC_volPerMm         = DEF_SC_VOL_PER_MM
@@ -1551,4 +1567,3 @@ SC_qPrepEnd         = False
 STT_dataBlock       = DaqBlock()
 
 TERM_log            = []
-TERM_maxLen         = 400

@@ -40,35 +40,37 @@ class Mainframe_test(unittest.TestCase):
     def test_addGcodeSgl (self):
         global testFrame
 
+        UTIL.SC_queue.clear()
+
         # G1
         testFrame.SGLC_entry_gcodeSglComm.setText('G1 X1 Y2.2 EXT3 F40')
         testFrame.addGcodeSgl()
         self.assertEqual( UTIL.SC_queue.display() 
-                         ,[str( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
-                                            ,Speed= UTIL.SpeedVector( ts=4 ) ) )])
+                         ,[UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
+                                       ,Speed= UTIL.SpeedVector( ts=4 ) ).printShort()] )
         
         testFrame.SGLC_entry_gcodeSglComm.setText('G1 X1')
         UTIL.DC_currZero = UTIL.Coordinate(x= 1, y= 1)
         testFrame.addGcodeSgl( atID= True, ID= 1 )
         self.assertEqual( UTIL.SC_queue.display() 
-                         ,[ str( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2, y=1) ) )
-                           ,str( UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
-                                             ,Speed= UTIL.SpeedVector( ts=4 ) ) )])
+                         ,[ UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2, y=1) ).printShort()
+                           ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
+                                        ,Speed= UTIL.SpeedVector( ts=4 ) ).printShort() ])
         
         testFrame.addGcodeSgl( atID= True, ID= 2, fromFile= True, fileText= 'G1 Z1' )
         self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2, y= 1 ) ) )
-                           ,str( UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 2, y= 1, z= 1 ) ) )
-                           ,str( UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
-                                             ,Speed= UTIL.SpeedVector( ts=4 ) ) )])
+                         ,[ UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2, y= 1 ) ).printShort()
+                           ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 2, y= 1, z= 1 ) ).printShort()
+                           ,UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
+                                        ,Speed= UTIL.SpeedVector( ts=4 ) ).printShort()])
         
         testFrame.addGcodeSgl( atID= False, ID=0, fromFile= True, fileText= 'G1 X1.2' )
         self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2, y= 1 ) ) )
-                           ,str( UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 2, y= 1, z= 1 ) ) )
-                           ,str( UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
-                                             ,Speed= UTIL.SpeedVector( ts=4 ) ) )
-                           ,str( UTIL.QEntry( id= 4 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext=3 ) ) )])
+                         ,[ UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2, y= 1 ) ).printShort()
+                           ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 2, y= 1, z= 1 ) ).printShort()
+                           ,UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
+                                        ,Speed= UTIL.SpeedVector( ts=4 ) ).printShort()
+                           ,UTIL.QEntry( id= 4 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext=3 ) ).printShort()])
         
         # G28 & G92
         testFrame.addGcodeSgl( atID= False, ID= 0, fromFile= True, fileText= 'G92 Y0 EXT0')
@@ -76,12 +78,12 @@ class Mainframe_test(unittest.TestCase):
 
         testFrame.addGcodeSgl( atID= False, ID=0, fromFile= True, fileText= 'G28 Y0 EXT0' )
         self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2, y= 1 ) ) )
-                           ,str( UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 2, y= 1, z= 1 ) ) )
-                           ,str( UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
-                                             ,Speed= UTIL.SpeedVector( ts=4 ) ) )
-                           ,str( UTIL.QEntry( id= 4 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext=3 ) ) )
-                           ,str( UTIL.QEntry( id= 5 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext=3 ) ) )])
+                         ,[ UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2, y= 1 ) ).printShort()
+                           ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 2, y= 1, z= 1 ) ).printShort()
+                           ,UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
+                                        ,Speed= UTIL.SpeedVector( ts=4 ) ).printShort()
+                           ,UTIL.QEntry( id= 4 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext=3 ) ).printShort()
+                           ,UTIL.QEntry( id= 5 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext=3 ) ).printShort()])
         
         testFrame.addGcodeSgl( atID= True, ID= 3, fromFile= True, fileText= 'G92 X0 Y0 Z0')
         self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate(x= 2, y=1, z=1, ext= 3) )
@@ -99,26 +101,26 @@ class Mainframe_test(unittest.TestCase):
                                                   [4,50,50,50],z10,tool0 EXT:3;')
         testFrame.addRapidSgl()
         self.assertEqual( UTIL.SC_queue.display() 
-                         ,[str( UTIL.QEntry( id= 1, pt= 'Q', Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3)
-                                            ,Speed= UTIL.SpeedVector( ts=4 ) ) )])
+                         ,[UTIL.QEntry( id= 1, pt= 'Q', Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3)
+                                       ,Speed= UTIL.SpeedVector( ts=4 ) ).printShort()])
         
         testFrame.SGLC_entry_rapidSglComm.setText('MoveL [[1.0,0.0,0.0][0.0,0.0,0.0,0.0]],\
                                                   [200,50,50,50],z10,tool0 EXT:0.0;')
         testFrame.addRapidSgl( atID= True, ID= 1 )
         self.assertEqual( UTIL.SC_queue.display() 
-                         ,[ str( UTIL.QEntry( id= 1, pt= 'Q', Coor1= UTIL.Coordinate(x= 1) ) )
-                           ,str( UTIL.QEntry( id= 2, pt= 'Q', Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
-                                             ,Speed= UTIL.SpeedVector( ts=4 ) ) )])
+                         ,[ UTIL.QEntry( id= 1, pt= 'Q', Coor1= UTIL.Coordinate(x= 1) ).printShort()
+                           ,UTIL.QEntry( id= 2, pt= 'Q', Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
+                                        ,Speed= UTIL.SpeedVector( ts=4 ) ).printShort()])
         
         UTIL.DC_currZero = UTIL.Coordinate(z= 1)
         testFrame.addRapidSgl( atID= True, ID= 2, fromFile= True
                               ,fileText= 'MoveL Offs(pHome,0.0,0.0,1.0),[200,50,50,50],z10,\
                                           tool0 EXT:0;')
         self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id= 1, pt= 'Q', Coor1= UTIL.Coordinate(x= 1) ) )
-                           ,str( UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(z= 2 ) ) )
-                           ,str( UTIL.QEntry( id= 3, pt= 'Q', Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
-                                             ,Speed= UTIL.SpeedVector( ts=4 ) ) )])
+                         ,[ UTIL.QEntry( id= 1, pt= 'Q', Coor1= UTIL.Coordinate(x= 1) ).printShort()
+                           ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(z= 2 ) ).printShort()
+                           ,UTIL.QEntry( id= 3, pt= 'Q', Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
+                                             ,Speed= UTIL.SpeedVector( ts=4 ) ).printShort()])
 
         UTIL.DC_currZero = UTIL.Coordinate()
         UTIL.SC_queue.clear()
@@ -138,47 +140,47 @@ class Mainframe_test(unittest.TestCase):
 
         testFrame.addSIB(number= 1, atEnd= False )
         self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 1, y= 2, z= 3, ext= 500)
-                                             ,Speed= UTIL.SpeedVector(ts= 400) ) ) 
-                           ,str( UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 6, y= 7, z= 8, ext= 990)
-                                             ,Speed= UTIL.SpeedVector(ts= 900) ) ) ] )
+                         ,[ UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 1, y= 2, z= 3, ext= 500)
+                                        ,Speed= UTIL.SpeedVector(ts= 400) ).printShort() 
+                           ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 6, y= 7, z= 8, ext= 990)
+                                        ,Speed= UTIL.SpeedVector(ts= 900) ).printShort() ] )
         
         UTIL.DC_currZero = UTIL.Coordinate(x= 1)
         testFrame.addSIB(number= 2, atEnd=True)
         self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 1, y= 2, z= 3, ext= 500)
-                                             ,Speed= UTIL.SpeedVector(ts= 400) ) ) 
-                           ,str( UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 6, y= 7, z= 8, ext= 990)
-                                             ,Speed= UTIL.SpeedVector(ts= 900) ) )  
-                           ,str( UTIL.QEntry( id= 3, pt= 'Q'
-                                             ,Coor1= UTIL.Coordinate( x= 1.1, y= 2.2, z= 3.3, rx= 4.4, ry= 5.5
-                                                                     ,rz= 6.6, q= 7.7, ext= 600)
-                                             ,Speed= UTIL.SpeedVector(ts= 18, os= 19, acr= 20, dcr= 21), z= 50 ) )  
-                           ,str( UTIL.QEntry( id= 4, mt= 'J'
-                                             ,Coor1= UTIL.Coordinate( x= 8, y= 8, z= 9, ext= 160)
-                                             ,Speed= UTIL.SpeedVector(ts= 110, os= 120, acr= 130, dcr= 140), z= 15 ) ) ] )
+                         ,[ UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 1, y= 2, z= 3, ext= 500)
+                                        ,Speed= UTIL.SpeedVector(ts= 400) ).printShort()
+                           ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 6, y= 7, z= 8, ext= 990)
+                                        ,Speed= UTIL.SpeedVector(ts= 900) ).printShort()
+                           ,UTIL.QEntry( id= 3, pt= 'Q'
+                                        ,Coor1= UTIL.Coordinate( x= 1.1, y= 2.2, z= 3.3, rx= 4.4, ry= 5.5
+                                                                ,rz= 6.6, q= 7.7, ext= 600)
+                                        ,Speed= UTIL.SpeedVector(ts= 18, os= 19, acr= 20, dcr= 21), z= 50 ).printShort() 
+                           ,UTIL.QEntry( id= 4, mt= 'J'
+                                        ,Coor1= UTIL.Coordinate( x= 8, y= 8, z= 9, ext= 160)
+                                        ,Speed= UTIL.SpeedVector(ts= 110, os= 120, acr= 130, dcr= 140), z= 15 ).printShort() ] )
         
         UTIL.DC_currZero = UTIL.Coordinate(x= 1)
         testFrame.addSIB(number= 3, atEnd= False)
         self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id= 1, pt= 'Q'
-                                             ,Coor1= UTIL.Coordinate( x= 1.1, y= 2.2, z= 3.3, rx= 4.4, ry= 5.5
-                                                                     ,rz= 6.6, q= 7.7, ext= 600)
-                                             ,Speed= UTIL.SpeedVector(ts= 18, os= 19, acr= 20, dcr= 21), z= 50 ) )
-                           ,str( UTIL.QEntry( id= 2, mt= 'J'
-                                             ,Coor1= UTIL.Coordinate( x= 8, y= 8, z= 9, ext= 160)
-                                             ,Speed= UTIL.SpeedVector(ts= 110, os= 120, acr= 130, dcr= 140), z= 15 ) )
-                           ,str( UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 1, y= 2, z= 3, ext= 500)
-                                             ,Speed= UTIL.SpeedVector(ts= 400) ) ) 
-                           ,str( UTIL.QEntry( id= 4, Coor1= UTIL.Coordinate(x= 6, y= 7, z= 8, ext= 990)
-                                             ,Speed= UTIL.SpeedVector(ts= 900) ) )  
-                           ,str( UTIL.QEntry( id= 5, pt= 'Q'
-                                             ,Coor1= UTIL.Coordinate( x= 1.1, y= 2.2, z= 3.3, rx= 4.4, ry= 5.5
-                                                                     ,rz= 6.6, q= 7.7, ext= 600)
-                                             ,Speed= UTIL.SpeedVector(ts= 18, os= 19, acr= 20, dcr= 21), z= 50 ) )
-                           ,str( UTIL.QEntry( id= 6, mt= 'J'
-                                             ,Coor1= UTIL.Coordinate( x= 8, y= 8, z= 9, ext= 160)
-                                             ,Speed= UTIL.SpeedVector(ts= 110, os= 120, acr= 130, dcr= 140), z= 15 ) ) ] )
+                         ,[ UTIL.QEntry( id= 1, pt= 'Q'
+                                        ,Coor1= UTIL.Coordinate( x= 1.1, y= 2.2, z= 3.3, rx= 4.4, ry= 5.5
+                                                                ,rz= 6.6, q= 7.7, ext= 600)
+                                        ,Speed= UTIL.SpeedVector(ts= 18, os= 19, acr= 20, dcr= 21), z= 50 ).printShort()
+                           ,UTIL.QEntry( id= 2, mt= 'J'
+                                        ,Coor1= UTIL.Coordinate( x= 8, y= 8, z= 9, ext= 160)
+                                        ,Speed= UTIL.SpeedVector(ts= 110, os= 120, acr= 130, dcr= 140), z= 15 ).printShort()
+                           ,UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 1, y= 2, z= 3, ext= 500)
+                                        ,Speed= UTIL.SpeedVector(ts= 400) ).printShort()
+                           ,UTIL.QEntry( id= 4, Coor1= UTIL.Coordinate(x= 6, y= 7, z= 8, ext= 990)
+                                        ,Speed= UTIL.SpeedVector(ts= 900) ).printShort()
+                           ,UTIL.QEntry( id= 5, pt= 'Q'
+                                        ,Coor1= UTIL.Coordinate( x= 1.1, y= 2.2, z= 3.3, rx= 4.4, ry= 5.5
+                                                                ,rz= 6.6, q= 7.7, ext= 600)
+                                        ,Speed= UTIL.SpeedVector(ts= 18, os= 19, acr= 20, dcr= 21), z= 50 ).printShort()
+                           ,UTIL.QEntry( id= 6, mt= 'J'
+                                        ,Coor1= UTIL.Coordinate( x= 8, y= 8, z= 9, ext= 160)
+                                        ,Speed= UTIL.SpeedVector(ts= 110, os= 120, acr= 130, dcr= 140), z= 15 ).printShort() ] )
         
         UTIL.SC_queue.clear()
         UTIL.DC_currZero = UTIL.Coordinate()
@@ -265,15 +267,15 @@ class Mainframe_test(unittest.TestCase):
         testFrame.SCTRL_entry_clrByID.setText('2..4')
         testFrame.clrQueue(partial= True)
         self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 1) ) )
-                           ,str( UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 5) ) )
-                           ,str( UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 6) ) ) ] )
+                         ,[ UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 1) ).printShort()
+                           ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 5) ).printShort()
+                           ,UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 6) ).printShort() ] )
 
         testFrame.SCTRL_entry_clrByID.setText('2')
         testFrame.clrQueue(partial= True)
         self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 1) ) )
-                           ,str( UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 6) ) ) ] )
+                         ,[ UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 1) ).printShort()
+                           ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 6) ).printShort() ] )
 
         testFrame.clrQueue(partial= False)
         self.assertEqual( UTIL.SC_queue.display()
@@ -286,17 +288,21 @@ class Mainframe_test(unittest.TestCase):
 
         UTIL.DC_currZero = UTIL.Coordinate( x= 1, y= 2.2, z=3, rx=4, ry= 5, rz= 6, q= 7, ext= 8 )
         testFrame.DC_drpd_moveType.setCurrentText('LINEAR')
-        self.assertEqual( testFrame.homeCommand()[1]
-                         ,UTIL.QEntry( id= 1, z= 0, Coor1= UTIL.Coordinate( x= 1, y= 2.2, z= 3, rx= 4 
-                                                                           ,ry= 5, rz= 6, q= 7, ext= 8) ) )
-        self.assertTrue( UTIL.DC_robMoving )
-
-        UTIL.DC_robMoving = False
+        command = testFrame.homeCommand()[1]
+        self.assertEqual( command
+                         ,UTIL.QEntry( id= 1, z= 0
+                                      ,Coor1= UTIL.Coordinate( x= 1, y= 2.2, z= 3, rx= 4 
+                                                              ,ry= 5, rz= 6, q= 7, ext= 8) ) )
+        self.assertTrue             ( UTIL.DC_robMoving )
+        testFrame.commandTransmitted( command, True, 1, True, True )
+        UTIL.DC_robMoving  = False
+        
         testFrame.DC_drpd_moveType.setCurrentText('JOINT')
-        self.assertEqual( testFrame.homeCommand()[1]
+        command = testFrame.homeCommand()[1]
+        self.assertEqual( command
                          ,UTIL.QEntry( id= 2, z= 0, mt= 'J'
-                                          ,Coor1= UTIL.Coordinate( x= 1, y= 2.2, z= 3, rx= 4 
-                                                                  ,ry= 5, rz= 6, q= 7, ext= 8) ) )
+                                      ,Coor1= UTIL.Coordinate( x= 1, y= 2.2, z= 3, rx= 4 
+                                                              ,ry= 5, rz= 6, q= 7, ext= 8) ) )
         
         UTIL.DC_currZero    = UTIL.Coordinate()
         UTIL.SC_currCommId  = 1
@@ -366,7 +372,7 @@ class Mainframe_test(unittest.TestCase):
 
         # secondarily calls labelUpdate_onQueueChange
         self.assertEqual( testFrame.SCTRL_arr_queue.item(0).text()
-                         ,str(UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2.2, y= 1) )) )
+                         ,UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2.2, y= 1) ).printShort() )
         
         UTIL.SC_queue.clear()
     
@@ -440,14 +446,6 @@ class Mainframe_test(unittest.TestCase):
         UTIL.DC_currZero    = UTIL.Coordinate(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1)
         UTIL.ROB_telem      = UTIL.RoboTelemetry( 9.9, 10, UTIL.Coordinate(1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8) ) 
         testFrame.posUpdate( rawDataString= 'ABC', telem= UTIL.RoboTelemetry() )
-        
-        # following is outsourced to RobCommWorker from now 
-        # self.assertEqual( UTIL.ROB_telem.Coor, UTIL.Coordinate(1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8) )
-        # self.assertEqual( UTIL.STT_dataBlock.Robo.Coor, UTIL.Coordinate(1.0,2.1,3.2,4.3,5.4,6.5,7.6,8.7) )
-        # self.assertEqual( UTIL.ROB_telem.tSpeed, 9.9 )
-        # self.assertEqual( UTIL.STT_dataBlock.Robo.tSpeed, 9.9 )
-        # self.assertEqual( UTIL.ROB_telem.id, 10 )
-        # self.assertEqual( UTIL.STT_dataBlock.Robo.id, 10 )
 
         # labelUpdate_onReceive (called from posUpdate)
         self.assertEqual( testFrame.TCP_ROB_disp_readBuffer.text(), 'ABC' )
@@ -489,7 +487,6 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual( testFrame.TCP_PUMP1_disp_writeBuffer.text(),  'ABC')
         self.assertEqual( testFrame.TCP_PUMP1_disp_bytesWritten.text(), '3')
         self.assertEqual( testFrame.TCP_PUMP1_disp_readBuffer.text(),   'DEF')
-        self.assertEqual( testFrame.PUMP_disp_currSpeed.text(),         '1.1%')
 
 
 
@@ -499,10 +496,11 @@ class Mainframe_test(unittest.TestCase):
         UTIL.STT_dataBlock.Pump1 = UTIL.PumpTelemetry(1.1,2.2,3.3,4.4)
         testFrame.pump1Update(telem= UTIL.STT_dataBlock.Pump1)
 
-        self.assertEqual( testFrame.PUMP_disp_freq.text(), '1.1' )
-        self.assertEqual( testFrame.PUMP_disp_volt.text(), '2.2' )
-        self.assertEqual( testFrame.PUMP_disp_amps.text(), '3.3' )
-        self.assertEqual( testFrame.PUMP_disp_torq.text(), '4.4' )
+        self.assertEqual( testFrame.PUMP_disp_freq.text(),      '1.1' )
+        self.assertEqual( testFrame.PUMP_disp_volt.text(),      '2.2' )
+        self.assertEqual( testFrame.PUMP_disp_amps.text(),      '3.3' )
+        self.assertEqual( testFrame.PUMP_disp_torq.text(),      '4.4' )
+        self.assertEqual( testFrame.PUMP_disp_currSpeed.text(), '1.1%')
 
         UTIL.STT_dataBlock.Pump1 = UTIL.PumpTelemetry()
     
@@ -511,19 +509,15 @@ class Mainframe_test(unittest.TestCase):
     def test_sendCommand (self):
         global testFrame
 
-        UTIL.ROB_commQueue.clear()
-        UTIL.SC_queue.add( UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(y= 1.1)) )
-
-        testFrame.sendCommand( command= UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2)), DC= True )
-        self.assertEqual( UTIL.ROB_commQueue.display()
-                         ,[str(UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2)))] )
-        self.assertEqual( UTIL.SC_queue.display()
-                         ,[str(UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(y= 1.1)))] )
+        UTIL.SC_currCommId = 1
+        testFrame.commandTransmitted( command= UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2))
+                                     ,msg= True
+                                     ,numSend= 1
+                                     ,dc= True
+                                     ,noError= True )
         self.assertEqual( UTIL.SC_currCommId, 2 )
 
-        UTIL.ROB_commQueue.clear()
         UTIL.SC_currCommId = 1
-        UTIL.SC_queue.clear()
 
     
 
@@ -532,22 +526,29 @@ class Mainframe_test(unittest.TestCase):
 
         testFrame.DC_sld_stepWidth.setValue(1)
         testFrame.DC_drpd_moveType.setCurrentText('LINEAR')
-        self.assertEqual( str(testFrame.sendDCCommand(axis= 'X', dir= '+')[1])
-                         ,str(UTIL.QEntry( id= 1, z=0, Coor1= UTIL.Coordinate(x=1) ) ))
+
+        command = testFrame.sendDCCommand(axis= 'X', dir= '+')[1]
+        self.assertEqual( command, UTIL.QEntry( id= 1, z=0, Coor1= UTIL.Coordinate(x=1) ) )
         
         UTIL.DC_robMoving = False
+        testFrame.commandTransmitted( command, True, 1, True, True )
         testFrame.DC_sld_stepWidth.setValue(2)
         testFrame.DC_drpd_moveType.setCurrentText('JOINT')
-        self.assertEqual( testFrame.sendDCCommand(axis= 'Y', dir= '-')[1]
-                         ,UTIL.QEntry( id= 2, mt='J',z=0, Coor1= UTIL.Coordinate(y= -10) ) )
+
+        command = testFrame.sendDCCommand(axis= 'Y', dir= '-')[1]
+        self.assertEqual( command, UTIL.QEntry( id= 2, mt='J',z=0, Coor1= UTIL.Coordinate(y= -10) ) )
 
         UTIL.DC_robMoving = False
+        testFrame.commandTransmitted( command, True, 1, True, True )
         testFrame.DC_sld_stepWidth.setValue(3)
-        self.assertEqual( testFrame.sendDCCommand(axis= 'Z', dir= '+')[1]
-                         ,UTIL.QEntry( id= 3, mt='J',z=0, Coor1= UTIL.Coordinate(z= 100) ) )
+
+        command = testFrame.sendDCCommand(axis= 'Z', dir= '+')[1]
+        self.assertEqual( command, UTIL.QEntry( id= 3, mt='J',z=0, Coor1= UTIL.Coordinate(z= 100) ) )
         
         UTIL.DC_robMoving = False
+        testFrame.commandTransmitted( command, True, 1, True, True )
         self.assertRaises( ValueError, testFrame.sendDCCommand, axis= 'A', dir= '+' )
+        
         UTIL.DC_robMoving = False
         self.assertRaises( ValueError, testFrame.sendDCCommand, axis= 'X', dir= '/' )
 
@@ -561,20 +562,20 @@ class Mainframe_test(unittest.TestCase):
 
         testFrame.TERM_entry_gcodeInterp.setText('G1 Y2.2')
         UTIL.ROB_telem.Coor = UTIL.Coordinate( 1,1,1,1,1,1,1,1 )
-        UTIL.DC_currZero = UTIL.Coordinate( y= 1 )
+        UTIL.DC_currZero    = UTIL.Coordinate( y= 1 )
 
-        self.assertEqual( testFrame.sendGcodeCommand()[1]
-                         ,UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate( x= 1, y= 3.2, z= 1, rx= 1
-                                                                     ,ry= 1, rz= 1, q= 1, ext= 1 ) ) )
+        command = testFrame.sendGcodeCommand()[1]
+        self.assertEqual( command, UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate( x= 1, y= 3.2, z= 1, rx= 1
+                                                                              ,ry= 1, rz= 1, q= 1, ext= 1 ) ) )
         
         UTIL.DC_robMoving = False
+        testFrame.commandTransmitted(command, True, 1, True, True)
         testFrame.TERM_entry_gcodeInterp.setText('G1 X1 Z3')
         UTIL.ROB_telem.Coor = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
-        UTIL.DC_currZero = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
+        UTIL.DC_currZero    = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
 
-        UTIL.DC_robMoving = False
-        self.assertEqual( testFrame.sendGcodeCommand()[1]
-                         ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate( 2.1,2.2,6.3,4.4,5.5,6.6,7.7,8.8 ) ) )
+        command = testFrame.sendGcodeCommand()[1]
+        self.assertEqual( command, UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate( 2.1,2.2,6.3,4.4,5.5,6.6,7.7,8.8 ) ) )
         
         UTIL.DC_robMoving = False
         UTIL.ROB_telem.Coor = UTIL.Coordinate()
@@ -594,16 +595,18 @@ class Mainframe_test(unittest.TestCase):
         testFrame.NC_float_ext.setValue(7)
         testFrame.DC_drpd_moveType.setCurrentText('LINEAR')
         
-        self.assertEqual( testFrame.sendNCCommand([1,2,3])[1]
-                         ,UTIL.QEntry( id= 1, z=0, Coor1= UTIL.Coordinate(x= 1, y= 2.2, z= 3) ) )
+        command = testFrame.sendNCCommand([1,2,3])[1]
+        self.assertEqual( command, UTIL.QEntry( id= 1, z=0, Coor1= UTIL.Coordinate(x= 1, y= 2.2, z= 3) ) )
         
         UTIL.DC_robMoving = False
+        testFrame.commandTransmitted( command, True, 1, True, True )
         UTIL.ROB_telem.Coor = UTIL.Coordinate( 1,1,1,1,1,1,0,1 )
         testFrame.DC_drpd_moveType.setCurrentText('JOINT')
-        self.assertEqual( testFrame.sendNCCommand([4,5,6,8])[1]
-                         ,UTIL.QEntry( id= 2, mt= 'J', z= 0
-                                      ,Coor1= UTIL.Coordinate( x= 1, y= 1, z= 1, rx= 4
-                                                              ,ry= 5, rz= 6, ext= 7) ) )
+
+        command = testFrame.sendNCCommand([4,5,6,8])[1]
+        self.assertEqual( command, 
+                          UTIL.QEntry( id= 2, mt= 'J', z= 0 
+                                      ,Coor1= UTIL.Coordinate( x= 1, y= 1, z= 1, rx= 4, ry= 5, rz= 6, ext= 7) ) )
         
         UTIL.DC_robMoving = False
         UTIL.ROB_telem.Coor = UTIL.Coordinate()
@@ -676,11 +679,18 @@ class Mainframe_test(unittest.TestCase):
     def test_systemStopCommands (self):
         global testFrame
 
-        self.assertEqual( testFrame.forcedStopCommand()[1], UTIL.QEntry( id= 0, mt= 'S' ) )
-        self.assertEqual( testFrame.robotStopCommand()[1],  UTIL.QEntry( id= 1, mt= 'E' ) )
+        command = testFrame.forcedStopCommand()[1]
+        self.assertEqual( command, UTIL.QEntry( id= 1, mt= 'S' ) )
+
+        testFrame.commandTransmitted(command, True, 1, True, True)
+        command = testFrame.robotStopCommand()[1]
+        self.assertEqual( command, UTIL.QEntry( id= 1, mt= 'E' ) )
+
+        testFrame.commandTransmitted(command, True, 1, True, True)
         testFrame.robotStopCommand(directly= False)
+
         self.assertEqual( UTIL.SC_queue.display()
-                         ,[ str(UTIL.QEntry( id= 3, mt= 'E' ))] )
+                         ,[UTIL.QEntry( id= 3, mt= 'E' ).printShort()] )
         
         UTIL.SC_currCommId = 1
         UTIL.SC_queue.clear()

@@ -161,8 +161,8 @@ class UTIL_test(unittest.TestCase):
         
         # display
         self.assertEqual( testQueue.display() ,
-                          [ str( UTIL.QEntry(id= 1) )
-                           ,str( UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3))) ] )
+                          [ UTIL.QEntry(id= 1).printShort()
+                           ,UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort() ] )
 
         self.assertEqual( emptyQueue.display()
                          ,["Queue is empty!"])
@@ -170,8 +170,8 @@ class UTIL_test(unittest.TestCase):
         # increment
         testQueue.increment()
         self.assertEqual( testQueue.display() ,
-                          [ str( UTIL.QEntry(id= 2) )
-                           ,str( UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3))) ] )
+                          [ UTIL.QEntry(id= 2).printShort() 
+                           ,UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort() ] )
         
         # add
         self.assertEqual( testQueue.add( UTIL.QEntry( id= -1 ) )
@@ -180,20 +180,20 @@ class UTIL_test(unittest.TestCase):
         testQueue.add( UTIL.QEntry( id= 0, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)) )
         testQueue.add( UTIL.QEntry( id= 9, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5)) )
         self.assertEqual( testQueue.display() 
-                         ,[ str( UTIL.QEntry(id= 2) )
-                           ,str( UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)))
-                           ,str( UTIL.QEntry(id= 4, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)))
-                           ,str( UTIL.QEntry(id= 5, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5))) ] )
+                         ,[ UTIL.QEntry(id= 2).printShort()
+                           ,UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort()
+                           ,UTIL.QEntry(id= 4, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)).printShort()
+                           ,UTIL.QEntry(id= 5, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5)).printShort() ] )
         
         testQueue.add( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(1,1,1,1,1,1,1,1)))
         testQueue.add( UTIL.QEntry( id= 4, Coor1= UTIL.Coordinate(6,6,6,6,6,6,6,6)))
         self.assertEqual( testQueue.display() ,
-                          [ str( UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(1,1,1,1,1,1,1,1)))
-                           ,str( UTIL.QEntry(id= 3) )
-                           ,str( UTIL.QEntry(id= 4, Coor1= UTIL.Coordinate(6,6,6,6,6,6,6,6)))
-                           ,str( UTIL.QEntry(id= 5, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)))
-                           ,str( UTIL.QEntry(id= 6, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)))
-                           ,str( UTIL.QEntry(id= 7, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5))) ] )
+                          [ UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(1,1,1,1,1,1,1,1)).printShort()
+                           ,UTIL.QEntry(id= 3).printShort()
+                           ,UTIL.QEntry(id= 4, Coor1= UTIL.Coordinate(6,6,6,6,6,6,6,6)).printShort()
+                           ,UTIL.QEntry(id= 5, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort()
+                           ,UTIL.QEntry(id= 6, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)).printShort()
+                           ,UTIL.QEntry(id= 7, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5)).printShort() ] )
         
         # clear
         self.assertEqual( testQueue.clear(all= False, ID= ''),      ValueError )
@@ -207,16 +207,16 @@ class UTIL_test(unittest.TestCase):
 
         testQueue.clear(all= False, ID = '4')
         self.assertEqual( testQueue.display()
-                         ,[ str( UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(1,1,1,1,1,1,1,1)))
-                           ,str( UTIL.QEntry(id= 3) )
-                           ,str( UTIL.QEntry(id= 4, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)))
-                           ,str( UTIL.QEntry(id= 5, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)))
-                           ,str( UTIL.QEntry(id= 6, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5))) ] )
+                         ,[ UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(1,1,1,1,1,1,1,1)).printShort()
+                           ,UTIL.QEntry(id= 3).printShort()
+                           ,UTIL.QEntry(id= 4, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort()
+                           ,UTIL.QEntry(id= 5, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)).printShort()
+                           ,UTIL.QEntry(id= 6, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5)).printShort() ] )
         
         testQueue.clear(all= False, ID = '3..5')
         self.assertEqual( testQueue.display()
-                         ,[ str( UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(1,1,1,1,1,1,1,1)))
-                           ,str( UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5))) ] )
+                         ,[ UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(1,1,1,1,1,1,1,1)).printShort()
+                           ,UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5)).printShort() ] )
         
         testQueue.clear()
         self.assertEqual( testQueue.display()
@@ -227,10 +227,9 @@ class UTIL_test(unittest.TestCase):
 
         testQueue.add( UTIL.QEntry() )
         testQueue.add( UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)) )
-        self.assertEqual( testQueue.popFirstItem()
-                         ,UTIL.QEntry(id= 1) )
+        self.assertEqual( testQueue.popFirstItem(), UTIL.QEntry(id= 1) )
         self.assertEqual( testQueue.display()
-                         ,[ str( UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3))) ] )
+                         ,[ UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort() ] )
         
 
 
@@ -340,7 +339,7 @@ class UTIL_test(unittest.TestCase):
         
         # send
         self.assertEqual( testTCPIP.send( UTIL.QEntry(id= 1) )
-                         ,(ConnectionError, None) )
+                         ,(ConnectionError, 0) )
         
         testTCPIP.connected = True
         self.assertEqual( testTCPIP.send( UTIL.QEntry(id= 1) ) 
@@ -348,7 +347,7 @@ class UTIL_test(unittest.TestCase):
         
         testTCPIP.w_bl = 159
         self.assertEqual( testTCPIP.send( UTIL.QEntry(id= 1) )
-                         ,(OSError, None) )
+                         ,(OSError, 0) )
 
         #receive
         self.assertEqual( testTCPIP.receive()
@@ -446,7 +445,7 @@ class UTIL_test(unittest.TestCase):
     def test_showOnTerminal_function (self):
         """ see showOnTerminal in libs/PRINT_data_utilities """
 
-        UTIL.TERM_maxLen = 1
+        UTIL.DEF_TERM_MAX_LINES = 1
         UTIL.addToCommProtocol('1')
         self.assertEqual(UTIL.TERM_log, ['1'])
 

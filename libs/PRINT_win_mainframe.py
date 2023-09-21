@@ -42,6 +42,7 @@ import libs.PRINT_data_utilities    as UTIL
 class Mainframe(QMainWindow, Ui_MainWindow):
     """ main UI of PRINT_py (further details pending) """
     
+
     logpath     = ''            # reference for logEntry, set by __init__
     testrun     = False         # switch for mainframe_test.py
     pump1Conn   = False         # switch to enable pump1
@@ -179,6 +180,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_btt_forcedStop.pressed.connect           ( self.forcedStopCommand )
         self.SCTRL_btt_startQProcessing.pressed.connect     ( self.startSCTRLQueue )
         self.SCTRL_btt_holdQProcessing.pressed.connect      ( lambda: self.stopSCTRLQueue   (prepEnd = True) )
+        self.SCTRL_num_liveAd_robot.valueChanged.connect    ( self.updateRobLiveAd )
         self.SCTRL_btt_addSIB1_atFront.pressed.connect      ( lambda: self.addSIB           (1) )
         self.SCTRL_btt_addSIB2_atFront.pressed.connect      ( lambda: self.addSIB           (2) )
         self.SCTRL_btt_addSIB3_atFront.pressed.connect      ( lambda: self.addSIB           (3) )
@@ -425,36 +427,36 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.roboCommThread = QThread()
         self.roboCommWorker = WORKERS.RoboCommWorker()
-        self.roboCommWorker.moveToThread            (self.roboCommThread)
-        self.roboCommThread.started.connect         (self.roboCommWorker.run)
-        self.roboCommThread.finished.connect        (self.roboCommWorker.stop)
-        self.roboCommThread.finished.connect        (self.roboCommWorker.deleteLater)
+        self.roboCommWorker.moveToThread            ( self.roboCommThread )
+        self.roboCommThread.started.connect         ( self.roboCommWorker.run )
+        self.roboCommThread.finished.connect        ( self.roboCommWorker.stop )
+        self.roboCommThread.finished.connect        ( self.roboCommWorker.deleteLater )
         self.roboCommWorker.dataReceived.connect    ( lambda: self.resetWatchdog(1) )
-        self.roboCommWorker.dataReceived.connect    (self.labelUpdate_onTerminalChange)
-        self.roboCommWorker.dataUpdated.connect     (self.posUpdate)
+        self.roboCommWorker.dataReceived.connect    ( self.labelUpdate_onTerminalChange )
+        self.roboCommWorker.dataUpdated.connect     ( self.posUpdate )
         self.roboCommWorker.endDcMoving.connect     ( lambda: self.switchRobMoving(end= True) )
-        self.roboCommWorker.endProcessing.connect   (self.stopSCTRLQueue)
-        self.roboCommWorker.logError.connect        (self.logEntry)
+        self.roboCommWorker.endProcessing.connect   ( self.stopSCTRLQueue )
+        self.roboCommWorker.logError.connect        ( self.logEntry )
         self.roboCommWorker.queueEmtpy.connect      ( lambda: self.stopSCTRLQueue(prepEnd= True) )
-        self.roboCommWorker.sendElem.connect        (self.sendCommand)
+        self.roboCommWorker.sendElem.connect        ( self.commandTransmitted )
 
         self.pumpCommThread = QThread()
         self.pumpCommWorker = WORKERS.PumpCommWorker()
-        self.pumpCommWorker.moveToThread            (self.pumpCommThread)
-        self.pumpCommThread.started.connect         (self.pumpCommWorker.run)
-        self.pumpCommThread.finished.connect        (self.pumpCommWorker.stop)
-        self.pumpCommThread.finished.connect        (self.pumpCommWorker.deleteLater)
-        self.pumpCommWorker.logError.connect        (self.logEntry)
-        self.pumpCommWorker.dataSend.connect        (self.pump1Send)
-        self.pumpCommWorker.dataReceived.connect    (self.pump1Update)
+        self.pumpCommWorker.moveToThread            ( self.pumpCommThread )
+        self.pumpCommThread.started.connect         ( self.pumpCommWorker.run )
+        self.pumpCommThread.finished.connect        ( self.pumpCommWorker.stop )
+        self.pumpCommThread.finished.connect        ( self.pumpCommWorker.deleteLater )
+        self.pumpCommWorker.logError.connect        ( self.logEntry )
+        self.pumpCommWorker.dataSend.connect        ( self.pump1Send )
+        self.pumpCommWorker.dataReceived.connect    ( self.pump1Update )
         self.pumpCommWorker.connActive.connect      ( lambda: self.resetWatchdog(2) )
 
         self.loadFileThread = QThread()
         self.loadFileWorker = WORKERS.LoadFileWorker()
-        self.loadFileWorker.moveToThread            (self.loadFileThread)
-        self.loadFileThread.started.connect         (self.loadFileWorker.start)
-        self.loadFileWorker.convFailed.connect      (self.loadFileFailed)
-        self.loadFileWorker.convFinished.connect    (self.loadFileFinished)
+        self.loadFileWorker.moveToThread            ( self.loadFileThread )
+        self.loadFileThread.started.connect         ( self.loadFileWorker.start )
+        self.loadFileWorker.convFailed.connect      ( self.loadFileFailed )
+        self.loadFileWorker.convFinished.connect    ( self.loadFileFinished )
 
         
     
@@ -633,14 +635,23 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          SETTINGS                                                 #
     #####################################################################################################
 
-    def updateCommForerun(self):
-        UTIL.ROB_commFr         = self.TCP_num_commForerun.value()
+    def updateCommForerun ( self ):
+        mutex.lock()
+        UTIL.ROB_commFr = self.TCP_num_commForerun.value()
+        mutex.unlock()
+    
+
+    def updateRobLiveAd ( self ):
+        mutex.lock()
+        UTIL.ROB_liveAd = self.SCTRL_num_liveAd_robot.value() / 100.0
+        mutex.unlock()
 
 
 
-    def applySettings(self):
+    def applySettings ( self ):
         """ load default settings to settings display """
         
+        mutex.lock()
         UTIL.SC_volPerMm        = self.SET_float_volPerMM.value()
         UTIL.IO_frToTs          = self.SET_float_frToMms.value()
         UTIL.PUMP1_literPerS    = self.SET_float_pumpVolFlow.value()
@@ -653,6 +664,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         UTIL.PRIN_speed.os      = self.SET_num_orientSpeed_print.value()
         UTIL.PRIN_speed.acr     = self.SET_num_accelRamp_print.value()
         UTIL.PRIN_speed.dcr     = self.SET_num_decelRamp_print.value()
+        mutex.unlock()
 
         self.logEntry('SETS',f"Settings updated -- ComFR: {UTIL.ROB_commFr}, VolPerMM: {UTIL.SC_volPerMm}"
                              f", FR2TS: {UTIL.IO_frToTs}, PVF: {UTIL.PUMP1_literPerS} IOZ: {UTIL.IO_zone}"
@@ -774,8 +786,17 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def labelUpdate_onQueueChange(self):
         """ show when new entries have been successfully placed in or taken from Queue """
 
+        listToDisplay   = UTIL.SC_queue.display()
+        maxLen          = UTIL.DEF_SC_MAX_LINES
+        length          = len(listToDisplay)
+        overlen         = length - maxLen
+
+        if( length > maxLen ):
+            listToDisplay           = listToDisplay[ 0 : maxLen ]
+            listToDisplay[maxLen-1] = f"{ overlen + 1 } further command are not display..." 
+
         self.SCTRL_arr_queue.clear()
-        self.SCTRL_arr_queue.addItems( UTIL.SC_queue.display() )
+        self.SCTRL_arr_queue.addItems( listToDisplay )
         if (self.SCTRL_chk_autoScroll.isChecked()):  self.SCTRL_arr_queue.scrollToBottom()
 
     
@@ -789,11 +810,22 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.TERM_arr_terminal.addItems ( UTIL.TERM_log )
         if (self.TERM_chk_autoScroll.isChecked()):  self.TERM_arr_terminal.scrollToBottom()
 
+        listToDisplay   = UTIL.ROB_commQueue.display()
+        maxLen          = UTIL.DEF_ICQ_MAX_LINES
+        length          = len(listToDisplay)
+        overlen         = length - maxLen
+
+        if( length > maxLen ):
+            listToDisplay           = listToDisplay[ 0 : maxLen ]
+            listToDisplay[maxLen-1] = f"{overlen} further command are not display..." 
+
         self.ICQ_arr_terminal.clear()
-        self.ICQ_arr_terminal.addItems  ( UTIL.ROB_commQueue.display() )
+        self.ICQ_arr_terminal.addItems  ( listToDisplay )
         if (self.ICQ_chk_autoScroll.isChecked()):  self.ICQ_arr_terminal.scrollToBottom()
 
     
+
+
 
     def labelUpdate_onNewZero(self):
         """ show when DC_zero has changed """
@@ -1385,28 +1417,25 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         command = UTIL.QEntry( id = 1
                               ,mt = 'S')
         
-        if (self.testrun): return self.sendCommand(command, DC = True)
+        if( self.testrun ): return self.sendCommand(command, DC = True)
         FSWarning = strdDialog('WARNING!\n\nRobot will stop after current movement!\n\
                                 OK to delete buffered commands on robot\n\
                                 Cancel to contuinue queue processing.'
                                 ,'FORCED STOP COMMIT')
         FSWarning.exec()
 
-        if(FSWarning.result()):
-            self.logEntry('SysC',f"FORCED STOP (user committed).")
-            if( UTIL.SC_qProcessing ): 
-                ans = self.sendCommand(command, DC = True)
-                self.stopSCTRLQueue()
+        if( FSWarning.result() ):
+            self.sendCommand(command, DC = True)
+            self.stopSCTRLQueue()
 
-                mutex.lock()
-                UTIL.SC_currCommId = UTIL.ROB_telem.id
-                mutex.unlock()
-                
-                return ans
+            mutex.lock()
+            UTIL.SC_currCommId = UTIL.ROB_telem.id
+            mutex.unlock()
+            
+            self.logEntry('SysC',f"FORCED STOP (user committed).")
         
         else:
             self.logEntry('SysC',f"user denied FS-Dialog, continuing...")
-            return None
     
 
 
@@ -1441,59 +1470,55 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                         SEND COMMANDS                                             #
     #####################################################################################################
     
-    def sendCommand(self,command, DC = False):
-        """ actual sendCommand function, uses the TCPIP class from utilies, handles errors (not done yet) """
+    def sendCommand (self, command, DC = False):
+        """ passing new commands to RoboCommWorker """
         
-        if (command == IndexError): return None
-        # if (not DC):                command.SV *= self.SCTRL_num_liveAd_robot.value() / 100.0
-        if( command.id > 3000 ): 
-            command.id -= 3000
-            if( command.id > 3000 ): command.id -= 3000
+        mutex.lock()
+        if( command.mt == 'S' ): UTIL.ROB_sendList.clear()
+        UTIL.ROB_sendList.append( (command, DC) )
+        mutex.unlock()
 
-        if (self.testrun):          msg, msgLen = True, 1
-
-        else:                       msg, msgLen = UTIL.ROB_tcpip.send(command)
+        return True, command
 
 
-        if (msg == True):
-            
-            mutex.lock()
 
-            UTIL.ROB_commQueue.add    (command)
-            UTIL.addToCommProtocol    (f"SEND:    ID: {command.id}  MT: {command.mt}  PT: {command.pt} \t|| COOR_1: {command.Coor1}"\
-                                       f"\n\t\t\t|| COOR_2: {command.Coor2}"\
-                                       f"\n\t\t\t|| SV:     {command.Speed} \t|| SBT: {command.sbt}   SC: {command.sc}   Z: {command.z}"\
-                                       f"\n\t\t\t|| TOOL:   {command.Tool}")
-            UTIL.SC_currCommId += 1
-            if (DC): UTIL.SC_queue.increment()
 
-            mutex.unlock()
-                
-            self.TCP_ROB_disp_writeBuffer.setText   (str(command))
-            self.TCP_ROB_disp_bytesWritten.setText  (str(msgLen))
+
+    def commandTransmitted (self, command, msg, numSend, dc, noError ):
+        """ handle UI update after new command was send """
+
+        if( noError ):
+            UTIL.SC_currCommId += numSend
+            if( UTIL.SC_currCommId > 3000 ):
+                mutex.lock() 
+                UTIL.SC_currCommId -= 3000
+                mutex.unlock()
+
+            if( dc ):   logTxt = f"{numSend} DC command(s) send"
+            else:       logTxt = f"{numSend} SC command(s) send"
+            self.logEntry( 'ComQ', logTxt )
 
             self.labelUpdate_onSend(command)
-            if (not DC): self.logEntry('ComQ',f"Command send  --  ID: {command.id}  MT: {command.mt}  PT: {command.pt}"
-                                              f"  --  COOR_1: {command.Coor1}  --  COOR_2: {command.Coor2}"
-                                              f"  --  SV: {command.Speed}  --  SBT: {command.sbt}   SC: {command.sc}"
-                                              f"  --  Z: {command.z}  --  TOOL: {command.Tool}  --  PMOD: {command.pMode}")
+            self.TCP_ROB_disp_writeBuffer.setText   (str(command))
+            self.TCP_ROB_disp_bytesWritten.setText  (str(numSend))
 
         elif (msg == ValueError):
-            self.logEntry('CONN','TCPIP class "ROB_tcpip" encountered ValueError in sendCommand, data length: ' + str(msgLen))
+            self.logEntry('CONN','TCPIP class "ROB_tcpip" encountered ValueError in sendCommand, data length: ' + str(numSend))
             self.TCP_ROB_disp_writeBuffer.setText   ('ValueError')
-            self.TCP_ROB_disp_bytesWritten.setText  (str(msgLen))
+            self.TCP_ROB_disp_bytesWritten.setText  (str(numSend))
+            UTIL.SC_currCommId += 1
         
         elif (msg == RuntimeError or msg == OSError):
             self.logEntry('CONN','TCPIP class "ROB_tcpip" encountered RuntimeError/OSError in sendCommand..')
             self.TCP_ROB_disp_writeBuffer.setText   ('RuntimeError/OSError')
-            self.TCP_ROB_disp_bytesWritten.setText  (str(msgLen))
+            self.TCP_ROB_disp_bytesWritten.setText  (str(numSend))
+            UTIL.SC_currCommId += 1
         
         else:
             self.logEntry('CONN','TCPIP class "ROB_tcpip" encountered ' + str(msg))
             self.TCP_ROB_disp_writeBuffer.setText   ('unspecified error')
-            self.TCP_ROB_disp_bytesWritten.setText  (str(msgLen))
-
-        return (msg, command)
+            self.TCP_ROB_disp_bytesWritten.setText  (str(numSend))
+            UTIL.SC_currCommId += 1
 
 
 

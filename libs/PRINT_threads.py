@@ -47,6 +47,8 @@ class PumpCommWorker(QObject):
 
 
 
+
+
     def run(self):
         """ start timer with standard operation on timeout,
             connect to pump via M-Tec Interface """
@@ -63,12 +65,16 @@ class PumpCommWorker(QObject):
 
 
 
+
+
     def stop(self):
         """ stop timer """
         
         self.loopTimer.stop()
         self.mtecInterface.stop()
         self.loopTimer.deleteLater()
+
+
 
 
 
@@ -90,6 +96,8 @@ class PumpCommWorker(QObject):
         else:
             self.logError.emit('CONN','Pump1 - Error during speed calculation for queue processing')
     
+
+
 
 
     def receive(self):
@@ -123,6 +131,7 @@ class PumpCommWorker(QObject):
 
 
 
+
 class RoboCommWorker(QObject):
     """ a worker object that check every 50 ms if the Robot queue has empty slots (according to ROBO_comm_forerun),
         emits signal to send data if so, beforehand
@@ -135,26 +144,37 @@ class RoboCommWorker(QObject):
     endProcessing   = pyqtSignal()
     logError        = pyqtSignal( str, str )
     queueEmtpy      = pyqtSignal()
-    sendElem        = pyqtSignal( UTIL.QEntry )
+    sendElem        = pyqtSignal( UTIL.QEntry, object, int, bool, bool )
 
 
 
     def run(self):
         """ start timer, receive and send on timeout """
 
+        self.commTimer = QTimer()
+        self.commTimer.setInterval      (10)
+        self.commTimer.timeout.connect  (self.receive)
+        self.commTimer.timeout.connect  (self.send)
+        self.commTimer.start()
+
         self.checkTimer = QTimer()
-        self.checkTimer.setInterval      (50)
-        self.checkTimer.timeout.connect  (self.receive)
-        self.checkTimer.timeout.connect  (self.send)
+        self.checkTimer.setInterval     (200)
+        self.checkTimer.timeout.connect (self.checkSC_queue)
         self.checkTimer.start()
+
 
 
 
     def stop(self):
         """ stop timer """
 
+        self.commTimer.stop()
+        self.commTimer.deleteLater()
+
         self.checkTimer.stop()
         self.checkTimer.deleteLater()    
+
+
 
 
 
@@ -163,11 +183,16 @@ class RoboCommWorker(QObject):
 
         telem,rawData,state = UTIL.ROB_tcpip.receive()
 
+        # check for ID overflow
+
         if (state == True):
             if(telem is not None): 
                 telem = round(telem, 1)
             self.dataReceived.emit()
 
+            if( telem.id < UTIL.ROB_lastTelem.id ): 
+                for x in UTIL.SC_queue.queue:  x.id -= 3000
+                
             mutex.lock()
             UTIL.addToCommProtocol(f"RECV:    ID {telem.id},   {telem.Coor}   ToolSpeed: {telem.tSpeed}")
 
@@ -179,6 +204,7 @@ class RoboCommWorker(QObject):
             
             # refresh data only if new
             if( telem != UTIL.ROB_lastTelem ):
+                    
 
                 # check if robot is processing a new command (length check to skip in first loop)
                 if( (telem.id != UTIL.ROB_lastTelem.id) and (len(UTIL.ROB_commQueue) > 0) ):
@@ -214,10 +240,12 @@ class RoboCommWorker(QObject):
             UTIL.addToCommProtocol(f"RECV:    error ({telem}) from TCPIP class ROB_tcpip, data: {rawData}")
             mutex.unlock()
         
+
+
     
     
-    def send(self):
-        """  signal mainframe to send queue element if qProcessing and robot queue has space """
+    def checkSC_queue (self):
+        """  add queue element to sendList if qProcessing and robot queue has space """
 
         lenSc  = len(UTIL.SC_queue)
         lenRob = len(UTIL.ROB_commQueue)
@@ -234,19 +262,71 @@ class RoboCommWorker(QObject):
         elif( UTIL.SC_qProcessing ):
             
             if( lenSc > 0 ):
-                if( (robId + UTIL.ROB_commFr) > UTIL.SC_queue[0].id ):
 
-                    mutex.lock()
-                    self.sendElem.emit( UTIL.SC_queue.popFirstItem() )
-                    mutex.unlock()
+                mutex.lock()
+                try:
+                    while( (robId + UTIL.ROB_commFr) > UTIL.SC_queue[0].id ):
+                        commTuple = ( UTIL.SC_queue.popFirstItem(), False )
+                        UTIL.ROB_sendList.append( commTuple ) 
+                except AttributeError:
+                    pass
+                mutex.unlock()
             
             else:
                 if( lenRob == 0 ):  self.endProcessing.emit()
                 else:               self.queueEmtpy.emit()
-        
+    
+
+
+
+
+    def send ( self, testrun= False ):
+        """ send sendList entries if not empty """
+
+        numToSend   = len( UTIL.ROB_sendList )
+        numSend     = 0
+        while( numToSend > 0 ):
+
+            commTuple   = UTIL.ROB_sendList.pop( 0 )
+            numToSend   = len( UTIL.ROB_sendList )
+            command     = commTuple[0]
+            directCtrl  = commTuple[1]
+
+            if    ( command == IndexError ):    break
+            while ( command.id > 3000 ):        command.id -= 3000
+
+            command.Speed.ts = int( command.Speed.ts * UTIL.ROB_liveAd )
+            
+            if( not testrun):   msg, msgLen = UTIL.ROB_tcpip.send(command)
+            else:               msg, msgLen = True, 159
+
+            if( msg ):
+                
+                numSend += 1
+                
+                mutex.lock()
+                UTIL.ROB_commQueue.add(command)
+                UTIL.addToCommProtocol(f"SEND:    ID: {command.id}  MT: {command.mt}  PT: {command.pt} \t|| COOR_1: {command.Coor1}"\
+                                       f"\n\t\t\t|| COOR_2: {command.Coor2}"\
+                                       f"\n\t\t\t|| SV:     {command.Speed} \t|| SBT: {command.sbt}   SC: {command.sc}   Z: {command.z}"\
+                                       f"\n\t\t\t|| TOOL:   {command.Tool}")
+                if( directCtrl ): UTIL.SC_queue.increment()
+                mutex.unlock()
+            
+            else: 
+                print(" Message Error ")
+                self.sendElem.emit(command, msg, msgLen, directCtrl, False)
+            
+            if( numToSend == 0 ):
+                print(" Block send ")
+                self.sendElem.emit(command, msg, numSend, directCtrl, True)
+            # else                :   self.sendElem.emit(command, msg, msgLen, directCtrl, False)
+
     
     
-    def checkRobCommZeroDist(self):
+
+
+    def checkRobCommZeroDist (self):
         """ calculates distance between next entry in ROB_commQueue and current position """
         if( len(UTIL.ROB_commQueue) == 1 ):
             return  m.sqrt(  m.pow( UTIL.ROB_commQueue[0].Coor1.x   - UTIL.ROB_telem.Coor.x, 2 )
@@ -262,6 +342,7 @@ class RoboCommWorker(QObject):
 
 
 
+
 class LoadFileWorker(QObject):
     """ worker converts .gcode or .mod into QEntries, outsourced to worker as 
         these files can have more than 10000 lines """
@@ -269,6 +350,7 @@ class LoadFileWorker(QObject):
     convFinished    = pyqtSignal( int, int, int )
     convFailed      = pyqtSignal( str )
     comList         = UTIL.Queue()
+
 
 
     def start(self):
@@ -360,6 +442,7 @@ class LoadFileWorker(QObject):
 
 
 
+
     def gcodeConv(self, ID, txt):
 
         # get text and position BEFORE PLANNED COMMAND EXECUTION
@@ -383,6 +466,7 @@ class LoadFileWorker(QObject):
         
         return entry, command
     
+
 
 
 
