@@ -248,6 +248,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ctrl_T     = QShortcut( 'Ctrl+T', self )
         self.ctrl_U     = QShortcut( 'Ctrl+U', self )
         self.ctrl_Raute = QShortcut( 'Ctrl+#', self )
+        self.ctrl_alt_I = QShortcut( 'Ctrl+Alt+I', self)
 
         # SCRIPT CONTROL
         self.ctrl_S.activated.connect       ( self.startSCTRLQueue )
@@ -255,6 +256,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ctrl_F.activated.connect       ( lambda: self.sendCommand    ( UTIL.SC_queue.popFirstItem() ) )
         self.ctrl_Raute.activated.connect   ( lambda: self.clrQueue(partial = False) )
         self.ctrl_Q.activated.connect       ( self.forcedStopCommand )
+        self.ctrl_alt_I.activated.connect   ( self.resetScId )
 
         # DIRECT CONTROL
         self.ctrl_U.activated.connect       ( lambda: self.sendDCCommand('X','+') )
@@ -1000,6 +1002,15 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #####################################################################################################
 
 
+    def resetScId(self):
+        """"""
+
+        mutex.lock()
+        UTIL.SC_currCommId = UTIL.ROB_telem.id + 1
+        mutex.unlock()
+   
+   
+   
     def startSCTRLQueue(self):
         """ set UI indicators, send the boring work of timing the command to our trusty threads """
 

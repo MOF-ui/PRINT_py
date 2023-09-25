@@ -473,6 +473,10 @@ class Queue:
                 increments all QEntry.ID to handle DC commands send before the queue
             add:
                 adds a new QEntry to queue, checks if QEntry.ID makes sense, places QEntry in queue according to the ID given
+            addList:
+                adds another queue, hopefully less time-consuming than a for loop with self.add
+            append:
+                other than '.add' this simply appends an entry indifferently to its ID
             clear:
                 deletes single or multiple QEntry from queue, adjusts following ID accordingly
             popFirstItem:
@@ -572,7 +576,8 @@ class Queue:
 
 
     def add(self, entry, threadCall= False):
-        """ adds a new QEntry to queue, checks if QEntry.ID makes sense, places QEntry in queue according to the ID given """
+        """ adds a new QEntry to queue, checks if QEntry.ID makes sense, places QEntry in queue according to the ID given 
+            threadCall option allows the first ID to be 0 """
 
         newEntry = copy.deepcopy(entry)
         lastItem = len(self.queue) - 1 
@@ -662,6 +667,14 @@ class Queue:
 
         return None
 
+
+
+    def append(self, entry):
+        """ other than '.add' this simply appends an entry indifferently to its ID """
+
+        newEntry = copy.deepcopy( entry )
+        self.queue.append( newEntry )
+        return None
     
 
 

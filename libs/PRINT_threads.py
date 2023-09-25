@@ -183,18 +183,23 @@ class RoboCommWorker(QObject):
 
         telem,rawData,state = UTIL.ROB_tcpip.receive()
 
-        # check for ID overflow
-
         if (state == True):
             if(telem is not None): 
                 telem = round(telem, 1)
             self.dataReceived.emit()
 
-            if( telem.id < UTIL.ROB_lastTelem.id ): 
-                for x in UTIL.SC_queue.queue:  x.id -= 3000
-                
             mutex.lock()
             UTIL.addToCommProtocol(f"RECV:    ID {telem.id},   {telem.Coor}   ToolSpeed: {telem.tSpeed}")
+
+            # check for ID overflow, reduce SC_queue IDs & get rid off ROB_commQueue entries with IDs at ~3000
+            if( telem.id < UTIL.ROB_lastTelem.id ): 
+                for x in UTIL.SC_queue.queue:  x.id -= 3000
+                id = UTIL.ROB_commQueue[0].id
+                while( id <= 3000 ): 
+                    UTIL.ROB_commQueue.popFirstItem()
+                    try:                id = UTIL.ROB_commQueue[0].id
+                    except Exception:   break
+
 
             # delete all finished command from ROB_commQueue
             try:
@@ -202,10 +207,10 @@ class RoboCommWorker(QObject):
             except AttributeError:
                 pass
             
+
             # refresh data only if new
             if( telem != UTIL.ROB_lastTelem ):
                     
-
                 # check if robot is processing a new command (length check to skip in first loop)
                 if( (telem.id != UTIL.ROB_lastTelem.id) and (len(UTIL.ROB_commQueue) > 0) ):
                     UTIL.ROB_movStartP  = UTIL.ROB_movEndP
@@ -262,10 +267,9 @@ class RoboCommWorker(QObject):
         elif( UTIL.SC_qProcessing ):
             
             if( lenSc > 0 ):
-
                 mutex.lock()
                 try:
-                    while( (robId + UTIL.ROB_commFr) > UTIL.SC_queue[0].id ):
+                    while( (robId + UTIL.ROB_commFr) >= UTIL.SC_queue[0].id ):
                         commTuple = ( UTIL.SC_queue.popFirstItem(), False )
                         UTIL.ROB_sendList.append( commTuple ) 
                 except AttributeError:
@@ -305,7 +309,7 @@ class RoboCommWorker(QObject):
                 numSend += 1
                 
                 mutex.lock()
-                UTIL.ROB_commQueue.add(command)
+                UTIL.ROB_commQueue.append(command)
                 UTIL.addToCommProtocol(f"SEND:    ID: {command.id}  MT: {command.mt}  PT: {command.pt} \t|| COOR_1: {command.Coor1}"\
                                        f"\n\t\t\t|| COOR_2: {command.Coor2}"\
                                        f"\n\t\t\t|| SV:     {command.Speed} \t|| SBT: {command.sbt}   SC: {command.sc}   Z: {command.z}"\
@@ -435,8 +439,8 @@ class LoadFileWorker(QObject):
             # set the last entry to pMode=end
             self.comList[ len(self.comList) - 1 ].pMode = 'end'
 
-        UTIL.SC_queue.addList( self.comList )
-        self.convFinished.emit( lineID, startID, skips )
+        UTIL.SC_queue.addList  ( self.comList )
+        self.convFinished.emit ( lineID, startID, skips )
         LFW_running = False
 
 
