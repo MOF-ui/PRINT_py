@@ -57,7 +57,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                           SETUP                                                   #
     #####################################################################################################
     
-    def __init__(self, lpath = None, connDef = (False,False), testrun = False, parent=None):
+    def __init__ ( self, lpath = None, connDef = (False,False), testrun = False, parent=None ):
         """ setup main window """
 
         super().__init__(parent)
@@ -138,7 +138,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def connectMainSignals(self):
+    def connectMainSignals ( self ):
         """ create signal-slot-links for UI buttons """
 
         # DIRECT CONTROL
@@ -195,6 +195,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # SETTINGS
         self.SET_btt_apply.pressed.connect                  ( self.applySettings )
         self.SET_btt_default.pressed.connect                ( self.loadDefaults )
+        self.SID_btt_robToProgID.pressed.connect            ( self.robToProgID )
         self.TCP_num_commForerun.valueChanged.connect       ( self.updateCommForerun )
 
         # SINGLE COMMAND
@@ -226,7 +227,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def connectShortSignals(self, setup = False):
+    def connectShortSignals ( self, setup = False ):
         """ create shortcuts and connect them to slots """
 
         # CREATE SIGNALS
@@ -284,7 +285,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def loadDefaults(self, setup = False):
+    def loadDefaults ( self, setup = False ):
         """ load default settings to settings display """
 
         self.SET_float_volPerMM.setValue        ( UTIL.DEF_SC_VOL_PER_MM )
@@ -315,7 +316,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                        CONNECTIONS                                                #
     #####################################################################################################
 
-    def connectTCP(self,TCPslot = 0):
+    def connectTCP ( self,TCPslot = 0 ):
         """slot-wise connection management, mostly to shrink code length, maybe more functionality later"""
 
         css = ("border-radius: 25px; \
@@ -378,7 +379,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def disconnectTCP(self,TCPslot = 0):
+    def disconnectTCP ( self,TCPslot = 0 ):
         """ disconnect works, reconnect crashes the app, problem probably lies here
             should also send E command to robot on disconnect """
 
@@ -424,7 +425,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          THREADS                                                  #
     #####################################################################################################
 
-    def connectThreads(self):
+    def connectThreads ( self ):
         """load all threads from PRINT_threads and set signal-slot-connections"""
 
         self.roboCommThread = QThread()
@@ -467,7 +468,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def posUpdate(self, rawDataString, telem):
+    def posUpdate ( self, rawDataString, telem ):
         """ write robots telemetry to global variables """
 
         # set the fist given position to zero as this is usually the standard position for Rob2, take current ID
@@ -486,7 +487,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def pump1Send(self, newSpeed, command, ans):
+    def pump1Send ( self, newSpeed, command, ans ):
         """ display pump communication """
 
         mutex.lock()
@@ -503,7 +504,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def pump1Update(self, telem):
+    def pump1Update ( self, telem ):
         """ display pump telemetry """
 
         self.PUMP_disp_freq.setText         ( str( UTIL.STT_dataBlock.Pump1.freq ) )
@@ -524,7 +525,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          WATCHDOGS                                                #
     #####################################################################################################
 
-    def setWatchdog(self, dognumber= 0):
+    def setWatchdog ( self, dognumber= 0 ):
         """ set Watchdog, check data updates from robot and pump occure at least every 10 sec """
 
         match dognumber:
@@ -553,7 +554,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def resetWatchdog(self, dognumber= 0):
+    def resetWatchdog ( self, dognumber= 0 ):
         """ reset the Watchdogs, robReceiveWD on every newly received data block """
 
         match dognumber:
@@ -565,7 +566,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def watchdogBite(self, dognumber= 0):
+    def watchdogBite ( self, dognumber= 0 ):
         """ close the UI on any biting WD, log info """
 
         match dognumber:
@@ -619,7 +620,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def killWatchdog(self, dognumber= 0):
+    def killWatchdog ( self, dognumber= 0 ):
         """ put them to sleep (dont do this to real dogs) """
 
         match dognumber:
@@ -646,6 +647,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def updateRobLiveAd ( self ):
         mutex.lock()
         UTIL.ROB_liveAd = self.SCTRL_num_liveAd_robot.value() / 100.0
+        mutex.unlock()
+    
+
+
+    def robToProgID ( self ):
+        mutex.lock()
+        UTIL.SC_currCommId = UTIL.ROB_telem.id
         mutex.unlock()
 
 
@@ -683,7 +691,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                        LOG FUNCTION                                               #
     #####################################################################################################
 
-    def logEntry(self, source='[    ]', text=''):
+    def logEntry ( self, source= '[    ]', text= '' ):
         """ set one-line for log entries, safes A LOT of code """
 
         text = text.replace('\n','')
@@ -710,7 +718,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                        QLABEL UPDATES                                             #
     #####################################################################################################
 
-    def labelUpdate_onReceive(self,dataString):
+    def labelUpdate_onReceive ( self, dataString ):
         """ update all QLabels in the UI that may change with newly received data from robot """
 
         pos     = UTIL.ROB_telem.Coor
@@ -768,7 +776,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def labelUpdate_onSend(self,entry):
+    def labelUpdate_onSend ( self, entry ):
         """ update all UI QLabels that may change when data was send to robot """
 
         self.labelUpdate_onQueueChange()
@@ -785,7 +793,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def labelUpdate_onQueueChange(self):
+    def labelUpdate_onQueueChange ( self ):
         """ show when new entries have been successfully placed in or taken from Queue """
 
         listToDisplay   = UTIL.SC_queue.display()
@@ -805,7 +813,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def labelUpdate_onTerminalChange(self):
+    def labelUpdate_onTerminalChange ( self ):
         """ show when data was send or received """
         
         self.TERM_arr_terminal.clear()
@@ -829,7 +837,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def labelUpdate_onNewZero(self):
+    def labelUpdate_onNewZero ( self ):
         """ show when DC_zero has changed """
 
         self.ZERO_disp_x.setText        ( str( UTIL.DC_currZero.x ) )
@@ -856,7 +864,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                            FILE IO                                                #
     #####################################################################################################
 
-    def openFile(self, testrun = False, testpath = None):
+    def openFile ( self, testrun= False, testpath= None ):
         """ prompts the user with a file dialog and estimates printing parameters in given file """
 
         # get file path and content
@@ -908,7 +916,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def loadFile(self, lf_atID = False, testrun= False):
+    def loadFile ( self, lf_atID= False, testrun= False ):
         """ reads the file set in self.openFile, adds all readable commands to command queue (at end or at ID)
             outsourced to loadFileWorker """
         
@@ -943,7 +951,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def loadFileFailed(self, txt):
+    def loadFileFailed ( self, txt ):
         """ handles convFailed emit from loadFileWorker """
 
         self.IO_lbl_loadFile.setText    (txt)
@@ -964,7 +972,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def loadFileFinished(self, lineID, startID, skips):
+    def loadFileFinished ( self, lineID, startID, skips ):
         """ handles convFinished emit from loadFileWorker """
         
         # update labels, log entry if you made it here
@@ -1002,7 +1010,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #####################################################################################################
 
 
-    def resetScId(self):
+    def resetScId ( self ):
         """"""
 
         mutex.lock()
@@ -1011,7 +1019,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
    
    
    
-    def startSCTRLQueue(self):
+    def startSCTRLQueue ( self ):
         """ set UI indicators, send the boring work of timing the command to our trusty threads """
 
         mutex.lock()
@@ -1033,7 +1041,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def stopSCTRLQueue(self, prepEnd = False):
+    def stopSCTRLQueue ( self, prepEnd= False ):
         """ set UI indicators, turn off threads """
 
         if( prepEnd ):
@@ -1060,7 +1068,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def addGcodeSgl(self, atID = False, ID = 0, fromFile = False, fileText = ''):
+    def addGcodeSgl ( self, atID= False, ID= 0, fromFile= False, fileText= '' ):
         """ function meant to convert any single gcode lines to QEntry,
             uses the position BEFORE PLANNED COMMAND EXECUTION, as this is the fallback option
             if no X, Y, Z or EXT position is given"""
@@ -1116,7 +1124,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def addRapidSgl(self, atID = False, ID = 0, fromFile = False, fileText = ''):
+    def addRapidSgl ( self, atID= False, ID= 0, fromFile= False, fileText= '' ):
         """ function meant to convert all RAPID single lines into QEntry """
 
         # get text and current position, (identify command -- to be added)
@@ -1154,7 +1162,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def addSIB(self,number,atEnd = False):
+    def addSIB ( self, number, atEnd= False ):
         """ add standard instruction block (SIB) to queue"""
 
         match number:
@@ -1210,7 +1218,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def clrQueue(self, partial = False):
+    def clrQueue ( self, partial= False ):
         """ delete specific or all items from queue """
 
         mutex.lock()
@@ -1235,7 +1243,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          DC COMMANDS                                              #
     #####################################################################################################
 
-    def valuesToDcSpinbox(self):
+    def valuesToDcSpinbox ( self ):
         """ button function to help the user adjust a postion via numeric control, copys the current position
             to the set coordinates spinboxes """
 
@@ -1249,7 +1257,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def switchRobMoving(self, end= False):
+    def switchRobMoving ( self, end= False ):
         """ change UTIL.DC_robMoving """
 
         mutex.lock()
@@ -1263,7 +1271,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def homeCommand(self):
+    def homeCommand ( self ):
         """ sets up a command to drive back to DC_curr_zero, gives it to the actual sendCommand function """
 
         if( UTIL.DC_robMoving ): return None, None
@@ -1286,7 +1294,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def sendDCCommand(self, axis= '0', dir= '+'):
+    def sendDCCommand ( self, axis= '0', dir= '+' ):
         """ sets up a command accourding to the DC frames input, gives it to the actual sendCommand function """
 
         if( UTIL.DC_robMoving ): return None, None
@@ -1329,7 +1337,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def sendNCCommand(self, axis= None):
+    def sendNCCommand ( self, axis= None ):
         """ sets up a command according to NC absolute positioning, gives it to the actual sendCommand function """
 
         if( UTIL.DC_robMoving ): return None, None
@@ -1362,7 +1370,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def sendGcodeCommand(self):
+    def sendGcodeCommand ( self ):
         """ send the GCode interpreter line on the TERM panel to robot,
             uses the current position as it is executed directly, otherwise DONT do that
             if no X, Y, Z or EXT position is given"""
@@ -1398,7 +1406,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def sendRapidCommand(self):
+    def sendRapidCommand ( self ):
         """ send the GCode interpreter line on the TERM panel to robot, absolute coordinates
             or relative to "pHome" (DC_currZero) """
 
@@ -1422,7 +1430,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def forcedStopCommand(self):
+    def forcedStopCommand ( self ):
         """ sets up non-moving-type commands, gives it to the actual sendCommand function """
         
         command = UTIL.QEntry( id = 1
@@ -1453,7 +1461,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def robotStopCommand(self, directly = True):
+    def robotStopCommand ( self, directly= True ):
         """ close connection signal for robot, add it to Queue or gives it to the actual sendCommand function """
 
         command = UTIL.QEntry( id = 1
@@ -1481,7 +1489,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                         SEND COMMANDS                                             #
     #####################################################################################################
     
-    def sendCommand (self, command, DC = False):
+    def sendCommand ( self, command, DC= False ):
         """ passing new commands to RoboCommWorker """
         
         mutex.lock()
@@ -1495,7 +1503,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def commandTransmitted (self, command, msg, numSend, dc, noError ):
+    def commandTransmitted ( self, command, msg, numSend, dc, noError ):
         """ handle UI update after new command was send """
 
         if( noError ):
@@ -1536,7 +1544,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def setZero(self, axis, fromSysMonitor= False):
+    def setZero ( self, axis, fromSysMonitor= False ):
         """ overwrite DC_curr_zero, uses deepcopy to avoid mutual large mutual exclusion blocks """
 
         newZero = copy.deepcopy(UTIL.DC_currZero)
@@ -1579,7 +1587,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                         PUMP CONTROL                                              #
     #####################################################################################################
 
-    def setSpeed(self, type = ''):
+    def setSpeed ( self, type= '' ):
         """ handle user inputs regarding pump frequency """
 
         mutex.lock()
@@ -1602,7 +1610,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                           CLOSE UI                                                #
     #####################################################################################################
 
-    def closeEvent(self, event):
+    def closeEvent ( self, event ):
         """ exit all threads and connections clean(ish) """
 
         self.logEntry('newline')

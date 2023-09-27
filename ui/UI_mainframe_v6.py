@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\mainframe_v2.ui'
+# Form implementation generated from reading ui file '.\mainframe.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -15,7 +15,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
-        MainWindow.resize(1933, 1108)
+        MainWindow.resize(1937, 1117)
         MainWindow.setMinimumSize(QtCore.QSize(600, 400))
         MainWindow.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
@@ -238,6 +238,7 @@ class Ui_MainWindow(object):
 "QFrame#SET_frame,\n"
 "QFrame#SGLC_frame,\n"
 "QFrame#SIB_frame, \n"
+"QFrame#SID_frame, \n"
 "QFrame#TERM_frame,\n"
 "QFrame#TCP_frame,\n"
 "QFrame#TRANS_frame,\n"
@@ -2391,13 +2392,13 @@ class Ui_MainWindow(object):
         self.ICQ_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ICQ_frame.setObjectName("ICQ_frame")
         self.ICQ_arr_terminal = QtWidgets.QListWidget(self.ICQ_frame)
-        self.ICQ_arr_terminal.setGeometry(QtCore.QRect(40, 100, 1111, 771))
+        self.ICQ_arr_terminal.setGeometry(QtCore.QRect(40, 130, 1111, 741))
         self.ICQ_arr_terminal.setFlow(QtWidgets.QListView.TopToBottom)
         self.ICQ_arr_terminal.setObjectName("ICQ_arr_terminal")
         item = QtWidgets.QListWidgetItem()
         self.ICQ_arr_terminal.addItem(item)
         self.ICQ_0_frameLabel = QtWidgets.QLabel(self.ICQ_frame)
-        self.ICQ_0_frameLabel.setGeometry(QtCore.QRect(30, 30, 381, 51))
+        self.ICQ_0_frameLabel.setGeometry(QtCore.QRect(20, 30, 381, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
@@ -2410,13 +2411,38 @@ class Ui_MainWindow(object):
         self.ICQ_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.ICQ_0_frameLabel.setObjectName("ICQ_0_frameLabel")
         self.ICQ_chk_autoScroll = QtWidgets.QCheckBox(self.ICQ_frame)
-        self.ICQ_chk_autoScroll.setGeometry(QtCore.QRect(1000, 70, 141, 27))
+        self.ICQ_chk_autoScroll.setGeometry(QtCore.QRect(1010, 100, 141, 27))
         self.ICQ_chk_autoScroll.setStyleSheet("background-color: #5d707f;\n"
 "font-size: 12pt;\n"
 "color: #f2f4f3;\n"
 "")
         self.ICQ_chk_autoScroll.setChecked(False)
         self.ICQ_chk_autoScroll.setObjectName("ICQ_chk_autoScroll")
+        self.SID_lbl_robID = QtWidgets.QLabel(self.ICQ_frame)
+        self.SID_lbl_robID.setGeometry(QtCore.QRect(720, 30, 81, 41))
+        self.SID_lbl_robID.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.SID_lbl_robID.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.SID_lbl_robID.setObjectName("SID_lbl_robID")
+        self.SID_disp_robID = QtWidgets.QLabel(self.ICQ_frame)
+        self.SID_disp_robID.setGeometry(QtCore.QRect(810, 30, 101, 41))
+        self.SID_disp_robID.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.SID_disp_robID.setObjectName("SID_disp_robID")
+        self.SID_disp_progID = QtWidgets.QLabel(self.ICQ_frame)
+        self.SID_disp_progID.setGeometry(QtCore.QRect(610, 30, 101, 41))
+        self.SID_disp_progID.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.SID_disp_progID.setObjectName("SID_disp_progID")
+        self.SID_lbl_progID = QtWidgets.QLabel(self.ICQ_frame)
+        self.SID_lbl_progID.setGeometry(QtCore.QRect(520, 30, 81, 41))
+        self.SID_lbl_progID.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.SID_lbl_progID.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.SID_lbl_progID.setObjectName("SID_lbl_progID")
+        self.SID_btt_robToProgID = QtWidgets.QPushButton(self.ICQ_frame)
+        self.SID_btt_robToProgID.setGeometry(QtCore.QRect(950, 30, 201, 41))
+        self.SID_btt_robToProgID.setObjectName("SID_btt_robToProgID")
         self.ZERO_frame = QtWidgets.QFrame(self.MONITOR_tab)
         self.ZERO_frame.setGeometry(QtCore.QRect(1260, 20, 631, 621))
         self.ZERO_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -3099,6 +3125,11 @@ class Ui_MainWindow(object):
         self.ICQ_arr_terminal.setSortingEnabled(__sortingEnabled)
         self.ICQ_0_frameLabel.setText(_translate("MainWindow", "INTERNAL COMMAND QUEUE"))
         self.ICQ_chk_autoScroll.setText(_translate("MainWindow", "enable auto scroll"))
+        self.SID_lbl_robID.setText(_translate("MainWindow", "ROBOT ID"))
+        self.SID_disp_robID.setText(_translate("MainWindow", "0"))
+        self.SID_disp_progID.setText(_translate("MainWindow", "0"))
+        self.SID_lbl_progID.setText(_translate("MainWindow", "SC ID"))
+        self.SID_btt_robToProgID.setText(_translate("MainWindow", "ROBOT ID   🡆  SCRIPT ID"))
         self.ZERO_0_frameLabel.setText(_translate("MainWindow", "ZERO POSITION"))
         self.ZERO_disp_z.setText(_translate("MainWindow", "0.0"))
         self.ZERO_lbl_y_disp.setText(_translate("MainWindow", "Y"))

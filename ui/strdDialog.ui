@@ -14,22 +14,21 @@
    <string>Dialog</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">border: 2px solid #5d707f;
-border-radius: 5px;
+   <string notr="true">border-radius: 5px;
 font-family: &quot;Bahnschrift&quot;;
 font-size: 14pt;
 padding: 2px;
 padding-left: 5px;
-background-color: #5d707f;
+background-color: #4c4a48;
 color: #f2f4f3;</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>350</y>
+     <y>331</y>
      <width>341</width>
-     <height>32</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -43,8 +42,10 @@ color: #f2f4f3;</string>
 	background-color: #FFBA00;
 	color: #000000;
 	border-radius: 5px;
+	border: None;
 	font-size: 14pt;
 	width: 5em;
+	height: 35px;
 }
 
 QPushButton:hover {
@@ -68,17 +69,16 @@ QPushButton:pressed {
      <x>20</x>
      <y>20</y>
      <width>521</width>
-     <height>311</height>
+     <height>291</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border: 2px solid #5d707f;
-border-radius: 5px;
+    <string notr="true">border-radius: 5px;
 font-family: &quot;Bahnschrift&quot;;
 font-size: 14pt;
 padding: 2px;
 padding-left: 5px;
-background-color: #5d707f;
+background-color: #4c4a48;
 color: #f2f4f3;</string>
    </property>
    <property name="text">

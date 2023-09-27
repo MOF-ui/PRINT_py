@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1933</width>
-    <height>1108</height>
+    <width>1937</width>
+    <height>1117</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -281,6 +281,7 @@ QFrame#SCRTL_frame,
 QFrame#SET_frame,
 QFrame#SGLC_frame,
 QFrame#SIB_frame, 
+QFrame#SID_frame, 
 QFrame#TERM_frame,
 QFrame#TCP_frame,
 QFrame#TRANS_frame,
@@ -371,7 +372,7 @@ QTabBar::tab:!selected:hover {
 }</string>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="PRINT_tab">
      <property name="styleSheet">
@@ -6192,9 +6193,9 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>100</y>
+         <y>130</y>
          <width>1111</width>
-         <height>771</height>
+         <height>741</height>
         </rect>
        </property>
        <property name="flow">
@@ -6209,7 +6210,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="ICQ_0_frameLabel">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>30</y>
          <width>381</width>
          <height>51</height>
@@ -6238,8 +6239,8 @@ color: #E1E5EE;</string>
       <widget class="QCheckBox" name="ICQ_chk_autoScroll">
        <property name="geometry">
         <rect>
-         <x>1000</x>
-         <y>70</y>
+         <x>1010</x>
+         <y>100</y>
          <width>141</width>
          <height>27</height>
         </rect>
@@ -6255,6 +6256,93 @@ color: #f2f4f3;
        </property>
        <property name="checked">
         <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="SID_lbl_robID">
+       <property name="geometry">
+        <rect>
+         <x>720</x>
+         <y>30</y>
+         <width>81</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>ROBOT ID</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="SID_disp_robID">
+       <property name="geometry">
+        <rect>
+         <x>810</x>
+         <y>30</y>
+         <width>101</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="SID_disp_progID">
+       <property name="geometry">
+        <rect>
+         <x>610</x>
+         <y>30</y>
+         <width>101</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="SID_lbl_progID">
+       <property name="geometry">
+        <rect>
+         <x>520</x>
+         <y>30</y>
+         <width>81</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>SC ID</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="SID_btt_robToProgID">
+       <property name="geometry">
+        <rect>
+         <x>950</x>
+         <y>30</y>
+         <width>201</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>ROBOT ID   🡆  SCRIPT ID</string>
        </property>
       </widget>
      </widget>
