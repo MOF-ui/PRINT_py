@@ -194,11 +194,14 @@ class RoboCommWorker(QObject):
             # check for ID overflow, reduce SC_queue IDs & get rid off ROB_commQueue entries with IDs at ~3000
             if( telem.id < UTIL.ROB_lastTelem.id ): 
                 for x in UTIL.SC_queue.queue:  x.id -= 3000
-                id = UTIL.ROB_commQueue[0].id
-                while( id <= 3000 ): 
-                    UTIL.ROB_commQueue.popFirstItem()
-                    try:                id = UTIL.ROB_commQueue[0].id
-                    except Exception:   break
+                try: 
+                    id = UTIL.ROB_commQueue[0].id
+                    while( id <= 3000 ): 
+                        UTIL.ROB_commQueue.popFirstItem()
+                        try:                id = UTIL.ROB_commQueue[0].id
+                        except Exception:   break
+                except AttributeError:
+                    pass
 
 
             # delete all finished command from ROB_commQueue

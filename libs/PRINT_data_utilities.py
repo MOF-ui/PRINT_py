@@ -1336,6 +1336,11 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
             if(res): 
                 entry.Coor1.x =  float( x[1:] .replace(',','.') )
                 entry.Coor1.x += zero.x
+                if(entry.Coor1.x > 0):
+                    entry.Coor1.ext = int(entry.Coor1.x / 500) * 200
+                    entry.Coor1.ext += zero.ext
+                else:
+                    entry.Coor1.ext = zero.ext
 
             y,res = reShort('Y\d+[,.]\d+', txt, pos.y, 'Y\d+')
             if(res): 
@@ -1352,10 +1357,10 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
                 fr              = float( fr[1:] .replace(',','.') )
                 entry.Speed.ts  = int(fr * IO_frToTs)
 
-            ext,res = reShort('EXT\d+[,.]\d+', txt, pos.ext, 'EXT\d+')
-            if(res): 
-                entry.Coor1.ext =  float( ext[3:] .replace(',','.') )
-                entry.Coor1.ext += zero.ext
+            # ext,res = reShort('EXT\d+[,.]\d+', txt, pos.ext, 'EXT\d+')
+            # if(res): 
+            #     entry.Coor1.ext =  float( ext[3:] .replace(',','.') )
+            #     entry.Coor1.ext += zero.ext
             
             entry.Coor1 = round( entry.Coor1, 2 )
             
