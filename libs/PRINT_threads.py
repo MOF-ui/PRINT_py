@@ -72,6 +72,7 @@ class PumpCommWorker(QObject):
         
         self.loopTimer.stop()
         self.mtecInterface.stop()
+        self.mtecInterface.disconnect()
         self.loopTimer.deleteLater()
 
 
@@ -322,7 +323,7 @@ class RoboCommWorker(QObject):
                 self.sendElem.emit(command, msg, msgLen, directCtrl, False)
             
             if( numToSend == 0 ):
-                print(" Block send ")
+                if( not testrun ): print(" Block send ")
                 self.sendElem.emit(command, msg, numSend, directCtrl, True)
             # else                :   self.sendElem.emit(command, msg, msgLen, directCtrl, False)
 

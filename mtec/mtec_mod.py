@@ -35,13 +35,21 @@ class MtecMod:
 
 
     def connect(self):
-        self.serial         = serial.Serial( baudrate   = self.settings_serial_baudRate
-                                            ,parity     = self.settings_serial_parity
-                                            ,stopbits   = self.settings_serial_stopBits
-                                            ,bytesize   = self.settings_serial_dataBits
-                                            ,port       = self.serial_port)
-        self.connected      = True
-        self.temp_sendReady = True
+        if( not self.connected ):
+            self.serial         = serial.Serial( baudrate   = self.settings_serial_baudRate
+                                                ,parity     = self.settings_serial_parity
+                                                ,stopbits   = self.settings_serial_stopBits
+                                                ,bytesize   = self.settings_serial_dataBits
+                                                ,port       = self.serial_port)
+            self.connected      = True
+            self.temp_sendReady = True
+        
+        
+
+    def disconnect(self):
+        self.serial.close()
+        self.connected      = False
+        self.temp_sendReady = False
 
 
 
@@ -189,7 +197,7 @@ class MtecMod:
 
 
 
-#################################################  EASY TO USE FUNCTIONs  #################################################
+#################################################  EASY TO USE FUNCTIONS  #################################################
 
     def start(self):
         return self.sendHexCommand(self.settings_frequencyInverterID + "06FA00C400")

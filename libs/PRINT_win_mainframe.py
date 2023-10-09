@@ -58,7 +58,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #####################################################################################################
     
     def __init__ ( self, lpath = None, connDef = (False,False), testrun = False, parent=None ):
-        """ setup main window """
+        """ setup main and daq UI, start subsystems & threads """
 
         super().__init__(parent)
         
@@ -195,7 +195,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # SETTINGS
         self.SET_btt_apply.pressed.connect                  ( self.applySettings )
         self.SET_btt_default.pressed.connect                ( self.loadDefaults )
-        self.SID_btt_robToProgID.pressed.connect            ( self.robToProgID )
+        self.SID_btt_robToProgID.pressed.connect            ( self.resetScId )
         self.TCP_num_commForerun.valueChanged.connect       ( self.updateCommForerun )
 
         # SINGLE COMMAND
@@ -209,8 +209,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         # CONNECTIONS
         # self.TCP_ROB_btt_reconn.pressed.connect             ( lambda: self.connectTCP(1) )
-        # self.TCP_PUMP1_btt_reconn.pressed.connect           ( lambda: self.connectTCP(2) )
-        # self.TCP_PUMP2_btt_reconn.pressed.connect           ( lambda: self.connectTCP(3) )
+        self.TCP_PUMP1_btt_reconn.pressed.connect           ( lambda: self.connectTCP(2) )
+        self.TCP_PUMP2_btt_reconn.pressed.connect           ( lambda: self.connectTCP(3) )
         self.TCP_ROB_btt_discon.pressed.connect             ( lambda: self.disconnectTCP(1) )
         self.TCP_PUMP1_btt_discon.pressed.connect           ( lambda: self.disconnectTCP(2) )
         self.TCP_PUMP2_btt_discon.pressed.connect           ( lambda: self.disconnectTCP(3) )
@@ -255,7 +255,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ctrl_S.activated.connect       ( self.startSCTRLQueue )
         self.ctrl_A.activated.connect       ( lambda: self.stopSCTRLQueue (prepEnd = True) )
         self.ctrl_F.activated.connect       ( lambda: self.sendCommand    ( UTIL.SC_queue.popFirstItem() ) )
-        self.ctrl_Raute.activated.connect   ( lambda: self.clrQueue(partial = False) )
+        self.ctrl_Raute.activated.connect   ( lambda: self.clrQueue       (partial = False) )
         self.ctrl_Q.activated.connect       ( self.forcedStopCommand )
         self.ctrl_alt_I.activated.connect   ( self.resetScId )
 
@@ -286,7 +286,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def loadDefaults ( self, setup = False ):
-        """ load default settings to settings display """
+        """ load default settings to user display """
 
         self.SET_float_volPerMM.setValue        ( UTIL.DEF_SC_VOL_PER_MM )
         self.SET_float_frToMms.setValue         ( UTIL.DEF_IO_FR_TO_TS )
@@ -319,8 +319,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def connectTCP ( self,TCPslot = 0 ):
         """slot-wise connection management, mostly to shrink code length, maybe more functionality later"""
 
-        css = ("border-radius: 25px; \
-                background-color: #00aaff;")
+        css = ("border-radius: 25px; background-color: #00aaff;")
 
         match TCPslot:
             case 1:  
@@ -387,9 +386,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         match TCPslot:
             case 1:  
+                self.killWatchdog(1)
                 self.roboCommThread.quit()
                 self.roboCommThread.wait()
-                self.killWatchdog(1)
                 UTIL.ROB_tcpip.close()
 
                 self.logEntry('CONN',f"user disconnected robot.")
@@ -397,9 +396,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             case 2:  
                 if( 'COM' in UTIL.PUMP1_tcpip.port ):
+                    self.killWatchdog(2)
                     self.pumpCommThread.quit()
                     self.pumpCommThread.wait()
-                    self.killWatchdog(2)
                 else:
                     raise ConnectionError('TCP not supported, unable to disconnect') # UTIL.PUMP1_tcpip.close()
                 
@@ -426,7 +425,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #####################################################################################################
 
     def connectThreads ( self ):
-        """load all threads from PRINT_threads and set signal-slot-connections"""
+        """ load all threads from PRINT_threads and set signal-slot-connections """
 
         self.roboCommThread = QThread()
         self.roboCommWorker = WORKERS.RoboCommWorker()
@@ -469,7 +468,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def posUpdate ( self, rawDataString, telem ):
-        """ write robots telemetry to global variables """
+        """ write robots telemetry to log & user displays, resetting globals position variables is done
+            by RobCommWorker """
 
         # set the fist given position to zero as this is usually the standard position for Rob2, take current ID
         if (self.firstPos):
@@ -488,7 +488,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def pump1Send ( self, newSpeed, command, ans ):
-        """ display pump communication """
+        """ display pump communication, global vars are set by PumpCommWorker """
 
         mutex.lock()
         UTIL.PUMP1_speed = newSpeed
@@ -505,7 +505,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def pump1Update ( self, telem ):
-        """ display pump telemetry """
+        """ display pump telemetry, global vars are set by PumpCommWorker """
 
         self.PUMP_disp_freq.setText         ( str( UTIL.STT_dataBlock.Pump1.freq ) )
         self.PUMP_disp_volt.setText         ( str( UTIL.STT_dataBlock.Pump1.volt ) )
@@ -577,9 +577,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                                              ,'WATCHDOG ALARM')
                 watchdogWarning.exec()
 
-                self.TCP_PUMP1_indi_connected.setStyleSheet( "border-radius: 25px;background-color: #4c4a48;" )
+                self.TCP_PUMP1_indi_connected.setStyleSheet( "border-radius: 25px; background-color: #4c4a48;" )
                 UTIL.PUMP1_tcpip.connected = False
                 self.killWatchdog(2)
+                self.pumpCommThread.quit()
+                self.pumpCommThread.wait()
                 return
 
             case _:   wdNum = '(unidentified)'
@@ -639,21 +641,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #####################################################################################################
 
     def updateCommForerun ( self ):
+        """ reset the robots internal buffer length """
+
         mutex.lock()
         UTIL.ROB_commFr = self.TCP_num_commForerun.value()
         mutex.unlock()
     
 
     def updateRobLiveAd ( self ):
+        """ new factor for QEntry.Speed.ts, applied before sending """
+
         mutex.lock()
         UTIL.ROB_liveAd = self.SCTRL_num_liveAd_robot.value() / 100.0
-        mutex.unlock()
-    
-
-
-    def robToProgID ( self ):
-        mutex.lock()
-        UTIL.SC_currCommId = UTIL.ROB_telem.id
         mutex.unlock()
 
 
@@ -692,7 +691,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #####################################################################################################
 
     def logEntry ( self, source= '[    ]', text= '' ):
-        """ set one-line for log entries, safes A LOT of code """
+        """ set one-line for log entries, safes A LOT of repetitive code """
 
         text = text.replace('\n','')
         text = text.replace('\t','')
@@ -757,6 +756,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.TERM_disp_robCommID.setText        ( str(robID) )
         self.TERM_disp_progCommID.setText       ( str(comID) )
 
+        # SCRIPT ID
+        self.SID_disp_progID.setText            ( str(progID) )
+        self.SID_disp_robID.setText             ( str(comID) )
+
         # CURRENT TRANSITION
         if(    (start.rx != end.rx) 
             or (start.ry != end.ry) 
@@ -785,7 +788,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         try:
             robId = UTIL.ROB_telem.id    if( UTIL.ROB_telem.id != -1 )   else 0
-            self.SCTRL_disp_buffComms.setText(str( UTIL.SC_queue[0].id - robId - 1 ))
+            self.SCTRL_disp_buffComms.setText( str( UTIL.SC_queue[0].id - robId - 1 ) )
         except AttributeError:  pass
 
 
@@ -1011,11 +1014,15 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def resetScId ( self ):
-        """"""
+        """ synchronize SC and ROB ID with this, if program falls out of sync with the robot, should
+            happen only with on-the-fly restarts, theoretically """
 
         mutex.lock()
         UTIL.SC_currCommId = UTIL.ROB_telem.id + 1
         mutex.unlock()
+
+        self.labelUpdate_onReceive( dataString= self.TCP_ROB_disp_readBuffer.text() )
+
    
    
    
@@ -1071,7 +1078,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def addGcodeSgl ( self, atID= False, ID= 0, fromFile= False, fileText= '' ):
         """ function meant to convert any single gcode lines to QEntry,
             uses the position BEFORE PLANNED COMMAND EXECUTION, as this is the fallback option
-            if no X, Y, Z or EXT position is given"""
+            if no X, Y, Z or EXT position is given """
 
         # get text and position BEFORE PLANNED COMMAND EXECUTION
         speed   = copy.deepcopy(UTIL.PRIN_speed)
@@ -1545,7 +1552,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def setZero ( self, axis, fromSysMonitor= False ):
-        """ overwrite DC_curr_zero, uses deepcopy to avoid mutual large mutual exclusion blocks """
+        """ overwrite DC_curr_zero, uses deepcopy to avoid large mutual exclusion blocks """
 
         newZero = copy.deepcopy(UTIL.DC_currZero)
         if( fromSysMonitor ):   
