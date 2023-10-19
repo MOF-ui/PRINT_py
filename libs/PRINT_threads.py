@@ -336,6 +336,7 @@ class RoboCommWorker(QObject):
 
     def checkRobCommZeroDist (self):
         """ calculates distance between next entry in ROB_commQueue and current position """
+
         if( len(UTIL.ROB_commQueue) == 1 ):
             return  m.sqrt(  m.pow( UTIL.ROB_commQueue[0].Coor1.x   - UTIL.ROB_telem.Coor.x, 2 )
                            + m.pow( UTIL.ROB_commQueue[0].Coor1.y   - UTIL.ROB_telem.Coor.y, 2 )
@@ -362,7 +363,8 @@ class LoadFileWorker(QObject):
 
 
     def start(self):
-        """ """
+        """ get data, start conversion loop """
+
         global LFW_filePath
         global LFW_lineID
         global LFW_pCtrl
@@ -422,6 +424,15 @@ class LoadFileWorker(QObject):
             LFW_running = False
             return
 
+        # check for unidistance mode
+        umCheck = UTIL.reShort('\&\&: \d+.\d+', txt, None, '\&\&: \d+')[0]
+        if( umCheck is not None ):
+            umDist = UTIL.reShort( '\d+.\d+', umCheck, ValueError, '\d+' )[0]
+            umConvRes = self.addUmTool( umDist )
+            if( umConvRes is not None ):
+                self.convFailed.emit( umConvRes )
+                return
+
         # automatic pump control
         if( LFW_pCtrl ):
             # set all entries to pmode=default
@@ -452,6 +463,7 @@ class LoadFileWorker(QObject):
 
 
     def gcodeConv(self, ID, txt):
+        """ single line conversion from GCode """
 
         # get text and position BEFORE PLANNED COMMAND EXECUTION
         speed   = copy.deepcopy(UTIL.PRIN_speed)
@@ -479,6 +491,7 @@ class LoadFileWorker(QObject):
 
 
     def rapidConv(self, ID, txt):
+        """ single line conversion from RAPID """
                 
         entry,err   = UTIL.rapidToQEntry(txt)
         if( entry == None ):
@@ -491,6 +504,26 @@ class LoadFileWorker(QObject):
             return None, ValueError
 
         return entry, None
+    
+
+
+
+
+    def addUmTool(self, umd):
+        """ check if the data makes send, add the tooldata to entries """
+        
+        try:                umDist = float( umd )
+        except Exception:   return f"UM-Mode failed reading {umd}"
+        if( umDist < 0.0  or  umDist > 2000.0 ): 
+                            return f"UM-Distance <0 or >2000"
+
+        for i in self.comList.queue:
+            travelTime = umDist / i.Speed.ts
+            if( (umDist % i.Speed.ts) != 0 ):
+                return f"UM-Mode failed setting {travelTime} to int."
+            
+            i.Tool.time_time = int( travelTime )
+        return None
 
 
 

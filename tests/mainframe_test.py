@@ -68,13 +68,15 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual( UTIL.SC_queue.display()
                          ,[ UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(x= 2, y= 1 ) ).printShort()
                            ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 2, y= 1, z= 1 ) ).printShort()
-                           ,UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
+                           ,UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext= 3 )
                                         ,Speed= UTIL.SpeedVector( ts=4 ) ).printShort()
-                           ,UTIL.QEntry( id= 4 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext=3 ) ).printShort()])
+                           # here, the external axis is set to 0, as a change in X activates the recalculation of the 
+                           # appropriate EXT position in UTIL.gcodeToQEntry using UTIL.SC_extFllwBhvr 
+                           ,UTIL.QEntry( id= 4 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext= 0 ) ).printShort()])
         
         # G28 & G92
         testFrame.addGcodeSgl( atID= False, ID= 0, fromFile= True, fileText= 'G92 Y0 EXT0')
-        self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate(x= 1, y=2.2, ext= 3))
+        self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate(x= 1, y= 2.2))
 
         testFrame.addGcodeSgl( atID= False, ID=0, fromFile= True, fileText= 'G28 Y0 EXT0' )
         self.assertEqual( UTIL.SC_queue.display()
@@ -82,11 +84,11 @@ class Mainframe_test(unittest.TestCase):
                            ,UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate(x= 2, y= 1, z= 1 ) ).printShort()
                            ,UTIL.QEntry( id= 3, Coor1= UTIL.Coordinate(x= 1, y= 2.2, ext=3 )
                                         ,Speed= UTIL.SpeedVector( ts=4 ) ).printShort()
-                           ,UTIL.QEntry( id= 4 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext=3 ) ).printShort()
-                           ,UTIL.QEntry( id= 5 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext=3 ) ).printShort()])
+                           ,UTIL.QEntry( id= 4 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext= 0 ) ).printShort()
+                           ,UTIL.QEntry( id= 5 ,Coor1= UTIL.Coordinate(x= 2.2, y= 2.2, ext= 0 ) ).printShort()])
         
-        testFrame.addGcodeSgl( atID= True, ID= 3, fromFile= True, fileText= 'G92 X0 Y0 Z0')
-        self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate(x= 2, y=1, z=1, ext= 3) )
+        testFrame.addGcodeSgl( atID= True, ID= 3, fromFile= True, fileText= 'G92 X0 Z0')
+        self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate(x= 2, y=2.2, z=1, ext= 0) )
 
 
         UTIL.DC_currZero = UTIL.Coordinate()

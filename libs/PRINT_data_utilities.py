@@ -1317,6 +1317,7 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
         "pos" should be the pos before this command is executed (before its EXECUTED, not before its added  
         to SC_queue) as its the fallback option if no new X, Y, Z or EXT posistion is passed"""
     global DC_currZero
+    global SC_extFllwBhvr
 
     # handle mutuables here
     pos   = copy.deepcopy(mutPos)
@@ -1337,7 +1338,7 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
                 entry.Coor1.x =  float( x[1:] .replace(',','.') )
                 entry.Coor1.x += zero.x
                 if(entry.Coor1.x > 0):
-                    entry.Coor1.ext = int(entry.Coor1.x / 500) * 200
+                    entry.Coor1.ext = int(entry.Coor1.x / SC_extFllwBhvr[0]) * SC_extFllwBhvr[1]
                     entry.Coor1.ext += zero.ext
                 else:
                     entry.Coor1.ext = zero.ext
@@ -1357,10 +1358,10 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
                 fr              = float( fr[1:] .replace(',','.') )
                 entry.Speed.ts  = int(fr * IO_frToTs)
 
-            # ext,res = reShort('EXT\d+[,.]\d+', txt, pos.ext, 'EXT\d+')
-            # if(res): 
-            #     entry.Coor1.ext =  float( ext[3:] .replace(',','.') )
-            #     entry.Coor1.ext += zero.ext
+            ext,res = reShort('EXT\d+[,.]\d+', txt, pos.ext, 'EXT\d+')
+            if(res): 
+                entry.Coor1.ext =  float( ext[3:] .replace(',','.') )
+                entry.Coor1.ext += zero.ext
             
             entry.Coor1 = round( entry.Coor1, 2 )
             
@@ -1528,6 +1529,7 @@ DEF_ROB_COMM_FR     = 10
 
 DEF_SC_VOL_PER_MM   = 0.01
 DEF_SC_MAX_LINES    = 400
+DEF_SC_EXT_FLLW_BHVR= (500,200)
 
 DEF_TERM_MAX_LINES  = 400
 
@@ -1581,6 +1583,7 @@ SC_currCommId       = 1
 SC_queue            = Queue()
 SC_qProcessing      = False
 SC_qPrepEnd         = False
+SC_extFllwBhvr      = DEF_SC_EXT_FLLW_BHVR
 
 STT_dataBlock       = DaqBlock()
 
