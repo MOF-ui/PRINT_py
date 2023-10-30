@@ -35,7 +35,7 @@ import libs.PRINT_pump_utilities    as PUTIL
 
 ####################################################   WORKER   ####################################################
 
-class PumpCommWorker(QObject):
+class PumpCommWorker (QObject):
     """ manages data updates and keepalive commands to pump """
 
     connActive      = pyqtSignal()
@@ -49,7 +49,7 @@ class PumpCommWorker(QObject):
 
 
 
-    def run(self):
+    def run (self):
         """ start timer with standard operation on timeout,
             connect to pump via M-Tec Interface """
 
@@ -67,7 +67,7 @@ class PumpCommWorker(QObject):
 
 
 
-    def stop(self):
+    def stop (self):
         """ stop timer """
         
         self.loopTimer.stop()
@@ -79,7 +79,7 @@ class PumpCommWorker(QObject):
 
 
 
-    def send(self):
+    def send (self):
         """ send pump speed to pump, uses modified setter in mtec's script (changed to function),
             which recognizes a value change and returns the machines answer and the original command string,
             uses user-set pump speed if no script is running """
@@ -101,7 +101,7 @@ class PumpCommWorker(QObject):
 
 
 
-    def receive(self):
+    def receive (self):
         """ request data updates for frequency, voltage, current and torque from pump, pass to mainframe """
 
         # get data 
@@ -133,7 +133,7 @@ class PumpCommWorker(QObject):
 
 
 
-class RoboCommWorker(QObject):
+class RoboCommWorker (QObject):
     """ a worker object that check every 50 ms if the Robot queue has empty slots (according to ROBO_comm_forerun),
         emits signal to send data if so, beforehand
         checks the TCPIP connection every 50 ms and writes the result to global vars """
@@ -149,7 +149,7 @@ class RoboCommWorker(QObject):
 
 
 
-    def run(self):
+    def run (self):
         """ start timer, receive and send on timeout """
 
         self.commTimer = QTimer()
@@ -166,7 +166,7 @@ class RoboCommWorker(QObject):
 
 
 
-    def stop(self):
+    def stop (self):
         """ stop timer """
 
         self.commTimer.stop()
@@ -179,7 +179,7 @@ class RoboCommWorker(QObject):
 
 
 
-    def receive(self):
+    def receive (self):
         """ receive 36-byte data block, write to ROB vars """
 
         telem,rawData,state = UTIL.ROB_tcpip.receive()
@@ -288,7 +288,7 @@ class RoboCommWorker(QObject):
 
 
 
-    def send ( self, testrun= False ):
+    def send (self, testrun= False):
         """ send sendList entries if not empty """
 
         numToSend   = len( UTIL.ROB_sendList )
@@ -344,6 +344,42 @@ class RoboCommWorker(QObject):
                            + m.pow( UTIL.ROB_commQueue[0].Coor1.ext - UTIL.ROB_telem.Coor.ext, 2 ) )
         else:
             return None
+
+
+
+
+
+
+
+
+class SensorCommWorker (QObject):
+    """ cycle through all sensors, collect the data """
+
+    cycleDone   = pyqtSignal( bool )
+
+
+
+    def start (self):
+        """ start cycling through the sensors """
+
+        self.cycleTimer = QTimer()
+        self.cycleTimer.setInterval     (200)
+        self.cycleTimer.timeout.connect (self.cycle)
+        self.cycleTimer.start()
+    
+
+
+    def stop (self):
+        """ stop cycling """
+
+        self.cycleTimer.stop()
+        self.cycleTimer.deleteLater()
+    
+
+
+    def cycle (self):
+        """ check every sensor once """
+        
         
 
 
@@ -352,7 +388,7 @@ class RoboCommWorker(QObject):
 
 
 
-class LoadFileWorker(QObject):
+class LoadFileWorker (QObject):
     """ worker converts .gcode or .mod into QEntries, outsourced to worker as 
         these files can have more than 10000 lines """
     
@@ -362,7 +398,7 @@ class LoadFileWorker(QObject):
 
 
 
-    def start(self):
+    def start (self):
         """ get data, start conversion loop """
 
         global LFW_filePath
@@ -462,7 +498,7 @@ class LoadFileWorker(QObject):
 
 
 
-    def gcodeConv(self, ID, txt):
+    def gcodeConv (self, ID, txt):
         """ single line conversion from GCode """
 
         # get text and position BEFORE PLANNED COMMAND EXECUTION
@@ -490,7 +526,7 @@ class LoadFileWorker(QObject):
 
 
 
-    def rapidConv(self, ID, txt):
+    def rapidConv (self, ID, txt):
         """ single line conversion from RAPID """
                 
         entry,err   = UTIL.rapidToQEntry(txt)
@@ -509,7 +545,7 @@ class LoadFileWorker(QObject):
 
 
 
-    def addUmTool(self, umd):
+    def addUmTool (self, umd):
         """ check if the data makes send, add the tooldata to entries """
         
         try:                umDist = float( umd )

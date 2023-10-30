@@ -70,7 +70,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         # LOGFILE SETUP
         if(lpath is None):
-            logWarning = strdDialog('No path for logfile!\n\nPress OK to continue anyways or\n\
+            logWarning = strdDialog('No path for logfile!\n\nPress OK to continue anyways or\
                                      Cancel to exit the program.'
                                     ,'LOGFILE ERROR')
             logWarning.exec()
@@ -647,6 +647,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         UTIL.ROB_commFr = self.TCP_num_commForerun.value()
         mutex.unlock()
     
+
 
     def updateRobLiveAd ( self ):
         """ new factor for QEntry.Speed.ts, applied before sending """
@@ -1444,8 +1445,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                               ,mt = 'S')
         
         if( self.testrun ): return self.sendCommand(command, DC = True)
-        FSWarning = strdDialog('WARNING!\n\nRobot will stop after current movement!\n\
-                                OK to delete buffered commands on robot\n\
+        FSWarning = strdDialog('WARNING!\n\nRobot will stop after current movement!\
+                                OK to delete buffered commands on robot;\
                                 Cancel to contuinue queue processing.'
                                 ,'FORCED STOP COMMIT')
         FSWarning.exec()
