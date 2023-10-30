@@ -239,6 +239,8 @@ class ToolCommand:
             motor 2 ID (fiber delivery)
         m2_steps:
             motor 2 steps/position
+            used as [motor steps/mm] when move type is 'V'
+            used as motor steps when move type is 'T'
         m3_id:
             motor 3 ID (mortar pump)
         M3_steps:
@@ -254,7 +256,7 @@ class ToolCommand:
         m4_id:
             motor 4 ID (rotation knife)
         m4_steps:
-            motor 4 steps/position
+            motor 4 on/off
         pnmtcFiber_id:
             pneumatic fiber conveyer ID
         pnmtcFiber_yn:
@@ -288,11 +290,11 @@ class ToolCommand:
                  time_id        = 0,
                  time_time      = 0):
         
-        self.m1_id          = int (m1_id)
+        self.m1_id          = int (m1_id)           # pivoting value
         self.m1_steps       = int (m1_steps)
-        self.m2_id          = int (m2_id)
+        self.m2_id          = int (m2_id)           # fiber value (calculated with V-option)
         self.m2_steps       = int (m2_steps)
-        self.m3_id          = int (m3_id)
+        self.m3_id          = int (m3_id)           # mortar pump
         self.m3_steps       = int (m3_steps)
         self.pnmtcClamp_id  = int (pnmtcClamp_id)
         self.pnmtcClamp_yn  = bool(pnmtcClamp_yn)
@@ -1318,6 +1320,8 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
         to SC_queue) as its the fallback option if no new X, Y, Z or EXT posistion is passed"""
     global DC_currZero
     global SC_extFllwBhvr
+    global TOOL_fibRatio
+    global DEF_TOOL_FIB_STPS
 
     # handle mutuables here
     pos   = copy.deepcopy(mutPos)
@@ -1332,7 +1336,8 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
         
         case 'G1':
             entry = QEntry(id=0, Coor1=pos, Speed=speed, z=zone)
-                
+
+            # set position and speed    
             x,res = reShort('X\d+[,.]\d+', txt, pos.x, 'X\d+')
             if(res): 
                 entry.Coor1.x =  float( x[1:] .replace(',','.') )
@@ -1364,6 +1369,10 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
                 entry.Coor1.ext += zero.ext
             
             entry.Coor1 = round( entry.Coor1, 2 )
+
+            # set tool settings
+            entry.Tool.m2_steps         = TOOL_fibRatio * DEF_TOOL_FIB_STPS
+            entry.Tool.pnmtcFiber_yn    = True
             
         case 'G28':
             entry = QEntry( id = 0, Coor1 = pos, Speed = speed, z  = zone)
@@ -1371,6 +1380,10 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
             if ('Y0'   in txt):   entry.Coor1.y   = zero.y
             if ('Z0'   in txt):   entry.Coor1.z   = zero.z
             if ('EXT0' in txt):   entry.Coor1.ext = zero.ext
+
+            # set tool settings
+            entry.Tool.m2_steps         = 0
+            entry.Tool.pnmtcFiber_yn    = False
         
         case 'G92':
             if ('X0'   in txt):   DC_currZero.x   = pos.x
@@ -1437,10 +1450,14 @@ def rapidToQEntry(txt = ''):
         zone,res        = reShort('z\d+',txt,10)
         entry.z         = int( zone[1:] )
 
-        # for later, if tool is implemented
-        tool    = reShort(',[^,]*$',txt,'tool0')[0]
-        tool    = re.findall('^.* ',tool)[0]
-        tool    = tool [: len(tool) - 1]
+        # # for later, if tool is implemented
+        # tool    = reShort(',[^,]*$',txt,'tool0')[0]
+        # tool    = re.findall('^.* ',tool)[0]
+        # tool    = tool [: len(tool) - 1]
+
+        # set tool settings
+        entry.Tool.m2_steps         = TOOL_fibRatio * DEF_TOOL_FIB_STPS
+        entry.Tool.pnmtcFiber_yn    = True
 
     except Exception as e:
         return None,e
@@ -1533,6 +1550,9 @@ DEF_SC_EXT_FLLW_BHVR= (500,200)
 
 DEF_TERM_MAX_LINES  = 400
 
+DEF_TOOL_FIB_STPS   = 10
+DEF_TOOL_FIB_RATIO  = 1.0
+
 
 ############################ global variables
 DC_currZero         = Coordinate()
@@ -1588,3 +1608,5 @@ SC_extFllwBhvr      = DEF_SC_EXT_FLLW_BHVR
 STT_dataBlock       = DaqBlock()
 
 TERM_log            = []
+
+TOOL_fibRatio       = DEF_TOOL_FIB_RATIO

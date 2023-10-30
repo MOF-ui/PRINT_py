@@ -140,8 +140,8 @@ else:
 
 
 # overwrite ROBO_tcpip for testing, delete later
-UTIL.ROB_tcpip.ip      = 'localhost'
-UTIL.ROB_tcpip.port    = 10001
+# UTIL.ROB_tcpip.ip      = 'localhost'
+# UTIL.ROB_tcpip.port    = 10001
 
 
 # get the go from user
