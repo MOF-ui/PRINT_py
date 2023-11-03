@@ -1,3 +1,6 @@
+# test data_utilities
+
+############################################# IMPORTS #################################################
 
 import os
 import sys
@@ -19,52 +22,52 @@ class UTIL_test(unittest.TestCase):
         """ test Coor class, used to store positional data from robot """
         
         # __init__ & __str__
-        self.assertEqual( str( UTIL.Coor( X= 1.2, Y= 3.4, Z= 5.6
-                                         ,X_ori= 7.8, Y_ori= 9.11, Z_ori= 22.33
-                                         ,Q= 44.55, EXT= 66.77) )
+        self.assertEqual( str( UTIL.Coordinate( x= 1.2, y= 3.4, z= 5.6
+                                                ,rx= 7.8, ry= 9.11, rz= 22.33
+                                                ,q= 44.55, ext= 66.77) )
                          ,f"X: {1.2}   Y: {3.4}   Z: {5.6}   " \
                           f"Rx: {7.8}   Ry: {9.11}   Rz: {22.33}   " \
                           f"Q: {44.55}   EXT: {66.77}")
-        self.assertEqual( str( UTIL.Coor() )
+        self.assertEqual( str( UTIL.Coordinate() )
                          ,f"X: {0.0}   Y: {0.0}   Z: {0.0}   " \
                           f"Rx: {0.0}   Ry: {0.0}   Rz: {0.0}   " \
                           f"Q: {0.0}   EXT: {0.0}")
         
         # __add__
-        self.assertEqual( UTIL.Coor( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
-                          + UTIL.Coor( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
-                          ,UTIL.Coor( 2.2, 4.4, 6.6, 8.8, 11.0, 13.2, 15.4, 17.6) )                          
-        self.assertEqual( UTIL.Coor( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
+        self.assertEqual( UTIL.Coordinate( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
+                          + UTIL.Coordinate( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
+                          ,UTIL.Coordinate( 2.2, 4.4, 6.6, 8.8, 11.0, 13.2, 15.4, 17.6) )                          
+        self.assertEqual( UTIL.Coordinate( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
                           + 11.1
-                          ,UTIL.Coor( 12.2, 13.3, 14.4, 15.5, 16.6, 17.7, 18.8, 19.9) )
+                          ,UTIL.Coordinate( 12.2, 13.3, 14.4, 15.5, 16.6, 17.7, 18.8, 19.9) )
         
         # __sub__
-        self.assertEqual( UTIL.Coor( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
-                          - UTIL.Coor( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
-                         ,UTIL.Coor() )
-        self.assertEqual( UTIL.Coor( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
+        self.assertEqual( UTIL.Coordinate( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
+                          - UTIL.Coordinate( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
+                         ,UTIL.Coordinate() )
+        self.assertEqual( UTIL.Coordinate( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
                           - 1.1
-                         ,UTIL.Coor( 0.0, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7) )
+                         ,UTIL.Coordinate( 0.0, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7) )
         
         #__round__
-        self.assertEqual( round(UTIL.Coor( 1.111, 2.222, 3.333, 4.444, 5.555, 6.666, 7.777, 8.888), 1)
-                         ,UTIL.Coor( 1.1, 2.2, 3.3, 4.4, 5.6, 6.7, 7.8, 8.9) )
+        self.assertEqual( round(UTIL.Coordinate( 1.111, 2.222, 3.333, 4.444, 5.555, 6.666, 7.777, 8.888), 1)
+                         ,UTIL.Coordinate( 1.1, 2.2, 3.3, 4.4, 5.6, 6.7, 7.8, 8.9) )
         
 
     def test_Speed_class(self):
         """ test Speed class, used to store acceleration and travel speed settings """
         
         # __init__ & __str__
-        self.assertEqual( str( UTIL.Speed( ACR= 1.2, DCR= 3.4, TS= 5.6, OS= 7.8) )
+        self.assertEqual( str( UTIL.SpeedVector( acr= 1.2, dcr= 3.4, ts= 5.6, os= 7.8) )
                          ,f"TS: {6}   OS: {8}   ACR: {1}   DCR: {3}")
-        self.assertEqual( str( UTIL.Speed() )
+        self.assertEqual( str( UTIL.SpeedVector() )
                          ,f"TS: {200}   OS: {50}   ACR: {50}   DCR: {50}")
         
         #__mul__ & __rmul__
-        self.assertEqual( UTIL.Speed( 22, 44, 6, 8) * 1.1
-                         ,UTIL.Speed( 24, 48, 7, 9))
-        self.assertEqual( UTIL.Speed( 22, 44, 6, 8) * 1.1
-                         ,1.1 * UTIL.Speed( 22, 44, 6, 8))
+        self.assertEqual( UTIL.SpeedVector( 22, 44, 6, 8) * 1.1
+                         ,UTIL.SpeedVector( 24, 48, 7, 9))
+        self.assertEqual( UTIL.SpeedVector( 22, 44, 6, 8) * 1.1
+                         ,1.1 * UTIL.SpeedVector( 22, 44, 6, 8))
         
 
 
@@ -72,12 +75,12 @@ class UTIL_test(unittest.TestCase):
         """ test ToolCommand class, used to store AmConEE data """
 
         # __init__ & __str__
-        self.assertEqual( str( UTIL.ToolCommand( M1_ID= 1, M1_STEPS= 2, M2_ID= 3, M2_STEPS= 4
-                                                ,M3_ID= 5, M3_STEPS= 6, PNMTC_CLAMP_ID= 7
-                                                ,PNMTC_CLAMP_YN= True ,KNIFE_ID= 8
-                                                ,KNIFE_YN= False, M4_ID= 9, M4_STEPS= False
-                                                ,PNMTC_FIBER_ID= 10, PNMTC_FIBER_YN= True
-                                                ,TIME_ID= 11, TIME_TIME= 12) )
+        self.assertEqual( str( UTIL.ToolCommand( m1_id= 1, m1_steps= 2, m2_id= 3, m2_steps= 4
+                                                ,m3_id= 5, m3_steps= 6, pnmtcClamp_id= 7
+                                                ,pnmtcClamp_yn= True ,knife_id= 8
+                                                ,knife_yn= False, m4_id= 9, m4_steps= False
+                                                ,pnmtcFiber_id= 10, pnmtcFiber_yn= True
+                                                ,time_id= 11, time_time= 12) )
                          ,f"M1: {1}, {2}   M2: {3}, {4}   M3: {5}, {6}   "\
                           f"P_C: {7}, {True}   KN: {8}, {False}   "\
                           f"M4: {9}, {False}   P_F: {10}, {True}   TIME: {11}, {12}")
@@ -95,20 +98,22 @@ class UTIL_test(unittest.TestCase):
         self.maxDiff = 2000
 
         # __init__ & __str__
-        self.assertEqual( str( UTIL.QEntry( ID= 1, MT= 2, PT= 3, COOR_1= UTIL.Coor(4,4,4,4,4,4,4,4)
-                                           ,COOR_2= UTIL.Coor(5,5,5,5,5,5,5,5), SV= UTIL.Speed(6,6,6,6)
-                                           ,SBT= 7 ,SC= "A" ,Z= 8
-                                           ,TOOL= UTIL.ToolCommand(9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9)) )
-                         ,f"ID: {1}  MT: {2}  PT: {3} \t|| COOR_1: {UTIL.Coor(4,4,4,4,4,4,4,4)}"\
-                          f"\n\t\t|| COOR_2: {UTIL.Coor(5,5,5,5,5,5,5,5)}"\
-                          f"\n\t\t|| SV:     {UTIL.Speed(6,6,6,6)} \t|| SBT: {7}   SC: A   Z: {8}"\
-                          f"\n\t\t|| TOOL:   {UTIL.ToolCommand(9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9)}")
+        self.assertEqual( str( UTIL.QEntry( id= 1, mt= 2, pt= 3, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)
+                                           ,Coor2= UTIL.Coordinate(5,5,5,5,5,5,5,5), Speed= UTIL.SpeedVector(6,6,6,6)
+                                           ,sbt= 7 ,sc= "A" ,z= 8
+                                           ,Tool= UTIL.ToolCommand(9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9)) )
+                         ,f"ID: {1}  MT: {2}  PT: {3} \t|| COOR_1: {UTIL.Coordinate(4,4,4,4,4,4,4,4)}"\
+                          f"\n\t\t|| COOR_2: {UTIL.Coordinate(5,5,5,5,5,5,5,5)}"\
+                          f"\n\t\t|| SV:     {UTIL.SpeedVector(6,6,6,6)} \t|| SBT: {7}   SC: A   Z: {8}"\
+                          f"\n\t\t|| TOOL:   {UTIL.ToolCommand(9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9)}"\
+                          f"\n\t\t|| PMODE:  None")
 
         self.assertEqual( str( UTIL.QEntry() )
-                         ,f"ID: {0}  MT: L  PT: E \t|| COOR_1: {UTIL.Coor()}"\
-                          f"\n\t\t|| COOR_2: {UTIL.Coor()}"\
-                          f"\n\t\t|| SV:     {UTIL.Speed()} \t|| SBT: {0}   SC: V   Z: {10}"\
-                          f"\n\t\t|| TOOL:   {UTIL.ToolCommand()}")
+                         ,f"ID: {0}  MT: L  PT: E \t|| COOR_1: {UTIL.Coordinate()}"\
+                          f"\n\t\t|| COOR_2: {UTIL.Coordinate()}"\
+                          f"\n\t\t|| SV:     {UTIL.SpeedVector()} \t|| SBT: {0}   SC: V   Z: {10}"\
+                          f"\n\t\t|| TOOL:   {UTIL.ToolCommand()}"\
+                          f"\n\t\t|| PMODE:  None")
         
 
 
@@ -120,12 +125,12 @@ class UTIL_test(unittest.TestCase):
         emptyQueue = UTIL.Queue()
         testQueue  = UTIL.Queue()
         testQueue.add( UTIL.QEntry() )
-        testQueue.add( UTIL.QEntry(ID= 3, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3)) )
+        testQueue.add( UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)) )
 
         # __init__ & __str__
         self.assertEqual( str( testQueue )
-                         ,f"Element 1: { UTIL.QEntry(ID= 1) }\n"\
-                          f"Element 2: { UTIL.QEntry(ID= 2, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3))}\n")
+                         ,f"Element 1: { UTIL.QEntry(id= 1) }\n"\
+                          f"Element 2: { UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3))}\n")
 
         self.assertEqual( str( UTIL.Queue() )
                          ,f"Queue is empty!")
@@ -133,7 +138,7 @@ class UTIL_test(unittest.TestCase):
         # __getitem__
         self.assertIsNone( emptyQueue[1] )
         self.assertEqual ( testQueue[1]
-                          ,UTIL.QEntry(ID= 2, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3)) )
+                          ,UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)) )
         
         # __len__
         self.assertEqual( len(testQueue), 2)
@@ -145,19 +150,19 @@ class UTIL_test(unittest.TestCase):
         # lastEntry
         self.assertIsNone( emptyQueue.lastEntry() )
         self.assertEqual ( testQueue.lastEntry()
-                          ,UTIL.QEntry(ID= 2, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3)) )
+                          ,UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)) )
         
         # entryBeforeID
         self.assertRaises( AttributeError, emptyQueue.entryBeforeID, 1 )
         self.assertRaises( AttributeError, testQueue.entryBeforeID,  1 )
         self.assertRaises( AttributeError, testQueue.entryBeforeID,  3 )
         self.assertEqual ( testQueue.entryBeforeID(2)
-                          ,UTIL.QEntry(ID= 1) )
+                          ,UTIL.QEntry(id= 1) )
         
         # display
         self.assertEqual( testQueue.display() ,
-                          [ str( UTIL.QEntry(ID= 1) )
-                           ,str( UTIL.QEntry(ID= 2, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3))) ] )
+                          [ UTIL.QEntry(id= 1).printShort()
+                           ,UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort() ] )
 
         self.assertEqual( emptyQueue.display()
                          ,["Queue is empty!"])
@@ -165,30 +170,30 @@ class UTIL_test(unittest.TestCase):
         # increment
         testQueue.increment()
         self.assertEqual( testQueue.display() ,
-                          [ str( UTIL.QEntry(ID= 2) )
-                           ,str( UTIL.QEntry(ID= 3, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3))) ] )
+                          [ UTIL.QEntry(id= 2).printShort() 
+                           ,UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort() ] )
         
         # add
-        self.assertEqual( testQueue.add( UTIL.QEntry( ID= -1 ) )
+        self.assertEqual( testQueue.add( UTIL.QEntry( id= -1 ) )
                          ,ValueError )
         
-        testQueue.add( UTIL.QEntry( ID= 0, COOR_1= UTIL.Coor(4,4,4,4,4,4,4,4)) )
-        testQueue.add( UTIL.QEntry( ID= 9, COOR_1= UTIL.Coor(5,5,5,5,5,5,5,5)) )
+        testQueue.add( UTIL.QEntry( id= 0, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)) )
+        testQueue.add( UTIL.QEntry( id= 9, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5)) )
         self.assertEqual( testQueue.display() 
-                         ,[ str( UTIL.QEntry(ID= 2) )
-                           ,str( UTIL.QEntry(ID= 3, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3)))
-                           ,str( UTIL.QEntry(ID= 4, COOR_1= UTIL.Coor(4,4,4,4,4,4,4,4)))
-                           ,str( UTIL.QEntry(ID= 5, COOR_1= UTIL.Coor(5,5,5,5,5,5,5,5))) ] )
+                         ,[ UTIL.QEntry(id= 2).printShort()
+                           ,UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort()
+                           ,UTIL.QEntry(id= 4, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)).printShort()
+                           ,UTIL.QEntry(id= 5, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5)).printShort() ] )
         
-        testQueue.add( UTIL.QEntry( ID= 1, COOR_1= UTIL.Coor(1,1,1,1,1,1,1,1)))
-        testQueue.add( UTIL.QEntry( ID= 4, COOR_1= UTIL.Coor(6,6,6,6,6,6,6,6)))
+        testQueue.add( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate(1,1,1,1,1,1,1,1)))
+        testQueue.add( UTIL.QEntry( id= 4, Coor1= UTIL.Coordinate(6,6,6,6,6,6,6,6)))
         self.assertEqual( testQueue.display() ,
-                          [ str( UTIL.QEntry(ID= 2, COOR_1= UTIL.Coor(1,1,1,1,1,1,1,1)))
-                           ,str( UTIL.QEntry(ID= 3) )
-                           ,str( UTIL.QEntry(ID= 4, COOR_1= UTIL.Coor(6,6,6,6,6,6,6,6)))
-                           ,str( UTIL.QEntry(ID= 5, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3)))
-                           ,str( UTIL.QEntry(ID= 6, COOR_1= UTIL.Coor(4,4,4,4,4,4,4,4)))
-                           ,str( UTIL.QEntry(ID= 7, COOR_1= UTIL.Coor(5,5,5,5,5,5,5,5))) ] )
+                          [ UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(1,1,1,1,1,1,1,1)).printShort()
+                           ,UTIL.QEntry(id= 3).printShort()
+                           ,UTIL.QEntry(id= 4, Coor1= UTIL.Coordinate(6,6,6,6,6,6,6,6)).printShort()
+                           ,UTIL.QEntry(id= 5, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort()
+                           ,UTIL.QEntry(id= 6, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)).printShort()
+                           ,UTIL.QEntry(id= 7, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5)).printShort() ] )
         
         # clear
         self.assertEqual( testQueue.clear(all= False, ID= ''),      ValueError )
@@ -202,16 +207,16 @@ class UTIL_test(unittest.TestCase):
 
         testQueue.clear(all= False, ID = '4')
         self.assertEqual( testQueue.display()
-                         ,[ str( UTIL.QEntry(ID= 2, COOR_1= UTIL.Coor(1,1,1,1,1,1,1,1)))
-                           ,str( UTIL.QEntry(ID= 3) )
-                           ,str( UTIL.QEntry(ID= 4, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3)))
-                           ,str( UTIL.QEntry(ID= 5, COOR_1= UTIL.Coor(4,4,4,4,4,4,4,4)))
-                           ,str( UTIL.QEntry(ID= 6, COOR_1= UTIL.Coor(5,5,5,5,5,5,5,5))) ] )
+                         ,[ UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(1,1,1,1,1,1,1,1)).printShort()
+                           ,UTIL.QEntry(id= 3).printShort()
+                           ,UTIL.QEntry(id= 4, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort()
+                           ,UTIL.QEntry(id= 5, Coor1= UTIL.Coordinate(4,4,4,4,4,4,4,4)).printShort()
+                           ,UTIL.QEntry(id= 6, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5)).printShort() ] )
         
         testQueue.clear(all= False, ID = '3..5')
         self.assertEqual( testQueue.display()
-                         ,[ str( UTIL.QEntry(ID= 2, COOR_1= UTIL.Coor(1,1,1,1,1,1,1,1)))
-                           ,str( UTIL.QEntry(ID= 3, COOR_1= UTIL.Coor(5,5,5,5,5,5,5,5))) ] )
+                         ,[ UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(1,1,1,1,1,1,1,1)).printShort()
+                           ,UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(5,5,5,5,5,5,5,5)).printShort() ] )
         
         testQueue.clear()
         self.assertEqual( testQueue.display()
@@ -221,11 +226,10 @@ class UTIL_test(unittest.TestCase):
         self.assertEqual( emptyQueue.popFirstItem(), IndexError )
 
         testQueue.add( UTIL.QEntry() )
-        testQueue.add( UTIL.QEntry(ID= 3, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3)) )
-        self.assertEqual( testQueue.popFirstItem()
-                         ,UTIL.QEntry(ID= 1) )
+        testQueue.add( UTIL.QEntry(id= 3, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)) )
+        self.assertEqual( testQueue.popFirstItem(), UTIL.QEntry(id= 1) )
         self.assertEqual( testQueue.display()
-                         ,[ str( UTIL.QEntry(ID= 2, COOR_1= UTIL.Coor(3,3,3,3,3,3,3,3))) ] )
+                         ,[ UTIL.QEntry(id= 2, Coor1= UTIL.Coordinate(3,3,3,3,3,3,3,3)).printShort() ] )
         
 
 
@@ -233,8 +237,8 @@ class UTIL_test(unittest.TestCase):
         """ test RoboTelemetry class, used to store 36 TCP-response from robot """
         
         # __init__ & __str__
-        self.assertEqual( str( UTIL.RoboTelemetry( TOOL_SPEED= 1.1, ID= 2
-                                                  ,POS= UTIL.Coor(3,3,3,3,3,3,3,3)) )
+        self.assertEqual( str( UTIL.RoboTelemetry( tSpeed= 1.1, id= 2
+                                                  ,Coor= UTIL.Coordinate(3,3,3,3,3,3,3,3)) )
                          ,f"ID: {2}   X: {3.0}   Y: {3.0}   Z: {3.0}   Rx: {3.0}   Ry: {3.0}   Rz: {3.0}   "\
                           f"EXT:   {3.0}   TOOL_SPEED: {1.1}" )
         self.assertEqual( str( UTIL.RoboTelemetry() )
@@ -242,11 +246,11 @@ class UTIL_test(unittest.TestCase):
                           f"EXT:   {0.0}   TOOL_SPEED: {0.0}" )
         
         #__round__
-        self.assertEqual( round( UTIL.RoboTelemetry( TOOL_SPEED= 1.111, ID= 2.222
-                                                    ,POS= UTIL.Coor(3.333,3.333,3.333,3.333,3.333,3.333,3.333,3.333))
+        self.assertEqual( round( UTIL.RoboTelemetry( tSpeed= 1.111, id= 2.222
+                                                    ,Coor= UTIL.Coordinate(3.333,3.333,3.333,3.333,3.333,3.333,3.333,3.333))
                                 ,1)
-                         ,UTIL.RoboTelemetry( TOOL_SPEED= 1.1, ID= 2
-                                             ,POS= UTIL.Coor(3.3,3.3,3.3,3.3,3.3,3.3,3.3,3.3)) )
+                         ,UTIL.RoboTelemetry( tSpeed= 1.1, id= 2
+                                             ,Coor= UTIL.Coordinate(3.3,3.3,3.3,3.3,3.3,3.3,3.3,3.3)) )
         
 
 
@@ -254,15 +258,15 @@ class UTIL_test(unittest.TestCase):
         """ test RoboTelemetry class, used to store 36 TCP-response from robot """
         
         # __init__ & __str__
-        self.assertEqual( str( UTIL.PumpTelemetry( FREQ= 1.1, VOLT= 2.2, AMPS= 3.3, TORQ= 4.4) )
+        self.assertEqual( str( UTIL.PumpTelemetry( freq= 1.1, volt= 2.2, amps= 3.3, torq= 4.4) )
                          ,f"FREQ: {1.1}   VOLT: {2.2}   AMPS: {3.3}   TORQ: {4.4}" )
         self.assertEqual( str( UTIL.PumpTelemetry() )
                          ,f"FREQ: {0.0}   VOLT: {0.0}   AMPS: {0.0}   TORQ: {0.0}" )
         
         #__round__
-        self.assertEqual( round( UTIL.PumpTelemetry( FREQ= 1.111, VOLT= 2.222, AMPS= 3.333, TORQ= 4.444)
+        self.assertEqual( round( UTIL.PumpTelemetry( freq= 1.111, volt= 2.222, amps= 3.333, torq= 4.444)
                                 ,1 )
-                         ,UTIL.PumpTelemetry( FREQ= 1.1, VOLT= 2.2, AMPS= 3.3, TORQ= 4.4))
+                         ,UTIL.PumpTelemetry( freq= 1.1, volt= 2.2, amps= 3.3, torq= 4.4))
 
 
 
@@ -270,29 +274,27 @@ class UTIL_test(unittest.TestCase):
         """ test DataBlock class, used to sort data for InfluxDB """
 
         # __init__ & __str__
-        self.assertEqual( str( UTIL.DataBlock( ambTemp= 1.1, ambHum= 2.2, delivPumpTemp= 3.3
-                                              ,robBaseTemp= 4.4, kPumpTemp= 5.5, delivPumpPress= 6.6
-                                              ,kPumpPress= 7.7, PUMP1= UTIL.PumpTelemetry(8,9,10,11)
-                                              ,PUMP2= UTIL.PumpTelemetry(12,13,14,15), admPumpFreq= 16.16
-                                              ,admPumpAmps= 17.17, kPumpFreq= 18.18, kPumpAmps= 19.19
-                                              ,id= 20.2, toolSpeed= 21.21, POS= UTIL.Coor(22,23,24,25,26,27,28,29)
+        self.assertEqual( str( UTIL.DaqBlock( amb_temp= 1.1, amb_hum= 2.2, delivPump_temp= 3.3
+                                              ,robBase_temp= 4.4, kPump_temp= 5.5, delivPump_press= 6.6
+                                              ,kPump_press= 7.7, Pump1= UTIL.PumpTelemetry(8,9,10,11)
+                                              ,Pump2= UTIL.PumpTelemetry(12,13,14,15), admPump_freq= 16.16
+                                              ,admPump_amps= 17.17, kPump_freq= 18.18, kPump_amps= 19.19
+                                              ,Robo= UTIL.RoboTelemetry(20.2, 21.21, UTIL.Coordinate(22,23,24,25,26,27,28,29))
                                               ,porosAnalysis= 30.30, distanceFront= 31.31, distanceEnd= 32.32) )
                          ,f"ambTemp: {1.1}    ambHum: {2.2}    delivPumpTemp: {3.3}    robBaseTemp: {4.4}    "\
                           f"kPumpTemp: {5.5}    delivPumpPress: {6.6}    kPumpPress: {7.7}    "\
                           f"PUMP1: {UTIL.PumpTelemetry(8,9,10,11)}    PUMP2: {UTIL.PumpTelemetry(12,13,14,15)}    "\
                           f"admPumpFreq: {16.16}    admPumpAmps: {17.17}    kPumpFreq: {18.18}    "\
-                          f"kPumpAmps: {19.19}    id: {20}    toolspeed: {21.21}    "\
-                          f"POS: {UTIL.Coor(22,23,24,25,26,27,28,29)}    porosAnalysis: {30.30}    "\
-                          f"distanceFront: {31.31}    distanceEnd: {32.32}")
+                          f"kPumpAmps: {19.19}    ROB: {UTIL.RoboTelemetry(20.2, 21.21, UTIL.Coordinate(22,23,24,25,26,27,28,29))}    "\
+                          f"porosAnalysis: {30.30}    distanceFront: {31.31}    distanceEnd: {32.32}")
         
-        self.assertEqual( str( UTIL.DataBlock() )
+        self.assertEqual( str( UTIL.DaqBlock() )
                          ,f"ambTemp: {0.0}    ambHum: {0.0}    delivPumpTemp: {0.0}    robBaseTemp: {0.0}    "\
                           f"kPumpTemp: {0.0}    delivPumpPress: {0.0}    kPumpPress: {0.0}    "\
                           f"PUMP1: {UTIL.PumpTelemetry()}    PUMP2: {UTIL.PumpTelemetry()}    "\
                           f"admPumpFreq: {0.0}    admPumpAmps: {0.0}    kPumpFreq: {0.0}    "\
-                          f"kPumpAmps: {0.0}    id: {0}    toolspeed: {0.0}    "\
-                          f"POS: {UTIL.Coor()}    porosAnalysis: {0.0}    "\
-                          f"distanceFront: {0.0}    distanceEnd: {0.0}")
+                          f"kPumpAmps: {0.0}    ROB: {UTIL.RoboTelemetry()}    "\
+                          f"porosAnalysis: {0.0}    distanceFront: {0.0}    distanceEnd: {0.0}")
 
 
 
@@ -302,7 +304,7 @@ class UTIL_test(unittest.TestCase):
         testTCPIP = UTIL.TCPIP()
 
         # __init__ & __str__
-        initTestTCPIP = UTIL.TCPIP( IP= '1.1.1.1', PORT= 2222, C_TOUT= 3.3, RW_TOUT= 4.4
+        initTestTCPIP = UTIL.TCPIP( ip= '1.1.1.1', PORT= 2222, C_TOUT= 3.3, RW_TOUT= 4.4
                                    ,R_BL= 5.5, W_BL= 6.6)
         
         self.assertEqual( str( initTestTCPIP )
@@ -316,8 +318,8 @@ class UTIL_test(unittest.TestCase):
         initTestTCPIP.close( end= True )
         
         # setParams
-        testTCPIP.setParams( { 'IP':'1.1.1.1', 'PORT': 2222, 'CTOUT': 0.003
-                              ,'RWTOUT': 0.004, 'R_BL': 5.5, 'W_BL': 6.6} )
+        testTCPIP.setParams( { 'IP':'1.1.1.1', 'PORT': 2222, 'C_TOUT': 0.003
+                              ,'RW_TOUT': 0.004, 'R_BL': 5.5, 'W_BL': 6.6} )
         self.assertEqual( str( testTCPIP) 
                          ,f"IP: 1.1.1.1   PORT: {2222}   C_TOUT: {0.003}   RW_TOUT: {0.004}   "\
                           f"R_BL: {5}   W_BL: {6}" )
@@ -331,21 +333,21 @@ class UTIL_test(unittest.TestCase):
         self.assertEqual( testTCPIP.connect()
                          ,(TimeoutError, ('1.1.1.1', 2222)) )
 
-        testTCPIP.PORT = 'ABC'
+        testTCPIP.port = 'ABC'
         self.assertRaises( ConnectionError,
                            testTCPIP.connect )
         
         # send
-        self.assertEqual( testTCPIP.send( UTIL.QEntry(ID= 1) )
-                         ,(ConnectionError, None) )
+        self.assertEqual( testTCPIP.send( UTIL.QEntry(id= 1) )
+                         ,(ConnectionError, 0) )
         
         testTCPIP.connected = True
-        self.assertEqual( testTCPIP.send( UTIL.QEntry(ID= 1) ) 
+        self.assertEqual( testTCPIP.send( UTIL.QEntry(id= 1) ) 
                          ,(ValueError, 159) )
         
-        testTCPIP.W_BL = 159
-        self.assertEqual( testTCPIP.send( UTIL.QEntry(ID= 1) )
-                         ,(OSError, None) )
+        testTCPIP.w_bl = 159
+        self.assertEqual( testTCPIP.send( UTIL.QEntry(id= 1) )
+                         ,(OSError, 0) )
 
         #receive
         self.assertEqual( testTCPIP.receive()
@@ -393,49 +395,52 @@ class UTIL_test(unittest.TestCase):
     def test_gcodeToQEntry_function (self):
         """ see gcodeToQEntry in libs/PRINT_data_utilities """
         
-        testPos   = UTIL.Coor(1,1,1,1,1,1,1,1)
-        testSpeed = UTIL.Speed(2,2,2,2)
+        testPos   = UTIL.Coordinate(1,1,1,1,1,1,1,1)
+        testSpeed = UTIL.SpeedVector(2,2,2,2)
         testZone  = 3
-        UTIL.DC_curr_zero = UTIL.Coor(4,4,4,4,4,4,4,4)
+        UTIL.DC_currZero = UTIL.Coordinate(4,4,4,4,4,4,4,4)
 
         testTxt   = 'G1 X5.5 Y6 EXT7 F80'
         self.assertEqual( UTIL.gcodeToQEntry( mutPos= testPos, mutSpeed= testSpeed
                                              ,zone= testZone, txt= testTxt)
-                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(9.5,10,1,1,1,1,1,11)
-                                        ,SV= UTIL.Speed(2,2,8,2) ,Z= 3  )
+                         ,( UTIL.QEntry( Coor1= UTIL.Coordinate(9.5,10,1,1,1,1,1,11)
+                                        ,Speed= UTIL.SpeedVector(2,2,8,2) ,z= 3
+                                        ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True)  )
                            ,'G1') )
         
         testTxt   = 'G28 X0 Y0'
         self.assertEqual( UTIL.gcodeToQEntry( mutPos= testPos, mutSpeed= testSpeed
                                              ,zone= testZone, txt= testTxt)
-                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(4,4,5,4,4,4,4,5)
-                                        ,SV= UTIL.Speed(2,2,2,2) ,Z= 3  )
+                         ,( UTIL.QEntry( Coor1= UTIL.Coordinate(4,4,1,1,1,1,1,1)
+                                        ,Speed= UTIL.SpeedVector(2,2,2,2) ,z= 3  )
                             ,'G28' ) )
         
         testTxt   = 'G92 X0 Y0'
         UTIL.gcodeToQEntry( mutPos= testPos, mutSpeed= testSpeed,zone= testZone, txt= testTxt)
-        self.assertEqual( UTIL.DC_curr_zero, UTIL.Coor(1,1,4,4,4,4,4,4) )
+        self.assertEqual( UTIL.DC_currZero, UTIL.Coordinate(1,1,4,4,4,4,4,4) )
     
 
     
     def test_rapidToQEntry_function (self):
         """ see gcodeToQEntry in libs/PRINT_data_utilities """
         
-        UTIL.DC_curr_zero = UTIL.Coor(4,4,4,4,4,4,4,4)
+        UTIL.DC_currZero = UTIL.Coordinate(4,4,4,4,4,4,4,4)
 
         testTxt   = 'MoveJ [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[0,0,0,0],[0,0,0,0,0,0]],\
                     [8,9,10,11],z12,tool0 EXT:13'
         self.assertEqual( UTIL.rapidToQEntry( txt= testTxt )
-                         ,(UTIL.QEntry( COOR_1= UTIL.Coor(1.1,2.2,3.3,4.4,5.5,6.6,7.7,13)
-                                        ,MT= 'J' ,PT= 'Q'
-                                        ,SV= UTIL.Speed(10,11,8,9) ,Z= 12)  
+                         ,(UTIL.QEntry( Coor1= UTIL.Coordinate(1.1,2.2,3.3,4.4,5.5,6.6,7.7,13)
+                                        ,mt= 'J' ,pt= 'Q'
+                                        ,Speed= UTIL.SpeedVector(10,11,8,9) ,z= 12
+                                        ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) )  
                           ,None ) )
         
         testTxt   = 'MoveL Offs(pHome,1.1,2.2,3.3),[8,9,10,11],z12,tool0 EXT:13'
         self.assertEqual( UTIL.rapidToQEntry( txt= testTxt )
-                         ,( UTIL.QEntry( COOR_1= UTIL.Coor(5.1,6.2,7.3,4,4,4,4,17)
-                                        ,PT= 'E'
-                                        ,SV= UTIL.Speed(10,11,8,9) ,Z= 12 )
+                         ,( UTIL.QEntry( Coor1= UTIL.Coordinate(5.1,6.2,7.3,4,4,4,4,17)
+                                        ,pt= 'E'
+                                        ,Speed= UTIL.SpeedVector(10,11,8,9) ,z= 12
+                                        ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) )
                             ,None ) )
         
 
@@ -443,16 +448,18 @@ class UTIL_test(unittest.TestCase):
     def test_showOnTerminal_function (self):
         """ see showOnTerminal in libs/PRINT_data_utilities """
 
-        UTIL.TERM_maxLen = 1
-        UTIL.showOnTerminal('1')
+        UTIL.DEF_TERM_MAX_LINES = 1
+        UTIL.addToCommProtocol('1')
         self.assertEqual(UTIL.TERM_log, ['1'])
 
-        UTIL.showOnTerminal('2')
+        UTIL.addToCommProtocol('2')
         self.assertEqual(UTIL.TERM_log, ['2'])
 
 
 
 
+
+#############################################  MAIN  ##################################################
 
 if __name__ == '__main__':
     unittest.main()

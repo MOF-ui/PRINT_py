@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainframe_v2.ui'
+# Form implementation generated from reading ui file '.\mainframe.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -15,7 +15,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
-        MainWindow.resize(1920, 1081)
+        MainWindow.resize(1937, 1117)
         MainWindow.setMinimumSize(QtCore.QSize(600, 400))
         MainWindow.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
@@ -238,8 +238,10 @@ class Ui_MainWindow(object):
 "QFrame#SET_frame,\n"
 "QFrame#SGLC_frame,\n"
 "QFrame#SIB_frame, \n"
+"QFrame#SID_frame, \n"
 "QFrame#TERM_frame,\n"
 "QFrame#TCP_frame,\n"
+"QFrame#TRANS_frame,\n"
 "QFrame#ZERO_frame {\n"
 "    border-radius: 8px;\n"
 "    background-color: #5D707F;\n"
@@ -370,7 +372,7 @@ class Ui_MainWindow(object):
         self.IO_disp_estimVol.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.IO_disp_estimVol.setObjectName("IO_disp_estimVol")
         self.IO_lbl_commNum = QtWidgets.QLabel(self.IO_frame)
-        self.IO_lbl_commNum.setGeometry(QtCore.QRect(30, 210, 121, 41))
+        self.IO_lbl_commNum.setGeometry(QtCore.QRect(20, 200, 141, 51))
         self.IO_lbl_commNum.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -378,7 +380,7 @@ class Ui_MainWindow(object):
         self.IO_lbl_commNum.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.IO_lbl_commNum.setObjectName("IO_lbl_commNum")
         self.IO_lbl_estimLen = QtWidgets.QLabel(self.IO_frame)
-        self.IO_lbl_estimLen.setGeometry(QtCore.QRect(20, 280, 131, 41))
+        self.IO_lbl_estimLen.setGeometry(QtCore.QRect(20, 270, 141, 51))
         self.IO_lbl_estimLen.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -386,19 +388,19 @@ class Ui_MainWindow(object):
         self.IO_lbl_estimLen.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.IO_lbl_estimLen.setObjectName("IO_lbl_estimLen")
         self.IO_lbl_estimVol = QtWidgets.QLabel(self.IO_frame)
-        self.IO_lbl_estimVol.setGeometry(QtCore.QRect(20, 350, 131, 41))
+        self.IO_lbl_estimVol.setGeometry(QtCore.QRect(20, 340, 141, 51))
         self.IO_lbl_estimVol.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
         self.IO_lbl_estimVol.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.IO_lbl_estimVol.setObjectName("IO_lbl_estimVol")
-        self.IO_btt_xyzZero = QtWidgets.QPushButton(self.IO_frame)
-        self.IO_btt_xyzZero.setGeometry(QtCore.QRect(40, 500, 231, 41))
-        self.IO_btt_xyzZero.setObjectName("IO_btt_xyzZero")
-        self.IO_btt_extZero = QtWidgets.QPushButton(self.IO_frame)
-        self.IO_btt_extZero.setGeometry(QtCore.QRect(40, 560, 231, 41))
-        self.IO_btt_extZero.setObjectName("IO_btt_extZero")
+        self.IO_btt_xyzextZero = QtWidgets.QPushButton(self.IO_frame)
+        self.IO_btt_xyzextZero.setGeometry(QtCore.QRect(40, 500, 231, 41))
+        self.IO_btt_xyzextZero.setObjectName("IO_btt_xyzextZero")
+        self.IO_btt_orientZero = QtWidgets.QPushButton(self.IO_frame)
+        self.IO_btt_orientZero.setGeometry(QtCore.QRect(40, 560, 231, 41))
+        self.IO_btt_orientZero.setObjectName("IO_btt_orientZero")
         self.IO_num_addByID = QtWidgets.QSpinBox(self.IO_frame)
         self.IO_num_addByID.setGeometry(QtCore.QRect(130, 730, 101, 41))
         self.IO_num_addByID.setStyleSheet("font-size: 14pt")
@@ -406,7 +408,7 @@ class Ui_MainWindow(object):
         self.IO_num_addByID.setMaximum(999999)
         self.IO_num_addByID.setObjectName("IO_num_addByID")
         self.IO_lbl_addByID = QtWidgets.QLabel(self.IO_frame)
-        self.IO_lbl_addByID.setGeometry(QtCore.QRect(40, 730, 81, 41))
+        self.IO_lbl_addByID.setGeometry(QtCore.QRect(30, 720, 91, 51))
         self.IO_lbl_addByID.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -441,6 +443,27 @@ class Ui_MainWindow(object):
 "color: #E1E5EE;")
         self.IO_lbl_newFile.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.IO_lbl_newFile.setObjectName("IO_lbl_newFile")
+        self.IO_chk_autoPCtrl = QtWidgets.QCheckBox(self.IO_frame)
+        self.IO_chk_autoPCtrl.setGeometry(QtCore.QRect(50, 670, 231, 31))
+        self.IO_chk_autoPCtrl.setStyleSheet("QCheckBox::indicator {\n"
+"    width: 20px;\n"
+"    height: 20px;\n"
+"    background-color: #f2f4f3;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QCheckBox::indicator:checked {\n"
+"    background-color: #ffba00;\n"
+"    image: url(:/images/right.png);\n"
+"}\n"
+"\n"
+"QWidget {\n"
+"    background-color: #5d707f;\n"
+"    font-size: 12pt;\n"
+"    color: #f2f4f3;\n"
+"}\n"
+"")
+        self.IO_chk_autoPCtrl.setObjectName("IO_chk_autoPCtrl")
         self.IO_lbl_newFile.raise_()
         self.IO_lbl_loadFile.raise_()
         self.IO_0_frameLabel.raise_()
@@ -452,12 +475,13 @@ class Ui_MainWindow(object):
         self.IO_lbl_commNum.raise_()
         self.IO_lbl_estimLen.raise_()
         self.IO_lbl_estimVol.raise_()
-        self.IO_btt_xyzZero.raise_()
-        self.IO_btt_extZero.raise_()
+        self.IO_btt_xyzextZero.raise_()
+        self.IO_btt_orientZero.raise_()
         self.IO_num_addByID.raise_()
         self.IO_lbl_addByID.raise_()
         self.IO_btt_addByID.raise_()
         self.IO_btt_loadFile.raise_()
+        self.IO_chk_autoPCtrl.raise_()
         self.SGLC_frame = QtWidgets.QFrame(self.PRINT_tab)
         self.SGLC_frame.setGeometry(QtCore.QRect(360, 20, 311, 911))
         self.SGLC_frame.setMouseTracking(False)
@@ -495,7 +519,7 @@ class Ui_MainWindow(object):
         self.SGLC_btt_gcodeSglComm_addByID.setText("")
         self.SGLC_btt_gcodeSglComm_addByID.setObjectName("SGLC_btt_gcodeSglComm_addByID")
         self.SGLC_lbl_gcodeSglComm_addByID = QtWidgets.QLabel(self.SGLC_frame)
-        self.SGLC_lbl_gcodeSglComm_addByID.setGeometry(QtCore.QRect(40, 470, 131, 21))
+        self.SGLC_lbl_gcodeSglComm_addByID.setGeometry(QtCore.QRect(40, 460, 131, 31))
         self.SGLC_lbl_gcodeSglComm_addByID.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -524,7 +548,7 @@ class Ui_MainWindow(object):
         self.SGLC_num_rapidSglComm_addByID.setMaximum(99999)
         self.SGLC_num_rapidSglComm_addByID.setObjectName("SGLC_num_rapidSglComm_addByID")
         self.SGLC_lbl_rapidSglComm_addByID = QtWidgets.QLabel(self.SGLC_frame)
-        self.SGLC_lbl_rapidSglComm_addByID.setGeometry(QtCore.QRect(40, 820, 131, 21))
+        self.SGLC_lbl_rapidSglComm_addByID.setGeometry(QtCore.QRect(40, 810, 131, 31))
         self.SGLC_lbl_rapidSglComm_addByID.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -627,7 +651,7 @@ class Ui_MainWindow(object):
         self.SCTRL_entry_clrByID.setGeometry(QtCore.QRect(60, 790, 121, 41))
         self.SCTRL_entry_clrByID.setObjectName("SCTRL_entry_clrByID")
         self.SCTRL_lbl_clrByID = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_clrByID.setGeometry(QtCore.QRect(60, 770, 131, 21))
+        self.SCTRL_lbl_clrByID.setGeometry(QtCore.QRect(60, 760, 131, 31))
         self.SCTRL_lbl_clrByID.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -653,7 +677,7 @@ class Ui_MainWindow(object):
         self.SCTRL_btt_addSIB1_atFront.setGeometry(QtCore.QRect(60, 620, 101, 31))
         self.SCTRL_btt_addSIB1_atFront.setObjectName("SCTRL_btt_addSIB1_atFront")
         self.SCRTL_lbl_queue = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCRTL_lbl_queue.setGeometry(QtCore.QRect(310, 100, 231, 31))
+        self.SCRTL_lbl_queue.setGeometry(QtCore.QRect(310, 110, 231, 31))
         self.SCRTL_lbl_queue.setStyleSheet("border: 0px;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
@@ -661,6 +685,7 @@ class Ui_MainWindow(object):
         self.SCRTL_lbl_queue.setObjectName("SCRTL_lbl_queue")
         self.SCTRL_btt_forcedStop = QtWidgets.QPushButton(self.SCRTL_frame)
         self.SCTRL_btt_forcedStop.setGeometry(QtCore.QRect(690, 60, 121, 41))
+        self.SCTRL_btt_forcedStop.setStyleSheet("background-color: rgb(255, 70, 73);")
         self.SCTRL_btt_forcedStop.setObjectName("SCTRL_btt_forcedStop")
         self.SCTRL_indi_qProcessing = QtWidgets.QLabel(self.SCRTL_frame)
         self.SCTRL_indi_qProcessing.setGeometry(QtCore.QRect(610, 60, 41, 41))
@@ -685,28 +710,30 @@ class Ui_MainWindow(object):
         self.SCTRL_disp_elemInQ.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.SCTRL_disp_elemInQ.setObjectName("SCTRL_disp_elemInQ")
         self.SCTRL_lbl_buffComms = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_buffComms.setGeometry(QtCore.QRect(830, 20, 131, 41))
+        self.SCTRL_lbl_buffComms.setGeometry(QtCore.QRect(830, 20, 151, 41))
         self.SCTRL_lbl_buffComms.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
+"font-size: 11pt;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;\n"
 "padding-left: 0px;")
         self.SCTRL_lbl_buffComms.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.SCTRL_lbl_buffComms.setObjectName("SCTRL_lbl_buffComms")
         self.SCTRL_lbl_elemInQ = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_elemInQ.setGeometry(QtCore.QRect(980, 20, 131, 41))
+        self.SCTRL_lbl_elemInQ.setGeometry(QtCore.QRect(980, 20, 141, 41))
         self.SCTRL_lbl_elemInQ.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
+"font-size: 11pt;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;\n"
 "padding-left: 0px;")
         self.SCTRL_lbl_elemInQ.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.SCTRL_lbl_elemInQ.setObjectName("SCTRL_lbl_elemInQ")
         self.SCTRL_arr_queue = QtWidgets.QListWidget(self.SCRTL_frame)
-        self.SCTRL_arr_queue.setGeometry(QtCore.QRect(310, 130, 801, 751))
+        self.SCTRL_arr_queue.setGeometry(QtCore.QRect(310, 140, 801, 741))
         self.SCTRL_arr_queue.setObjectName("SCTRL_arr_queue")
+        item = QtWidgets.QListWidgetItem()
+        self.SCTRL_arr_queue.addItem(item)
         self.SCTRL_lbl_liveAd_robot = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_liveAd_robot.setGeometry(QtCore.QRect(60, 430, 171, 21))
+        self.SCTRL_lbl_liveAd_robot.setGeometry(QtCore.QRect(60, 420, 181, 31))
         self.SCTRL_lbl_liveAd_robot.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -714,7 +741,7 @@ class Ui_MainWindow(object):
         self.SCTRL_lbl_liveAd_robot.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.SCTRL_lbl_liveAd_robot.setObjectName("SCTRL_lbl_liveAd_robot")
         self.SCTRL_lbl_liveAd_pump1 = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_liveAd_pump1.setGeometry(QtCore.QRect(60, 500, 171, 21))
+        self.SCTRL_lbl_liveAd_pump1.setGeometry(QtCore.QRect(60, 490, 181, 31))
         self.SCTRL_lbl_liveAd_pump1.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -742,6 +769,14 @@ class Ui_MainWindow(object):
         self.SCTRL_btt_addSIB3_atFront = QtWidgets.QPushButton(self.SCRTL_frame)
         self.SCTRL_btt_addSIB3_atFront.setGeometry(QtCore.QRect(60, 700, 101, 31))
         self.SCTRL_btt_addSIB3_atFront.setObjectName("SCTRL_btt_addSIB3_atFront")
+        self.SCTRL_chk_autoScroll = QtWidgets.QCheckBox(self.SCRTL_frame)
+        self.SCTRL_chk_autoScroll.setGeometry(QtCore.QRect(970, 115, 141, 20))
+        self.SCTRL_chk_autoScroll.setStyleSheet("background-color: #5d707f;\n"
+"font-size: 12pt;\n"
+"color: #f2f4f3;\n"
+"")
+        self.SCTRL_chk_autoScroll.setChecked(False)
+        self.SCTRL_chk_autoScroll.setObjectName("SCTRL_chk_autoScroll")
         self.SCTRL_lbl_elemInQ.raise_()
         self.SCTRL_lbl_buffComms.raise_()
         self.SCRTL_lbl_queue.raise_()
@@ -772,6 +807,7 @@ class Ui_MainWindow(object):
         self.SCTRL_num_liveAd_pump1.raise_()
         self.SCTRL_btt_addSIB3_atEnd.raise_()
         self.SCTRL_btt_addSIB3_atFront.raise_()
+        self.SCTRL_chk_autoScroll.raise_()
         self.SGLC_frame.raise_()
         self.SCRTL_frame.raise_()
         self.IO_frame.raise_()
@@ -836,6 +872,7 @@ class Ui_MainWindow(object):
         self.DC_sld_stepWidth.setStyleSheet("")
         self.DC_sld_stepWidth.setMinimum(1)
         self.DC_sld_stepWidth.setMaximum(3)
+        self.DC_sld_stepWidth.setPageStep(1)
         self.DC_sld_stepWidth.setProperty("value", 1)
         self.DC_sld_stepWidth.setOrientation(QtCore.Qt.Horizontal)
         self.DC_sld_stepWidth.setObjectName("DC_sld_stepWidth")
@@ -1030,16 +1067,16 @@ class Ui_MainWindow(object):
         self.NC_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.NC_0_frameLabel.setObjectName("NC_0_frameLabel")
         self.NC_btt_xyzSend = QtWidgets.QPushButton(self.NC_frame)
-        self.NC_btt_xyzSend.setGeometry(QtCore.QRect(710, 100, 181, 41))
+        self.NC_btt_xyzSend.setGeometry(QtCore.QRect(710, 170, 181, 41))
         self.NC_btt_xyzSend.setObjectName("NC_btt_xyzSend")
         self.NC_btt_xyzExtSend = QtWidgets.QPushButton(self.NC_frame)
-        self.NC_btt_xyzExtSend.setGeometry(QtCore.QRect(710, 170, 181, 41))
+        self.NC_btt_xyzExtSend.setGeometry(QtCore.QRect(710, 220, 181, 41))
         self.NC_btt_xyzExtSend.setObjectName("NC_btt_xyzExtSend")
         self.NC_btt_orientSend = QtWidgets.QPushButton(self.NC_frame)
-        self.NC_btt_orientSend.setGeometry(QtCore.QRect(710, 330, 181, 41))
+        self.NC_btt_orientSend.setGeometry(QtCore.QRect(710, 270, 181, 41))
         self.NC_btt_orientSend.setObjectName("NC_btt_orientSend")
         self.NC_btt_orientZero = QtWidgets.QPushButton(self.NC_frame)
-        self.NC_btt_orientZero.setGeometry(QtCore.QRect(710, 260, 181, 41))
+        self.NC_btt_orientZero.setGeometry(QtCore.QRect(710, 340, 181, 41))
         self.NC_btt_orientZero.setObjectName("NC_btt_orientZero")
         self.NC_disp_ext = QtWidgets.QLabel(self.NC_frame)
         self.NC_disp_ext.setGeometry(QtCore.QRect(530, 100, 121, 41))
@@ -1122,7 +1159,7 @@ class Ui_MainWindow(object):
         self.NC_lbl_z_set.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.NC_lbl_z_set.setObjectName("NC_lbl_z_set")
         self.NC_lbl_zOrient_disp = QtWidgets.QLabel(self.NC_frame)
-        self.NC_lbl_zOrient_disp.setGeometry(QtCore.QRect(370, 220, 121, 41))
+        self.NC_lbl_zOrient_disp.setGeometry(QtCore.QRect(370, 230, 121, 41))
         self.NC_lbl_zOrient_disp.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -1130,7 +1167,7 @@ class Ui_MainWindow(object):
         self.NC_lbl_zOrient_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.NC_lbl_zOrient_disp.setObjectName("NC_lbl_zOrient_disp")
         self.NC_lbl_yOrient_disp = QtWidgets.QLabel(self.NC_frame)
-        self.NC_lbl_yOrient_disp.setGeometry(QtCore.QRect(210, 220, 121, 41))
+        self.NC_lbl_yOrient_disp.setGeometry(QtCore.QRect(210, 230, 121, 41))
         self.NC_lbl_yOrient_disp.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -1138,7 +1175,7 @@ class Ui_MainWindow(object):
         self.NC_lbl_yOrient_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.NC_lbl_yOrient_disp.setObjectName("NC_lbl_yOrient_disp")
         self.NC_lbl_zOrient_set = QtWidgets.QLabel(self.NC_frame)
-        self.NC_lbl_zOrient_set.setGeometry(QtCore.QRect(370, 290, 121, 41))
+        self.NC_lbl_zOrient_set.setGeometry(QtCore.QRect(370, 300, 131, 41))
         self.NC_lbl_zOrient_set.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -1146,7 +1183,7 @@ class Ui_MainWindow(object):
         self.NC_lbl_zOrient_set.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.NC_lbl_zOrient_set.setObjectName("NC_lbl_zOrient_set")
         self.NC_lbl_xOrient_disp = QtWidgets.QLabel(self.NC_frame)
-        self.NC_lbl_xOrient_disp.setGeometry(QtCore.QRect(50, 220, 121, 41))
+        self.NC_lbl_xOrient_disp.setGeometry(QtCore.QRect(50, 230, 121, 41))
         self.NC_lbl_xOrient_disp.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -1154,7 +1191,7 @@ class Ui_MainWindow(object):
         self.NC_lbl_xOrient_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.NC_lbl_xOrient_disp.setObjectName("NC_lbl_xOrient_disp")
         self.NC_lbl_xOrient_set = QtWidgets.QLabel(self.NC_frame)
-        self.NC_lbl_xOrient_set.setGeometry(QtCore.QRect(50, 290, 121, 41))
+        self.NC_lbl_xOrient_set.setGeometry(QtCore.QRect(50, 300, 131, 41))
         self.NC_lbl_xOrient_set.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -1162,11 +1199,11 @@ class Ui_MainWindow(object):
         self.NC_lbl_xOrient_set.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.NC_lbl_xOrient_set.setObjectName("NC_lbl_xOrient_set")
         self.NC_disp_xOrient = QtWidgets.QLabel(self.NC_frame)
-        self.NC_disp_xOrient.setGeometry(QtCore.QRect(50, 260, 121, 41))
+        self.NC_disp_xOrient.setGeometry(QtCore.QRect(50, 270, 121, 41))
         self.NC_disp_xOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.NC_disp_xOrient.setObjectName("NC_disp_xOrient")
         self.NC_lbl_yOrient_set = QtWidgets.QLabel(self.NC_frame)
-        self.NC_lbl_yOrient_set.setGeometry(QtCore.QRect(210, 290, 121, 41))
+        self.NC_lbl_yOrient_set.setGeometry(QtCore.QRect(210, 300, 131, 41))
         self.NC_lbl_yOrient_set.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -1174,11 +1211,11 @@ class Ui_MainWindow(object):
         self.NC_lbl_yOrient_set.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.NC_lbl_yOrient_set.setObjectName("NC_lbl_yOrient_set")
         self.NC_disp_yOrient = QtWidgets.QLabel(self.NC_frame)
-        self.NC_disp_yOrient.setGeometry(QtCore.QRect(210, 260, 121, 41))
+        self.NC_disp_yOrient.setGeometry(QtCore.QRect(210, 270, 121, 41))
         self.NC_disp_yOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.NC_disp_yOrient.setObjectName("NC_disp_yOrient")
         self.NC_disp_zOrient = QtWidgets.QLabel(self.NC_frame)
-        self.NC_disp_zOrient.setGeometry(QtCore.QRect(370, 260, 121, 41))
+        self.NC_disp_zOrient.setGeometry(QtCore.QRect(370, 270, 121, 41))
         self.NC_disp_zOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.NC_disp_zOrient.setObjectName("NC_disp_zOrient")
         self.NC_float_x = QtWidgets.QDoubleSpinBox(self.NC_frame)
@@ -1206,23 +1243,26 @@ class Ui_MainWindow(object):
         self.NC_float_z.setMaximum(9999.99)
         self.NC_float_z.setObjectName("NC_float_z")
         self.NC_float_zOrient = QtWidgets.QDoubleSpinBox(self.NC_frame)
-        self.NC_float_zOrient.setGeometry(QtCore.QRect(370, 330, 121, 41))
+        self.NC_float_zOrient.setGeometry(QtCore.QRect(370, 340, 121, 41))
         self.NC_float_zOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.NC_float_zOrient.setMinimum(-9999.99)
         self.NC_float_zOrient.setMaximum(9999.99)
         self.NC_float_zOrient.setObjectName("NC_float_zOrient")
         self.NC_float_yOrient = QtWidgets.QDoubleSpinBox(self.NC_frame)
-        self.NC_float_yOrient.setGeometry(QtCore.QRect(210, 330, 121, 41))
+        self.NC_float_yOrient.setGeometry(QtCore.QRect(210, 340, 121, 41))
         self.NC_float_yOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.NC_float_yOrient.setMinimum(-9999.99)
         self.NC_float_yOrient.setMaximum(9999.99)
         self.NC_float_yOrient.setObjectName("NC_float_yOrient")
         self.NC_float_xOrient = QtWidgets.QDoubleSpinBox(self.NC_frame)
-        self.NC_float_xOrient.setGeometry(QtCore.QRect(50, 330, 121, 41))
+        self.NC_float_xOrient.setGeometry(QtCore.QRect(50, 340, 121, 41))
         self.NC_float_xOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.NC_float_xOrient.setMinimum(-9999.99)
         self.NC_float_xOrient.setMaximum(9999.99)
         self.NC_float_xOrient.setObjectName("NC_float_xOrient")
+        self.NC_btt_getValues = QtWidgets.QPushButton(self.NC_frame)
+        self.NC_btt_getValues.setGeometry(QtCore.QRect(710, 100, 181, 41))
+        self.NC_btt_getValues.setObjectName("NC_btt_getValues")
         self.NC_lbl_ext_set.raise_()
         self.NC_lbl_y_set.raise_()
         self.NC_lbl_z_set.raise_()
@@ -1256,6 +1296,7 @@ class Ui_MainWindow(object):
         self.NC_float_zOrient.raise_()
         self.NC_float_yOrient.raise_()
         self.NC_float_xOrient.raise_()
+        self.NC_btt_getValues.raise_()
         self.TERM_frame = QtWidgets.QFrame(self.DIRECT_tab)
         self.TERM_frame.setGeometry(QtCore.QRect(1040, 20, 851, 911))
         self.TERM_frame.setStyleSheet("")
@@ -1284,9 +1325,9 @@ class Ui_MainWindow(object):
         self.TERM_disp_tcpSpeed.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.TERM_disp_tcpSpeed.setObjectName("TERM_disp_tcpSpeed")
         self.TERM_lbl_progCommID = QtWidgets.QLabel(self.TERM_frame)
-        self.TERM_lbl_progCommID.setGeometry(QtCore.QRect(670, 10, 151, 41))
+        self.TERM_lbl_progCommID.setGeometry(QtCore.QRect(665, 10, 151, 41))
         self.TERM_lbl_progCommID.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
+"font-size: 11pt;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
         self.TERM_lbl_progCommID.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
@@ -1298,7 +1339,7 @@ class Ui_MainWindow(object):
         self.TERM_lbl_tcpSpeed = QtWidgets.QLabel(self.TERM_frame)
         self.TERM_lbl_tcpSpeed.setGeometry(QtCore.QRect(330, 10, 121, 41))
         self.TERM_lbl_tcpSpeed.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
+"font-size: 11pt;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
         self.TERM_lbl_tcpSpeed.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
@@ -1306,7 +1347,7 @@ class Ui_MainWindow(object):
         self.TERM_lbl_robCommID = QtWidgets.QLabel(self.TERM_frame)
         self.TERM_lbl_robCommID.setGeometry(QtCore.QRect(490, 10, 141, 41))
         self.TERM_lbl_robCommID.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
+"font-size: 11pt;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
         self.TERM_lbl_robCommID.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
@@ -1318,6 +1359,8 @@ class Ui_MainWindow(object):
         self.TERM_arr_terminal.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerItem)
         self.TERM_arr_terminal.setFlow(QtWidgets.QListView.TopToBottom)
         self.TERM_arr_terminal.setObjectName("TERM_arr_terminal")
+        item = QtWidgets.QListWidgetItem()
+        self.TERM_arr_terminal.addItem(item)
         self.TERM_lbl_terminal = QtWidgets.QLabel(self.TERM_frame)
         self.TERM_lbl_terminal.setGeometry(QtCore.QRect(60, 110, 201, 31))
         self.TERM_lbl_terminal.setStyleSheet("border: 0px;\n"
@@ -1363,11 +1406,9 @@ class Ui_MainWindow(object):
         self.TERM_btt_rapidInterp.setObjectName("TERM_btt_rapidInterp")
         self.TERM_chk_autoScroll = QtWidgets.QCheckBox(self.TERM_frame)
         self.TERM_chk_autoScroll.setGeometry(QtCore.QRect(670, 115, 141, 20))
-        self.TERM_chk_autoScroll.setStyleSheet("QWidget {\n"
-"    background-color: #5d707f;\n"
-"    font-size: 12pt;\n"
-"    color: #f2f4f3;\n"
-"}\n"
+        self.TERM_chk_autoScroll.setStyleSheet("background-color: #5d707f;\n"
+"font-size: 12pt;\n"
+"color: #f2f4f3;\n"
 "")
         self.TERM_chk_autoScroll.setChecked(True)
         self.TERM_chk_autoScroll.setObjectName("TERM_chk_autoScroll")
@@ -1433,7 +1474,7 @@ class Ui_MainWindow(object):
         self.TCP_ROB_tab = QtWidgets.QWidget()
         self.TCP_ROB_tab.setObjectName("TCP_ROB_tab")
         self.TCP_ROB_lbl_bytesToRead = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 240, 131, 21))
+        self.TCP_ROB_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 230, 131, 31))
         self.TCP_ROB_lbl_bytesToRead.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1445,7 +1486,7 @@ class Ui_MainWindow(object):
         self.TCP_ROB_disp_bytesWritten.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.TCP_ROB_disp_bytesWritten.setObjectName("TCP_ROB_disp_bytesWritten")
         self.TCP_ROB_lbl_bytesWritten = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 140, 131, 21))
+        self.TCP_ROB_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 130, 141, 31))
         self.TCP_ROB_lbl_bytesWritten.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1453,7 +1494,7 @@ class Ui_MainWindow(object):
         self.TCP_ROB_lbl_bytesWritten.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.TCP_ROB_lbl_bytesWritten.setObjectName("TCP_ROB_lbl_bytesWritten")
         self.TCP_ROB_lbl_ip = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_ip.setGeometry(QtCore.QRect(40, 340, 131, 21))
+        self.TCP_ROB_lbl_ip.setGeometry(QtCore.QRect(40, 330, 131, 31))
         self.TCP_ROB_lbl_ip.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1461,7 +1502,7 @@ class Ui_MainWindow(object):
         self.TCP_ROB_lbl_ip.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.TCP_ROB_lbl_ip.setObjectName("TCP_ROB_lbl_ip")
         self.TCP_ROB_lbl_port = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_port.setGeometry(QtCore.QRect(240, 340, 131, 21))
+        self.TCP_ROB_lbl_port.setGeometry(QtCore.QRect(240, 330, 131, 31))
         self.TCP_ROB_lbl_port.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1469,7 +1510,7 @@ class Ui_MainWindow(object):
         self.TCP_ROB_lbl_port.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.TCP_ROB_lbl_port.setObjectName("TCP_ROB_lbl_port")
         self.TCP_ROB_lbl_tio_conn = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_tio_conn.setGeometry(QtCore.QRect(620, 340, 131, 21))
+        self.TCP_ROB_lbl_tio_conn.setGeometry(QtCore.QRect(620, 330, 131, 31))
         self.TCP_ROB_lbl_tio_conn.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1477,7 +1518,7 @@ class Ui_MainWindow(object):
         self.TCP_ROB_lbl_tio_conn.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.TCP_ROB_lbl_tio_conn.setObjectName("TCP_ROB_lbl_tio_conn")
         self.TCP_ROB_lbl_writeBuffer = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_writeBuffer.setGeometry(QtCore.QRect(30, 120, 131, 21))
+        self.TCP_ROB_lbl_writeBuffer.setGeometry(QtCore.QRect(40, 110, 131, 31))
         self.TCP_ROB_lbl_writeBuffer.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1485,7 +1526,7 @@ class Ui_MainWindow(object):
         self.TCP_ROB_lbl_writeBuffer.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.TCP_ROB_lbl_writeBuffer.setObjectName("TCP_ROB_lbl_writeBuffer")
         self.TCP_ROB_lbl_readBuffer = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_readBuffer.setGeometry(QtCore.QRect(30, 220, 131, 21))
+        self.TCP_ROB_lbl_readBuffer.setGeometry(QtCore.QRect(40, 210, 131, 31))
         self.TCP_ROB_lbl_readBuffer.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1493,7 +1534,7 @@ class Ui_MainWindow(object):
         self.TCP_ROB_lbl_readBuffer.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.TCP_ROB_lbl_readBuffer.setObjectName("TCP_ROB_lbl_readBuffer")
         self.TCP_ROB_disp_writeBuffer = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_disp_writeBuffer.setGeometry(QtCore.QRect(30, 140, 571, 61))
+        self.TCP_ROB_disp_writeBuffer.setGeometry(QtCore.QRect(40, 140, 561, 61))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(10)
@@ -1503,13 +1544,13 @@ class Ui_MainWindow(object):
         self.TCP_ROB_disp_writeBuffer.setWordWrap(True)
         self.TCP_ROB_disp_writeBuffer.setObjectName("TCP_ROB_disp_writeBuffer")
         self.TCP_ROB_disp_readBuffer = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_disp_readBuffer.setGeometry(QtCore.QRect(30, 240, 571, 61))
+        self.TCP_ROB_disp_readBuffer.setGeometry(QtCore.QRect(40, 240, 561, 61))
         self.TCP_ROB_disp_readBuffer.setStyleSheet("font-size: 10pt")
         self.TCP_ROB_disp_readBuffer.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.TCP_ROB_disp_readBuffer.setWordWrap(True)
         self.TCP_ROB_disp_readBuffer.setObjectName("TCP_ROB_disp_readBuffer")
         self.TCP_ROB_lbl_tio_rw = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_tio_rw.setGeometry(QtCore.QRect(430, 340, 131, 21))
+        self.TCP_ROB_lbl_tio_rw.setGeometry(QtCore.QRect(430, 330, 131, 31))
         self.TCP_ROB_lbl_tio_rw.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1580,13 +1621,13 @@ class Ui_MainWindow(object):
         self.TCP_PUMP1_tab = QtWidgets.QWidget()
         self.TCP_PUMP1_tab.setObjectName("TCP_PUMP1_tab")
         self.TCP_PUMP1_disp_readBuffer = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_disp_readBuffer.setGeometry(QtCore.QRect(30, 240, 571, 61))
+        self.TCP_PUMP1_disp_readBuffer.setGeometry(QtCore.QRect(40, 240, 561, 61))
         self.TCP_PUMP1_disp_readBuffer.setStyleSheet("font-size: 10pt")
         self.TCP_PUMP1_disp_readBuffer.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.TCP_PUMP1_disp_readBuffer.setWordWrap(True)
         self.TCP_PUMP1_disp_readBuffer.setObjectName("TCP_PUMP1_disp_readBuffer")
         self.TCP_PUMP1_lbl_bytesToRead = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 240, 131, 21))
+        self.TCP_PUMP1_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 230, 131, 31))
         self.TCP_PUMP1_lbl_bytesToRead.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1601,7 +1642,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP1_btt_reconn.setGeometry(QtCore.QRect(360, 60, 181, 41))
         self.TCP_PUMP1_btt_reconn.setObjectName("TCP_PUMP1_btt_reconn")
         self.TCP_PUMP1_lbl_writeBuffer = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_writeBuffer.setGeometry(QtCore.QRect(30, 120, 131, 21))
+        self.TCP_PUMP1_lbl_writeBuffer.setGeometry(QtCore.QRect(40, 110, 131, 31))
         self.TCP_PUMP1_lbl_writeBuffer.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1619,7 +1660,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP1_indi_connected.setText("")
         self.TCP_PUMP1_indi_connected.setObjectName("TCP_PUMP1_indi_connected")
         self.TCP_PUMP1_disp_writeBuffer = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_disp_writeBuffer.setGeometry(QtCore.QRect(30, 140, 571, 61))
+        self.TCP_PUMP1_disp_writeBuffer.setGeometry(QtCore.QRect(40, 140, 561, 61))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(10)
@@ -1629,7 +1670,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP1_disp_writeBuffer.setWordWrap(True)
         self.TCP_PUMP1_disp_writeBuffer.setObjectName("TCP_PUMP1_disp_writeBuffer")
         self.TCP_PUMP1_lbl_tio_conn = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_tio_conn.setGeometry(QtCore.QRect(620, 340, 131, 21))
+        self.TCP_PUMP1_lbl_tio_conn.setGeometry(QtCore.QRect(620, 330, 131, 31))
         self.TCP_PUMP1_lbl_tio_conn.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1637,7 +1678,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP1_lbl_tio_conn.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.TCP_PUMP1_lbl_tio_conn.setObjectName("TCP_PUMP1_lbl_tio_conn")
         self.TCP_PUMP1_lbl_tio_rw = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_tio_rw.setGeometry(QtCore.QRect(430, 340, 131, 21))
+        self.TCP_PUMP1_lbl_tio_rw.setGeometry(QtCore.QRect(430, 330, 131, 31))
         self.TCP_PUMP1_lbl_tio_rw.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1648,7 +1689,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP1_btt_discon.setGeometry(QtCore.QRect(570, 60, 181, 41))
         self.TCP_PUMP1_btt_discon.setObjectName("TCP_PUMP1_btt_discon")
         self.TCP_PUMP1_lbl_port = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_port.setGeometry(QtCore.QRect(240, 340, 131, 21))
+        self.TCP_PUMP1_lbl_port.setGeometry(QtCore.QRect(240, 330, 131, 31))
         self.TCP_PUMP1_lbl_port.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1656,7 +1697,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP1_lbl_port.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.TCP_PUMP1_lbl_port.setObjectName("TCP_PUMP1_lbl_port")
         self.TCP_PUMP1_lbl_readBuffer = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_readBuffer.setGeometry(QtCore.QRect(30, 220, 131, 21))
+        self.TCP_PUMP1_lbl_readBuffer.setGeometry(QtCore.QRect(40, 210, 131, 31))
         self.TCP_PUMP1_lbl_readBuffer.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1668,7 +1709,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP1_disp_ip.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.TCP_PUMP1_disp_ip.setObjectName("TCP_PUMP1_disp_ip")
         self.TCP_PUMP1_lbl_bytesWritten = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 140, 131, 21))
+        self.TCP_PUMP1_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 130, 141, 31))
         self.TCP_PUMP1_lbl_bytesWritten.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1688,7 +1729,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP1_lbl_connected.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.TCP_PUMP1_lbl_connected.setObjectName("TCP_PUMP1_lbl_connected")
         self.TCP_PUMP1_lbl_ip = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_ip.setGeometry(QtCore.QRect(40, 340, 131, 21))
+        self.TCP_PUMP1_lbl_ip.setGeometry(QtCore.QRect(40, 330, 131, 31))
         self.TCP_PUMP1_lbl_ip.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1727,7 +1768,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP2_tab = QtWidgets.QWidget()
         self.TCP_PUMP2_tab.setObjectName("TCP_PUMP2_tab")
         self.TCP_PUMP2_lbl_tio_conn = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_tio_conn.setGeometry(QtCore.QRect(620, 340, 131, 21))
+        self.TCP_PUMP2_lbl_tio_conn.setGeometry(QtCore.QRect(620, 330, 131, 31))
         self.TCP_PUMP2_lbl_tio_conn.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1747,7 +1788,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP2_disp_tio_conn.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.TCP_PUMP2_disp_tio_conn.setObjectName("TCP_PUMP2_disp_tio_conn")
         self.TCP_PUMP2_lbl_ip = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_ip.setGeometry(QtCore.QRect(40, 340, 131, 21))
+        self.TCP_PUMP2_lbl_ip.setGeometry(QtCore.QRect(40, 330, 131, 31))
         self.TCP_PUMP2_lbl_ip.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1755,7 +1796,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP2_lbl_ip.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.TCP_PUMP2_lbl_ip.setObjectName("TCP_PUMP2_lbl_ip")
         self.TCP_PUMP2_lbl_tio_rw = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_tio_rw.setGeometry(QtCore.QRect(430, 340, 131, 21))
+        self.TCP_PUMP2_lbl_tio_rw.setGeometry(QtCore.QRect(430, 330, 131, 31))
         self.TCP_PUMP2_lbl_tio_rw.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1774,7 +1815,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP2_disp_bytesToRead.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.TCP_PUMP2_disp_bytesToRead.setObjectName("TCP_PUMP2_disp_bytesToRead")
         self.TCP_PUMP2_lbl_bytesWritten = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 140, 131, 21))
+        self.TCP_PUMP2_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 130, 131, 31))
         self.TCP_PUMP2_lbl_bytesWritten.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1782,7 +1823,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP2_lbl_bytesWritten.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.TCP_PUMP2_lbl_bytesWritten.setObjectName("TCP_PUMP2_lbl_bytesWritten")
         self.TCP_PUMP2_lbl_bytesToRead = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 240, 131, 21))
+        self.TCP_PUMP2_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 230, 131, 31))
         self.TCP_PUMP2_lbl_bytesToRead.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1794,7 +1835,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP2_disp_bytesWritten.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.TCP_PUMP2_disp_bytesWritten.setObjectName("TCP_PUMP2_disp_bytesWritten")
         self.TCP_PUMP2_lbl_readBuffer = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_readBuffer.setGeometry(QtCore.QRect(30, 220, 131, 21))
+        self.TCP_PUMP2_lbl_readBuffer.setGeometry(QtCore.QRect(40, 210, 131, 31))
         self.TCP_PUMP2_lbl_readBuffer.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1812,7 +1853,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP2_disp_tio_rw.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.TCP_PUMP2_disp_tio_rw.setObjectName("TCP_PUMP2_disp_tio_rw")
         self.TCP_PUMP2_lbl_port = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_port.setGeometry(QtCore.QRect(240, 340, 131, 21))
+        self.TCP_PUMP2_lbl_port.setGeometry(QtCore.QRect(240, 330, 131, 31))
         self.TCP_PUMP2_lbl_port.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1824,7 +1865,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP2_disp_ip.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.TCP_PUMP2_disp_ip.setObjectName("TCP_PUMP2_disp_ip")
         self.TCP_PUMP2_lbl_writeBuffer = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_writeBuffer.setGeometry(QtCore.QRect(30, 120, 131, 21))
+        self.TCP_PUMP2_lbl_writeBuffer.setGeometry(QtCore.QRect(40, 110, 131, 31))
         self.TCP_PUMP2_lbl_writeBuffer.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #4c4a48;\n"
@@ -1832,7 +1873,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP2_lbl_writeBuffer.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
         self.TCP_PUMP2_lbl_writeBuffer.setObjectName("TCP_PUMP2_lbl_writeBuffer")
         self.TCP_PUMP2_disp_writeBuffer = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_disp_writeBuffer.setGeometry(QtCore.QRect(30, 140, 571, 61))
+        self.TCP_PUMP2_disp_writeBuffer.setGeometry(QtCore.QRect(40, 140, 561, 61))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(10)
@@ -1845,7 +1886,7 @@ class Ui_MainWindow(object):
         self.TCP_PUMP2_btt_discon.setGeometry(QtCore.QRect(570, 60, 181, 41))
         self.TCP_PUMP2_btt_discon.setObjectName("TCP_PUMP2_btt_discon")
         self.TCP_PUMP2_disp_readBuffer = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_disp_readBuffer.setGeometry(QtCore.QRect(30, 240, 571, 61))
+        self.TCP_PUMP2_disp_readBuffer.setGeometry(QtCore.QRect(40, 240, 561, 61))
         self.TCP_PUMP2_disp_readBuffer.setStyleSheet("font-size: 10pt")
         self.TCP_PUMP2_disp_readBuffer.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.TCP_PUMP2_disp_readBuffer.setWordWrap(True)
@@ -1922,7 +1963,7 @@ class Ui_MainWindow(object):
         self.SIB_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.SIB_0_frameLabel.setObjectName("SIB_0_frameLabel")
         self.SIB_lbl_sib1 = QtWidgets.QLabel(self.SIB_frame)
-        self.SIB_lbl_sib1.setGeometry(QtCore.QRect(40, 54, 231, 31))
+        self.SIB_lbl_sib1.setGeometry(QtCore.QRect(40, 50, 261, 31))
         self.SIB_lbl_sib1.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -1935,7 +1976,7 @@ class Ui_MainWindow(object):
         self.SIB_entry_sib2.setAcceptRichText(False)
         self.SIB_entry_sib2.setObjectName("SIB_entry_sib2")
         self.SIB_lbl_sib2 = QtWidgets.QLabel(self.SIB_frame)
-        self.SIB_lbl_sib2.setGeometry(QtCore.QRect(40, 190, 241, 31))
+        self.SIB_lbl_sib2.setGeometry(QtCore.QRect(40, 185, 281, 31))
         self.SIB_lbl_sib2.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -1953,7 +1994,7 @@ class Ui_MainWindow(object):
         self.SIB_entry_sib3.setAcceptRichText(False)
         self.SIB_entry_sib3.setObjectName("SIB_entry_sib3")
         self.SIB_lbl_sib3 = QtWidgets.QLabel(self.SIB_frame)
-        self.SIB_lbl_sib3.setGeometry(QtCore.QRect(40, 333, 241, 31))
+        self.SIB_lbl_sib3.setGeometry(QtCore.QRect(40, 330, 261, 31))
         self.SIB_lbl_sib3.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -1987,24 +2028,25 @@ class Ui_MainWindow(object):
         self.SET_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.SET_0_frameLabel.setObjectName("SET_0_frameLabel")
         self.SET_lbl_logEntry = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_logEntry.setGeometry(QtCore.QRect(470, 10, 131, 21))
+        self.SET_lbl_logEntry.setGeometry(QtCore.QRect(330, 30, 131, 61))
         self.SET_lbl_logEntry.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
+"font-size: 14pt;\n"
 "background-color: #5d707f;\n"
 "color: #E1E5EE;")
-        self.SET_lbl_logEntry.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
+        self.SET_lbl_logEntry.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.SET_lbl_logEntry.setObjectName("SET_lbl_logEntry")
         self.SET_num_accelRamp_dc = QtWidgets.QSpinBox(self.SET_frame)
         self.SET_num_accelRamp_dc.setGeometry(QtCore.QRect(470, 210, 131, 41))
         self.SET_num_accelRamp_dc.setStyleSheet("")
         self.SET_num_accelRamp_dc.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.SET_num_accelRamp_dc.setMinimum(0)
-        self.SET_num_accelRamp_dc.setMaximum(99999)
+        self.SET_num_accelRamp_dc.setMaximum(2000)
+        self.SET_num_accelRamp_dc.setSingleStep(5)
         self.SET_num_accelRamp_dc.setProperty("value", 0)
         self.SET_num_accelRamp_dc.setDisplayIntegerBase(10)
         self.SET_num_accelRamp_dc.setObjectName("SET_num_accelRamp_dc")
         self.SET_lbl_accelRamp_dc = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_accelRamp_dc.setGeometry(QtCore.QRect(330, 210, 131, 41))
+        self.SET_lbl_accelRamp_dc.setGeometry(QtCore.QRect(340, 205, 131, 51))
         self.SET_lbl_accelRamp_dc.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2012,7 +2054,7 @@ class Ui_MainWindow(object):
         self.SET_lbl_accelRamp_dc.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.SET_lbl_accelRamp_dc.setObjectName("SET_lbl_accelRamp_dc")
         self.SET_lbl_volPerE = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_volPerE.setGeometry(QtCore.QRect(70, 110, 81, 41))
+        self.SET_lbl_volPerE.setGeometry(QtCore.QRect(30, 104, 131, 51))
         self.SET_lbl_volPerE.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2020,7 +2062,7 @@ class Ui_MainWindow(object):
         self.SET_lbl_volPerE.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.SET_lbl_volPerE.setObjectName("SET_lbl_volPerE")
         self.SET_lbl_accelRamp_print = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_accelRamp_print.setGeometry(QtCore.QRect(610, 210, 151, 41))
+        self.SET_lbl_accelRamp_print.setGeometry(QtCore.QRect(610, 205, 161, 51))
         self.SET_lbl_accelRamp_print.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2028,7 +2070,7 @@ class Ui_MainWindow(object):
         self.SET_lbl_accelRamp_print.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.SET_lbl_accelRamp_print.setObjectName("SET_lbl_accelRamp_print")
         self.SET_lbl_transSpeed_print = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_transSpeed_print.setGeometry(QtCore.QRect(620, 110, 141, 41))
+        self.SET_lbl_transSpeed_print.setGeometry(QtCore.QRect(630, 105, 141, 51))
         self.SET_lbl_transSpeed_print.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2036,7 +2078,7 @@ class Ui_MainWindow(object):
         self.SET_lbl_transSpeed_print.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.SET_lbl_transSpeed_print.setObjectName("SET_lbl_transSpeed_print")
         self.SET_lbl_frToMms = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_frToMms.setGeometry(QtCore.QRect(70, 160, 81, 41))
+        self.SET_lbl_frToMms.setGeometry(QtCore.QRect(20, 156, 141, 51))
         self.SET_lbl_frToMms.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2048,34 +2090,26 @@ class Ui_MainWindow(object):
         self.SET_num_orientSpeed_print.setStyleSheet("")
         self.SET_num_orientSpeed_print.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.SET_num_orientSpeed_print.setMinimum(0)
-        self.SET_num_orientSpeed_print.setMaximum(99999)
+        self.SET_num_orientSpeed_print.setMaximum(3000)
+        self.SET_num_orientSpeed_print.setSingleStep(5)
         self.SET_num_orientSpeed_print.setProperty("value", 0)
         self.SET_num_orientSpeed_print.setDisplayIntegerBase(10)
         self.SET_num_orientSpeed_print.setObjectName("SET_num_orientSpeed_print")
         self.SET_lbl_zone = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_zone.setGeometry(QtCore.QRect(70, 260, 81, 41))
+        self.SET_lbl_zone.setGeometry(QtCore.QRect(80, 260, 81, 41))
         self.SET_lbl_zone.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
 "color: #E1E5EE;")
         self.SET_lbl_zone.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.SET_lbl_zone.setObjectName("SET_lbl_zone")
-        self.SET_num_ioSplit = QtWidgets.QSpinBox(self.SET_frame)
-        self.SET_num_ioSplit.setGeometry(QtCore.QRect(160, 210, 131, 41))
-        self.SET_num_ioSplit.setToolTipDuration(-1)
-        self.SET_num_ioSplit.setStyleSheet("")
-        self.SET_num_ioSplit.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.SET_num_ioSplit.setMinimum(0)
-        self.SET_num_ioSplit.setMaximum(99999)
-        self.SET_num_ioSplit.setProperty("value", 0)
-        self.SET_num_ioSplit.setDisplayIntegerBase(10)
-        self.SET_num_ioSplit.setObjectName("SET_num_ioSplit")
         self.SET_num_transSpeed_dc = QtWidgets.QSpinBox(self.SET_frame)
         self.SET_num_transSpeed_dc.setGeometry(QtCore.QRect(470, 110, 131, 41))
         self.SET_num_transSpeed_dc.setStyleSheet("")
         self.SET_num_transSpeed_dc.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.SET_num_transSpeed_dc.setMinimum(0)
-        self.SET_num_transSpeed_dc.setMaximum(99999)
+        self.SET_num_transSpeed_dc.setMaximum(2000)
+        self.SET_num_transSpeed_dc.setSingleStep(5)
         self.SET_num_transSpeed_dc.setProperty("value", 0)
         self.SET_num_transSpeed_dc.setDisplayIntegerBase(10)
         self.SET_num_transSpeed_dc.setObjectName("SET_num_transSpeed_dc")
@@ -2084,12 +2118,13 @@ class Ui_MainWindow(object):
         self.SET_num_transSpeed_print.setStyleSheet("")
         self.SET_num_transSpeed_print.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.SET_num_transSpeed_print.setMinimum(0)
-        self.SET_num_transSpeed_print.setMaximum(99999)
+        self.SET_num_transSpeed_print.setMaximum(3000)
+        self.SET_num_transSpeed_print.setSingleStep(5)
         self.SET_num_transSpeed_print.setProperty("value", 0)
         self.SET_num_transSpeed_print.setDisplayIntegerBase(10)
         self.SET_num_transSpeed_print.setObjectName("SET_num_transSpeed_print")
         self.SET_lbl_orientSpeed_dc = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_orientSpeed_dc.setGeometry(QtCore.QRect(330, 160, 131, 41))
+        self.SET_lbl_orientSpeed_dc.setGeometry(QtCore.QRect(340, 155, 131, 51))
         self.SET_lbl_orientSpeed_dc.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2097,7 +2132,7 @@ class Ui_MainWindow(object):
         self.SET_lbl_orientSpeed_dc.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.SET_lbl_orientSpeed_dc.setObjectName("SET_lbl_orientSpeed_dc")
         self.SET_lbl_ioSplit = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_ioSplit.setGeometry(QtCore.QRect(70, 210, 81, 41))
+        self.SET_lbl_ioSplit.setGeometry(QtCore.QRect(30, 206, 131, 51))
         self.SET_lbl_ioSplit.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2120,7 +2155,7 @@ class Ui_MainWindow(object):
         self.SET_num_zone.setDisplayIntegerBase(10)
         self.SET_num_zone.setObjectName("SET_num_zone")
         self.SET_lbl_decelRamp_print = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_decelRamp_print.setGeometry(QtCore.QRect(610, 260, 151, 41))
+        self.SET_lbl_decelRamp_print.setGeometry(QtCore.QRect(610, 255, 161, 51))
         self.SET_lbl_decelRamp_print.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2128,7 +2163,7 @@ class Ui_MainWindow(object):
         self.SET_lbl_decelRamp_print.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.SET_lbl_decelRamp_print.setObjectName("SET_lbl_decelRamp_print")
         self.SET_lbl_orientSpeed_print = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_orientSpeed_print.setGeometry(QtCore.QRect(620, 160, 141, 41))
+        self.SET_lbl_orientSpeed_print.setGeometry(QtCore.QRect(620, 155, 151, 51))
         self.SET_lbl_orientSpeed_print.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2140,12 +2175,13 @@ class Ui_MainWindow(object):
         self.SET_num_accelRamp_print.setStyleSheet("")
         self.SET_num_accelRamp_print.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.SET_num_accelRamp_print.setMinimum(0)
-        self.SET_num_accelRamp_print.setMaximum(99999)
+        self.SET_num_accelRamp_print.setMaximum(3000)
+        self.SET_num_accelRamp_print.setSingleStep(5)
         self.SET_num_accelRamp_print.setProperty("value", 0)
         self.SET_num_accelRamp_print.setDisplayIntegerBase(10)
         self.SET_num_accelRamp_print.setObjectName("SET_num_accelRamp_print")
         self.SET_lbl_transSpeed_dc = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_transSpeed_dc.setGeometry(QtCore.QRect(330, 110, 131, 41))
+        self.SET_lbl_transSpeed_dc.setGeometry(QtCore.QRect(340, 105, 131, 51))
         self.SET_lbl_transSpeed_dc.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2157,7 +2193,8 @@ class Ui_MainWindow(object):
         self.SET_num_decelRamp_print.setStyleSheet("")
         self.SET_num_decelRamp_print.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.SET_num_decelRamp_print.setMinimum(0)
-        self.SET_num_decelRamp_print.setMaximum(99999)
+        self.SET_num_decelRamp_print.setMaximum(3000)
+        self.SET_num_decelRamp_print.setSingleStep(5)
         self.SET_num_decelRamp_print.setProperty("value", 0)
         self.SET_num_decelRamp_print.setDisplayIntegerBase(10)
         self.SET_num_decelRamp_print.setObjectName("SET_num_decelRamp_print")
@@ -2166,12 +2203,13 @@ class Ui_MainWindow(object):
         self.SET_num_decelRamp_dc.setStyleSheet("")
         self.SET_num_decelRamp_dc.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.SET_num_decelRamp_dc.setMinimum(0)
-        self.SET_num_decelRamp_dc.setMaximum(99999)
+        self.SET_num_decelRamp_dc.setMaximum(2000)
+        self.SET_num_decelRamp_dc.setSingleStep(5)
         self.SET_num_decelRamp_dc.setProperty("value", 0)
         self.SET_num_decelRamp_dc.setDisplayIntegerBase(10)
         self.SET_num_decelRamp_dc.setObjectName("SET_num_decelRamp_dc")
         self.SET_lbl_decelRamp_dc = QtWidgets.QLabel(self.SET_frame)
-        self.SET_lbl_decelRamp_dc.setGeometry(QtCore.QRect(330, 260, 131, 41))
+        self.SET_lbl_decelRamp_dc.setGeometry(QtCore.QRect(340, 255, 131, 51))
         self.SET_lbl_decelRamp_dc.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2183,7 +2221,8 @@ class Ui_MainWindow(object):
         self.SET_num_orientSpeed_dc.setStyleSheet("")
         self.SET_num_orientSpeed_dc.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.SET_num_orientSpeed_dc.setMinimum(0)
-        self.SET_num_orientSpeed_dc.setMaximum(99999)
+        self.SET_num_orientSpeed_dc.setMaximum(2000)
+        self.SET_num_orientSpeed_dc.setSingleStep(5)
         self.SET_num_orientSpeed_dc.setProperty("value", 0)
         self.SET_num_orientSpeed_dc.setDisplayIntegerBase(10)
         self.SET_num_orientSpeed_dc.setObjectName("SET_num_orientSpeed_dc")
@@ -2197,38 +2236,36 @@ class Ui_MainWindow(object):
         self.SET_float_frToMms.setGeometry(QtCore.QRect(160, 160, 131, 41))
         self.SET_float_frToMms.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.SET_float_frToMms.setSuffix("")
-        self.SET_float_frToMms.setMaximum(9999.0)
+        self.SET_float_frToMms.setDecimals(4)
+        self.SET_float_frToMms.setMaximum(20.0)
+        self.SET_float_frToMms.setSingleStep(0.01)
         self.SET_float_frToMms.setObjectName("SET_float_frToMms")
-        self.SET_float_volPerE = QtWidgets.QDoubleSpinBox(self.SET_frame)
-        self.SET_float_volPerE.setGeometry(QtCore.QRect(160, 110, 131, 41))
-        self.SET_float_volPerE.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.SET_float_volPerE.setSuffix("")
-        self.SET_float_volPerE.setMaximum(9999.0)
-        self.SET_float_volPerE.setObjectName("SET_float_volPerE")
+        self.SET_float_volPerMM = QtWidgets.QDoubleSpinBox(self.SET_frame)
+        self.SET_float_volPerMM.setGeometry(QtCore.QRect(160, 110, 131, 41))
+        self.SET_float_volPerMM.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.SET_float_volPerMM.setSuffix("")
+        self.SET_float_volPerMM.setDecimals(4)
+        self.SET_float_volPerMM.setMaximum(20.0)
+        self.SET_float_volPerMM.setSingleStep(0.01)
+        self.SET_float_volPerMM.setObjectName("SET_float_volPerMM")
+        self.SET_float_pumpVolFlow = QtWidgets.QDoubleSpinBox(self.SET_frame)
+        self.SET_float_pumpVolFlow.setGeometry(QtCore.QRect(160, 211, 131, 41))
+        self.SET_float_pumpVolFlow.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.SET_float_pumpVolFlow.setDecimals(3)
+        self.SET_float_pumpVolFlow.setMaximum(999.0)
+        self.SET_float_pumpVolFlow.setSingleStep(0.1)
+        self.SET_float_pumpVolFlow.setObjectName("SET_float_pumpVolFlow")
         self.PUMP_frame = QtWidgets.QFrame(self.SET_tab)
         self.PUMP_frame.setGeometry(QtCore.QRect(30, 690, 871, 241))
         self.PUMP_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.PUMP_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.PUMP_frame.setObjectName("PUMP_frame")
-        self.PUMP_0_frameLabel = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_0_frameLabel.setGeometry(QtCore.QRect(30, 10, 101, 51))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(22)
-        self.PUMP_0_frameLabel.setFont(font)
-        self.PUMP_0_frameLabel.setStyleSheet("border: 0px;\n"
-"font-size: 22pt;\n"
-"padding: 0px;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.PUMP_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.PUMP_0_frameLabel.setObjectName("PUMP_0_frameLabel")
         self.PUMP_disp_freq = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_freq.setGeometry(QtCore.QRect(100, 180, 111, 41))
+        self.PUMP_disp_freq.setGeometry(QtCore.QRect(110, 180, 111, 41))
         self.PUMP_disp_freq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.PUMP_disp_freq.setObjectName("PUMP_disp_freq")
         self.PUMP_lbl_freq = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_freq.setGeometry(QtCore.QRect(10, 180, 81, 41))
+        self.PUMP_lbl_freq.setGeometry(QtCore.QRect(20, 174, 91, 51))
         self.PUMP_lbl_freq.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -2236,7 +2273,7 @@ class Ui_MainWindow(object):
         self.PUMP_lbl_freq.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.PUMP_lbl_freq.setObjectName("PUMP_lbl_freq")
         self.PUMP_lbl_volt = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_volt.setGeometry(QtCore.QRect(240, 180, 61, 41))
+        self.PUMP_lbl_volt.setGeometry(QtCore.QRect(240, 174, 71, 51))
         self.PUMP_lbl_volt.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -2252,11 +2289,11 @@ class Ui_MainWindow(object):
         self.PUMP_disp_amps.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.PUMP_disp_amps.setObjectName("PUMP_disp_amps")
         self.PUMP_disp_torq = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_torq.setGeometry(QtCore.QRect(730, 180, 111, 41))
+        self.PUMP_disp_torq.setGeometry(QtCore.QRect(720, 180, 111, 41))
         self.PUMP_disp_torq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.PUMP_disp_torq.setObjectName("PUMP_disp_torq")
         self.PUMP_lbl_amps = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_amps.setGeometry(QtCore.QRect(440, 180, 71, 41))
+        self.PUMP_lbl_amps.setGeometry(QtCore.QRect(450, 174, 71, 51))
         self.PUMP_lbl_amps.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -2264,7 +2301,7 @@ class Ui_MainWindow(object):
         self.PUMP_lbl_amps.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.PUMP_lbl_amps.setObjectName("PUMP_lbl_amps")
         self.PUMP_lbl_torq = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_torq.setGeometry(QtCore.QRect(650, 180, 71, 41))
+        self.PUMP_lbl_torq.setGeometry(QtCore.QRect(650, 174, 71, 51))
         self.PUMP_lbl_torq.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5D707F;\n"
@@ -2311,8 +2348,20 @@ class Ui_MainWindow(object):
 "color: #E1E5EE;")
         self.PUMP_lbl_currSpeed.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.PUMP_lbl_currSpeed.setObjectName("PUMP_lbl_currSpeed")
+        self.PUMP_0_frameLabel = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_0_frameLabel.setGeometry(QtCore.QRect(20, 20, 161, 51))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(22)
+        self.PUMP_0_frameLabel.setFont(font)
+        self.PUMP_0_frameLabel.setStyleSheet("border: 0px;\n"
+"font-size: 22pt;\n"
+"padding: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.PUMP_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.PUMP_0_frameLabel.setObjectName("PUMP_0_frameLabel")
         self.PUMP_lbl_setSpeed.raise_()
-        self.PUMP_0_frameLabel.raise_()
         self.PUMP_disp_freq.raise_()
         self.PUMP_lbl_freq.raise_()
         self.PUMP_lbl_volt.raise_()
@@ -2329,6 +2378,7 @@ class Ui_MainWindow(object):
         self.PUMP_num_setSpeed.raise_()
         self.PUMP_btt_reverse.raise_()
         self.PUMP_lbl_currSpeed.raise_()
+        self.PUMP_0_frameLabel.raise_()
         self.SET_frame.raise_()
         self.SIB_frame.raise_()
         self.TCP_frame.raise_()
@@ -2337,16 +2387,18 @@ class Ui_MainWindow(object):
         self.MONITOR_tab = QtWidgets.QWidget()
         self.MONITOR_tab.setObjectName("MONITOR_tab")
         self.ICQ_frame = QtWidgets.QFrame(self.MONITOR_tab)
-        self.ICQ_frame.setGeometry(QtCore.QRect(30, 20, 831, 911))
+        self.ICQ_frame.setGeometry(QtCore.QRect(30, 20, 1191, 911))
         self.ICQ_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.ICQ_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ICQ_frame.setObjectName("ICQ_frame")
         self.ICQ_arr_terminal = QtWidgets.QListWidget(self.ICQ_frame)
-        self.ICQ_arr_terminal.setGeometry(QtCore.QRect(40, 100, 751, 771))
+        self.ICQ_arr_terminal.setGeometry(QtCore.QRect(40, 130, 1111, 741))
         self.ICQ_arr_terminal.setFlow(QtWidgets.QListView.TopToBottom)
         self.ICQ_arr_terminal.setObjectName("ICQ_arr_terminal")
+        item = QtWidgets.QListWidgetItem()
+        self.ICQ_arr_terminal.addItem(item)
         self.ICQ_0_frameLabel = QtWidgets.QLabel(self.ICQ_frame)
-        self.ICQ_0_frameLabel.setGeometry(QtCore.QRect(30, 30, 311, 51))
+        self.ICQ_0_frameLabel.setGeometry(QtCore.QRect(20, 30, 381, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
@@ -2358,13 +2410,46 @@ class Ui_MainWindow(object):
 "color: #E1E5EE;")
         self.ICQ_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.ICQ_0_frameLabel.setObjectName("ICQ_0_frameLabel")
+        self.ICQ_chk_autoScroll = QtWidgets.QCheckBox(self.ICQ_frame)
+        self.ICQ_chk_autoScroll.setGeometry(QtCore.QRect(1010, 100, 141, 27))
+        self.ICQ_chk_autoScroll.setStyleSheet("background-color: #5d707f;\n"
+"font-size: 12pt;\n"
+"color: #f2f4f3;\n"
+"")
+        self.ICQ_chk_autoScroll.setChecked(False)
+        self.ICQ_chk_autoScroll.setObjectName("ICQ_chk_autoScroll")
+        self.SID_lbl_robID = QtWidgets.QLabel(self.ICQ_frame)
+        self.SID_lbl_robID.setGeometry(QtCore.QRect(720, 30, 81, 41))
+        self.SID_lbl_robID.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.SID_lbl_robID.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.SID_lbl_robID.setObjectName("SID_lbl_robID")
+        self.SID_disp_robID = QtWidgets.QLabel(self.ICQ_frame)
+        self.SID_disp_robID.setGeometry(QtCore.QRect(810, 30, 101, 41))
+        self.SID_disp_robID.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.SID_disp_robID.setObjectName("SID_disp_robID")
+        self.SID_disp_progID = QtWidgets.QLabel(self.ICQ_frame)
+        self.SID_disp_progID.setGeometry(QtCore.QRect(610, 30, 101, 41))
+        self.SID_disp_progID.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.SID_disp_progID.setObjectName("SID_disp_progID")
+        self.SID_lbl_progID = QtWidgets.QLabel(self.ICQ_frame)
+        self.SID_lbl_progID.setGeometry(QtCore.QRect(520, 30, 81, 41))
+        self.SID_lbl_progID.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.SID_lbl_progID.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.SID_lbl_progID.setObjectName("SID_lbl_progID")
+        self.SID_btt_robToProgID = QtWidgets.QPushButton(self.ICQ_frame)
+        self.SID_btt_robToProgID.setGeometry(QtCore.QRect(950, 30, 201, 41))
+        self.SID_btt_robToProgID.setObjectName("SID_btt_robToProgID")
         self.ZERO_frame = QtWidgets.QFrame(self.MONITOR_tab)
-        self.ZERO_frame.setGeometry(QtCore.QRect(900, 30, 441, 631))
+        self.ZERO_frame.setGeometry(QtCore.QRect(1260, 20, 631, 621))
         self.ZERO_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.ZERO_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ZERO_frame.setObjectName("ZERO_frame")
         self.ZERO_0_frameLabel = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_0_frameLabel.setGeometry(QtCore.QRect(30, 30, 261, 51))
+        self.ZERO_0_frameLabel.setGeometry(QtCore.QRect(10, 30, 261, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
@@ -2377,82 +2462,255 @@ class Ui_MainWindow(object):
         self.ZERO_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.ZERO_0_frameLabel.setObjectName("ZERO_0_frameLabel")
         self.ZERO_disp_z = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_z.setGeometry(QtCore.QRect(210, 260, 161, 41))
+        self.ZERO_disp_z.setGeometry(QtCore.QRect(140, 260, 161, 41))
         self.ZERO_disp_z.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.ZERO_disp_z.setObjectName("ZERO_disp_z")
         self.ZERO_lbl_y_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_y_disp.setGeometry(QtCore.QRect(80, 190, 121, 41))
+        self.ZERO_lbl_y_disp.setGeometry(QtCore.QRect(80, 190, 51, 41))
         self.ZERO_lbl_y_disp.setStyleSheet("border: 0px;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
         self.ZERO_lbl_y_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.ZERO_lbl_y_disp.setObjectName("ZERO_lbl_y_disp")
         self.ZERO_lbl_yOrient_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_yOrient_disp.setGeometry(QtCore.QRect(60, 400, 141, 41))
+        self.ZERO_lbl_yOrient_disp.setGeometry(QtCore.QRect(80, 470, 51, 41))
         self.ZERO_lbl_yOrient_disp.setStyleSheet("border: 0px;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
         self.ZERO_lbl_yOrient_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.ZERO_lbl_yOrient_disp.setObjectName("ZERO_lbl_yOrient_disp")
         self.ZERO_disp_zOrient = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_zOrient.setGeometry(QtCore.QRect(210, 540, 161, 41))
+        self.ZERO_disp_zOrient.setGeometry(QtCore.QRect(140, 540, 161, 41))
         self.ZERO_disp_zOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.ZERO_disp_zOrient.setObjectName("ZERO_disp_zOrient")
         self.ZERO_lbl_zOrient_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_zOrient_disp.setGeometry(QtCore.QRect(60, 540, 141, 41))
+        self.ZERO_lbl_zOrient_disp.setGeometry(QtCore.QRect(80, 540, 51, 41))
         self.ZERO_lbl_zOrient_disp.setStyleSheet("border: 0px;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
         self.ZERO_lbl_zOrient_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.ZERO_lbl_zOrient_disp.setObjectName("ZERO_lbl_zOrient_disp")
         self.ZERO_lbl_xOrient_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_xOrient_disp.setGeometry(QtCore.QRect(60, 470, 141, 41))
+        self.ZERO_lbl_xOrient_disp.setGeometry(QtCore.QRect(70, 400, 61, 41))
         self.ZERO_lbl_xOrient_disp.setStyleSheet("border: 0px;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
         self.ZERO_lbl_xOrient_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.ZERO_lbl_xOrient_disp.setObjectName("ZERO_lbl_xOrient_disp")
         self.ZERO_lbl_ext_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_ext_disp.setGeometry(QtCore.QRect(80, 330, 121, 41))
+        self.ZERO_lbl_ext_disp.setGeometry(QtCore.QRect(80, 330, 51, 41))
         self.ZERO_lbl_ext_disp.setStyleSheet("border: 0px;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
         self.ZERO_lbl_ext_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.ZERO_lbl_ext_disp.setObjectName("ZERO_lbl_ext_disp")
         self.ZERO_disp_yOrient = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_yOrient.setGeometry(QtCore.QRect(210, 400, 161, 41))
+        self.ZERO_disp_yOrient.setGeometry(QtCore.QRect(140, 470, 161, 41))
         self.ZERO_disp_yOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.ZERO_disp_yOrient.setObjectName("ZERO_disp_yOrient")
         self.ZERO_disp_ext = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_ext.setGeometry(QtCore.QRect(210, 330, 161, 41))
+        self.ZERO_disp_ext.setGeometry(QtCore.QRect(140, 330, 161, 41))
         self.ZERO_disp_ext.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.ZERO_disp_ext.setObjectName("ZERO_disp_ext")
         self.ZERO_lbl_x_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_x_disp.setGeometry(QtCore.QRect(80, 120, 121, 41))
+        self.ZERO_lbl_x_disp.setGeometry(QtCore.QRect(70, 120, 61, 41))
         self.ZERO_lbl_x_disp.setStyleSheet("border: 0px;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
         self.ZERO_lbl_x_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.ZERO_lbl_x_disp.setObjectName("ZERO_lbl_x_disp")
         self.ZERO_disp_xOrient = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_xOrient.setGeometry(QtCore.QRect(210, 470, 161, 41))
+        self.ZERO_disp_xOrient.setGeometry(QtCore.QRect(140, 400, 161, 41))
         self.ZERO_disp_xOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.ZERO_disp_xOrient.setObjectName("ZERO_disp_xOrient")
         self.ZERO_lbl_z_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_z_disp.setGeometry(QtCore.QRect(80, 260, 121, 41))
+        self.ZERO_lbl_z_disp.setGeometry(QtCore.QRect(90, 260, 41, 41))
         self.ZERO_lbl_z_disp.setStyleSheet("border: 0px;\n"
 "background-color: #5D707F;\n"
 "color: #E1E5EE;")
         self.ZERO_lbl_z_disp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
         self.ZERO_lbl_z_disp.setObjectName("ZERO_lbl_z_disp")
         self.ZERO_disp_x = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_x.setGeometry(QtCore.QRect(210, 120, 161, 41))
+        self.ZERO_disp_x.setGeometry(QtCore.QRect(140, 120, 161, 41))
         self.ZERO_disp_x.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.ZERO_disp_x.setObjectName("ZERO_disp_x")
         self.ZERO_disp_y = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_y.setGeometry(QtCore.QRect(210, 190, 161, 41))
+        self.ZERO_disp_y.setGeometry(QtCore.QRect(140, 190, 161, 41))
         self.ZERO_disp_y.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.ZERO_disp_y.setObjectName("ZERO_disp_y")
+        self.ZERO_float_x = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
+        self.ZERO_float_x.setGeometry(QtCore.QRect(381, 120, 171, 41))
+        self.ZERO_float_x.setStyleSheet("font-size: 14pt;")
+        self.ZERO_float_x.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_float_x.setMinimum(-9999.0)
+        self.ZERO_float_x.setMaximum(9999.0)
+        self.ZERO_float_x.setSingleStep(10.0)
+        self.ZERO_float_x.setObjectName("ZERO_float_x")
+        self.ZERO_float_y = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
+        self.ZERO_float_y.setGeometry(QtCore.QRect(380, 190, 171, 41))
+        self.ZERO_float_y.setStyleSheet("font-size: 14pt;")
+        self.ZERO_float_y.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_float_y.setMinimum(-9999.0)
+        self.ZERO_float_y.setMaximum(9999.0)
+        self.ZERO_float_y.setSingleStep(10.0)
+        self.ZERO_float_y.setObjectName("ZERO_float_y")
+        self.ZERO_float_z = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
+        self.ZERO_float_z.setGeometry(QtCore.QRect(380, 260, 171, 41))
+        self.ZERO_float_z.setStyleSheet("font-size: 14pt;")
+        self.ZERO_float_z.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_float_z.setMinimum(-9999.0)
+        self.ZERO_float_z.setMaximum(9999.0)
+        self.ZERO_float_z.setSingleStep(10.0)
+        self.ZERO_float_z.setObjectName("ZERO_float_z")
+        self.ZERO_float_ext = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
+        self.ZERO_float_ext.setGeometry(QtCore.QRect(380, 330, 171, 41))
+        self.ZERO_float_ext.setStyleSheet("font-size: 14pt;")
+        self.ZERO_float_ext.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_float_ext.setMinimum(-9999.0)
+        self.ZERO_float_ext.setMaximum(9999.0)
+        self.ZERO_float_ext.setSingleStep(10.0)
+        self.ZERO_float_ext.setObjectName("ZERO_float_ext")
+        self.ZERO_float_rx = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
+        self.ZERO_float_rx.setGeometry(QtCore.QRect(380, 400, 171, 41))
+        self.ZERO_float_rx.setStyleSheet("font-size: 14pt;")
+        self.ZERO_float_rx.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_float_rx.setMinimum(-9999.0)
+        self.ZERO_float_rx.setMaximum(9999.0)
+        self.ZERO_float_rx.setSingleStep(10.0)
+        self.ZERO_float_rx.setObjectName("ZERO_float_rx")
+        self.ZERO_float_ry = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
+        self.ZERO_float_ry.setGeometry(QtCore.QRect(380, 470, 171, 41))
+        self.ZERO_float_ry.setStyleSheet("font-size: 14pt;")
+        self.ZERO_float_ry.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_float_ry.setMinimum(-9999.0)
+        self.ZERO_float_ry.setMaximum(9999.0)
+        self.ZERO_float_ry.setSingleStep(10.0)
+        self.ZERO_float_ry.setObjectName("ZERO_float_ry")
+        self.ZERO_float_rz = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
+        self.ZERO_float_rz.setGeometry(QtCore.QRect(380, 540, 171, 41))
+        self.ZERO_float_rz.setStyleSheet("font-size: 14pt;")
+        self.ZERO_float_rz.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ZERO_float_rz.setMinimum(-9999.0)
+        self.ZERO_float_rz.setMaximum(9999.0)
+        self.ZERO_float_rz.setSingleStep(10.0)
+        self.ZERO_float_rz.setObjectName("ZERO_float_rz")
+        self.ZERO_btt_newZero = QtWidgets.QPushButton(self.ZERO_frame)
+        self.ZERO_btt_newZero.setGeometry(QtCore.QRect(380, 57, 181, 41))
+        self.ZERO_btt_newZero.setObjectName("ZERO_btt_newZero")
+        self.TRANS_frame = QtWidgets.QFrame(self.MONITOR_tab)
+        self.TRANS_frame.setGeometry(QtCore.QRect(1260, 680, 631, 251))
+        self.TRANS_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.TRANS_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.TRANS_frame.setObjectName("TRANS_frame")
+        self.TRANS_0_frameLabel = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_0_frameLabel.setGeometry(QtCore.QRect(40, 14, 262, 50))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(22)
+        self.TRANS_0_frameLabel.setFont(font)
+        self.TRANS_0_frameLabel.setStyleSheet("border: 0px;\n"
+"font-size: 22pt;\n"
+"padding: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.TRANS_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.TRANS_0_frameLabel.setObjectName("TRANS_0_frameLabel")
+        self.TRANS_disp_xStart = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_disp_xStart.setGeometry(QtCore.QRect(140, 80, 131, 31))
+        self.TRANS_disp_xStart.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_disp_xStart.setObjectName("TRANS_disp_xStart")
+        self.TRANS_lbl_x = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_lbl_x.setGeometry(QtCore.QRect(80, 80, 51, 31))
+        self.TRANS_lbl_x.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.TRANS_lbl_x.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_lbl_x.setObjectName("TRANS_lbl_x")
+        self.TRANS_disp_yStart = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_disp_yStart.setGeometry(QtCore.QRect(140, 120, 131, 31))
+        self.TRANS_disp_yStart.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_disp_yStart.setObjectName("TRANS_disp_yStart")
+        self.TRANS_disp_zStart = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_disp_zStart.setGeometry(QtCore.QRect(140, 160, 131, 31))
+        self.TRANS_disp_zStart.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_disp_zStart.setObjectName("TRANS_disp_zStart")
+        self.TRANS_lbl_y = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_lbl_y.setGeometry(QtCore.QRect(70, 120, 61, 31))
+        self.TRANS_lbl_y.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.TRANS_lbl_y.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_lbl_y.setObjectName("TRANS_lbl_y")
+        self.TRANS_lbl_z = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_lbl_z.setGeometry(QtCore.QRect(80, 160, 51, 31))
+        self.TRANS_lbl_z.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.TRANS_lbl_z.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_lbl_z.setObjectName("TRANS_lbl_z")
+        self.TRANS_disp_extStart = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_disp_extStart.setGeometry(QtCore.QRect(140, 200, 131, 31))
+        self.TRANS_disp_extStart.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_disp_extStart.setObjectName("TRANS_disp_extStart")
+        self.TRANS_lbl_ext = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_lbl_ext.setGeometry(QtCore.QRect(70, 200, 61, 31))
+        self.TRANS_lbl_ext.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.TRANS_lbl_ext.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_lbl_ext.setObjectName("TRANS_lbl_ext")
+        self.TRANS_img_arrow = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_img_arrow.setGeometry(QtCore.QRect(290, 100, 121, 121))
+        self.TRANS_img_arrow.setStyleSheet("image: url(:/images/right_fullYellow.png);\n"
+"background-color: #5d707f;\n"
+"border: None;")
+        self.TRANS_img_arrow.setObjectName("TRANS_img_arrow")
+        self.TRANS_disp_extEnd = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_disp_extEnd.setGeometry(QtCore.QRect(430, 200, 131, 31))
+        self.TRANS_disp_extEnd.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_disp_extEnd.setObjectName("TRANS_disp_extEnd")
+        self.TRANS_disp_yEnd = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_disp_yEnd.setGeometry(QtCore.QRect(430, 120, 131, 31))
+        self.TRANS_disp_yEnd.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_disp_yEnd.setObjectName("TRANS_disp_yEnd")
+        self.TRANS_disp_zEnd = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_disp_zEnd.setGeometry(QtCore.QRect(430, 160, 131, 31))
+        self.TRANS_disp_zEnd.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_disp_zEnd.setObjectName("TRANS_disp_zEnd")
+        self.TRANS_disp_xEnd = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_disp_xEnd.setGeometry(QtCore.QRect(430, 80, 131, 31))
+        self.TRANS_disp_xEnd.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_disp_xEnd.setObjectName("TRANS_disp_xEnd")
+        self.TRANS_lbl_newOrient = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_lbl_newOrient.setGeometry(QtCore.QRect(390, 30, 131, 31))
+        self.TRANS_lbl_newOrient.setStyleSheet("border: 0px;\n"
+"font-size: 12pt;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.TRANS_lbl_newOrient.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.TRANS_lbl_newOrient.setObjectName("TRANS_lbl_newOrient")
+        self.TRANS_indi_newOrient = QtWidgets.QLabel(self.TRANS_frame)
+        self.TRANS_indi_newOrient.setGeometry(QtCore.QRect(530, 30, 31, 31))
+        self.TRANS_indi_newOrient.setStyleSheet("border-radius: 15px;\n"
+"background-color: #4c4a48;")
+        self.TRANS_indi_newOrient.setText("")
+        self.TRANS_indi_newOrient.setObjectName("TRANS_indi_newOrient")
+        self.TRANS_img_arrow.raise_()
+        self.TRANS_disp_xEnd.raise_()
+        self.TRANS_0_frameLabel.raise_()
+        self.TRANS_disp_xStart.raise_()
+        self.TRANS_lbl_x.raise_()
+        self.TRANS_disp_yStart.raise_()
+        self.TRANS_disp_zStart.raise_()
+        self.TRANS_lbl_y.raise_()
+        self.TRANS_lbl_z.raise_()
+        self.TRANS_disp_extStart.raise_()
+        self.TRANS_lbl_ext.raise_()
+        self.TRANS_disp_extEnd.raise_()
+        self.TRANS_disp_yEnd.raise_()
+        self.TRANS_disp_zEnd.raise_()
+        self.TRANS_lbl_newOrient.raise_()
+        self.TRANS_indi_newOrient.raise_()
         self.tab.addTab(self.MONITOR_tab, "")
         MainWindow.setCentralWidget(self.mainframe)
         self.TERM_lbl_gcodeInterp.setBuddy(self.TERM_entry_gcodeInterp)
@@ -2465,16 +2723,116 @@ class Ui_MainWindow(object):
         self.SET_lbl_transSpeed_print.setBuddy(self.SET_num_transSpeed_print)
         self.SET_lbl_zone.setBuddy(self.SET_num_zone)
         self.SET_lbl_orientSpeed_dc.setBuddy(self.SET_num_orientSpeed_dc)
-        self.SET_lbl_ioSplit.setBuddy(self.SET_num_ioSplit)
         self.SET_lbl_decelRamp_print.setBuddy(self.SET_num_decelRamp_print)
         self.SET_lbl_orientSpeed_print.setBuddy(self.SET_num_orientSpeed_print)
         self.SET_lbl_transSpeed_dc.setBuddy(self.SET_num_transSpeed_dc)
         self.SET_lbl_decelRamp_dc.setBuddy(self.SET_num_decelRamp_dc)
 
         self.retranslateUi(MainWindow)
-        self.tab.setCurrentIndex(1)
+        self.tab.setCurrentIndex(0)
         self.TCP_tab.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        MainWindow.setTabOrder(self.tab, self.IO_btt_newFile)
+        MainWindow.setTabOrder(self.IO_btt_newFile, self.IO_btt_xyzextZero)
+        MainWindow.setTabOrder(self.IO_btt_xyzextZero, self.IO_btt_orientZero)
+        MainWindow.setTabOrder(self.IO_btt_orientZero, self.IO_num_addByID)
+        MainWindow.setTabOrder(self.IO_num_addByID, self.IO_btt_addByID)
+        MainWindow.setTabOrder(self.IO_btt_addByID, self.IO_btt_loadFile)
+        MainWindow.setTabOrder(self.IO_btt_loadFile, self.SGLC_btt_sendFirstQComm)
+        MainWindow.setTabOrder(self.SGLC_btt_sendFirstQComm, self.SGLC_entry_gcodeSglComm)
+        MainWindow.setTabOrder(self.SGLC_entry_gcodeSglComm, self.SGLC_btt_gcodeSglComm)
+        MainWindow.setTabOrder(self.SGLC_btt_gcodeSglComm, self.SGLC_num_gcodeSglComm_addByID)
+        MainWindow.setTabOrder(self.SGLC_num_gcodeSglComm_addByID, self.SGLC_btt_gcodeSglComm_addByID)
+        MainWindow.setTabOrder(self.SGLC_btt_gcodeSglComm_addByID, self.SGLC_entry_rapidSglComm)
+        MainWindow.setTabOrder(self.SGLC_entry_rapidSglComm, self.SGLC_btt_rapidSglComm)
+        MainWindow.setTabOrder(self.SGLC_btt_rapidSglComm, self.SGLC_num_rapidSglComm_addByID)
+        MainWindow.setTabOrder(self.SGLC_num_rapidSglComm_addByID, self.SGLC_btt_rapidSglComm_addByID)
+        MainWindow.setTabOrder(self.SGLC_btt_rapidSglComm_addByID, self.SCTRL_btt_startQProcessing)
+        MainWindow.setTabOrder(self.SCTRL_btt_startQProcessing, self.SCTRL_btt_holdQProcessing)
+        MainWindow.setTabOrder(self.SCTRL_btt_holdQProcessing, self.SCTRL_num_liveAd_robot)
+        MainWindow.setTabOrder(self.SCTRL_num_liveAd_robot, self.SCTRL_num_liveAd_pump1)
+        MainWindow.setTabOrder(self.SCTRL_num_liveAd_pump1, self.SCTRL_btt_addSIB1_atFront)
+        MainWindow.setTabOrder(self.SCTRL_btt_addSIB1_atFront, self.SCTRL_btt_addSIB1_atEnd)
+        MainWindow.setTabOrder(self.SCTRL_btt_addSIB1_atEnd, self.SCTRL_btt_addSIB2_atFront)
+        MainWindow.setTabOrder(self.SCTRL_btt_addSIB2_atFront, self.SCTRL_btt_addSIB2_atEnd)
+        MainWindow.setTabOrder(self.SCTRL_btt_addSIB2_atEnd, self.SCTRL_btt_addSIB3_atFront)
+        MainWindow.setTabOrder(self.SCTRL_btt_addSIB3_atFront, self.SCTRL_btt_addSIB3_atEnd)
+        MainWindow.setTabOrder(self.SCTRL_btt_addSIB3_atEnd, self.SCTRL_entry_clrByID)
+        MainWindow.setTabOrder(self.SCTRL_entry_clrByID, self.SCTRL_btt_clrByID)
+        MainWindow.setTabOrder(self.SCTRL_btt_clrByID, self.SCTRL_btt_clrQ)
+        MainWindow.setTabOrder(self.SCTRL_btt_clrQ, self.SCTRL_arr_queue)
+        MainWindow.setTabOrder(self.SCTRL_arr_queue, self.SCTRL_btt_forcedStop)
+        MainWindow.setTabOrder(self.SCTRL_btt_forcedStop, self.DC_drpd_moveType)
+        MainWindow.setTabOrder(self.DC_drpd_moveType, self.DC_btt_xyzZero)
+        MainWindow.setTabOrder(self.DC_btt_xyzZero, self.DC_btt_extZero)
+        MainWindow.setTabOrder(self.DC_btt_extZero, self.DC_btt_home)
+        MainWindow.setTabOrder(self.DC_btt_home, self.DC_sld_stepWidth)
+        MainWindow.setTabOrder(self.DC_sld_stepWidth, self.DC_btt_xPlus)
+        MainWindow.setTabOrder(self.DC_btt_xPlus, self.DC_btt_xMinus)
+        MainWindow.setTabOrder(self.DC_btt_xMinus, self.DC_btt_yPlus)
+        MainWindow.setTabOrder(self.DC_btt_yPlus, self.DC_btt_yMinus)
+        MainWindow.setTabOrder(self.DC_btt_yMinus, self.DC_btt_zPlus)
+        MainWindow.setTabOrder(self.DC_btt_zPlus, self.DC_btt_zMinus)
+        MainWindow.setTabOrder(self.DC_btt_zMinus, self.DC_btt_extPlus)
+        MainWindow.setTabOrder(self.DC_btt_extPlus, self.DC_btt_extMinus)
+        MainWindow.setTabOrder(self.DC_btt_extMinus, self.NC_float_x)
+        MainWindow.setTabOrder(self.NC_float_x, self.NC_float_y)
+        MainWindow.setTabOrder(self.NC_float_y, self.NC_float_z)
+        MainWindow.setTabOrder(self.NC_float_z, self.NC_float_ext)
+        MainWindow.setTabOrder(self.NC_float_ext, self.NC_float_xOrient)
+        MainWindow.setTabOrder(self.NC_float_xOrient, self.NC_float_yOrient)
+        MainWindow.setTabOrder(self.NC_float_yOrient, self.NC_float_zOrient)
+        MainWindow.setTabOrder(self.NC_float_zOrient, self.NC_btt_getValues)
+        MainWindow.setTabOrder(self.NC_btt_getValues, self.NC_btt_xyzSend)
+        MainWindow.setTabOrder(self.NC_btt_xyzSend, self.NC_btt_xyzExtSend)
+        MainWindow.setTabOrder(self.NC_btt_xyzExtSend, self.NC_btt_orientSend)
+        MainWindow.setTabOrder(self.NC_btt_orientSend, self.NC_btt_orientZero)
+        MainWindow.setTabOrder(self.NC_btt_orientZero, self.TERM_arr_terminal)
+        MainWindow.setTabOrder(self.TERM_arr_terminal, self.TERM_chk_autoScroll)
+        MainWindow.setTabOrder(self.TERM_chk_autoScroll, self.TERM_entry_gcodeInterp)
+        MainWindow.setTabOrder(self.TERM_entry_gcodeInterp, self.TERM_btt_gcodeInterp)
+        MainWindow.setTabOrder(self.TERM_btt_gcodeInterp, self.TERM_entry_rapidInterp)
+        MainWindow.setTabOrder(self.TERM_entry_rapidInterp, self.TERM_btt_rapidInterp)
+        MainWindow.setTabOrder(self.TERM_btt_rapidInterp, self.TCP_tab)
+        MainWindow.setTabOrder(self.TCP_tab, self.TCP_num_commForerun)
+        MainWindow.setTabOrder(self.TCP_num_commForerun, self.TCP_ROB_btt_reconn)
+        MainWindow.setTabOrder(self.TCP_ROB_btt_reconn, self.TCP_ROB_btt_discon)
+        MainWindow.setTabOrder(self.TCP_ROB_btt_discon, self.PUMP_num_setSpeed)
+        MainWindow.setTabOrder(self.PUMP_num_setSpeed, self.PUMP_btt_setSpeed)
+        MainWindow.setTabOrder(self.PUMP_btt_setSpeed, self.PUMP_btt_stop)
+        MainWindow.setTabOrder(self.PUMP_btt_stop, self.PUMP_btt_plus1)
+        MainWindow.setTabOrder(self.PUMP_btt_plus1, self.PUMP_btt_minus1)
+        MainWindow.setTabOrder(self.PUMP_btt_minus1, self.PUMP_btt_reverse)
+        MainWindow.setTabOrder(self.PUMP_btt_reverse, self.SET_float_volPerMM)
+        MainWindow.setTabOrder(self.SET_float_volPerMM, self.SET_float_frToMms)
+        MainWindow.setTabOrder(self.SET_float_frToMms, self.SET_float_pumpVolFlow)
+        MainWindow.setTabOrder(self.SET_float_pumpVolFlow, self.SET_num_zone)
+        MainWindow.setTabOrder(self.SET_num_zone, self.SET_num_transSpeed_dc)
+        MainWindow.setTabOrder(self.SET_num_transSpeed_dc, self.SET_num_orientSpeed_dc)
+        MainWindow.setTabOrder(self.SET_num_orientSpeed_dc, self.SET_num_accelRamp_dc)
+        MainWindow.setTabOrder(self.SET_num_accelRamp_dc, self.SET_num_decelRamp_dc)
+        MainWindow.setTabOrder(self.SET_num_decelRamp_dc, self.SET_num_transSpeed_print)
+        MainWindow.setTabOrder(self.SET_num_transSpeed_print, self.SET_num_orientSpeed_print)
+        MainWindow.setTabOrder(self.SET_num_orientSpeed_print, self.SET_num_accelRamp_print)
+        MainWindow.setTabOrder(self.SET_num_accelRamp_print, self.SET_num_decelRamp_print)
+        MainWindow.setTabOrder(self.SET_num_decelRamp_print, self.SET_btt_apply)
+        MainWindow.setTabOrder(self.SET_btt_apply, self.SET_btt_default)
+        MainWindow.setTabOrder(self.SET_btt_default, self.SIB_entry_sib1)
+        MainWindow.setTabOrder(self.SIB_entry_sib1, self.SIB_entry_sib2)
+        MainWindow.setTabOrder(self.SIB_entry_sib2, self.SIB_entry_sib3)
+        MainWindow.setTabOrder(self.SIB_entry_sib3, self.ICQ_arr_terminal)
+        MainWindow.setTabOrder(self.ICQ_arr_terminal, self.ZERO_btt_newZero)
+        MainWindow.setTabOrder(self.ZERO_btt_newZero, self.ZERO_float_x)
+        MainWindow.setTabOrder(self.ZERO_float_x, self.ZERO_float_y)
+        MainWindow.setTabOrder(self.ZERO_float_y, self.ZERO_float_z)
+        MainWindow.setTabOrder(self.ZERO_float_z, self.ZERO_float_ext)
+        MainWindow.setTabOrder(self.ZERO_float_ext, self.ZERO_float_rx)
+        MainWindow.setTabOrder(self.ZERO_float_rx, self.ZERO_float_ry)
+        MainWindow.setTabOrder(self.ZERO_float_ry, self.ZERO_float_rz)
+        MainWindow.setTabOrder(self.ZERO_float_rz, self.TCP_PUMP1_btt_reconn)
+        MainWindow.setTabOrder(self.TCP_PUMP1_btt_reconn, self.TCP_PUMP2_btt_discon)
+        MainWindow.setTabOrder(self.TCP_PUMP2_btt_discon, self.TCP_PUMP2_btt_reconn)
+        MainWindow.setTabOrder(self.TCP_PUMP2_btt_reconn, self.TCP_PUMP1_btt_discon)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -2491,13 +2849,14 @@ class Ui_MainWindow(object):
 "length [m]:"))
         self.IO_lbl_estimVol.setText(_translate("MainWindow", "estimated printing\n"
 "volume [L]:"))
-        self.IO_btt_xyzZero.setText(_translate("MainWindow", "SET XYZ ZERO"))
-        self.IO_btt_extZero.setText(_translate("MainWindow", "SET Ext ZERO"))
+        self.IO_btt_xyzextZero.setText(_translate("MainWindow", "XYZ && EXT 🡆 ZERO"))
+        self.IO_btt_orientZero.setText(_translate("MainWindow", "ORIENTATION 🡆 ZERO"))
         self.IO_lbl_addByID.setText(_translate("MainWindow", "add at\n"
 "specific ID:"))
         self.IO_btt_loadFile.setText(_translate("MainWindow", "load && add to queue"))
         self.IO_lbl_loadFile.setText(_translate("MainWindow", "... not executed"))
         self.IO_lbl_newFile.setText(_translate("MainWindow", "GCode/RAPID file"))
+        self.IO_chk_autoPCtrl.setText(_translate("MainWindow", "use automatic pump control"))
         self.SGLC_0_frameLabel.setText(_translate("MainWindow", "SINGLE COMMAND"))
         self.SGLC_lbl_gcodeSglComm.setText(_translate("MainWindow", "GCode single command"))
         self.SGLC_btt_gcodeSglComm.setText(_translate("MainWindow", "add to queue"))
@@ -2526,7 +2885,7 @@ class Ui_MainWindow(object):
         self.SCTRL_disp_robCommID.setText(_translate("MainWindow", "0"))
         self.SCTRL_lbl_progCommID.setText(_translate("MainWindow", "program command ID"))
         self.SCTRL_disp_progCommID.setText(_translate("MainWindow", "0"))
-        self.SCTRL_btt_clrQ.setText(_translate("MainWindow", "clear queue"))
+        self.SCTRL_btt_clrQ.setText(_translate("MainWindow", "❌ clear queue"))
         self.SCTRL_lbl_clrByID.setText(_translate("MainWindow", "clear by ID:"))
         self.SCTRL_btt_addSIB2_atFront.setText(_translate("MainWindow", "add SIB2"))
         self.SCTRL_btt_addSIB2_atEnd.setText(_translate("MainWindow", "at end"))
@@ -2540,23 +2899,29 @@ class Ui_MainWindow(object):
         self.SCTRL_disp_elemInQ.setText(_translate("MainWindow", "0"))
         self.SCTRL_lbl_buffComms.setText(_translate("MainWindow", "buffered commands"))
         self.SCTRL_lbl_elemInQ.setText(_translate("MainWindow", "elements in queue"))
+        __sortingEnabled = self.SCTRL_arr_queue.isSortingEnabled()
+        self.SCTRL_arr_queue.setSortingEnabled(False)
+        item = self.SCTRL_arr_queue.item(0)
+        item.setText(_translate("MainWindow", "Queue is empty!"))
+        self.SCTRL_arr_queue.setSortingEnabled(__sortingEnabled)
         self.SCTRL_lbl_liveAd_robot.setText(_translate("MainWindow", "live adjust: robot speed"))
         self.SCTRL_lbl_liveAd_pump1.setText(_translate("MainWindow", "live adjust: pump speed"))
         self.SCTRL_num_liveAd_robot.setSuffix(_translate("MainWindow", "%"))
         self.SCTRL_num_liveAd_pump1.setSuffix(_translate("MainWindow", "%"))
         self.SCTRL_btt_addSIB3_atEnd.setText(_translate("MainWindow", "at end"))
         self.SCTRL_btt_addSIB3_atFront.setText(_translate("MainWindow", "add SIB3"))
+        self.SCTRL_chk_autoScroll.setText(_translate("MainWindow", "enable auto scroll"))
         self.tab.setTabText(self.tab.indexOf(self.PRINT_tab), _translate("MainWindow", "     PRINTING     "))
         self.DC_0_frameLabel.setText(_translate("MainWindow", "DC TRANSITION"))
         self.DC_drpd_moveType.setItemText(0, _translate("MainWindow", "LINEAR"))
         self.DC_drpd_moveType.setItemText(1, _translate("MainWindow", "JOINT"))
         self.DC_lbl_robotMoving.setText(_translate("MainWindow", "ROBOT MOVING"))
-        self.DC_btt_xyzZero.setText(_translate("MainWindow", "SET XYZ ZERO"))
-        self.DC_btt_extZero.setText(_translate("MainWindow", "SET Ext ZERO"))
-        self.DC_btt_home.setText(_translate("MainWindow", "HOME (ZERO)"))
+        self.DC_btt_xyzZero.setText(_translate("MainWindow", "XYZ 🡆 ZERO"))
+        self.DC_btt_extZero.setText(_translate("MainWindow", "EXT 🡆 ZERO"))
+        self.DC_btt_home.setText(_translate("MainWindow", "🏠  HOME"))
         self.DC_lbl_x.setText(_translate("MainWindow", "X"))
         self.DC_lbl_y.setText(_translate("MainWindow", "Y"))
-        self.DC_lbl_ext.setText(_translate("MainWindow", "Ext"))
+        self.DC_lbl_ext.setText(_translate("MainWindow", "EXT"))
         self.DC_lbl_z.setText(_translate("MainWindow", "Z"))
         self.DC_disp_x.setText(_translate("MainWindow", "0.0"))
         self.DC_disp_y.setText(_translate("MainWindow", "0.0"))
@@ -2567,30 +2932,31 @@ class Ui_MainWindow(object):
         self.DC_lbl_stepWidth_100mm.setText(_translate("MainWindow", "100 mm"))
         self.NC_0_frameLabel.setText(_translate("MainWindow", "DC NUMERIC CONTROL"))
         self.NC_btt_xyzSend.setText(_translate("MainWindow", "SEND XYZ"))
-        self.NC_btt_xyzExtSend.setText(_translate("MainWindow", "SEND XYZ && Ext"))
-        self.NC_btt_orientSend.setText(_translate("MainWindow", "SEND ORIENT"))
-        self.NC_btt_orientZero.setText(_translate("MainWindow", "ORIENT ZERO"))
+        self.NC_btt_xyzExtSend.setText(_translate("MainWindow", "SEND XYZ && EXT"))
+        self.NC_btt_orientSend.setText(_translate("MainWindow", "SEND ORIENTATION"))
+        self.NC_btt_orientZero.setText(_translate("MainWindow", "ORIENTATION 🡆 ZERO"))
         self.NC_disp_ext.setText(_translate("MainWindow", "0.0"))
-        self.NC_lbl_ext_disp.setText(_translate("MainWindow", "Ext position"))
-        self.NC_lbl_z_disp.setText(_translate("MainWindow", "Z position"))
+        self.NC_lbl_ext_disp.setText(_translate("MainWindow", "EXT"))
+        self.NC_lbl_z_disp.setText(_translate("MainWindow", "Z"))
         self.NC_disp_z.setText(_translate("MainWindow", "0.0"))
         self.NC_disp_x.setText(_translate("MainWindow", "0.0"))
-        self.NC_lbl_x_disp.setText(_translate("MainWindow", "X position"))
+        self.NC_lbl_x_disp.setText(_translate("MainWindow", "X"))
         self.NC_disp_y.setText(_translate("MainWindow", "0.0"))
-        self.NC_lbl_y_disp.setText(_translate("MainWindow", "Y position"))
-        self.NC_lbl_x_set.setText(_translate("MainWindow", "set X position"))
-        self.NC_lbl_y_set.setText(_translate("MainWindow", "set Y position"))
-        self.NC_lbl_ext_set.setText(_translate("MainWindow", "set Ext position"))
-        self.NC_lbl_z_set.setText(_translate("MainWindow", "set Z position"))
-        self.NC_lbl_zOrient_disp.setText(_translate("MainWindow", "Z orientation"))
-        self.NC_lbl_yOrient_disp.setText(_translate("MainWindow", "Y orientation"))
-        self.NC_lbl_zOrient_set.setText(_translate("MainWindow", "set Z orientation"))
-        self.NC_lbl_xOrient_disp.setText(_translate("MainWindow", "X orientation"))
-        self.NC_lbl_xOrient_set.setText(_translate("MainWindow", "set X orientation"))
+        self.NC_lbl_y_disp.setText(_translate("MainWindow", "Y"))
+        self.NC_lbl_x_set.setText(_translate("MainWindow", "set to:"))
+        self.NC_lbl_y_set.setText(_translate("MainWindow", "set to:"))
+        self.NC_lbl_ext_set.setText(_translate("MainWindow", "set to:"))
+        self.NC_lbl_z_set.setText(_translate("MainWindow", "set to:"))
+        self.NC_lbl_zOrient_disp.setText(_translate("MainWindow", "RZ"))
+        self.NC_lbl_yOrient_disp.setText(_translate("MainWindow", "RY"))
+        self.NC_lbl_zOrient_set.setText(_translate("MainWindow", "set to:"))
+        self.NC_lbl_xOrient_disp.setText(_translate("MainWindow", "RX"))
+        self.NC_lbl_xOrient_set.setText(_translate("MainWindow", "set to:"))
         self.NC_disp_xOrient.setText(_translate("MainWindow", "0.0"))
-        self.NC_lbl_yOrient_set.setText(_translate("MainWindow", "set Y orientation"))
+        self.NC_lbl_yOrient_set.setText(_translate("MainWindow", "set to:"))
         self.NC_disp_yOrient.setText(_translate("MainWindow", "0.0"))
         self.NC_disp_zOrient.setText(_translate("MainWindow", "0.0"))
+        self.NC_btt_getValues.setText(_translate("MainWindow", "🡇 GET VALUES"))
         self.TERM_0_frameLabel.setText(_translate("MainWindow", "DC TERMINAL"))
         self.TERM_disp_progCommID.setText(_translate("MainWindow", "0"))
         self.TERM_disp_tcpSpeed.setText(_translate("MainWindow", "0.0"))
@@ -2598,6 +2964,11 @@ class Ui_MainWindow(object):
         self.TERM_disp_robCommID.setText(_translate("MainWindow", "0"))
         self.TERM_lbl_tcpSpeed.setText(_translate("MainWindow", "TCP speed"))
         self.TERM_lbl_robCommID.setText(_translate("MainWindow", "robot command ID"))
+        __sortingEnabled = self.TERM_arr_terminal.isSortingEnabled()
+        self.TERM_arr_terminal.setSortingEnabled(False)
+        item = self.TERM_arr_terminal.item(0)
+        item.setText(_translate("MainWindow", "waiting for data exchange.."))
+        self.TERM_arr_terminal.setSortingEnabled(__sortingEnabled)
         self.TERM_lbl_terminal.setText(_translate("MainWindow", "Terminal:"))
         self.TERM_lbl_gcodeInterp.setText(_translate("MainWindow", "GCode interpreter"))
         self.TERM_entry_gcodeInterp.setText(_translate("MainWindow", "G1 X2.3 Y4.56 Z7.8 F900"))
@@ -2607,7 +2978,7 @@ class Ui_MainWindow(object):
         self.TERM_btt_rapidInterp.setText(_translate("MainWindow", "SEND"))
         self.TERM_chk_autoScroll.setText(_translate("MainWindow", "enable auto scroll"))
         self.tab.setTabText(self.tab.indexOf(self.DIRECT_tab), _translate("MainWindow", "     DIRECT CONTROL     "))
-        self.TCP_0_frameLabel.setText(_translate("MainWindow", "TCP Settings"))
+        self.TCP_0_frameLabel.setText(_translate("MainWindow", "TCP SETTINGS"))
         self.TCP_ROB_lbl_bytesToRead.setText(_translate("MainWindow", "TCP bytes to read"))
         self.TCP_ROB_disp_bytesWritten.setText(_translate("MainWindow", "0"))
         self.TCP_ROB_lbl_bytesWritten.setText(_translate("MainWindow", "TCP bytes written"))
@@ -2616,8 +2987,8 @@ class Ui_MainWindow(object):
         self.TCP_ROB_lbl_tio_conn.setText(_translate("MainWindow", "TCP conn timeout"))
         self.TCP_ROB_lbl_writeBuffer.setText(_translate("MainWindow", "TCP written"))
         self.TCP_ROB_lbl_readBuffer.setText(_translate("MainWindow", "TCP read"))
-        self.TCP_ROB_disp_writeBuffer.setText(_translate("MainWindow", "TextLabel"))
-        self.TCP_ROB_disp_readBuffer.setText(_translate("MainWindow", "TextLabel"))
+        self.TCP_ROB_disp_writeBuffer.setText(_translate("MainWindow", "nothing send, yet.."))
+        self.TCP_ROB_disp_readBuffer.setText(_translate("MainWindow", "nothing received, yet.."))
         self.TCP_ROB_lbl_tio_rw.setText(_translate("MainWindow", "TCP r/w timeout"))
         self.TCP_ROB_lbl_connected.setText(_translate("MainWindow", "CONNECTION\n"
 "ESTABLISHED"))
@@ -2629,13 +3000,13 @@ class Ui_MainWindow(object):
         self.TCP_ROB_disp_tio_conn.setText(_translate("MainWindow", "0"))
         self.TCP_ROB_disp_bytesToRead.setText(_translate("MainWindow", "0"))
         self.TCP_tab.setTabText(self.TCP_tab.indexOf(self.TCP_ROB_tab), _translate("MainWindow", "    ROBOT    "))
-        self.TCP_PUMP1_disp_readBuffer.setText(_translate("MainWindow", "TextLabel"))
+        self.TCP_PUMP1_disp_readBuffer.setText(_translate("MainWindow", "nothing received, yet.."))
         self.TCP_PUMP1_lbl_bytesToRead.setText(_translate("MainWindow", "TCP bytes to read"))
         self.TCP_PUMP1_disp_tio_rw.setText(_translate("MainWindow", "0"))
         self.TCP_PUMP1_btt_reconn.setText(_translate("MainWindow", "RECONNECT"))
         self.TCP_PUMP1_lbl_writeBuffer.setText(_translate("MainWindow", "TCP written"))
         self.TCP_PUMP1_disp_bytesWritten.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP1_disp_writeBuffer.setText(_translate("MainWindow", "TextLabel"))
+        self.TCP_PUMP1_disp_writeBuffer.setText(_translate("MainWindow", "nothing send, yet.."))
         self.TCP_PUMP1_lbl_tio_conn.setText(_translate("MainWindow", "TCP conn timeout"))
         self.TCP_PUMP1_lbl_tio_rw.setText(_translate("MainWindow", "TCP r/w timeout"))
         self.TCP_PUMP1_btt_discon.setText(_translate("MainWindow", "DISCONNECT"))
@@ -2667,9 +3038,9 @@ class Ui_MainWindow(object):
         self.TCP_PUMP2_lbl_port.setText(_translate("MainWindow", "TCP port"))
         self.TCP_PUMP2_disp_ip.setText(_translate("MainWindow", "0"))
         self.TCP_PUMP2_lbl_writeBuffer.setText(_translate("MainWindow", "TCP written"))
-        self.TCP_PUMP2_disp_writeBuffer.setText(_translate("MainWindow", "TextLabel"))
+        self.TCP_PUMP2_disp_writeBuffer.setText(_translate("MainWindow", "nothing send, yet.."))
         self.TCP_PUMP2_btt_discon.setText(_translate("MainWindow", "DISCONNECT"))
-        self.TCP_PUMP2_disp_readBuffer.setText(_translate("MainWindow", "TextLabel"))
+        self.TCP_PUMP2_disp_readBuffer.setText(_translate("MainWindow", "nothing received, yet.."))
         self.TCP_tab.setTabText(self.TCP_tab.indexOf(self.TCP_PUMP2_tab), _translate("MainWindow", "    PUMP 2    "))
         self.TCP_lbl_commForerun.setText(_translate("MainWindow", "COMM FORERUN"))
         self.TCP_lbl_qProcessing.setText(_translate("MainWindow", "QUEUE\n"
@@ -2680,39 +3051,39 @@ class Ui_MainWindow(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Bahnschrift\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MoveL [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[8,9,10,11],[12,13,14,15,16,17]],[18,19,20,21],z50,tool0  EXT:600</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MoveJ Offs(pHome,7.0,8.0,9.0),[110,120,130,140],z15,tool0 EXT:160</p></body></html>"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MoveJ [[1400.0,1500.0,1900.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT:1900</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MoveJ [[1400.0,1500.0,1600.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT:1900</p></body></html>"))
         self.SIB_lbl_sib2.setText(_translate("MainWindow", "standard instruction block 2 (SIB2)"))
         self.SIB_entry_sib1.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Bahnschrift\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">G1 X1.0 Y2.0 Z3.0 F4000 EXT500</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">G1 X6.0 Y7.0 Z8.0 F9000 EXT990</p></body></html>"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MoveJ [[-340.0,2060.0,1400.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT:200</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MoveJ [[-340.0,2060.0,800.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT:200</p></body></html>"))
         self.SIB_entry_sib3.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Bahnschrift\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MoveL [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[8,9,10,11],[12,13,14,15,16,17]],[18,19,20,21],z50,tool0  EXT:600</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MoveJ Offs(pHome,7.0,8.0,9.0),[110,120,130,140],z15,tool0 EXT:160</p></body></html>"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MoveJ [[1153.4,3945.6,1297.05],[0.70620,0.02032,0.70771,0.00352],[,,,,,]],[100,50,50,50],z0,tool0 EXT:1900</p></body></html>"))
         self.SIB_lbl_sib3.setText(_translate("MainWindow", "standard instruction block 3 (SIB3)"))
         self.SET_0_frameLabel.setText(_translate("MainWindow", "SETTINGS"))
-        self.SET_lbl_logEntry.setText(_translate("MainWindow", "log entry"))
+        self.SET_lbl_logEntry.setText(_translate("MainWindow", "last\n"
+"log entry"))
         self.SET_lbl_accelRamp_dc.setText(_translate("MainWindow", "DC acceleration\n"
 "ramp [mm/s²]"))
-        self.SET_lbl_volPerE.setText(_translate("MainWindow", "volume\n"
-"per E [L]:"))
+        self.SET_lbl_volPerE.setText(_translate("MainWindow", "extruded volume\n"
+"per mm [L/mm]"))
         self.SET_lbl_accelRamp_print.setText(_translate("MainWindow", "printing acceleration\n"
 "ramp [mm/²]"))
         self.SET_lbl_transSpeed_print.setText(_translate("MainWindow", "printing transition\n"
 "speed [mm/s]"))
-        self.SET_lbl_frToMms.setText(_translate("MainWindow", "feedrate\n"
-"to mm/s:"))
-        self.SET_lbl_zone.setText(_translate("MainWindow", "Zone:"))
+        self.SET_lbl_frToMms.setText(_translate("MainWindow", "GCode F-command \n"
+"to mm/s"))
+        self.SET_lbl_zone.setText(_translate("MainWindow", " IO zone"))
         self.SET_lbl_orientSpeed_dc.setText(_translate("MainWindow", "DC orientation\n"
 "speed [grad/s]"))
-        self.SET_lbl_ioSplit.setText(_translate("MainWindow", "IO split\n"
-"file advise:"))
+        self.SET_lbl_ioSplit.setText(_translate("MainWindow", "pump volume\n"
+"flow [L/s]"))
         self.SET_disp_logEntry.setText(_translate("MainWindow", "no logfile created!"))
         self.SET_lbl_decelRamp_print.setText(_translate("MainWindow", "printing deceleration\n"
 "ramp [mm/²]"))
@@ -2724,7 +3095,6 @@ class Ui_MainWindow(object):
 "ramp [mm/²]"))
         self.SET_btt_apply.setText(_translate("MainWindow", "APPLY"))
         self.SET_btt_default.setText(_translate("MainWindow", "DEFAULT"))
-        self.PUMP_0_frameLabel.setText(_translate("MainWindow", "PUMP"))
         self.PUMP_disp_freq.setText(_translate("MainWindow", "0.0"))
         self.PUMP_lbl_freq.setText(_translate("MainWindow", "motor\n"
 "frequency:"))
@@ -2742,28 +3112,56 @@ class Ui_MainWindow(object):
         self.PUMP_lbl_setSpeed.setText(_translate("MainWindow", "set speed:"))
         self.PUMP_disp_currSpeed.setText(_translate("MainWindow", "0%"))
         self.PUMP_btt_setSpeed.setText(_translate("MainWindow", "SET"))
-        self.PUMP_btt_stop.setText(_translate("MainWindow", "STOP"))
+        self.PUMP_btt_stop.setText(_translate("MainWindow", "⛔ STOP"))
         self.PUMP_num_setSpeed.setSuffix(_translate("MainWindow", "%"))
         self.PUMP_btt_reverse.setText(_translate("MainWindow", "REVERSE DIRECTION"))
         self.PUMP_lbl_currSpeed.setText(_translate("MainWindow", "current speed:"))
+        self.PUMP_0_frameLabel.setText(_translate("MainWindow", "PUMP CTRL"))
         self.tab.setTabText(self.tab.indexOf(self.SET_tab), _translate("MainWindow", "     SETTINGS     "))
-        self.ICQ_0_frameLabel.setText(_translate("MainWindow", "internal command queue"))
+        __sortingEnabled = self.ICQ_arr_terminal.isSortingEnabled()
+        self.ICQ_arr_terminal.setSortingEnabled(False)
+        item = self.ICQ_arr_terminal.item(0)
+        item.setText(_translate("MainWindow", "Queue is empty!"))
+        self.ICQ_arr_terminal.setSortingEnabled(__sortingEnabled)
+        self.ICQ_0_frameLabel.setText(_translate("MainWindow", "INTERNAL COMMAND QUEUE"))
+        self.ICQ_chk_autoScroll.setText(_translate("MainWindow", "enable auto scroll"))
+        self.SID_lbl_robID.setText(_translate("MainWindow", "ROBOT ID"))
+        self.SID_disp_robID.setText(_translate("MainWindow", "0"))
+        self.SID_disp_progID.setText(_translate("MainWindow", "0"))
+        self.SID_lbl_progID.setText(_translate("MainWindow", "SC ID"))
+        self.SID_btt_robToProgID.setText(_translate("MainWindow", "ROBOT ID   🡆  SCRIPT ID"))
         self.ZERO_0_frameLabel.setText(_translate("MainWindow", "ZERO POSITION"))
         self.ZERO_disp_z.setText(_translate("MainWindow", "0.0"))
-        self.ZERO_lbl_y_disp.setText(_translate("MainWindow", "Y position"))
-        self.ZERO_lbl_yOrient_disp.setText(_translate("MainWindow", "Y orientation"))
+        self.ZERO_lbl_y_disp.setText(_translate("MainWindow", "Y"))
+        self.ZERO_lbl_yOrient_disp.setText(_translate("MainWindow", "RY"))
         self.ZERO_disp_zOrient.setText(_translate("MainWindow", "0.0"))
-        self.ZERO_lbl_zOrient_disp.setText(_translate("MainWindow", "Z orientation"))
-        self.ZERO_lbl_xOrient_disp.setText(_translate("MainWindow", "X orientation"))
-        self.ZERO_lbl_ext_disp.setText(_translate("MainWindow", "EXT position"))
+        self.ZERO_lbl_zOrient_disp.setText(_translate("MainWindow", "RZ"))
+        self.ZERO_lbl_xOrient_disp.setText(_translate("MainWindow", "RX"))
+        self.ZERO_lbl_ext_disp.setText(_translate("MainWindow", "EXT"))
         self.ZERO_disp_yOrient.setText(_translate("MainWindow", "0.0"))
         self.ZERO_disp_ext.setText(_translate("MainWindow", "0.0"))
-        self.ZERO_lbl_x_disp.setText(_translate("MainWindow", "X position"))
+        self.ZERO_lbl_x_disp.setText(_translate("MainWindow", "X"))
         self.ZERO_disp_xOrient.setText(_translate("MainWindow", "0.0"))
-        self.ZERO_lbl_z_disp.setText(_translate("MainWindow", "Z position"))
+        self.ZERO_lbl_z_disp.setText(_translate("MainWindow", "Z"))
         self.ZERO_disp_x.setText(_translate("MainWindow", "0.0"))
         self.ZERO_disp_y.setText(_translate("MainWindow", "0.0"))
+        self.ZERO_btt_newZero.setText(_translate("MainWindow", "SET NEW ZERO"))
+        self.TRANS_0_frameLabel.setText(_translate("MainWindow", "CURRENT TRANSITION"))
+        self.TRANS_disp_xStart.setText(_translate("MainWindow", "0.0"))
+        self.TRANS_lbl_x.setText(_translate("MainWindow", "X :"))
+        self.TRANS_disp_yStart.setText(_translate("MainWindow", "0.0"))
+        self.TRANS_disp_zStart.setText(_translate("MainWindow", "0.0"))
+        self.TRANS_lbl_y.setText(_translate("MainWindow", "Y :"))
+        self.TRANS_lbl_z.setText(_translate("MainWindow", " Z :"))
+        self.TRANS_disp_extStart.setText(_translate("MainWindow", "0.0"))
+        self.TRANS_lbl_ext.setText(_translate("MainWindow", "EXT :"))
+        self.TRANS_disp_extEnd.setText(_translate("MainWindow", "0.0"))
+        self.TRANS_disp_yEnd.setText(_translate("MainWindow", "0.0"))
+        self.TRANS_disp_zEnd.setText(_translate("MainWindow", "0.0"))
+        self.TRANS_disp_xEnd.setText(_translate("MainWindow", "0.0"))
+        self.TRANS_lbl_newOrient.setText(_translate("MainWindow", "NEW ORIENTATION"))
         self.tab.setTabText(self.tab.indexOf(self.MONITOR_tab), _translate("MainWindow", "     SYSTEM MONITOR     "))
+
 
 
 
