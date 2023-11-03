@@ -224,7 +224,7 @@ class Mainframe_test(unittest.TestCase):
         testFrame.updateCommForerun()
 
         self.assertEqual( UTIL.ROB_commFr,      1 )
-        self.assertEqual( UTIL.SC_volPerMm,     2.2 )
+        self.assertEqual( UTIL.SC_volPerM,     2.2 )
         self.assertEqual( UTIL.IO_frToTs,       3.3 )
         self.assertEqual( UTIL.IO_zone,         4 )
         self.assertEqual( UTIL.DC_speed.ts,     5 )
@@ -408,8 +408,8 @@ class Mainframe_test(unittest.TestCase):
         global gcodeTestpath
         global rapidTestpath
 
-        currSetting         = UTIL.SC_volPerMm
-        UTIL.SC_volPerMm    = 0.1
+        currSetting         = UTIL.SC_volPerM
+        UTIL.SC_volPerM    = 0.1
         
         testFrame.openFile( testrun= True, testpath= gcodeTestpath )
         self.assertEqual  ( UTIL.IO_currFilepath, gcodeTestpath )
@@ -426,7 +426,7 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual  ( testFrame.IO_disp_estimLen.text(), '3.0' )
         self.assertEqual  ( testFrame.IO_disp_estimVol.text(), '0.3' )
 
-        UTIL.SC_volPerMm = currSetting
+        UTIL.SC_volPerM = currSetting
 
 
 

@@ -22,7 +22,7 @@ class PUTIL_test(unittest.TestCase):
         """ cases 'default', 'start' and 'end' are tested seperately """
 
         UTIL.PUMP1_speed     = 89
-        UTIL.SC_volPerMm     = 0.01
+        UTIL.SC_volPerM     = 0.01
         UTIL.PUMP1_literPerS = 10
 
         # domain control
@@ -56,7 +56,7 @@ class PUTIL_test(unittest.TestCase):
     def test_defaultMode(self):
         """  """
 
-        UTIL.SC_volPerMm     = 0.01
+        UTIL.SC_volPerM     = 0.01
         UTIL.PUMP1_literPerS = 10
 
         # None

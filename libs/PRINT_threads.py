@@ -558,7 +558,9 @@ class LoadFileWorker (QObject):
             if( (umDist % i.Speed.ts) != 0 ):
                 return f"UM-Mode failed setting {travelTime} to int."
             
-            i.Tool.time_time = int( travelTime )
+            i.sc                = 'T'
+            i.sbt               = int( travelTime )
+            i.Tool.time_time    = int( travelTime )
         return None
 
 

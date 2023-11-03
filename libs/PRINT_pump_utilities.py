@@ -85,7 +85,7 @@ def defaultMode( command= None ):
     if( command is None ):   return None
     if( command != lastDefCommand ):
                 # ([mm/s]          * [L/mm]           / [L/s]                ) * 100.0  =  [%]
-        speed = ( command.Speed.ts * UTIL.SC_volPerMm / UTIL.PUMP1_literPerS ) * 100.0
+        speed = ( command.Speed.ts * UTIL.SC_volPerM / UTIL.PUMP1_literPerS ) * 100.0
         lastDefCommand = copy.deepcopy(command)
 
     else:
@@ -103,7 +103,7 @@ def profileMode( command= None, profile= None ):
     global preceedingSpeed
 
     if( None in [command, profile] ): return None
-    speed = ( command.Speed.ts * UTIL.SC_volPerMm / UTIL.PUMP1_literPerS ) * 100.0
+    speed = ( command.Speed.ts * UTIL.SC_volPerM / UTIL.PUMP1_literPerS ) * 100.0
 
     # as more complex pump scripts should only apply to linear movements, 
     # the remaining travel distance can be calculated using pythagoras
@@ -173,7 +173,7 @@ def getBaseSpeed(base = 'default', fallback = 0.0):
         case 'conn':    
             try:
                 nextCommand = UTIL.ROB_commQueue[1]
-                baseSpeed = ( nextCommand.Speed.ts * UTIL.SC_volPerMm / UTIL.PUMP1_literPerS ) * 100.0
+                baseSpeed = ( nextCommand.Speed.ts * UTIL.SC_volPerM / UTIL.PUMP1_literPerS ) * 100.0
             except AttributeError:  
                 baseSpeed = fallback
         case _: return None

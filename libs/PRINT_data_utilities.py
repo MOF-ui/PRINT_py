@@ -444,6 +444,7 @@ class QEntry:
 
 
     def printShort(self):
+        """ prints only most important parameters, saving display space """
 
         return  f"ID: {self.id} -- {self.mt}, {self.pt} -- COOR_1: {self.Coor1} -- SV: {self.Speed} -- PMODE:  {self.pMode}"
 
@@ -1251,6 +1252,10 @@ def preCheckGcodeFile(txt=''):
             x = xNew
             y = yNew
             z = zNew
+        
+        # convert filamentLength to meters and round
+        filamentLength /= 1000
+        filamentLength = round( filamentLength, 2 )
 
     except Exception as e:
         return None, None, e
@@ -1544,7 +1549,7 @@ DEF_PUMP_LPS        = 0.5
 
 DEF_ROB_COMM_FR     = 10
 
-DEF_SC_VOL_PER_MM   = 0.01
+DEF_SC_VOL_PER_M    = 0.4       # calculated for 1m of 4cm wide and 1cm high filament
 DEF_SC_MAX_LINES    = 400
 DEF_SC_EXT_FLLW_BHVR= (500,200)
 
@@ -1598,7 +1603,7 @@ ROB_movEndP         = Coordinate()
 ROB_sendList        = []
 ROB_liveAd          = 1.0
 
-SC_volPerMm         = DEF_SC_VOL_PER_MM
+SC_volPerM          = DEF_SC_VOL_PER_M
 SC_currCommId       = 1
 SC_queue            = Queue()
 SC_qProcessing      = False

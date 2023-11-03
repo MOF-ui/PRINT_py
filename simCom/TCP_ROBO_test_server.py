@@ -8,7 +8,9 @@ def stt_update():
 	global toggle
 
 	while toggle:
-		conn.sendall(struct.pack('<fifffffff',99.0,ID,1.0,2.0,3.0,4.0,5.0,6.0,7.0))
+		id = ID - 5
+		if( id < 0 ): id = 0
+		conn.sendall(struct.pack('<fifffffff',99.0,id,1.0,2.0,3.0,4.0,5.0,6.0,7.0))
 		sleep(1)
 	
 

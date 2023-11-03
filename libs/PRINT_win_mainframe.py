@@ -288,7 +288,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def loadDefaults ( self, setup = False ):
         """ load default settings to user display """
 
-        self.SET_float_volPerMM.setValue        ( UTIL.DEF_SC_VOL_PER_MM )
+        self.SET_float_volPerMM.setValue        ( UTIL.DEF_SC_VOL_PER_M )
         self.SET_float_frToMms.setValue         ( UTIL.DEF_IO_FR_TO_TS )
         self.SET_float_pumpVolFlow.setValue     ( UTIL.DEF_PUMP_LPS )
         self.SET_num_zone.setValue              ( UTIL.DEF_IO_ZONE )
@@ -662,7 +662,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ load default settings to settings display """
         
         mutex.lock()
-        UTIL.SC_volPerMm        = self.SET_float_volPerMM.value()
+        UTIL.SC_volPerM         = self.SET_float_volPerMM.value()
         UTIL.IO_frToTs          = self.SET_float_frToMms.value()
         UTIL.PUMP1_literPerS    = self.SET_float_pumpVolFlow.value()
         UTIL.IO_zone            = self.SET_num_zone.value()
@@ -676,7 +676,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         UTIL.PRIN_speed.dcr     = self.SET_num_decelRamp_print.value()
         mutex.unlock()
 
-        self.logEntry('SETS',f"Settings updated -- ComFR: {UTIL.ROB_commFr}, VolPerMM: {UTIL.SC_volPerMm}"
+        self.logEntry('SETS',f"Settings updated -- ComFR: {UTIL.ROB_commFr}, VolPerMM: {UTIL.SC_volPerM}"
                              f", FR2TS: {UTIL.IO_frToTs}, PVF: {UTIL.PUMP1_literPerS} IOZ: {UTIL.IO_zone}"
                              f", PrinTS: {UTIL.PRIN_speed.ts}, PrinOS: {UTIL.PRIN_speed.os}"
                              f", PrinACR: {UTIL.PRIN_speed.acr} PrinDCR: {UTIL.PRIN_speed.dcr}, DCTS: {UTIL.DC_speed.ts}"
@@ -902,9 +902,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             return None
         
         # display data
-        filamentVol     = filamentLength * UTIL.SC_volPerMm
-        filamentLength  = round(filamentLength, 3)
-        filamentVol     = round(filamentVol, 3)
+        filamentVol = round( filamentLength * UTIL.SC_volPerM, 1 )
 
         self.IO_disp_filename.setText   (ans.name)
         self.IO_disp_commNum.setText    ( str(commNum) )
@@ -1439,7 +1437,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def forcedStopCommand ( self ):
-        """ sets up non-moving-type commands, gives it to the actual sendCommand function """
+        """ send immediate stop to robot (buffer will be lost, but added to the queue again),
+            gives command  to the actual sendCommand function """
         
         command = UTIL.QEntry( id = 1
                               ,mt = 'S')
@@ -1447,18 +1446,29 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if( self.testrun ): return self.sendCommand(command, DC = True)
         FSWarning = strdDialog('WARNING!\n\nRobot will stop after current movement!\
                                 OK to delete buffered commands on robot;\
-                                Cancel to contuinue queue processing.'
+                                Cancel to continue queue processing.'
                                 ,'FORCED STOP COMMIT')
         FSWarning.exec()
 
         if( FSWarning.result() ):
-            self.sendCommand(command, DC = True)
             self.stopSCTRLQueue()
+            self.sendCommand(command, DC = True)
 
             mutex.lock()
-            UTIL.SC_currCommId = UTIL.ROB_telem.id
+
+            lostBuf             =  copy.deepcopy( UTIL.ROB_commQueue )
+
+            for item in UTIL.ROB_sendList:  
+                if( item[0].mt != 'S' ): lostBuf.queue.append( item[0] )
+
+            UTIL.SC_currCommId  = UTIL.ROB_telem.id
+            UTIL.SC_queue.queue = lostBuf.queue + UTIL.SC_queue.queue
+            UTIL.ROB_commQueue.clear()
+            UTIL.ROB_sendList.clear()
+
             mutex.unlock()
-            
+
+            self.labelUpdate_onQueueChange()
             self.logEntry('SysC',f"FORCED STOP (user committed).")
         
         else:
@@ -1479,7 +1489,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.logEntry('SysC',"sending robot stop command directly")
             if( UTIL.SC_qProcessing ): 
                 self.stopSCTRLQueue()
+            
+            mutex.lock()
+            UTIL.ROB_sendList.clear()
+            mutex.unlock()
+
             return self.sendCommand(command, DC = True)
+        
         else:
             command.id = 0
             UTIL.SC_queue.add(command)
@@ -1501,7 +1517,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ passing new commands to RoboCommWorker """
         
         mutex.lock()
-        if( command.mt == 'S' ): UTIL.ROB_sendList.clear()
         UTIL.ROB_sendList.append( (command, DC) )
         mutex.unlock()
 
