@@ -568,7 +568,8 @@ class Mainframe_test(unittest.TestCase):
 
         command = testFrame.sendGcodeCommand()[1]
         self.assertEqual( command, UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate( x= 1, y= 3.2, z= 1, rx= 1
-                                                                              ,ry= 1, rz= 1, q= 1, ext= 1 ) ) )
+                                                                              ,ry= 1, rz= 1, q= 1, ext= 1 )
+                                               ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) ) )
         
         UTIL.DC_robMoving = False
         testFrame.commandTransmitted(command, True, 1, True, True)
@@ -577,7 +578,8 @@ class Mainframe_test(unittest.TestCase):
         UTIL.DC_currZero    = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
 
         command = testFrame.sendGcodeCommand()[1]
-        self.assertEqual( command, UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate( 2.1,2.2,6.3,4.4,5.5,6.6,7.7,8.8 ) ) )
+        self.assertEqual( command, UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate( 2.1,2.2,6.3,4.4,5.5,6.6,7.7,8.8 )
+                                               ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) ) )
         
         UTIL.DC_robMoving = False
         UTIL.ROB_telem.Coor = UTIL.Coordinate()
@@ -624,7 +626,8 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual( testFrame.sendRapidCommand()[1]
                          ,UTIL.QEntry( id= 1, pt= 'Q', z= 50
                                       ,Coor1= UTIL.Coordinate( x= 1, y= 2, z= 3, rx= 4
-                                                              ,ry= 5, rz= 6, q= 7, ext= 600 ) ))
+                                                              ,ry= 5, rz= 6, q= 7, ext= 600 )
+                                      ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) ))
         
         UTIL.SC_currCommId = 1
     

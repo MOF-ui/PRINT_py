@@ -404,7 +404,8 @@ class UTIL_test(unittest.TestCase):
         self.assertEqual( UTIL.gcodeToQEntry( mutPos= testPos, mutSpeed= testSpeed
                                              ,zone= testZone, txt= testTxt)
                          ,( UTIL.QEntry( Coor1= UTIL.Coordinate(9.5,10,1,1,1,1,1,11)
-                                        ,Speed= UTIL.SpeedVector(2,2,8,2) ,z= 3  )
+                                        ,Speed= UTIL.SpeedVector(2,2,8,2) ,z= 3
+                                        ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True)  )
                            ,'G1') )
         
         testTxt   = 'G28 X0 Y0'
@@ -430,14 +431,16 @@ class UTIL_test(unittest.TestCase):
         self.assertEqual( UTIL.rapidToQEntry( txt= testTxt )
                          ,(UTIL.QEntry( Coor1= UTIL.Coordinate(1.1,2.2,3.3,4.4,5.5,6.6,7.7,13)
                                         ,mt= 'J' ,pt= 'Q'
-                                        ,Speed= UTIL.SpeedVector(10,11,8,9) ,z= 12)  
+                                        ,Speed= UTIL.SpeedVector(10,11,8,9) ,z= 12
+                                        ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) )  
                           ,None ) )
         
         testTxt   = 'MoveL Offs(pHome,1.1,2.2,3.3),[8,9,10,11],z12,tool0 EXT:13'
         self.assertEqual( UTIL.rapidToQEntry( txt= testTxt )
                          ,( UTIL.QEntry( Coor1= UTIL.Coordinate(5.1,6.2,7.3,4,4,4,4,17)
                                         ,pt= 'E'
-                                        ,Speed= UTIL.SpeedVector(10,11,8,9) ,z= 12 )
+                                        ,Speed= UTIL.SpeedVector(10,11,8,9) ,z= 12
+                                        ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) )
                             ,None ) )
         
 

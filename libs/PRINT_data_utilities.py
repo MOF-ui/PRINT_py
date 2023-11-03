@@ -1371,7 +1371,7 @@ def gcodeToQEntry(mutPos, mutSpeed, zone, txt = ''):
             entry.Coor1 = round( entry.Coor1, 2 )
 
             # set tool settings
-            entry.Tool.m2_steps         = TOOL_fibRatio * DEF_TOOL_FIB_STPS
+            entry.Tool.m2_steps         = int( TOOL_fibRatio * DEF_TOOL_FIB_STPS )
             entry.Tool.pnmtcFiber_yn    = True
             
         case 'G28':
@@ -1456,7 +1456,7 @@ def rapidToQEntry(txt = ''):
         # tool    = tool [: len(tool) - 1]
 
         # set tool settings
-        entry.Tool.m2_steps         = TOOL_fibRatio * DEF_TOOL_FIB_STPS
+        entry.Tool.m2_steps         = int( TOOL_fibRatio * DEF_TOOL_FIB_STPS )
         entry.Tool.pnmtcFiber_yn    = True
 
     except Exception as e:

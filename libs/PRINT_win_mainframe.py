@@ -1402,7 +1402,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             else:                       panTxt = f"{command}\n{txt}"
 
             self.TERM_entry_gcodeInterp.setText(panTxt)
-            return entry, None
+            return None, command
         
         entry.id = UTIL.SC_currCommId
 
