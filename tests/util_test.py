@@ -362,7 +362,7 @@ class UTIL_test(unittest.TestCase):
     def test_preCheckGcodeFile_function (self):
         """ checks preCheckGcodeFiles function, should count the number of commands in a file """
 
-        testTxt = ';comment\nG1 X0 Y0 Z0\nG1 X2 Y0 Z0.0\nG1 X2 Y1.5 Z0'
+        testTxt = ';comment\nG1 X0 Y0 Z0\nG1 X2000 Y0 Z0.0\nG1 X2000 Y1500 Z0'
         self.assertEqual( UTIL.preCheckGcodeFile()
                          ,(0, 0, 'empty') )
         self.assertEqual( UTIL.preCheckGcodeFile(testTxt)
@@ -374,7 +374,7 @@ class UTIL_test(unittest.TestCase):
         """ checks preCheckGcodeFiles function, should count the number of commands in a file """
 
         testTxt = '!comment\nMoveL [[0.0,0.0,0.0],...,v50,z10,tool0\n'\
-                  + 'MoveL [[2.0,0.0,0.0],...,v50,z10,tool0\nMoveL [[2.0,1.5,0.0],...,v50,z10,tool0'
+                  + 'MoveL [[2000.0,0.0,0.0],...,v50,z10,tool0\nMoveL [[2000.0,1500.0,0.0],...,v50,z10,tool0'
         self.assertEqual( UTIL.preCheckRapidFile()
                          ,(0, 0, 'empty') )
         self.assertEqual( UTIL.preCheckRapidFile(testTxt)

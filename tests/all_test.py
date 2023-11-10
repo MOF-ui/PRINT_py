@@ -13,6 +13,11 @@ from util_test          import UTIL_test
 from putil_test         import PUTIL_test
 from thread_test        import Thread_test
 
+# reimport everything so its up to date
+import mainframe_test
+import importlib
+importlib.reload(mainframe_test)
+
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir  = os.path.dirname(current_dir)

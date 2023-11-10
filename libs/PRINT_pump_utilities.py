@@ -99,8 +99,8 @@ def defaultMode( command= None ):
 def profileMode( command= None, profile= None ):
     """ pump mode for preset pump speed profiles, set with support points, can be used to 
         drive custom pump speed slopes before, while or after printing """
-    global DIFF_CONST
     global preceedingSpeed
+    global lastSpeed
 
     if( None in [command, profile] ): return None
     speed = ( command.Speed.ts * UTIL.SC_volPerM / UTIL.PUMP1_literPerS ) * 100.0
@@ -131,8 +131,9 @@ def profileMode( command= None, profile= None ):
     base = getBaseSpeed( settings['base'], speed )
 
     match settings['mode']:
+        
         case 'instant': speed = base
-        case 'diff':    speed += round(( base - speed ) * DIFF_CONST, 0)
+
         case 'linear':  
             # if settDur is 0.0 this is the first setting, need to calculate time from the 
             # movements starting point
@@ -140,7 +141,7 @@ def profileMode( command= None, profile= None ):
             baseNull = 0.0
             if( prevSett is not None): 
                 timeNull = prevSett['until']
-                baseNull = getBaseSpeed( prevSett['base'] )
+                baseNull = getBaseSpeed( prevSett['base'], speed )
 
             else:
                 strt        = copy.deepcopy( UTIL.ROB_movStartP )
@@ -154,6 +155,28 @@ def profileMode( command= None, profile= None ):
 
             slope = ( base - baseNull ) / ( settings['until'] - timeNull )
             speed = timeRemainung * slope + base
+
+        case 'smoothstep':
+            # same principle as 'linear' but as sigmoid-like smoothstep
+            timeNull = 0.0
+            baseNull = 0.0
+            if( prevSett is not None): 
+                timeNull = prevSett['until']
+                baseNull = getBaseSpeed( prevSett['base'], speed )
+
+            else:
+                strt        = copy.deepcopy( UTIL.ROB_movStartP )
+                distTotal   = m.sqrt(  m.pow(command.Coor1.x - strt.x, 2)
+                                     + m.pow(command.Coor1.y - strt.y, 2)
+                                     + m.pow(command.Coor1.z - strt.z, 2) )
+
+                # get the remaining time ( [mm] / [mm/s] = [s] )
+                timeNull = distTotal / command.Speed.ts
+                baseNull = preceedingSpeed
+
+            normalizedTime  = ( timeRemainung - timeNull ) / ( settings['until'] - timeNull )
+            # get sigmoid function with x * x * ( 3 - 2 * x )
+            speed           = baseNull + (base - baseNull) * normalizedTime * normalizedTime * ( 3 - 2 * normalizedTime )
 
     return speed    
     
@@ -189,13 +212,12 @@ def getBaseSpeed(base = 'default', fallback = 0.0):
 #                                     GLOBALS
 #############################################################################################
 
-DIFF_CONST      = 0.25
 START_SUPP_PTS  = [   { 'until': 5.0,   'base': 'zero',     'mode': 'instant' },
-                      { 'until': 1.0,   'base': 'max',      'mode': 'diff'    },
+                      { 'until': 1.0,   'base': 'max',      'mode': 'instant' },
                       { 'until': 0.0,   'base': 'conn',     'mode': 'linear'  } ]
 
 END_SUPP_PTS    = [   { 'until': 5.0,   'base': 'default',  'mode': 'instant' },
-                      { 'until': 1.0,   'base': 'retract',  'mode': 'diff'    },
+                      { 'until': 1.0,   'base': 'retract',  'mode': 'smoothstep' },
                       { 'until': 0.0,   'base': 'zero',     'mode': 'instant' } ]
 
 retractSpeed    = -50.0

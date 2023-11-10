@@ -195,7 +195,7 @@ class Mainframe_test(unittest.TestCase):
 
         # check if defaults were loaded
         self.assertEqual( testFrame.TCP_num_commForerun.value()      ,UTIL.DEF_ROB_COMM_FR)
-        self.assertEqual( testFrame.SET_float_volPerMM.value()       ,UTIL.DEF_SC_VOL_PER_MM)
+        self.assertEqual( testFrame.SET_float_volPerMM.value()       ,UTIL.DEF_SC_VOL_PER_M)
         self.assertEqual( testFrame.SET_float_frToMms.value()        ,UTIL.DEF_IO_FR_TO_TS)
         self.assertEqual( testFrame.SET_num_zone.value()             ,UTIL.DEF_IO_ZONE)
         self.assertEqual( testFrame.SET_num_transSpeed_dc.value()    ,UTIL.DEF_DC_SPEED.ts)
@@ -242,7 +242,7 @@ class Mainframe_test(unittest.TestCase):
         testFrame.applySettings()
         testFrame.updateCommForerun()
         self.assertEqual( testFrame.TCP_num_commForerun.value()      ,UTIL.DEF_ROB_COMM_FR )
-        self.assertEqual( testFrame.SET_float_volPerMM.value()       ,UTIL.DEF_SC_VOL_PER_MM )
+        self.assertEqual( testFrame.SET_float_volPerMM.value()       ,UTIL.DEF_SC_VOL_PER_M )
         self.assertEqual( testFrame.SET_float_frToMms.value()        ,UTIL.DEF_IO_FR_TO_TS )
         self.assertEqual( testFrame.SET_num_zone.value()             ,UTIL.DEF_IO_ZONE )
         self.assertEqual( testFrame.SET_num_transSpeed_dc.value()    ,UTIL.DEF_DC_SPEED.ts )
@@ -733,11 +733,11 @@ logfile.close()
 
 gcodeTestpath = dirpath / pl.Path('0_UT_testfile.gcode')
 rapidTestpath = dirpath / pl.Path('0_UT_testfile.mod')
-gcodeText     = ';comment\nG1 Y2\nG1 Z1'
+gcodeText     = ';comment\nG1 Y2000\nG1 Z1000'
 rapidText     = '!comment\nMoveJ pHome,v200,fine,tool0;\n\n\
                     ! start printjob relative to pStart\n\
-                    MoveL Offs(pHome,0.0,2.0,0.0),[200,50,50,50],z10,tool0 EXT:11;\n\
-                    MoveL Offs(pHome,0.0,2.0,1.0),[200,50,50,50],z10,tool0 EXT:11;'
+                    MoveL Offs(pHome,0.0,2000.0,0.0),[200,50,50,50],z10,tool0 EXT:11;\n\
+                    MoveL Offs(pHome,0.0,2000.0,1000.0),[200,50,50,50],z10,tool0 EXT:11;'
 
 gcodeTestfile = open(gcodeTestpath,'w')
 rapidTestfile = open(rapidTestpath,'w')

@@ -1281,20 +1281,24 @@ def preCheckRapidFile(txt=''):
         for row in rows:
             # the ' p' expression is to differ between 'MoveJ pHome,[...]'
             # and 'MoveJ Offs(pHome [...]'
-            if ( ('Move' in row) and (' p' not in row) ):   
+            if ( ('Move' in row) and (' p' not in row) ):
                 commNum += 1
                 xNew = float( re.findall('\d+\.\d+', row)[0] )
                 yNew = float( re.findall('\d+\.\d+', row)[1] )
                 zNew = float( re.findall('\d+\.\d+', row)[2] )
 
                 # do the Pythagoras for me, baby
-                filamentLength += m.sqrt( m.pow( (xNew - x), 2 ) 
-                                         +m.pow( (yNew - y), 2 ) 
+                filamentLength += m.sqrt( m.pow( (xNew - x), 2 )
+                                         +m.pow( (yNew - y), 2 )
                                          +m.pow( (zNew - z), 2 ) )
 
                 x = xNew
                 y = yNew
                 z = zNew
+        
+        # convert filamentLength to meters and round
+        filamentLength /= 1000
+        filamentLength = round( filamentLength, 2 )
 
     except Exception as e:
         return None, None, e

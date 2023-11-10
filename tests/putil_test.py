@@ -83,11 +83,11 @@ class PUTIL_test(unittest.TestCase):
         UTIL.ROB_commQueue.add( UTIL.QEntry() )
         UTIL.ROB_telem.Coor   = UTIL.Coordinate()
         PUTIL.START_SUPP_PTS  = [   { 'until': 3.0,   'base': 'zero',     'mode': 'instant' },
-                                    { 'until': 1.0,   'base': 'max',      'mode': 'diff'    },
+                                    { 'until': 1.0,   'base': 'max',      'mode': 'instant'    },
                                     { 'until': 0.0,   'base': 'conn',     'mode': 'linear'  } ]
 
         PUTIL.END_SUPP_PTS    = [   { 'until': 5.0,   'base': 'default',  'mode': 'instant' },
-                                    { 'until': 1.0,   'base': 'retract',  'mode': 'instant' },
+                                    { 'until': 1.0,   'base': 'retract',  'mode': 'smoothstep' },
                                     { 'until': 0.0,   'base': 'zero',     'mode': 'instant' } ]
 
 
@@ -100,7 +100,7 @@ class PUTIL_test(unittest.TestCase):
         self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 0 )
 
         UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 8 )
-        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 25.1 )
+        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 100.0 )
 
         UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 9.5 )
         self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 60.0 )
@@ -112,8 +112,8 @@ class PUTIL_test(unittest.TestCase):
         UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 4 )
         self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.END_SUPP_PTS ), 0.1 )
 
-        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 6 )
-        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.END_SUPP_PTS ), -50 )
+        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 7 )
+        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.END_SUPP_PTS ), -24.95 )
 
         UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 10 )
         self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.END_SUPP_PTS ), 0 )

@@ -4990,7 +4990,8 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1153.4,3945.6,1297.05],[0.70620,0.02032,0.70771,0.00352],[,,,,,]],[100,50,50,50],z0,tool0 EXT:1900&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1153.4,3945.6,1297.05],[0.70620,0.02032,0.70771,0.00352],[,,,,,]],[100,50,50,50],z0,tool0 EXT:200&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="acceptRichText">
         <bool>false</bool>
@@ -5173,7 +5174,7 @@ color: #E1E5EE;</string>
        </property>
        <property name="text">
         <string>extruded volume
-per mm [L/mm]</string>
+per m [L/m]</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -5196,7 +5197,7 @@ color: #E1E5EE;</string>
        </property>
        <property name="text">
         <string>printing acceleration
-ramp [mm/²]</string>
+ramp [mm/s²]</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -5488,7 +5489,7 @@ color: #E1E5EE;</string>
        </property>
        <property name="text">
         <string>printing deceleration
-ramp [mm/²]</string>
+ramp [mm/s²]</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -5659,7 +5660,7 @@ color: #E1E5EE;</string>
        </property>
        <property name="text">
         <string>DC deceleration
-ramp [mm/²]</string>
+ramp [mm/s²]</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
