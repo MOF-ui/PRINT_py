@@ -166,7 +166,7 @@ class ConnDialog(QDialog,Ui_ConnDialog):
 
 #######################################   STRD DIALOG    #####################################################
 
-def strdDialog(usrText='you forgot to set the text, dumbass', usrTitle='default window', standalone=False):
+def strdDialog(usrText='you forgot to set a text, dummy', usrTitle='default window', standalone=False):
     """ shows a dialog window, text and title can be set, returns the users choice """
 
     if standalone:

@@ -7,6 +7,7 @@
 
 # python standard libraries
 import os
+import re
 import sys
 import copy
 from pathlib    import Path
@@ -29,8 +30,9 @@ from ui.UI_mainframe_v6 import Ui_MainWindow
 
 
 # import my own libs
-from libs.PRINT_win_daq     import daqWindow
-from libs.PRINT_win_dialogs import strdDialog, fileDialog
+from libs.PRINT_win_daq         import daqWindow
+from libs.PRINT_win_dialogs     import strdDialog, fileDialog
+from libs.PRINT_pump_utilities  import defaultMode as PU_defMode
 import libs.PRINT_threads           as WORKERS
 import libs.PRINT_data_utilities    as UTIL
 
@@ -47,7 +49,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     testrun     = False         # switch for mainframe_test.py
     pump1Conn   = False         # switch to enable pump1
     pump2Conn   = False         # switch to enable pump2
-    DAQ         = False         # reference for DAQ main window, instance is loaded in __init__
+    DAQ         = None          # reference for DAQ main window, instance is loaded in __init__
     firstPos    = True          # one-time switch to get robot home position
 
 
@@ -57,89 +59,95 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                           SETUP                                                   #
     #####################################################################################################
     
-    def __init__ ( self, lpath = None, connDef = (False,False), testrun = False, parent=None ):
+    def __init__( self, lpath = None, connDef = (False,False), testrun = False, parent=None ):
         """ setup main and daq UI, start subsystems & threads """
 
-        super().__init__(parent)
+        super().__init__( parent )
         
         # UI SETUP
-        self.setupUi(self)
-        self.setWindowTitle("---   PRINT_py  -  Main Window  ---")
-        self.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
+        self.setupUi        ( self )
+        self.setWindowTitle ( "---   PRINT_py  -  Main Window  ---" )
+        self.setWindowFlags ( Qt.WindowMaximizeButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint )
         self.testrun = testrun
 
         # LOGFILE SETUP
         if(lpath is None):
-            logWarning = strdDialog('No path for logfile!\n\nPress OK to continue anyways or\
-                                     Cancel to exit the program.'
-                                    ,'LOGFILE ERROR')
+            logWarning = strdDialog ( 'No path for logfile!\n\nPress OK to continue anyways or\
+                                       Cancel to exit the program.'
+                                      ,'LOGFILE ERROR' )
             logWarning.exec()
 
-            if( logWarning.result() == 0 ):
-                self.logEntry('GNRL','no logpath given, user choose to exit, exit after setup...')
+            if( logWarning.result() == 0 ):   
                 # suicide after the actual .exec is finished, exit without chrash
-                QTimer.singleShot(0, self.close)
+                self.logEntry       ( 'GNRL', 'no logpath given, user choose to exit, exit after setup...' )
+                QTimer.singleShot   ( 0, self.close )
             else:
-                self.logEntry('GNRL','no logpath given, user chose to continue without...')
+                self.logEntry       ( 'GNRL', 'no logpath given, user chose to continue without...' )
 
         else:
             self.logpath = lpath
-            self.logEntry('GNRL','main GUI running.')
+            self.logEntry( 'GNRL', 'main GUI running.' )
 
         # DAQ SETUP
-        self.DAQ = daqWindow()
+        self.DAQ      = daqWindow()
         self.DAQTimer = QTimer()
-        self.DAQTimer.setInterval(1000)
-        self.DAQTimer.timeout.connect(self.DAQ.timeUpdate)
+        self.DAQTimer.setInterval       ( 1000 )
+        self.DAQTimer.timeout.connect   ( self.DAQ.timeUpdate )
         self.DAQTimer.start()
+
         if (not testrun): self.DAQ.show()
-        self.logEntry('GNRL','DAQ GUI running.')
+        self.logEntry( 'GNRL', 'DAQ GUI running.' )
 
         # LOAD THREADS, SIGNALS & DEFAULT SETTINGS
-        self.logEntry('GNRL','init threading...')
-        self.connectThreads()
-        self.logEntry('GNRL','connecting signals...')
-        self.connectMainSignals()
+        self.logEntry           ( 'GNRL', 'init threading...' )
+        self.connectThreads     ()
+        self.logEntry           ( 'GNRL', 'connecting signals...' )
+        self.connectMainSignals ()
         self.connectShortSignals()
-        self.logEntry('GNRL','load default settings...')
-        self.loadDefaults(setup= True)
+        self.logEntry           ( 'GNRL', 'load default settings...' )
+        self.loadDefaults       ( setup= True )
 
         # TESTRUN OPTION
         if(testrun):
-            self.logEntry('TEST','testrun, skipping robot connection...')
-            self.logEntry('GNRL','setup finished.')
-            self.logEntry('newline')
+            self.logEntry( 'TEST', 'testrun, skipping robot connection...' )
+            self.logEntry( 'GNRL', 'setup finished.' )
+            self.logEntry( 'newline' )
             return
         
         # ROBOT CONNECTION SETUP
-        self.logEntry('GNRL','connect to Robot...') 
+        self.logEntry( 'GNRL', 'connect to Robot...' ) 
         res = self.connectTCP(1)
 
         # if connection fails, suicide after the actual .exec is finished, exit without chrash
         if(res == False):
-            self.logEntry('GNRL','failed, exiting...')
-            QTimer.singleShot(0, self.close)
+            self.logEntry       ( 'GNRL', 'failed, exiting...' )
+            QTimer.singleShot   ( 0, self.close )
             return
 
         # PUMP CONNECTIONS SETUP
         if (connDef[0]): 
-            self.logEntry('GNRL','connect to pump1...')
-            self.connectTCP(2)
+            self.logEntry   ( 'GNRL', 'connect to pump1...' )
+            self.connectTCP ( 2 )
         if (connDef[1]):  
-            self.logEntry('GNRL','connect to pump2...')
-            self.connectTCP(3)
+            self.logEntry   ( 'GNRL', 'connect to pump2...' )
+            self.connectTCP ( 3 )
 
         # FINISH SETUP
-        self.logEntry('GNRL','setup finished.')
-        self.logEntry('newline')
+        self.logEntry( 'GNRL', 'setup finished.' )
+        self.logEntry( 'newline' )
 
 
 
 
 
 
-    def connectMainSignals ( self ):
+    def connectMainSignals( self ):
         """ create signal-slot-links for UI buttons """
+
+        # AMCON CONTROL
+        self.ADC_btt_resetAll.pressed.connect               ( self.loadAdcDefaults )
+        self.ADC_num_panning.valueChanged.connect           ( self.adcUserChange )
+        self.ASC_btt_overwrSC.pressed.connect               ( self.amconScriptOverwrite )
 
         # DIRECT CONTROL
         self.DC_btt_xPlus.pressed.connect                   ( lambda: self.sendDCCommand('X','+') )
@@ -170,11 +178,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         # PUMP CONTROL
         self.PUMP_btt_setSpeed.pressed.connect              ( self.setSpeed )
-        self.PUMP_btt_plus1.pressed.connect                 ( lambda: self.setSpeed('1') )
+        self.PUMP_btt_plus1.pressed.connect                 ( lambda: self.setSpeed( '1') )
         self.PUMP_btt_minus1.pressed.connect                ( lambda: self.setSpeed('-1') )
+        self.PUMP_btt_plus10.pressed.connect                ( lambda: self.setSpeed( '10') )
+        self.PUMP_btt_minus10.pressed.connect               ( lambda: self.setSpeed('-10') )
+        self.PUMP_btt_plus25.pressed.connect                ( lambda: self.setSpeed( '25') )
+        self.PUMP_btt_minus25.pressed.connect               ( lambda: self.setSpeed('-25') )
         self.PUMP_btt_stop.pressed.connect                  ( lambda: self.setSpeed('0') )
         self.PUMP_btt_reverse.pressed.connect               ( lambda: self.setSpeed('r') )
         self.SCTRL_num_liveAd_pump1.valueChanged.connect    ( lambda: self.setSpeed('c') )
+        self.PUMP_btt_ccToDefault.pressed.connect           ( lambda: self.setSpeed('def') )
+        self.PUMP_btt_scToDefault.pressed.connect           ( self.pumpScriptOverwrite )
+        self.PUMP_btt_pinchValve.pressed.connect            ( self.pinchValveToggle )
 
         # SCRIPT CONTROL
         self.SCTRL_btt_forcedStop.pressed.connect           ( self.forcedStopCommand )
@@ -195,6 +210,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # SETTINGS
         self.SET_btt_apply.pressed.connect                  ( self.applySettings )
         self.SET_btt_default.pressed.connect                ( self.loadDefaults )
+        self.SET_TE_btt_apply.pressed.connect               ( self.applyTeSettings )
+        self.SET_TE_btt_default.pressed.connect             ( self.loadTeDefaults )
         self.SID_btt_robToProgID.pressed.connect            ( self.resetScId )
         self.TCP_num_commForerun.valueChanged.connect       ( self.updateCommForerun )
 
@@ -227,7 +244,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def connectShortSignals ( self, setup = False ):
+    def connectShortSignals( self ):
         """ create shortcuts and connect them to slots """
 
         # CREATE SIGNALS
@@ -285,8 +302,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def loadDefaults ( self, setup = False ):
-        """ load default settings to user display """
+    def loadDefaults( self, setup = False ):
+        """ load default general settings to user display """
 
         self.SET_float_volPerMM.setValue        ( UTIL.DEF_SC_VOL_PER_M )
         self.SET_float_frToMms.setValue         ( UTIL.DEF_IO_FR_TO_TS )
@@ -302,9 +319,45 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SET_num_decelRamp_print.setValue   ( UTIL.DEF_PRIN_SPEED.dcr )
 
         if(not setup): 
-            self.logEntry('SETS','User resetted all properties to default values.')
+            self.logEntry('SETS','User resetted general properties to default values.')
         else:
             self.TCP_num_commForerun.setValue   ( UTIL.DEF_ROB_COMM_FR )
+
+            self.loadAdcDefaults()
+            self.ASC_num_panning.setValue       ( UTIL.DEF_AMC_PANNING )
+            self.ASC_num_fibDeliv.setValue      ( UTIL.DEF_AMC_FIB_DELIV )
+            self.ASC_btt_clamp.setChecked       ( UTIL.DEF_AMC_CLAMP )
+            self.ASC_btt_knifePos.setChecked    ( UTIL.DEF_AMC_KNIFE_POS )
+            self.ASC_btt_knife.setChecked       ( UTIL.DEF_AMC_KNIFE )
+            self.ASC_btt_fiberPnmtc.setChecked  ( UTIL.DEF_AMC_FIBER_PNMTC )
+
+
+
+
+
+
+    def loadTeDefaults( self, setup = False ):
+        """ load default Tool/External settings to user display """
+
+        self.SET_TE_num_fllwBhvrInterv.setValue ( UTIL.DEF_SC_EXT_FLLW_BHVR[0] )
+        self.SET_TE_num_fllwBhvrSkip.setValue   ( UTIL.DEF_SC_EXT_FLLW_BHVR[1] )
+
+        if(not setup):  self.logEntry( 'SETS', 'User resetted TE properties to default values.' )
+
+
+
+
+
+
+    def loadAdcDefaults( self ):
+        """ load ADC default values """
+
+        self.ADC_num_panning.setValue       ( UTIL.DEF_AMC_PANNING )
+        self.ADC_num_fibDeliv.setValue      ( UTIL.DEF_AMC_FIB_DELIV )
+        self.ADC_btt_clamp.setChecked       ( UTIL.DEF_AMC_CLAMP )
+        self.ADC_btt_knifePos.setChecked    ( UTIL.DEF_AMC_KNIFE_POS )
+        self.ADC_btt_knife.setChecked       ( UTIL.DEF_AMC_KNIFE )
+        self.ADC_btt_fiberPnmtc.setChecked  ( UTIL.DEF_AMC_FIBER_PNMTC )
         
 
 
@@ -316,46 +369,44 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                        CONNECTIONS                                                #
     #####################################################################################################
 
-    def connectTCP ( self,TCPslot = 0 ):
-        """slot-wise connection management, mostly to shrink code length, maybe more functionality later"""
+    def connectTCP( self,TCPslot = 0 ):
+        """ slot-wise connection management, mostly to shrink code length, maybe more functionality later """
 
-        css = ("border-radius: 25px; background-color: #00aaff;")
+        css = ( "border-radius: 25px; background-color: #00aaff;" )
 
         match TCPslot:
             case 1:  
-                res,conn = UTIL.ROB_tcpip.connect()
-                self.TCP_ROB_indi_connected.setStyleSheet(css)
+                res, conn = UTIL.ROB_tcpip.connect()
+                self.TCP_ROB_indi_connected.setStyleSheet( css )
                 
-                if (res == True):
+                if( res == True ):
                     # if successful, start threading and watchdog
-                    self.roboCommThread.start()
-                    self.setWatchdog(1)
-
-                    self.logEntry('CONN',f"connected to {conn[0]} at {conn[1]}.")
+                    self.roboCommThread.start   ()
+                    self.setWatchdog            ( 1 )
+                    self.logEntry               ( 'CONN', f"connected to {conn[0]} at {conn[1]}." )
                     return True
                 
-                elif (res == TimeoutError):             self.logEntry('CONN',f"timed out while trying to connect {conn[0]} at {conn[1]} .")
-                elif (res == ConnectionRefusedError):   self.logEntry('CONN',f"server {conn[0]} at {conn[1]} refused the connection.")
-                else:                                   self.logEntry('CONN',f"connection to {conn[0]} at {conn[1]} failed ({res})!")
-                
+                elif (res == TimeoutError):             self.logEntry( 'CONN', f"timed out while trying to connect {conn[0]} at {conn[1]} ." )
+                elif (res == ConnectionRefusedError):   self.logEntry( 'CONN', f"server {conn[0]} at {conn[1]} refused the connection." )
+                else:                                   self.logEntry( 'CONN', f"connection to {conn[0]} at {conn[1]} failed ({res})!" )
                 return False
 
             case 2:
-                if('COM' in UTIL.PUMP1_tcpip.port): 
+                if( 'COM' in UTIL.PUMP1_tcpip.port ): 
                     # no check if connection is possible (done via mtec lib), start threading and WD in good hope
                     self.pumpCommThread.start()
-                    self.setWatchdog(2)
+                    self.setWatchdog( 2 )
                 else:
-                    raise ConnectionError('TCP not supported') 
+                    raise ConnectionError( 'TCP not supported' ) 
                     # res,conn = UTIL.PUMP1_tcpip.connect()
 
-                self.logEntry('GNRL',f"connected to Pump1 at {UTIL.PUMP1_tcpip.port}.")
-                self.TCP_PUMP1_indi_connected.setStyleSheet(css)
+                self.logEntry( 'GNRL', f"connected to Pump1 at {UTIL.PUMP1_tcpip.port}." )
+                self.TCP_PUMP1_indi_connected.setStyleSheet( css )
                 self.pump1Conn = True
                 return True
 
             case 3:  
-                raise ConnectionError('PUMP2 not supported, yet')
+                raise ConnectionError( 'PUMP2 not supported, yet' )
             #     if('COM' in UTIL.PUMP2_tcpip.port): 
             #         # no check if connection is possible (done via mtec lib), start threading and WD in good hope
             #         self.pumpTwoCommThread.start()
@@ -378,29 +429,30 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def disconnectTCP ( self,TCPslot = 0 ):
+    def disconnectTCP( self,TCPslot = 0 ):
         """ disconnect works, reconnect crashes the app, problem probably lies here
             should also send E command to robot on disconnect """
 
-        css = ("border-radius: 25px; background-color: #4c4a48;")
+        css = ( "border-radius: 25px; background-color: #4c4a48;" )
 
         match TCPslot:
             case 1:  
-                self.killWatchdog(1)
+                self.killWatchdog( 1 )
                 self.roboCommThread.quit()
                 self.roboCommThread.wait()
                 UTIL.ROB_tcpip.close()
 
-                self.logEntry('CONN',f"user disconnected robot.")
-                self.TCP_ROB_indi_connected.setStyleSheet(css)
+                self.logEntry( 'CONN', f"user disconnected robot." )
+                self.TCP_ROB_indi_connected.setStyleSheet( css )
 
             case 2:  
                 if( 'COM' in UTIL.PUMP1_tcpip.port ):
-                    self.killWatchdog(2)
+                    self.killWatchdog( 2 )
                     self.pumpCommThread.quit()
                     self.pumpCommThread.wait()
                 else:
-                    raise ConnectionError('TCP not supported, unable to disconnect') # UTIL.PUMP1_tcpip.close()
+                    raise ConnectionError( 'TCP not supported, unable to disconnect' ) 
+                    # UTIL.PUMP1_tcpip.close()
                 
             case 3:  
                 pass
@@ -424,7 +476,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          THREADS                                                  #
     #####################################################################################################
 
-    def connectThreads ( self ):
+    def connectThreads( self ):
         """ load all threads from PRINT_threads and set signal-slot-connections """
 
         self.roboCommThread = QThread()
@@ -433,14 +485,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.roboCommThread.started.connect         ( self.roboCommWorker.run )
         self.roboCommThread.finished.connect        ( self.roboCommWorker.stop )
         self.roboCommThread.finished.connect        ( self.roboCommWorker.deleteLater )
-        self.roboCommWorker.dataReceived.connect    ( lambda: self.resetWatchdog(1) )
+        self.roboCommWorker.dataReceived.connect    ( lambda: self.resetWatchdog( 1 ) )
         self.roboCommWorker.dataReceived.connect    ( self.labelUpdate_onTerminalChange )
-        self.roboCommWorker.dataUpdated.connect     ( self.posUpdate )
-        self.roboCommWorker.endDcMoving.connect     ( lambda: self.switchRobMoving(end= True) )
+        self.roboCommWorker.dataUpdated.connect     ( self.roboReceived )
+        self.roboCommWorker.endDcMoving.connect     ( lambda: self.switchRobMoving( end= True ) )
         self.roboCommWorker.endProcessing.connect   ( self.stopSCTRLQueue )
         self.roboCommWorker.logError.connect        ( self.logEntry )
-        self.roboCommWorker.queueEmtpy.connect      ( lambda: self.stopSCTRLQueue(prepEnd= True) )
-        self.roboCommWorker.sendElem.connect        ( self.commandTransmitted )
+        self.roboCommWorker.queueEmtpy.connect      ( lambda: self.stopSCTRLQueue( prepEnd= True ) )
+        self.roboCommWorker.sendElem.connect        ( self.roboSend )
 
         self.pumpCommThread = QThread()
         self.pumpCommWorker = WORKERS.PumpCommWorker()
@@ -450,8 +502,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.pumpCommThread.finished.connect        ( self.pumpCommWorker.deleteLater )
         self.pumpCommWorker.logError.connect        ( self.logEntry )
         self.pumpCommWorker.dataSend.connect        ( self.pump1Send )
-        self.pumpCommWorker.dataReceived.connect    ( self.pump1Update )
-        self.pumpCommWorker.connActive.connect      ( lambda: self.resetWatchdog(2) )
+        self.pumpCommWorker.dataReceived.connect    ( self.pump1Received )
+        self.pumpCommWorker.connActive.connect      ( lambda: self.resetWatchdog( 2 ) )
 
         self.loadFileThread = QThread()
         self.loadFileWorker = WORKERS.LoadFileWorker()
@@ -460,34 +512,71 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.loadFileWorker.convFailed.connect      ( self.loadFileFailed )
         self.loadFileWorker.convFinished.connect    ( self.loadFileFinished )
 
+
+
+
+
+    def roboSend( self, command, msg, numSend, dc, noError ):
+        """ handle UI update after new command was send """
+
+        if( noError ):
+            UTIL.SC_currCommId += numSend
+            if( UTIL.SC_currCommId > 3000 ):
+                mutex.lock() 
+                UTIL.SC_currCommId -= 3000
+                mutex.unlock()
+
+            if( dc ):   logTxt = f"{numSend} DC command(s) send"
+            else:       logTxt = f"{numSend} SC command(s) send"
+            self.logEntry( 'ComQ', logTxt )
+
+            self.labelUpdate_onSend( command )
+            self.TCP_ROB_disp_writeBuffer.setText   ( str(command) )
+            self.TCP_ROB_disp_bytesWritten.setText  ( str(numSend) )
+
+        elif( msg == ValueError ):
+            self.logEntry( 'CONN', f"TCPIP class 'ROB_tcpip' encountered ValueError in sendCommand, data length: {numSend}" )
+            self.TCP_ROB_disp_writeBuffer.setText   ( 'ValueError' )
+            self.TCP_ROB_disp_bytesWritten.setText  ( str(numSend) )
+            UTIL.SC_currCommId += 1
         
-    
+        elif( msg == RuntimeError or msg == OSError ):
+            self.logEntry( 'CONN', 'TCPIP class "ROB_tcpip" encountered RuntimeError/OSError in sendCommand..' )
+            self.TCP_ROB_disp_writeBuffer.setText   ( 'RuntimeError/OSError' )
+            self.TCP_ROB_disp_bytesWritten.setText  ( str(numSend) )
+            UTIL.SC_currCommId += 1
+        
+        else:
+            self.logEntry( 'CONN', f"TCPIP class 'ROB_tcpip' encountered {msg}" )
+            self.TCP_ROB_disp_writeBuffer.setText   ( 'unspecified error' )
+            self.TCP_ROB_disp_bytesWritten.setText  ( str(numSend) )
+            UTIL.SC_currCommId += 1
 
 
 
 
 
-    def posUpdate ( self, rawDataString, telem ):
+    def roboReceived( self, rawDataString, telem ):
         """ write robots telemetry to log & user displays, resetting globals position variables is done
             by RobCommWorker """
 
         # set the fist given position to zero as this is usually the standard position for Rob2, take current ID
-        if (self.firstPos):
+        if( self.firstPos ):
             # UTIL.SC_currCommId = telem.id + 1
             UTIL.ROB_movStartP = copy.deepcopy( UTIL.ROB_telem.Coor )
             UTIL.ROB_movEndP   = copy.deepcopy( UTIL.ROB_telem.Coor )
-            self.setZero([1,2,3,4,5,6,8])
+            self.setZero( [1,2,3,4,5,6,8] )
             self.firstPos = False
 
-        self.logEntry('RTel',f"ID {telem.id},   {telem.Coor}   ToolSpeed: {telem.tSpeed}")
-        self.labelUpdate_onReceive(rawDataString)
+        self.logEntry( 'RTel', f"ID {telem.id},   {telem.Coor}   ToolSpeed: {telem.tSpeed}" )
+        self.labelUpdate_onReceive( rawDataString )
         self.DAQ.dataUpdate()
 
 
 
 
 
-    def pump1Send ( self, newSpeed, command, ans ):
+    def pump1Send( self, newSpeed, command, ans ):
         """ display pump communication, global vars are set by PumpCommWorker """
 
         mutex.lock()
@@ -498,22 +587,26 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.TCP_PUMP1_disp_bytesWritten.setText    ( str(len(command)) )
         self.TCP_PUMP1_disp_readBuffer.setText      ( str(ans) )
     
-        self.logEntry('PMP1',f"speed set to {UTIL.PUMP1_speed}, command: {command}")
+        self.logEntry( 'PMP1', f"speed set to {UTIL.PUMP1_speed}, command: {command}" )
 
 
 
 
 
-    def pump1Update ( self, telem ):
+    def pump1Received( self, telem ):
         """ display pump telemetry, global vars are set by PumpCommWorker """
 
-        self.PUMP_disp_freq.setText         ( str( UTIL.STT_dataBlock.Pump1.freq ) )
-        self.PUMP_disp_volt.setText         ( str( UTIL.STT_dataBlock.Pump1.volt ) )
-        self.PUMP_disp_amps.setText         ( str( UTIL.STT_dataBlock.Pump1.amps ) )
-        self.PUMP_disp_torq.setText         ( str( UTIL.STT_dataBlock.Pump1.torq ) )
+        # telemetry contains no info about the rotation direction, interpret according to setting
+        if( UTIL.PUMP1_speed < 0 ): telem.freq *= -1
+
+        # display & log
+        self.PUMP_disp_freq.setText         ( str(UTIL.STT_dataBlock.Pump1.freq) )
+        self.PUMP_disp_volt.setText         ( str(UTIL.STT_dataBlock.Pump1.volt) )
+        self.PUMP_disp_amps.setText         ( str(UTIL.STT_dataBlock.Pump1.amps) )
+        self.PUMP_disp_torq.setText         ( str(UTIL.STT_dataBlock.Pump1.torq) )
         self.PUMP_disp_currSpeed.setText    ( f"{telem.freq}%" )
 
-        self.logEntry('PTel',f"PUMP1, freq: {telem.freq}, volt: {telem.volt}, amps: {telem.amps}, torq: {telem.torq}")
+        self.logEntry( 'PTel', f"PUMP1, freq: {telem.freq}, volt: {telem.volt}, amps: {telem.amps}, torq: {telem.torq}" )
 
 
 
@@ -525,69 +618,69 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          WATCHDOGS                                                #
     #####################################################################################################
 
-    def setWatchdog ( self, dognumber= 0 ):
+    def setWatchdog( self, dognumber= 0 ):
         """ set Watchdog, check data updates from robot and pump occure at least every 10 sec """
 
         match dognumber:
             case 1:
                 self.robReceiveWD = QTimer()
-                self.robReceiveWD.setSingleShot    (True)
-                self.robReceiveWD.setInterval      (10000)
-                self.robReceiveWD.timeout.connect  (lambda: self.watchdogBite(1))
+                self.robReceiveWD.setSingleShot    ( True )
+                self.robReceiveWD.setInterval      ( 10000 )
+                self.robReceiveWD.timeout.connect  ( lambda: self.watchdogBite( 1 ) )
 
                 self.robReceiveWD.start()
-                self.logEntry('WDOG','Watchdog 1 (robReceiveWD) started.')
+                self.logEntry( 'WDOG', 'Watchdog 1 (robReceiveWD) started.' )
 
             case 2: 
                 self.pumpOneReceiveWD = QTimer()
-                self.pumpOneReceiveWD.setSingleShot    (True)
-                self.pumpOneReceiveWD.setInterval      (10000)
-                self.pumpOneReceiveWD.timeout.connect  (lambda: self.watchdogBite(2))
+                self.pumpOneReceiveWD.setSingleShot    ( True )
+                self.pumpOneReceiveWD.setInterval      ( 10000 )
+                self.pumpOneReceiveWD.timeout.connect  ( lambda: self.watchdogBite( 2 ) )
 
                 self.pumpOneReceiveWD.start()
-                self.logEntry('WDOG','Watchdog 2 (pumpOneReceiveWD) started.')
+                self.logEntry( 'WDOG', 'Watchdog 2 (pumpOneReceiveWD) started.' )
 
             case _:
-                self.logEntry('WDOG','Watchdog setting failed, invalid dog number given')
+                self.logEntry( 'WDOG', 'Watchdog setting failed, invalid dog number given' )
 
         
 
 
 
-    def resetWatchdog ( self, dognumber= 0 ):
+    def resetWatchdog( self, dognumber= 0 ):
         """ reset the Watchdogs, robReceiveWD on every newly received data block """
 
         match dognumber:
             case 1:   self.robReceiveWD.start()
             case 2:   self.pumpOneReceiveWD.start()
-            case _:   self.logEntry('WDOG','Watchdog reset failed, invalid dog number given')
+            case _:   self.logEntry( 'WDOG', 'Watchdog reset failed, invalid dog number given' )
 
 
 
 
 
-    def watchdogBite ( self, dognumber= 0 ):
+    def watchdogBite( self, dognumber= 0 ):
         """ close the UI on any biting WD, log info """
 
         match dognumber:
             case 1:   wdNum = '1'
 
             case 2:
-                watchdogWarning = strdDialog(f"Watchdog 2 (Pump 1) has bitten, connection lost, pump offline"
-                                             ,'WATCHDOG ALARM')
+                watchdogWarning = strdDialog( f"Watchdog 2 (Pump 1) has bitten, connection lost, pump offline"
+                                              ,'WATCHDOG ALARM' )
                 watchdogWarning.exec()
 
                 self.TCP_PUMP1_indi_connected.setStyleSheet( "border-radius: 25px; background-color: #4c4a48;" )
                 UTIL.PUMP1_tcpip.connected = False
-                self.killWatchdog(2)
+                self.killWatchdog( 2 )
                 self.pumpCommThread.quit()
                 self.pumpCommThread.wait()
                 return
 
             case _:   wdNum = '(unidentified)'
         
-        if(UTIL.SC_qProcessing):
-            self.logEntry           ('WDOG',f"Watchdog {wdNum} has bitten! Stopping script control & forwarding forced-stop to robot!")
+        if( UTIL.SC_qProcessing ):
+            self.logEntry           ( 'WDOG', f"Watchdog {wdNum} has bitten! Stopping script control & forwarding forced-stop to robot!" )
             self.forcedStopCommand  ()
             self.stopSCTRLQueue     ()
 
@@ -601,28 +694,28 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                     f"exit and close."
 
         if( UTIL.ROB_tcpip.connected ):
-            watchdogWarning = strdDialog(wdTxt, 'WATCHDOG ALARM')
+            watchdogWarning = strdDialog( wdTxt, 'WATCHDOG ALARM' )
             watchdogWarning.exec()
 
             if( watchdogWarning.result() ):
-                self.logEntry('WDOG',f"User chose to return to main screen.")
+                self.logEntry( 'WDOG', f"User chose to return to main screen." )
 
             else:
-                self.logEntry('WDOG',f"User chose to close PRINT_py, exiting...")
+                self.logEntry( 'WDOG', f"User chose to close PRINT_py, exiting..." )
                 self.close()
 
-            if( not UTIL.SC_qProcessing): 
-                self.logEntry('WDOG',f"Watchdog {wdNum} has bitten, robot disconnected!")
+            if( not UTIL.SC_qProcessing ): 
+                self.logEntry( 'WDOG', f"Watchdog {wdNum} has bitten, robot disconnected!" )
 
         self.TCP_ROB_indi_connected.setStyleSheet( "border-radius: 25px;background-color: #4c4a48;" )
         UTIL.ROB_tcpip.connected = False
-        self.killWatchdog(1)
+        self.killWatchdog( 1 )
 
         
 
 
 
-    def killWatchdog ( self, dognumber= 0 ):
+    def killWatchdog( self, dognumber= 0 ):
         """ put them to sleep (dont do this to real dogs) """
 
         match dognumber:
@@ -640,7 +733,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          SETTINGS                                                 #
     #####################################################################################################
 
-    def updateCommForerun ( self ):
+    def updateCommForerun( self ):
         """ reset the robots internal buffer length """
 
         mutex.lock()
@@ -649,7 +742,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     
 
 
-    def updateRobLiveAd ( self ):
+    def updateRobLiveAd( self ):
         """ new factor for QEntry.Speed.ts, applied before sending """
 
         mutex.lock()
@@ -658,7 +751,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def applySettings ( self ):
+    def applySettings( self ):
         """ load default settings to settings display """
         
         mutex.lock()
@@ -676,11 +769,22 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         UTIL.PRIN_speed.dcr     = self.SET_num_decelRamp_print.value()
         mutex.unlock()
 
-        self.logEntry('SETS',f"Settings updated -- ComFR: {UTIL.ROB_commFr}, VolPerMM: {UTIL.SC_volPerM}"
-                             f", FR2TS: {UTIL.IO_frToTs}, PVF: {UTIL.PUMP1_literPerS} IOZ: {UTIL.IO_zone}"
-                             f", PrinTS: {UTIL.PRIN_speed.ts}, PrinOS: {UTIL.PRIN_speed.os}"
-                             f", PrinACR: {UTIL.PRIN_speed.acr} PrinDCR: {UTIL.PRIN_speed.dcr}, DCTS: {UTIL.DC_speed.ts}"
-                             f", DCOS: {UTIL.DC_speed.os}, DCACR: {UTIL.DC_speed.acr}, DCDCR: {UTIL.DC_speed.dcr}")
+        self.logEntry('SETS', f"General settings updated -- ComFR: {UTIL.ROB_commFr}, VolPerMM: {UTIL.SC_volPerM}"
+                              f", FR2TS: {UTIL.IO_frToTs}, PVF: {UTIL.PUMP1_literPerS} IOZ: {UTIL.IO_zone}"
+                              f", PrinTS: {UTIL.PRIN_speed.ts}, PrinOS: {UTIL.PRIN_speed.os}"
+                              f", PrinACR: {UTIL.PRIN_speed.acr} PrinDCR: {UTIL.PRIN_speed.dcr}, DCTS: {UTIL.DC_speed.ts}"
+                              f", DCOS: {UTIL.DC_speed.os}, DCACR: {UTIL.DC_speed.acr}, DCDCR: {UTIL.DC_speed.dcr}")
+
+
+
+    def applyTeSettings( self ):
+        """ load default settings to settings display """
+        
+        mutex.lock()
+        UTIL.SC_extFllwBhvr = ( self.SET_TE_lbl_fllwBhvrInterv.value(), self.SET_TE_lbl_fllwBhvrSkip.value() )
+        mutex.unlock()
+
+        self.logEntry( 'SETS', f"TE settings updated -- FB_inter: {UTIL.SC_extFllwBhvr[0]}, FB_skip: {UTIL.SC_extFllwBhvr[1]}" )
 
 
 
@@ -691,21 +795,21 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                        LOG FUNCTION                                               #
     #####################################################################################################
 
-    def logEntry ( self, source= '[    ]', text= '' ):
+    def logEntry( self, source= '[    ]', text= '' ):
         """ set one-line for log entries, safes A LOT of repetitive code """
 
-        text = text.replace('\n','')
-        text = text.replace('\t','')
-        if (self.logpath == ''):    return None
+        text = text.replace( '\n', '' )
+        text = text.replace( '\t', '' )
+        if( self.logpath == '' ):   return None
 
-        if (source == 'newline'):   text = '\n'
+        if( source == 'newline' ):  text = '\n'
         else:                       text = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}    [{source}]:        {text}\n"
 
-        try:                        logfile = open(self.logpath,'a')
+        try:                        logfile = open( self.logpath, 'a' )
         except FileExistsError:     pass
 
-        self.SET_disp_logEntry.setText(text)
-        logfile.write(text)
+        self.SET_disp_logEntry.setText( text )
+        logfile.write( text )
         logfile.close()
 
 
@@ -718,7 +822,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                        QLABEL UPDATES                                             #
     #####################################################################################################
 
-    def labelUpdate_onReceive ( self, dataString ):
+    def labelUpdate_onReceive( self, dataString ):
         """ update all QLabels in the UI that may change with newly received data from robot """
 
         pos     = UTIL.ROB_telem.Coor
@@ -780,24 +884,39 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def labelUpdate_onSend ( self, entry ):
+    def labelUpdate_onSend( self, entry ):
         """ update all UI QLabels that may change when data was send to robot """
 
+        # update command lists and buffer size displays
         self.labelUpdate_onQueueChange()
         self.labelUpdate_onTerminalChange()
-        self.SCTRL_disp_elemInQ.setText  ( str(len(UTIL.SC_queue)) )
+        self.SCTRL_disp_elemInQ.setText( str(len(UTIL.SC_queue)) )
 
         try:
             robId = UTIL.ROB_telem.id    if( UTIL.ROB_telem.id != -1 )   else 0
             self.SCTRL_disp_buffComms.setText( str( UTIL.SC_queue[0].id - robId - 1 ) )
         except AttributeError:  pass
 
+        # update Amcon & Pump tab
+        self.ADC_num_panning.setValue       ( entry.Tool.pan_steps )
+        self.ASC_num_panning.setValue       ( entry.Tool.pan_steps )
+        self.ADC_num_fibDeliv.setValue      ( entry.Tool.fibDeliv_steps )
+        self.ASC_num_fibDeliv.setValue      ( entry.Tool.fibDeliv_steps )
+        self.ADC_btt_clamp.setChecked       ( entry.Tool.pnmtcClamp_yn )
+        self.ASC_btt_clamp.setChecked       ( entry.Tool.pnmtcClamp_yn )
+        self.ADC_btt_knifePos.setChecked    ( entry.Tool.knifePos_yn )
+        self.ASC_btt_knifePos.setChecked    ( entry.Tool.knifePos_yn )
+        self.ADC_btt_knife.setChecked       ( entry.Tool.knife_yn )
+        self.ASC_btt_knife.setChecked       ( entry.Tool.knife_yn )
+        self.ADC_btt_fiberPnmtc.setChecked  ( entry.Tool.fiberPnmtc_yn )
+        self.ASC_btt_fiberPnmtc.setChecked  ( entry.Tool.fiberPnmtc_yn )
 
 
 
 
 
-    def labelUpdate_onQueueChange ( self ):
+
+    def labelUpdate_onQueueChange( self ):
         """ show when new entries have been successfully placed in or taken from Queue """
 
         listToDisplay   = UTIL.SC_queue.display()
@@ -806,8 +925,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         overlen         = length - maxLen
 
         if( length > maxLen ):
-            listToDisplay           = listToDisplay[ 0 : maxLen ]
-            listToDisplay[maxLen-1] = f"{ overlen + 1 } further command are not display..." 
+            listToDisplay               = listToDisplay[ 0 : maxLen ]
+            listToDisplay[ maxLen-1 ]   = f"{ overlen + 1 } further command are not display..." 
 
         self.SCTRL_arr_queue.clear()
         self.SCTRL_arr_queue.addItems( listToDisplay )
@@ -817,12 +936,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def labelUpdate_onTerminalChange ( self ):
-        """ show when data was send or received """
+    def labelUpdate_onTerminalChange( self ):
+        """ show when data was send or received, update ICQ """
         
         self.TERM_arr_terminal.clear()
-        self.TERM_arr_terminal.addItems ( UTIL.TERM_log )
-        if (self.TERM_chk_autoScroll.isChecked()):  self.TERM_arr_terminal.scrollToBottom()
+        self.TERM_arr_terminal.addItems( UTIL.TERM_log )
+        if( self.TERM_chk_autoScroll.isChecked() ):  self.TERM_arr_terminal.scrollToBottom()
 
         listToDisplay   = UTIL.ROB_commQueue.display()
         maxLen          = UTIL.DEF_ICQ_MAX_LINES
@@ -830,12 +949,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         overlen         = length - maxLen
 
         if( length > maxLen ):
-            listToDisplay           = listToDisplay[ 0 : maxLen ]
-            listToDisplay[maxLen-1] = f"{overlen} further command are not display..." 
+            listToDisplay               = listToDisplay[ 0 : maxLen ]
+            listToDisplay[ maxLen-1 ]   = f"{overlen} further command are not display..." 
 
         self.ICQ_arr_terminal.clear()
-        self.ICQ_arr_terminal.addItems  ( listToDisplay )
-        if (self.ICQ_chk_autoScroll.isChecked()):  self.ICQ_arr_terminal.scrollToBottom()
+        self.ICQ_arr_terminal.addItems( listToDisplay )
+        if( self.ICQ_chk_autoScroll.isChecked() ):  self.ICQ_arr_terminal.scrollToBottom()
 
     
 
@@ -844,13 +963,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def labelUpdate_onNewZero ( self ):
         """ show when DC_zero has changed """
 
-        self.ZERO_disp_x.setText        ( str( UTIL.DC_currZero.x ) )
-        self.ZERO_disp_y.setText        ( str( UTIL.DC_currZero.y ) )
-        self.ZERO_disp_z.setText        ( str( UTIL.DC_currZero.z ) )
-        self.ZERO_disp_xOrient.setText  ( str( UTIL.DC_currZero.rx ) )
-        self.ZERO_disp_yOrient.setText  ( str( UTIL.DC_currZero.ry ) )
-        self.ZERO_disp_zOrient.setText  ( str( UTIL.DC_currZero.rz ) )
-        self.ZERO_disp_ext.setText      ( str( UTIL.DC_currZero.ext ) )
+        self.ZERO_disp_x.setText        ( str(UTIL.DC_currZero.x) )
+        self.ZERO_disp_y.setText        ( str(UTIL.DC_currZero.y) )
+        self.ZERO_disp_z.setText        ( str(UTIL.DC_currZero.z) )
+        self.ZERO_disp_xOrient.setText  ( str(UTIL.DC_currZero.rx) )
+        self.ZERO_disp_yOrient.setText  ( str(UTIL.DC_currZero.ry) )
+        self.ZERO_disp_zOrient.setText  ( str(UTIL.DC_currZero.rz) )
+        self.ZERO_disp_ext.setText      ( str(UTIL.DC_currZero.ext) )
 
         self.ZERO_float_x.setValue      ( UTIL.DC_currZero.x )
         self.ZERO_float_y.setValue      ( UTIL.DC_currZero.y )
@@ -868,48 +987,48 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                            FILE IO                                                #
     #####################################################################################################
 
-    def openFile ( self, testrun= False, testpath= None ):
+    def openFile( self, testrun= False, testpath= None ):
         """ prompts the user with a file dialog and estimates printing parameters in given file """
 
         # get file path and content
-        if (testrun): ans = testpath
+        if( testrun ): ans = testpath
         else:            
-            fDialog = fileDialog('select file to load')
+            fDialog = fileDialog( 'select file to load' )
             fDialog.exec()
-            ans = Path(fDialog.selectedFiles()[0]) if( fDialog.result() ) else None
+            ans = Path( fDialog.selectedFiles()[0] ) if( fDialog.result() ) else None
         
-        if(ans is None):
-            self.IO_disp_filename.setText("no file selected")
+        if( ans is None ):
+            self.IO_disp_filename.setText( "no file selected" )
             UTIL.IO_currFilepath = None
             return None
         
-        file    = open(ans,'r')
+        file    = open( ans, 'r' )
         txt     = file.read()
         file.close()
 
         # get number of commands and filament length
-        if( ans.suffix == '.mod' ):     commNum, filamentLength, res = UTIL.preCheckRapidFile(txt)
-        else:                           commNum, filamentLength, res = UTIL.preCheckGcodeFile(txt)
+        if( ans.suffix == '.mod' ):     commNum, filamentLength, res = UTIL.preCheckRapidFile( txt )
+        else:                           commNum, filamentLength, res = UTIL.preCheckGcodeFile( txt )
         
-        if(commNum is None):
-            self.IO_disp_filename.setText   ('COULD NOT READ FILE!')
-            self.logEntry                   ('F-IO', f"Error while opening {ans} file: {res}")
+        if( commNum is None ):
+            self.IO_disp_filename.setText   ( 'COULD NOT READ FILE!' )
+            self.logEntry                   ( 'F-IO', f"Error while opening {ans} file: {res}" )
             UTIL.IO_currFilepath           = None
             return None
 
-        if(res == 'empty'):
-            self.IO_disp_filename.setText('FILE EMPTY!')
+        if( res == 'empty' ):
+            self.IO_disp_filename.setText( 'FILE EMPTY!' )
             return None
         
         # display data
         filamentVol = round( filamentLength * UTIL.SC_volPerM, 1 )
 
-        self.IO_disp_filename.setText   (ans.name)
+        self.IO_disp_filename.setText   ( ans.name )
         self.IO_disp_commNum.setText    ( str(commNum) )
         self.IO_disp_estimLen.setText   ( str(filamentLength) )
         self.IO_disp_estimVol.setText   ( str(filamentVol) )
 
-        self.logEntry('F-IO', f"Opened new file at {ans}:   {commNum} commands,   {filamentLength}mm filament, {filamentVol}L")
+        self.logEntry( 'F-IO', f"Opened new file at {ans}:   {commNum} commands,   {filamentLength}mm filament, {filamentVol}L" )
         UTIL.IO_currFilepath = ans
         return ans
     
@@ -918,24 +1037,24 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def loadFile ( self, lf_atID= False, testrun= False ):
+    def loadFile( self, lf_atID= False, testrun= False ):
         """ reads the file set in self.openFile, adds all readable commands to command queue (at end or at ID)
             outsourced to loadFileWorker """
         
         if( WORKERS.LFW_running ): return
 
         # get user input
-        startID = self.IO_num_addByID.value() if(lf_atID) else 0
+        startID = self.IO_num_addByID.value() if( lf_atID ) else 0
         pCtrl   = self.IO_chk_autoPCtrl.isChecked()
         fpath   = UTIL.IO_currFilepath
         
-        if ( (fpath is None) 
-             or not ( (fpath.suffix == '.gcode') or (fpath.suffix == '.mod') ) ):
-            self.IO_lbl_loadFile.setText("... no valid file, not executed")
+        if( (fpath is None) 
+            or not ( (fpath.suffix == '.gcode') or (fpath.suffix == '.mod') ) ):
+            self.IO_lbl_loadFile.setText( "... no valid file, not executed" )
             return
 
-        self.IO_lbl_loadFile.setText("... conversion running ...")
-        self.logEntry('F-IO',f"started to load file from {fpath}, task passed to loadFileThread...")
+        self.IO_lbl_loadFile.setText( "... conversion running ..." )
+        self.logEntry( 'F-IO', f"started to load file from {fpath}, task passed to loadFileThread..." )
 
         # set up THREADS vars and start
         mutex.lock()
@@ -946,18 +1065,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         if( not testrun ):  
             self.loadFileThread.start()
-            self.IO_btt_loadFile.setStyleSheet( ' font-size: 16pt; background-color: #a28230;' )
+            self.IO_btt_loadFile.setStyleSheet( 'font-size: 16pt; background-color: #a28230;' )
 
 
 
 
 
 
-    def loadFileFailed ( self, txt ):
+    def loadFileFailed( self, txt ):
         """ handles convFailed emit from loadFileWorker """
 
-        self.IO_lbl_loadFile.setText    (txt)
-        self.logEntry                   ('F-IO',f"ERROR: file IO from aborted! {txt}")
+        self.IO_lbl_loadFile.setText    ( txt )
+        self.logEntry                   ( 'F-IO', f"ERROR: file IO from aborted! {txt}" )
 
         # reset THREADS vars and exit
         mutex.lock()
@@ -966,7 +1085,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         WORKERS.LFW_pCtrl    = False
         mutex.unlock()
 
-        self.IO_btt_loadFile.setStyleSheet( ' font-size: 16pt;' )
+        self.IO_btt_loadFile.setStyleSheet( 'font-size: 16pt;' )
         self.loadFileThread.quit()
     
 
@@ -974,7 +1093,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def loadFileFinished ( self, lineID, startID, skips ):
+    def loadFileFinished( self, lineID, startID, skips ):
         """ handles convFinished emit from loadFileWorker """
         
         # update labels, log entry if you made it here
@@ -982,13 +1101,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.labelUpdate_onNewZero()
         self.IO_num_addByID.setValue( lineID )
 
-        if(skips == 0):     self.IO_lbl_loadFile.setText("... conversion successful")
-        else:               self.IO_lbl_loadFile.setText(f"... {skips} command(s) skipped (syntax)")
+        if( skips == 0 ):   self.IO_lbl_loadFile.setText( "... conversion successful" )
+        else:               self.IO_lbl_loadFile.setText(f"... {skips} command(s) skipped (syntax)" )
         
         logTxt = f"File loading finished:   {lineID - startID} commands added ({skips} skipped due to syntax),"
-        if (startID != 0):  logTxt += f" starting fom {startID}."
+        if( startID != 0 ): logTxt += f" starting fom {startID}."
         else:               logTxt += f" at the end."
-        self.logEntry('F-IO', logTxt)
+        self.logEntry( 'F-IO', logTxt )
 
         # reset THREADS vars and exit
         mutex.lock()
@@ -997,7 +1116,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         WORKERS.LFW_pCtrl    = False
         mutex.unlock()
 
-        self.IO_btt_loadFile.setStyleSheet( ' font-size: 16pt;' )
+        self.IO_btt_loadFile.setStyleSheet( 'font-size: 16pt;' )
         self.loadFileThread.quit()
         
 
@@ -1012,7 +1131,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #####################################################################################################
 
 
-    def resetScId ( self ):
+    def resetScId( self ):
         """ synchronize SC and ROB ID with this, if program falls out of sync with the robot, should
             happen only with on-the-fly restarts, theoretically """
 
@@ -1025,19 +1144,28 @@ class Mainframe(QMainWindow, Ui_MainWindow):
    
    
    
-    def startSCTRLQueue ( self ):
+    def startSCTRLQueue( self ):
         """ set UI indicators, send the boring work of timing the command to our trusty threads """
 
+        # set parameters
         mutex.lock()
-        UTIL.PUMP1_speed    = 0
         UTIL.SC_qProcessing = True
         UTIL.SC_qPrepEnd    = False
         mutex.unlock()
-        self.logEntry('ComQ','queue processing started')
+        self.logEntry( 'ComQ', 'queue processing started' )
 
+        # update GUI
         css = "border-radius: 20px; background-color: #00aaff;"
-        self.SCTRL_indi_qProcessing.setStyleSheet   (css)
-        self.TCP_indi_qProcessing.setStyleSheet     (css)
+        self.SCTRL_indi_qProcessing.setStyleSheet   ( css )
+        self.TCP_indi_qProcessing.setStyleSheet     ( css )
+        self.ASC_indi_qProcessing.setStyleSheet     ( css )
+        self.ASC_num_panning.setEnable              ( False )
+        self.ASC_num_fibDeliv.setEnable             ( False )
+        self.ASC_btt_clamp.setEnable                ( False )
+        self.ASC_btt_knifePos.setEnable             ( False )
+        self.ASC_btt_knife.setEnable                ( False )
+        self.ASC_btt_fiberPnmtc.setEnable           ( False )
+        self.ASC_btt_overwrSC.setEnable             ( False )
         self.switchRobMoving()
 
         self.labelUpdate_onQueueChange()
@@ -1047,7 +1175,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def stopSCTRLQueue ( self, prepEnd= False ):
+    def stopSCTRLQueue( self, prepEnd= False ):
         """ set UI indicators, turn off threads """
 
         if( prepEnd ):
@@ -1060,27 +1188,37 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             UTIL.SC_qPrepEnd    = False
             UTIL.SC_qProcessing = False
             mutex.unlock()
-            self.logEntry('ComQ','queue processing stopped')
+            self.logEntry( 'ComQ', 'queue processing stopped' )
 
             self.labelUpdate_onQueueChange()
-            self.switchRobMoving(end= True)
+            self.switchRobMoving( end= True )
             css = "border-radius: 20px; background-color: #4c4a48;"
 
-        self.SCTRL_indi_qProcessing.setStyleSheet   (css)
-        self.TCP_indi_qProcessing.setStyleSheet     (css)
+            self.ASC_num_panning.setEnable      ( True )
+            self.ASC_num_fibDeliv.setEnable     ( True )
+            self.ASC_btt_clamp.setEnable        ( True )
+            self.ASC_btt_knifePos.setEnable     ( True )
+            self.ASC_btt_knife.setEnable        ( True )
+            self.ASC_btt_fiberPnmtc.setEnable   ( True )
+            self.ASC_btt_overwrSC.setEnable     ( True )
+
+        # update GUI
+        self.SCTRL_indi_qProcessing.setStyleSheet   ( css )
+        self.TCP_indi_qProcessing.setStyleSheet     ( css )
+        self.ASC_indi_qProcessing.setStyleSheet     ( css )
 
     
 
 
 
 
-    def addGcodeSgl ( self, atID= False, ID= 0, fromFile= False, fileText= '' ):
+    def addGcodeSgl( self, atID= False, ID= 0, fromFile= False, fileText= '' ):
         """ function meant to convert any single gcode lines to QEntry,
             uses the position BEFORE PLANNED COMMAND EXECUTION, as this is the fallback option
             if no X, Y, Z or EXT position is given """
 
         # get text and position BEFORE PLANNED COMMAND EXECUTION
-        speed   = copy.deepcopy(UTIL.PRIN_speed)
+        speed   = copy.deepcopy( UTIL.PRIN_speed )
         try:
             if( not atID ):     pos = copy.deepcopy( UTIL.SC_queue.lastEntry().Coor1 )
             else:               pos = copy.deepcopy( UTIL.SC_queue.entryBeforeID(ID).Coor1 )
@@ -1090,16 +1228,16 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         else:                   txt = fileText
         
         # act according to GCode command
-        entry,command = UTIL.gcodeToQEntry(pos, speed ,UTIL.IO_zone ,txt)
+        entry,command = UTIL.gcodeToQEntry( pos, speed ,UTIL.IO_zone ,txt )
         
         if ( (command != 'G1') and (command != 'G28') and (command != 'G92') ):
-            if(command == ';'):         panTxt = f"leading semicolon interpreted as comment:\n{txt}"
-            elif(command is None):      panTxt = f"SYNTAX ERROR:\n{txt}"
+            if  ( command == ';' ):     panTxt = f"leading semicolon interpreted as comment:\n{txt}"
+            elif( command is None ):    panTxt = f"SYNTAX ERROR:\n{txt}"
             else:                   
-                if(not fromFile):       self.SGLC_entry_gcodeSglComm.setText(f"{command}\n{txt}")
+                if( not fromFile ):     self.SGLC_entry_gcodeSglComm.setText(f"{command}\n{txt}")
                 return entry, command
             
-            if(not fromFile):           self.SGLC_entry_gcodeSglComm.setText(panTxt)
+            if( not fromFile ):         self.SGLC_entry_gcodeSglComm.setText(panTxt)
             return entry, None
         
         elif( command == 'G92' ):   
@@ -1107,21 +1245,21 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             return entry, None
 
         # set command ID if given, sorting is done later by "Queue" class
-        if(atID):    entry.id = ID
+        if( atID ):    entry.id = ID
 
         mutex.lock()
-        res = UTIL.SC_queue.add(entry)
+        res = UTIL.SC_queue.add( entry )
         mutex.unlock()
         
-        if(res == ValueError):
-            if(not fromFile):   self.SGLC_entry_gcodeSglComm.setText("VALUE ERROR: \n" + txt)
+        if( res == ValueError ):
+            if( not fromFile ):   self.SGLC_entry_gcodeSglComm.setText( f"VALUE ERROR: \n {txt}" )
             return None, ValueError
         
-        if(not fromFile):    self.logEntry('ComQ',f"single GCode command added -- "
-                                                  f"ID: {entry.id}  MT: {entry.mt}  PT: {entry.pt}"
-                                                  f"  --  COOR_1: {entry.Coor1}  --  COOR_2: {entry.Coor2}"
-                                                  f"  --  SV: {entry.Speed}  --  SBT: {entry.sbt}   SC: {entry.sc}"
-                                                  f"  --  Z: {entry.z}  --  TOOL: {entry.Tool}")
+        if( not fromFile ):  self.logEntry( 'ComQ', f"single GCode command added -- "
+                                                    f"ID: {entry.id}  MT: {entry.mt}  PT: {entry.pt}"
+                                                    f"  --  COOR_1: {entry.Coor1}  --  COOR_2: {entry.Coor2}"
+                                                    f"  --  SV: {entry.Speed}  --  SBT: {entry.sbt}   SC: {entry.sc}"
+                                                    f"  --  Z: {entry.z}  --  TOOL: {entry.Tool}" )
         self.labelUpdate_onQueueChange()
         return entry, command
 
@@ -1130,34 +1268,34 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def addRapidSgl ( self, atID= False, ID= 0, fromFile= False, fileText= '' ):
+    def addRapidSgl( self, atID= False, ID= 0, fromFile= False, fileText= '' ):
         """ function meant to convert all RAPID single lines into QEntry """
 
         # get text and current position, (identify command -- to be added)
-        if( not fromFile):      txt = self.SGLC_entry_rapidSglComm.toPlainText() 
+        if( not fromFile ):     txt = self.SGLC_entry_rapidSglComm.toPlainText() 
         else:                   txt = fileText
         
-        entry,err   = UTIL.rapidToQEntry(txt)
+        entry,err   = UTIL.rapidToQEntry( txt )
         if( entry == None ):
-            if(not fromFile):   self.SGLC_entry_rapidSglComm.setText(f"SYNTAX ERROR: {err}\n" + txt)
+            if( not fromFile ): self.SGLC_entry_rapidSglComm.setText( f"SYNTAX ERROR: {err}\n {txt}" )
             return None, err
         
         # set command ID if given, sorting is done later by "Queue" class
-        if(atID):    entry.id = ID
+        if( atID ):  entry.id = ID
 
         mutex.lock()
-        res = UTIL.SC_queue.add(entry)
+        res = UTIL.SC_queue.add( entry )
         mutex.unlock()
 
-        if(res == ValueError):
-            if(not fromFile):   self.SGLC_entry_rapidSglComm.setText("VALUE ERROR: \n" + txt)
+        if( res == ValueError ):
+            if( not fromFile ):   self.SGLC_entry_rapidSglComm.setText( f"VALUE ERROR: \n {txt}" )
             return None, ValueError
         
-        if(not fromFile):    self.logEntry('ComQ',f"single RAPID command added -- "
-                                                  f"ID: {entry.id}  MT: {entry.mt}  PT: {entry.pt}"
-                                                  f"  --  COOR_1: {entry.Coor1}  --  COOR_2: {entry.Coor2}"
-                                                  f"  --  SV: {entry.Speed}  --  SBT: {entry.sbt}   SC: {entry.sc}"
-                                                  f"  --  Z: {entry.z}  --  TOOL: {entry.Tool}")
+        if( not fromFile ):  self.logEntry( 'ComQ', f"single RAPID command added -- "
+                                                    f"ID: {entry.id}  MT: {entry.mt}  PT: {entry.pt}"
+                                                    f"  --  COOR_1: {entry.Coor1}  --  COOR_2: {entry.Coor2}"
+                                                    f"  --  SV: {entry.Speed}  --  SBT: {entry.sbt}   SC: {entry.sc}"
+                                                    f"  --  Z: {entry.z}  --  TOOL: {entry.Tool}" )
 
         # update displays
         self.labelUpdate_onQueueChange()
@@ -1168,7 +1306,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def addSIB ( self, number, atEnd= False ):
+    def addSIB( self, number, atEnd= False ):
         """ add standard instruction block (SIB) to queue"""
 
         match number:
@@ -1177,27 +1315,27 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             case 3: txt = self.SIB_entry_sib3.toPlainText()
             case _: return False
 
-        if ( (len(UTIL.SC_queue) == 0)  or  not atEnd ):    
+        if ( ( len(UTIL.SC_queue) == 0 )  or  not atEnd ):    
             try:                        lineID = UTIL.SC_queue[0].id
             except AttributeError:      lineID = UTIL.ROB_telem.id + 1
         else:                           lineID = UTIL.SC_queue.lastEntry().id + 1
 
         if( lineID < 1 ): lineID = 1
         lineID_start    = lineID
-        rows            = txt.split('\n')
+        rows            = txt.split( '\n' )
 
         # interpret rows as either RAPID or GCode, row-wise, handling the entry is unnessecary as
         # its added to queue by the addRapidSgl / addGcodeSgl funcions already
         for row in rows:
-            if('Move' in row):
+            if( 'Move' in row ):
                 entry,err = self.addRapidSgl( atID= True, ID= lineID, fromFile=True, fileText= row)
                 
-                if(err is not None):
+                if( err is not None ):
                     match number:
-                        case 1: self.SIB_entry_sib1.setText    (f"COMMAND ERROR, ABORTED\n {txt}")
-                        case 2: self.SIB_entry_sib2.setText    (f"COMMAND ERROR, ABORTED\n {txt}")
-                        case 3: self.SIB_entry_sib3.setText    (f"COMMAND ERROR, ABORTED\n {txt}")
-                    self.logEntry(f"SIB{number}",f"ERROR: SIB command import aborted ({err})! false entry: {txt}")
+                        case 1: self.SIB_entry_sib1.setText( f"COMMAND ERROR, ABORTED\n {txt}" )
+                        case 2: self.SIB_entry_sib2.setText( f"COMMAND ERROR, ABORTED\n {txt}" )
+                        case 3: self.SIB_entry_sib3.setText( f"COMMAND ERROR, ABORTED\n {txt}" )
+                    self.logEntry( f"SIB{number}", f"ERROR: SIB command import aborted ({err})! false entry: {txt}" )
                     return False
                 else:   lineID += 1
 
@@ -1207,16 +1345,16 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 if( (command == 'G1')  or  (command == 'G28') ):    lineID  += 1
                 else:
                     match number:
-                        case 1: self.SIB_entry_sib1.setText    (f"COMMAND ERROR, ABORTED\n {txt}")
-                        case 2: self.SIB_entry_sib2.setText    (f"COMMAND ERROR, ABORTED\n {txt}")
-                        case 3: self.SIB_entry_sib3.setText    (f"COMMAND ERROR, ABORTED\n {txt}")
-                    self.logEntry(f"SIB{number}",f"ERROR: SIB command import aborted ({command})! false entry: {txt}")
+                        case 1: self.SIB_entry_sib1.setText( f"COMMAND ERROR, ABORTED\n {txt}" )
+                        case 2: self.SIB_entry_sib2.setText( f"COMMAND ERROR, ABORTED\n {txt}" )
+                        case 3: self.SIB_entry_sib3.setText( f"COMMAND ERROR, ABORTED\n {txt}" )
+                    self.logEntry( f"SIB{number}", f"ERROR: SIB command import aborted ({command})! false entry: {txt}" )
                     return False
         
-        logTxt = f"{lineID - lineID_start} SIB lines added"
-        if (atEnd): logTxt += " at end of queue"
-        else:       logTxt += " in front of queue"
-        self.logEntry(f"SIB{number}", logTxt)
+        logTxt = f"{ lineID - lineID_start } SIB lines added"
+        if( atEnd ):    logTxt += " at end of queue"
+        else:           logTxt += " in front of queue"
+        self.logEntry( f"SIB{number}", logTxt )
         return True
     
 
@@ -1224,19 +1362,20 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def clrQueue ( self, partial= False ):
+    def clrQueue( self, partial= False ):
         """ delete specific or all items from queue """
 
         mutex.lock()
-        if (partial):   UTIL.SC_queue.clear( all = False
+        if( partial ):  UTIL.SC_queue.clear( all = False
                                             ,ID  = self.SCTRL_entry_clrByID.text())
         else:           UTIL.SC_queue.clear( all = True )
         mutex.unlock()
         
-        if(not partial): self.logEntry('ComQ','queue emptied by user')
-        else:               self.logEntry('ComQ',f"queue IDs cleared: {self.SCTRL_entry_clrByID.text()}")
+        if( not partial ):  self.logEntry( 'ComQ', 'queue emptied by user' )
+        else:               self.logEntry( 'ComQ', f"queue IDs cleared: {self.SCTRL_entry_clrByID.text()}" )
         self.labelUpdate_onQueueChange()
         return True
+
 
 
 
@@ -1249,7 +1388,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          DC COMMANDS                                              #
     #####################################################################################################
 
-    def valuesToDcSpinbox ( self ):
+    def valuesToDcSpinbox( self ):
         """ button function to help the user adjust a postion via numeric control, copys the current position
             to the set coordinates spinboxes """
 
@@ -1263,44 +1402,57 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def switchRobMoving ( self, end= False ):
+    def switchRobMoving( self, end= False ):
         """ change UTIL.DC_robMoving """
 
         mutex.lock()
         if( end ):
-            UTIL.DC_robMoving = False
-            self.DC_indi_robotMoving.setStyleSheet("border-radius: 25px; background-color: #4c4a48;")
+            css = "border-radius: 25px; background-color: #4c4a48;"
+            UTIL.DC_robMoving   = False
+            buttonToggle        = True
         else:
-            UTIL.DC_robMoving = True
-            self.DC_indi_robotMoving.setStyleSheet("border-radius: 25px; background-color: #00aaff;")
+            css = "border-radius: 25px; background-color: #00aaff;"
+            UTIL.DC_robMoving   = True
+            buttonToggle        = False
+        
+        self.ADC_num_panning.setEnable      ( buttonToggle )
+        self.ADC_num_fibDeliv.setEnable     ( buttonToggle )
+        self.ADC_btt_clamp.setEnable        ( buttonToggle )
+        self.ADC_btt_knifePos.setEnable     ( buttonToggle )
+        self.ADC_btt_knife.setEnable        ( buttonToggle )
+        self.ADC_btt_fiberPnmtc.setEnable   ( buttonToggle )
+        self.ADC_btt_resetAll.setEnable     ( buttonToggle )
+        
+        self.DC_indi_robotMoving.setStyleSheet ( css )
+        self.ADC_indi_robotMoving.setStyleSheet( css )
         mutex.unlock()
 
 
 
-    def homeCommand ( self ):
+    def homeCommand( self ):
         """ sets up a command to drive back to DC_curr_zero, gives it to the actual sendCommand function """
 
         if( UTIL.DC_robMoving ): return None, None
         self.switchRobMoving()
 
-        zero    = copy.deepcopy(UTIL.DC_currZero)
+        zero    = copy.deepcopy( UTIL.DC_currZero )
         readMT  = self.DC_drpd_moveType.currentText()
-        mt      = 'L'  if (readMT == 'LINEAR')  else 'J'
+        mt      = 'L'  if( readMT == 'LINEAR' ) else 'J'
 
         command = UTIL.QEntry( id       = UTIL.SC_currCommId
                               ,mt       = mt
-                              ,Coor1   = zero
-                              ,Speed       = copy.deepcopy( UTIL.DC_speed )
+                              ,Coor1    = zero
+                              ,Speed    = copy.deepcopy( UTIL.DC_speed )
                               ,z        = 0)
         
-        self.logEntry('DCom','sending DC home command...')
-        return self.sendCommand(command, DC = True)
+        self.logEntry( 'DCom', 'sending DC home command...' )
+        return self.sendCommand( command, DC = True )
         
 
 
 
 
-    def sendDCCommand ( self, axis= '0', dir= '+' ):
+    def sendDCCommand( self, axis= '0', dir= '+' ):
         """ sets up a command accourding to the DC frames input, gives it to the actual sendCommand function """
 
         if( UTIL.DC_robMoving ): return None, None
@@ -1313,10 +1465,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             case 3:     stepWidth = 100
             case _:     raise ValueError
 
-        if(dir != '+' and dir != '-'):      raise ValueError
-        if(dir == '-'):                     stepWidth = -stepWidth
+        if( dir != '+' and dir != '-' ):    raise ValueError
+        if( dir == '-' ):                   stepWidth = -stepWidth
 
-        newPos = copy.deepcopy(UTIL.ROB_telem.Coor)
+        newPos = copy.deepcopy( UTIL.ROB_telem.Coor )
 
         match axis:
             case 'X':       newPos.x   += stepWidth
@@ -1327,7 +1479,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             
         
         readMT  = self.DC_drpd_moveType.currentText()
-        mt      = 'L'  if (readMT == 'LINEAR')  else 'J'
+        mt      = 'L'  if( readMT == 'LINEAR' ) else 'J'
 
         command = UTIL.QEntry( id       = UTIL.SC_currCommId
                               ,mt       = mt
@@ -1335,21 +1487,21 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                               ,Speed    = copy.deepcopy( UTIL.DC_speed )
                               ,z        = 0)
         
-        self.logEntry('DCom',f"sending DC command: ({command})")
-        return self.sendCommand(command, DC = True)
+        self.logEntry( 'DCom', f"sending DC command: ({command})" )
+        return self.sendCommand( command, DC = True )
 
 
 
 
 
 
-    def sendNCCommand ( self, axis= None ):
+    def sendNCCommand( self, axis= None ):
         """ sets up a command according to NC absolute positioning, gives it to the actual sendCommand function """
 
         if( UTIL.DC_robMoving ): return None, None
         self.switchRobMoving()
 
-        newPos = copy.deepcopy(UTIL.ROB_telem.Coor)
+        newPos = copy.deepcopy( UTIL.ROB_telem.Coor )
 
         # 7 is a placeholder for Q, which can not be set by hand
         if 1 in axis:   newPos.x    = float(self.NC_float_x.value())
@@ -1361,7 +1513,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if 8 in axis:   newPos.ext  = float(self.NC_float_ext.value())
 
         readMT  = self.DC_drpd_moveType.currentText()
-        mt      = 'L'  if (readMT == 'LINEAR')  else 'J'
+        mt      = 'L'  if( readMT == 'LINEAR' ) else 'J'
 
         command = UTIL.QEntry( id       = UTIL.SC_currCommId
                               ,mt       = mt
@@ -1369,14 +1521,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                               ,Speed    = copy.deepcopy( UTIL.DC_speed )
                               ,z        = 0)
         
-        self.logEntry('DCom',f"sending NC command: ({newPos})")
-        return self.sendCommand(command, DC = True)
+        self.logEntry( 'DCom', f"sending NC command: ({newPos})" )
+        return self.sendCommand( command, DC = True )
     
 
 
 
 
-    def sendGcodeCommand ( self ):
+    def sendGcodeCommand( self ):
         """ send the GCode interpreter line on the TERM panel to robot,
             uses the current position as it is executed directly, otherwise DONT do that
             if no X, Y, Z or EXT position is given"""
@@ -1385,34 +1537,34 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.switchRobMoving()
 
         # get text 
-        speed   = copy.deepcopy(UTIL.DC_speed)
-        pos     = copy.deepcopy(UTIL.ROB_telem.Coor)
+        speed   = copy.deepcopy( UTIL.DC_speed )
+        pos     = copy.deepcopy( UTIL.ROB_telem.Coor )
         txt     = self.TERM_entry_gcodeInterp.text()
         
         # act according to GCode command
-        entry,command = UTIL.gcodeToQEntry(pos, speed ,UTIL.IO_zone ,txt)
+        entry,command = UTIL.gcodeToQEntry( pos, speed, UTIL.IO_zone, txt )
         
-        if   ( command == 'G92'):       self.labelUpdate_onNewZero()
+        if( command == 'G92'):          self.labelUpdate_onNewZero()
 
-        elif ( (command != 'G1') and (command != 'G28') ):
-            if  (command == ';'):       panTxt = f"leading semicolon interpreted as comment:\n{txt}"
-            elif(command is None):      panTxt = f"SYNTAX ERROR:\n{txt}"
+        elif( (command != 'G1') and (command != 'G28') ):
+            if  ( command == ';' ):     panTxt = f"leading semicolon interpreted as comment:\n{txt}"
+            elif( command is None ):    panTxt = f"SYNTAX ERROR:\n{txt}"
             else:                       panTxt = f"{command}\n{txt}"
 
-            self.TERM_entry_gcodeInterp.setText(panTxt)
+            self.TERM_entry_gcodeInterp.setText( panTxt )
             return None, command
         
         entry.id = UTIL.SC_currCommId
 
         self.logEntry('DCom',f"sending GCode DC command: ({entry})")
-        return self.sendCommand(entry, DC = True)
+        return self.sendCommand( entry, DC = True )
 
 
 
 
 
 
-    def sendRapidCommand ( self ):
+    def sendRapidCommand( self ):
         """ send the GCode interpreter line on the TERM panel to robot, absolute coordinates
             or relative to "pHome" (DC_currZero) """
 
@@ -1420,39 +1572,39 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.switchRobMoving()
 
         txt         = self.TERM_entry_rapidInterp.text()
-        entry,err   = UTIL.rapidToQEntry(txt)
+        entry,err   = UTIL.rapidToQEntry( txt )
 
         if( entry == None ):
-            self.TERM_entry_rapidInterp.setText(f"SYNTAX ERROR: {err}\n" + txt)
+            self.TERM_entry_rapidInterp.setText( f"SYNTAX ERROR: {err}\n" + txt )
             return None, err
         
         entry.id = UTIL.SC_currCommId
 
-        self.logEntry('DCom',f"sending RAPID DC command: ({entry})")
-        return self.sendCommand(entry, DC = True)
+        self.logEntry( 'DCom', f"sending RAPID DC command: ({entry})" )
+        return self.sendCommand( entry, DC = True )
 
 
 
 
 
 
-    def forcedStopCommand ( self ):
+    def forcedStopCommand( self ):
         """ send immediate stop to robot (buffer will be lost, but added to the queue again),
             gives command  to the actual sendCommand function """
         
         command = UTIL.QEntry( id = 1
                               ,mt = 'S')
         
-        if( self.testrun ): return self.sendCommand(command, DC = True)
-        FSWarning = strdDialog('WARNING!\n\nRobot will stop after current movement!\
-                                OK to delete buffered commands on robot;\
-                                Cancel to continue queue processing.'
+        if( self.testrun ): return self.sendCommand( command, DC = True )
+        FSWarning = strdDialog( 'WARNING!\n\nRobot will stop after current movement!\
+                                 OK to delete buffered commands on robot;\
+                                 Cancel to continue queue processing.'
                                 ,'FORCED STOP COMMIT')
         FSWarning.exec()
 
         if( FSWarning.result() ):
             self.stopSCTRLQueue()
-            self.sendCommand(command, DC = True)
+            self.sendCommand( command, DC = True )
 
             mutex.lock()
 
@@ -1469,24 +1621,24 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             mutex.unlock()
 
             self.labelUpdate_onQueueChange()
-            self.logEntry('SysC',f"FORCED STOP (user committed).")
+            self.logEntry( 'SysC', f"FORCED STOP (user committed)." )
         
         else:
-            self.logEntry('SysC',f"user denied FS-Dialog, continuing...")
+            self.logEntry( 'SysC', f"user denied FS-Dialog, continuing..." )
     
 
 
 
 
 
-    def robotStopCommand ( self, directly= True ):
+    def robotStopCommand( self, directly= True ):
         """ close connection signal for robot, add it to Queue or gives it to the actual sendCommand function """
 
         command = UTIL.QEntry( id = 1
                               ,mt = 'E')
         
-        if(directly):
-            self.logEntry('SysC',"sending robot stop command directly")
+        if( directly ):
+            self.logEntry( 'SysC', "sending robot stop command directly" )
             if( UTIL.SC_qProcessing ): 
                 self.stopSCTRLQueue()
             
@@ -1494,12 +1646,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             UTIL.ROB_sendList.clear()
             mutex.unlock()
 
-            return self.sendCommand(command, DC = True)
+            return self.sendCommand( command, DC = True )
         
         else:
             command.id = 0
-            UTIL.SC_queue.add(command)
-            self.logEntry('SysC',"added robot stop command to queue")
+            UTIL.SC_queue.add( command )
+            self.logEntry( 'SysC', "added robot stop command to queue" )
             return command
 
 
@@ -1513,7 +1665,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                         SEND COMMANDS                                             #
     #####################################################################################################
     
-    def sendCommand ( self, command, DC= False ):
+    def sendCommand( self, command, DC= False ):
         """ passing new commands to RoboCommWorker """
         
         mutex.lock()
@@ -1526,51 +1678,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def commandTransmitted ( self, command, msg, numSend, dc, noError ):
-        """ handle UI update after new command was send """
 
-        if( noError ):
-            UTIL.SC_currCommId += numSend
-            if( UTIL.SC_currCommId > 3000 ):
-                mutex.lock() 
-                UTIL.SC_currCommId -= 3000
-                mutex.unlock()
-
-            if( dc ):   logTxt = f"{numSend} DC command(s) send"
-            else:       logTxt = f"{numSend} SC command(s) send"
-            self.logEntry( 'ComQ', logTxt )
-
-            self.labelUpdate_onSend(command)
-            self.TCP_ROB_disp_writeBuffer.setText   (str(command))
-            self.TCP_ROB_disp_bytesWritten.setText  (str(numSend))
-
-        elif (msg == ValueError):
-            self.logEntry('CONN','TCPIP class "ROB_tcpip" encountered ValueError in sendCommand, data length: ' + str(numSend))
-            self.TCP_ROB_disp_writeBuffer.setText   ('ValueError')
-            self.TCP_ROB_disp_bytesWritten.setText  (str(numSend))
-            UTIL.SC_currCommId += 1
-        
-        elif (msg == RuntimeError or msg == OSError):
-            self.logEntry('CONN','TCPIP class "ROB_tcpip" encountered RuntimeError/OSError in sendCommand..')
-            self.TCP_ROB_disp_writeBuffer.setText   ('RuntimeError/OSError')
-            self.TCP_ROB_disp_bytesWritten.setText  (str(numSend))
-            UTIL.SC_currCommId += 1
-        
-        else:
-            self.logEntry('CONN','TCPIP class "ROB_tcpip" encountered ' + str(msg))
-            self.TCP_ROB_disp_writeBuffer.setText   ('unspecified error')
-            self.TCP_ROB_disp_bytesWritten.setText  (str(numSend))
-            UTIL.SC_currCommId += 1
-
-
-
-
-
-
-    def setZero ( self, axis, fromSysMonitor= False ):
+    def setZero( self, axis, fromSysMonitor= False ):
         """ overwrite DC_curr_zero, uses deepcopy to avoid large mutual exclusion blocks """
 
-        newZero = copy.deepcopy(UTIL.DC_currZero)
+        newZero = copy.deepcopy( UTIL.DC_currZero )
         if( fromSysMonitor ):   
             currPos = UTIL.Coordinate( x=   self.ZERO_float_x.value()
                                       ,y=   self.ZERO_float_y.value()
@@ -1597,7 +1709,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             mutex.unlock()
         
         self.labelUpdate_onNewZero()
-        self.logEntry('ZERO',f"current zero position updated: ({UTIL.DC_currZero})")
+        self.logEntry( 'ZERO', f"current zero position updated: ({UTIL.DC_currZero})" )
 
 
 
@@ -1610,18 +1722,29 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                         PUMP CONTROL                                              #
     #####################################################################################################
 
-    def setSpeed ( self, type= '' ):
+    def setSpeed( self, type= '' ):
         """ handle user inputs regarding pump frequency """
 
         mutex.lock()
         UTIL.PUMP1_liveAd = self.SCTRL_num_liveAd_pump1.value() / 100.0
         match type:
-            case '1':   UTIL.PUMP1_speed += 1
-            case '-1':  UTIL.PUMP1_speed -= 1
-            case '0':   UTIL.PUMP1_speed =  0
-            case 'r':   UTIL.PUMP1_speed *= -1
-            case 'c':   pass
-            case _:     UTIL.PUMP1_speed = self.PUMP_num_setSpeed.value()
+            case   '1':     UTIL.PUMP1_speed += 1
+            case  '-1':     UTIL.PUMP1_speed -= 1
+            case  '10':     UTIL.PUMP1_speed += 10
+            case '-10':     UTIL.PUMP1_speed -= 10
+            case  '25':     UTIL.PUMP1_speed += 25
+            case '-25':     UTIL.PUMP1_speed -= 25
+            case   '0':     UTIL.PUMP1_speed =  0
+            case   'r':     UTIL.PUMP1_speed *= -1
+            case   'c':     pass
+            case 'def':     
+                if( len(UTIL.ROB_commQueue) != 0 ): 
+                    UTIL.PUMP1_speed = PU_defMode( UTIL.ROB_commQueue[0] )
+                else:
+                    userInfo = strdDialog( 'No current command!', 'Action not possible' )
+                    userInfo.exec()
+
+            case _:         UTIL.PUMP1_speed = self.PUMP_num_setSpeed.value()
         mutex.unlock()
 
 
@@ -1629,32 +1752,164 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
     
 
+    def pumpScriptOverwrite( self ):
+        """ overwrites every command in SC_queue """
+
+        # windows vista dialog
+        userDialog = strdDialog( f"You about to overwrite every command in SC_queue to contain the "
+                                 f"'pMode default' command, are you sure?"
+                                ,f"Overwrite warning" )
+        userDialog.exec()
+        if( userDialog.result() == 0): return
+
+        # overwrite
+        mutex.lock()
+        for i in range( len(UTIL.SC_queue) ):
+            UTIL.SC_queue[i].pMode = 'default'
+        mutex.unlock()
+        return
+
+
+
+
+    
+
+    def pinchValveToggle( self ):
+        """ not implemented yet """
+
+        raise ProcessLookupError('pinch valve routine does not exist, yet!')
+
+
+
+
+    
+
+    #####################################################################################################
+    #                                       AMCON COMMANDS                                              #
+    #####################################################################################################
+
+    def amconScriptOverwrite( self ):
+        """ override entire/partial SC queue with custom Amcon settings """
+
+        # windows vista dialog
+        userDialog = strdDialog( f"You about to overwrite every command in SC_queue to contain the "
+                                 f"the displayed Amcon commands, are you sure?"
+                                ,f"Overwrite warning" )
+        userDialog.exec()
+        if( userDialog.result() == 0): return
+
+        # actual overwrite
+        idRange = self.ASC_num_SCLines.text()
+        if( idRange < 1 ):
+            userInfo = strdDialog( 'SC lines value is lower than 1, nothing was done.', 'Command error' )
+            userInfo.exec()
+            return None
+        
+        panVal      = self.ADC_num_panning.value()
+        fibDeliv    = self.ADC_num_fibDeliv.value()
+        clamp       = self.ADC_btt_clamp.isChecked()
+        knifePos    = self.ADC_btt_knifePos.isChecked()
+        knife       = self.ADC_btt_knife.isChecked()
+        fiberPnmtc  = self.ADC_btt_fiberPnmtc.isChecked()
+        
+        if( '..' in idRange ):
+            ids     = re.findall( '\d+', idRange )
+            if( len(ids) != 2 ): 
+                userInfo = strdDialog( 'Worng syntax used in SC lines value, nothing was done.', 'Command error' )
+                userInfo.exec()
+                return None
+
+            mutex.lock()
+            for i in range( ids[1] - ids[0] ):
+                j = UTIL.SC_queue.idPos( i + ids[0] )
+                UTIL.SC_queue[ j ].Tool.pan_steps        = panVal
+                UTIL.SC_queue[ j ].Tool.fibDeliv_steps   = fibDeliv
+                UTIL.SC_queue[ j ].Tool.clamp_yn         = clamp
+                UTIL.SC_queue[ j ].Tool.knifePos_yn      = knifePos
+                UTIL.SC_queue[ j ].Tool.knife_yn         = knife
+                UTIL.SC_queue[ j ].Tool.fiberPnmtc       = fiberPnmtc
+            mutex.unlock()
+
+        else:
+            ids     = re.findall( '\d+', idRange )
+            if( len(ids) != 1 ): 
+                userInfo = strdDialog( 'Worng syntax used in SC lines value, nothing was done.', 'Command error' )
+                userInfo.exec()
+                return None
+
+            mutex.lock()
+            j = UTIL.SC_queue.idPos( ids[0] )
+            UTIL.SC_queue[ j ].Tool.pan_steps        = panVal
+            UTIL.SC_queue[ j ].Tool.fibDeliv_steps   = fibDeliv
+            UTIL.SC_queue[ j ].Tool.clamp_yn         = clamp
+            UTIL.SC_queue[ j ].Tool.knifePos_yn      = knifePos
+            UTIL.SC_queue[ j ].Tool.knife_yn         = knife
+            UTIL.SC_queue[ j ].Tool.fiberPnmtc       = fiberPnmtc
+            mutex.unlock()
+
+        tool = UTIL.SC_queue[ ids( 0 ) ].Tool 
+        self.logEntry( 'ACON', f"{ idRange } SC commands overwritten to new tool settings: ({ tool })" )
+
+
+
+
+    
+
+    def adcUserChange( self ):
+        """ send changes to Amcon, if user commit them """
+
+        if( UTIL.DC_robMoving ): return None, None
+
+        pos  = copy.deepcopy( UTIL.ROB_telem.Coor )
+        tool = UTIL.ToolCommand( pan_steps=         self.ADC_num_panning.value()
+                                ,fibDeliv_steps=    self.ADC_num_fibDeliv.value()
+                                ,pnmtcClamp_yn=     self.ADC_btt_clamp.isChecked()
+                                ,knifePos_yn=       self.ADC_btt_knifePos.isChecked()
+                                ,knife_yn=          self.ADC_btt_knife.isChecked()
+                                ,pnmtcFiber_yn=     self.ADC_btt_fiberPnmtc.isChecked() )
+
+        command = UTIL.QEntry( id       = UTIL.SC_currCommId
+                              ,Coor1    = pos
+                              ,Speed    = copy.deepcopy( UTIL.DC_speed )
+                              ,Tool     = tool )
+        
+        self.logEntry( 'ACON', f"updating tool status by user: ({ tool })" )
+        return self.sendCommand( command, DC = True )
+
+
+
+
+
+
+
+
+
     #####################################################################################################
     #                                           CLOSE UI                                                #
     #####################################################################################################
 
-    def closeEvent ( self, event ):
+    def closeEvent( self, event ):
         """ exit all threads and connections clean(ish) """
 
-        self.logEntry('newline')
-        self.logEntry('GNRL','closeEvent signal.')
-        self.logEntry('GNRL','end threading, delete threads...')
+        self.logEntry( 'newline')
+        self.logEntry( 'GNRL', 'closeEvent signal.' )
+        self.logEntry( 'GNRL', 'end threading, delete threads...' )
         
-        if(UTIL.ROB_tcpip.connected):
-            self.logEntry               ('CONN','closing robot TCP connection...')
+        if( UTIL.ROB_tcpip.connected ):
+            self.logEntry               ( 'CONN', 'closing robot TCP connection...' )
             self.robotStopCommand       ()
             UTIL.ROB_tcpip.close        ( end= True )
             self.roboCommThread.quit    ()
             self.roboCommThread.wait    ()
 
-        if(self.pump1Conn):
-            self.logEntry               ('CONN','closing pump connections...')
+        if( self.pump1Conn ):
+            self.logEntry               ( 'CONN', 'closing pump connections...' )
             
             if( 'COM' in UTIL.PUMP1_tcpip.port ):
                 self.pumpCommThread.quit()
                 self.pumpCommThread.wait()
             else:
-                raise ConnectionError('TCP not supported, unable to disconnect') # UTIL.PUMP1_tcpip.close()
+                raise ConnectionError( 'TCP not supported, unable to disconnect' ) # UTIL.PUMP1_tcpip.close()
 
         # if(self.pump2Conn):
         #     if( 'COM' in UTIL.PUMP2_tcpip.PORT ):
@@ -1670,7 +1925,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.loadFileThread.wait()
         self.loadFileThread.deleteLater()
 
-        self.logEntry('GNRL','exiting GUI.')
+        self.logEntry( 'GNRL', 'exiting GUI.' )
         self.DAQTimer.stop()
         self.DAQ.close()
         event.accept()
@@ -1704,14 +1959,14 @@ if __name__ == '__main__':
     logpath = UTIL.createLogfile()
 
     # overwrite ROB_tcpip for testing, delete later
-    UTIL.ROB_tcpip.ip = 'localhost'
+    UTIL.ROB_tcpip.ip   = 'localhost'
     UTIL.ROB_tcpip.port = 10001
 
     # start the UI and assign to app
     app = 0                             # leave that here so app doesnt include the remnant of a previous QApplication instance
     win = 0
-    app = QApplication(sys.argv)
-    win = Mainframe(lpath=logpath)
+    app = QApplication( sys.argv )
+    win = Mainframe( lpath=logpath )
     win.show()
 
     # start application (uses sys for CMD)

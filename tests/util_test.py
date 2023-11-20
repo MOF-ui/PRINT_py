@@ -75,10 +75,10 @@ class UTIL_test(unittest.TestCase):
         """ test ToolCommand class, used to store AmConEE data """
 
         # __init__ & __str__
-        self.assertEqual( str( UTIL.ToolCommand( m1_id= 1, m1_steps= 2, m2_id= 3, m2_steps= 4
-                                                ,m3_id= 5, m3_steps= 6, pnmtcClamp_id= 7
-                                                ,pnmtcClamp_yn= True ,knife_id= 8
-                                                ,knife_yn= False, m4_id= 9, m4_steps= False
+        self.assertEqual( str( UTIL.ToolCommand( pan_id= 1, pan_steps= 2, fibDeliv_id= 3, fibDeliv_steps= 4
+                                                ,morPump_id= 5, morPump_steps= 6, pnmtcClamp_id= 7
+                                                ,pnmtcClamp_yn= True ,knifePos_id= 8
+                                                ,knifePos_yn= False, knife_id= 9, knife_yn= False
                                                 ,pnmtcFiber_id= 10, pnmtcFiber_yn= True
                                                 ,time_id= 11, time_time= 12) )
                          ,f"M1: {1}, {2}   M2: {3}, {4}   M3: {5}, {6}   "\
@@ -405,7 +405,7 @@ class UTIL_test(unittest.TestCase):
                                              ,zone= testZone, txt= testTxt)
                          ,( UTIL.QEntry( Coor1= UTIL.Coordinate(9.5,10,1,1,1,1,1,11)
                                         ,Speed= UTIL.SpeedVector(2,2,8,2) ,z= 3
-                                        ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True)  )
+                                        ,Tool= UTIL.ToolCommand(fibDeliv_steps= 10, pnmtcFiber_yn= True)  )
                            ,'G1') )
         
         testTxt   = 'G28 X0 Y0'
@@ -432,7 +432,7 @@ class UTIL_test(unittest.TestCase):
                          ,(UTIL.QEntry( Coor1= UTIL.Coordinate(1.1,2.2,3.3,4.4,5.5,6.6,7.7,13)
                                         ,mt= 'J' ,pt= 'Q'
                                         ,Speed= UTIL.SpeedVector(10,11,8,9) ,z= 12
-                                        ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) )  
+                                        ,Tool= UTIL.ToolCommand(fibDeliv_steps= 10, pnmtcFiber_yn= True) )  
                           ,None ) )
         
         testTxt   = 'MoveL Offs(pHome,1.1,2.2,3.3),[8,9,10,11],z12,tool0 EXT:13'
@@ -440,7 +440,7 @@ class UTIL_test(unittest.TestCase):
                          ,( UTIL.QEntry( Coor1= UTIL.Coordinate(5.1,6.2,7.3,4,4,4,4,17)
                                         ,pt= 'E'
                                         ,Speed= UTIL.SpeedVector(10,11,8,9) ,z= 12
-                                        ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) )
+                                        ,Tool= UTIL.ToolCommand(fibDeliv_steps= 10, pnmtcFiber_yn= True) )
                             ,None ) )
         
 

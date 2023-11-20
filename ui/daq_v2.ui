@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1916</width>
-    <height>1071</height>
+    <width>1924</width>
+    <height>1089</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -225,9 +225,9 @@ QTextEdit:selected {
   <widget class="QFrame" name="PATH_frame">
    <property name="geometry">
     <rect>
-     <x>50</x>
+     <x>40</x>
      <y>30</y>
-     <width>1011</width>
+     <width>1021</width>
      <height>151</height>
     </rect>
    </property>
@@ -414,9 +414,9 @@ color: #E1E5EE;</string>
    <widget class="QLabel" name="BASIC_lbl_delivPumpTemp">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>330</y>
-      <width>131</width>
+      <width>141</width>
       <height>51</height>
      </rect>
     </property>
@@ -433,7 +433,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>pipe temperature
+     <string>PIPE temperature
 (delivery pump)</string>
     </property>
     <property name="alignment">
@@ -459,9 +459,9 @@ color: #E1E5EE;</string>
    <widget class="QLabel" name="BASIC_lbl_robBaseTemp">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>400</y>
-      <width>131</width>
+      <width>141</width>
       <height>51</height>
      </rect>
     </property>
@@ -478,7 +478,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>pipe temperature
+     <string>PIPE temperature
 (robot base)</string>
     </property>
     <property name="alignment">
@@ -520,9 +520,9 @@ color: #E1E5EE;</string>
    <widget class="QLabel" name="BASIC_lbl_2kPumpTemp">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>470</y>
-      <width>131</width>
+      <width>141</width>
       <height>51</height>
      </rect>
     </property>
@@ -539,7 +539,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>pipe temperature
+     <string>PIPE temperature
 (2K pump)</string>
     </property>
     <property name="alignment">
@@ -562,7 +562,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>ambient
+     <string>AMBIENT
 temperature</string>
     </property>
     <property name="alignment">
@@ -617,7 +617,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>ambient
+     <string>AMBIENT
 humidity</string>
     </property>
     <property name="alignment">
@@ -662,7 +662,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>pipe pressure
+     <string>PIPE pressure
 (2k pump)</string>
     </property>
     <property name="alignment">
@@ -707,7 +707,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>pipe pressure
+     <string>PIPE pressure
 (delivery pump)</string>
     </property>
     <property name="alignment">
@@ -1240,7 +1240,7 @@ color: #E1E5EE;</string>
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>320</y>
+      <y>321</y>
       <width>91</width>
       <height>51</height>
      </rect>
@@ -1248,18 +1248,16 @@ color: #E1E5EE;</string>
     <property name="font">
      <font>
       <family>Bahnschrift</family>
-      <pointsize>11</pointsize>
+      <pointsize>14</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">border: 0px;
-font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>X position
-(relative)</string>
+     <string>X</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -1277,18 +1275,16 @@ color: #E1E5EE;</string>
     <property name="font">
      <font>
       <family>Bahnschrift</family>
-      <pointsize>11</pointsize>
+      <pointsize>14</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">border: 0px;
-font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>Y position
-(relative)</string>
+     <string>Y</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -1338,18 +1334,16 @@ color: #E1E5EE;</string>
     <property name="font">
      <font>
       <family>Bahnschrift</family>
-      <pointsize>11</pointsize>
+      <pointsize>14</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">border: 0px;
-font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>Z position
-(relative)</string>
+     <string>Z</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -1367,18 +1361,16 @@ color: #E1E5EE;</string>
     <property name="font">
      <font>
       <family>Bahnschrift</family>
-      <pointsize>11</pointsize>
+      <pointsize>14</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">border: 0px;
-font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>X orientation
-(relative)</string>
+     <string>RX</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -1444,18 +1436,16 @@ color: #E1E5EE;</string>
     <property name="font">
      <font>
       <family>Bahnschrift</family>
-      <pointsize>11</pointsize>
+      <pointsize>14</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">border: 0px;
-font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>Y orientation
-(relative)</string>
+     <string>RY</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -1473,18 +1463,16 @@ color: #E1E5EE;</string>
     <property name="font">
      <font>
       <family>Bahnschrift</family>
-      <pointsize>11</pointsize>
+      <pointsize>14</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">border: 0px;
-font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>Z orientation
-(relative)</string>
+     <string>RZ</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -1502,18 +1490,16 @@ color: #E1E5EE;</string>
     <property name="font">
      <font>
       <family>Bahnschrift</family>
-      <pointsize>11</pointsize>
+      <pointsize>14</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">border: 0px;
-font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>EXT position
-(relative)</string>
+     <string>EXT</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -1555,25 +1541,24 @@ color: #E1E5EE;</string>
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>120</y>
+      <y>125</y>
       <width>91</width>
-      <height>51</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>Bahnschrift</family>
-      <pointsize>11</pointsize>
+      <pointsize>14</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">border: 0px;
-font-size: 11pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>robotor ID</string>
+     <string>ID</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -1591,12 +1576,12 @@ color: #E1E5EE;</string>
     <property name="font">
      <font>
       <family>Bahnschrift</family>
-      <pointsize>11</pointsize>
+      <pointsize>12</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">border: 0px;
-font-size: 11pt;
+font-size: 12pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
@@ -1623,6 +1608,54 @@ color: #E1E5EE;</string>
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
+   <widget class="QLabel" name="ROB_lbl_tcpSpeed_2">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>290</y>
+      <width>151</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Bahnschrift</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+    </property>
+    <property name="text">
+     <string>relative positions</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+    </property>
+   </widget>
+   <zorder>ROB_lbl_tcpSpeed_2</zorder>
+   <zorder>ROB_0_frameLabel</zorder>
+   <zorder>ROB_disp_xPos</zorder>
+   <zorder>ROB_lbl_xPos</zorder>
+   <zorder>ROB_lbl_yPos</zorder>
+   <zorder>ROB_disp_yPos</zorder>
+   <zorder>ROB_disp_xOri</zorder>
+   <zorder>ROB_lbl_zPos</zorder>
+   <zorder>ROB_lbl_xOri</zorder>
+   <zorder>ROB_disp_zPos</zorder>
+   <zorder>ROB_disp_yOri</zorder>
+   <zorder>ROB_disp_zOri</zorder>
+   <zorder>ROB_lbl_yOri</zorder>
+   <zorder>ROB_lbl_zOri</zorder>
+   <zorder>ROB_lbl_extPos</zorder>
+   <zorder>ROB_disp_extPos</zorder>
+   <zorder>ROB_disp_tcpSpeed</zorder>
+   <zorder>ROB_lbl_id</zorder>
+   <zorder>ROB_lbl_tcpSpeed</zorder>
+   <zorder>ROB_disp_id</zorder>
   </widget>
   <widget class="QFrame" name="MORT_frame">
    <property name="geometry">

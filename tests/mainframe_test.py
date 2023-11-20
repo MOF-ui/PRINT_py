@@ -296,7 +296,7 @@ class Mainframe_test(unittest.TestCase):
                                       ,Coor1= UTIL.Coordinate( x= 1, y= 2.2, z= 3, rx= 4 
                                                               ,ry= 5, rz= 6, q= 7, ext= 8) ) )
         self.assertTrue             ( UTIL.DC_robMoving )
-        testFrame.commandTransmitted( command, True, 1, True, True )
+        testFrame.roboSend( command, True, 1, True, True )
         UTIL.DC_robMoving  = False
         
         testFrame.DC_drpd_moveType.setCurrentText('JOINT')
@@ -440,14 +440,14 @@ class Mainframe_test(unittest.TestCase):
         # check first loop switch, Q is not set by posUpdate
         UTIL.ROB_telem = UTIL.RoboTelemetry( 0, 0, UTIL.Coordinate(1,2,3,4,5,6,7,8.8) )
         self.assertEqual    ( UTIL.DC_currZero, UTIL.Coordinate() )
-        testFrame.posUpdate ( rawDataString= 'ABC', telem= UTIL.RoboTelemetry() )
+        testFrame.roboReceived ( rawDataString= 'ABC', telem= UTIL.RoboTelemetry() )
         self.assertEqual    ( UTIL.DC_currZero, UTIL.Coordinate(1,2,3,4,5,6,0,8.8) )
 
         # check loop run
         UTIL.SC_currCommId = 15
         UTIL.DC_currZero    = UTIL.Coordinate(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1)
         UTIL.ROB_telem      = UTIL.RoboTelemetry( 9.9, 10, UTIL.Coordinate(1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8) ) 
-        testFrame.posUpdate( rawDataString= 'ABC', telem= UTIL.RoboTelemetry() )
+        testFrame.roboReceived( rawDataString= 'ABC', telem= UTIL.RoboTelemetry() )
 
         # labelUpdate_onReceive (called from posUpdate)
         self.assertEqual( testFrame.TCP_ROB_disp_readBuffer.text(), 'ABC' )
@@ -496,7 +496,7 @@ class Mainframe_test(unittest.TestCase):
         global testFrame
         
         UTIL.STT_dataBlock.Pump1 = UTIL.PumpTelemetry(1.1,2.2,3.3,4.4)
-        testFrame.pump1Update(telem= UTIL.STT_dataBlock.Pump1)
+        testFrame.pump1Received(telem= UTIL.STT_dataBlock.Pump1)
 
         self.assertEqual( testFrame.PUMP_disp_freq.text(),      '1.1' )
         self.assertEqual( testFrame.PUMP_disp_volt.text(),      '2.2' )
@@ -512,7 +512,7 @@ class Mainframe_test(unittest.TestCase):
         global testFrame
 
         UTIL.SC_currCommId = 1
-        testFrame.commandTransmitted( command= UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2))
+        testFrame.roboSend( command= UTIL.QEntry(id= 1, Coor1= UTIL.Coordinate(x= 2.2))
                                      ,msg= True
                                      ,numSend= 1
                                      ,dc= True
@@ -533,7 +533,7 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual( command, UTIL.QEntry( id= 1, z=0, Coor1= UTIL.Coordinate(x=1) ) )
         
         UTIL.DC_robMoving = False
-        testFrame.commandTransmitted( command, True, 1, True, True )
+        testFrame.roboSend( command, True, 1, True, True )
         testFrame.DC_sld_stepWidth.setValue(2)
         testFrame.DC_drpd_moveType.setCurrentText('JOINT')
 
@@ -541,14 +541,14 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual( command, UTIL.QEntry( id= 2, mt='J',z=0, Coor1= UTIL.Coordinate(y= -10) ) )
 
         UTIL.DC_robMoving = False
-        testFrame.commandTransmitted( command, True, 1, True, True )
+        testFrame.roboSend( command, True, 1, True, True )
         testFrame.DC_sld_stepWidth.setValue(3)
 
         command = testFrame.sendDCCommand(axis= 'Z', dir= '+')[1]
         self.assertEqual( command, UTIL.QEntry( id= 3, mt='J',z=0, Coor1= UTIL.Coordinate(z= 100) ) )
         
         UTIL.DC_robMoving = False
-        testFrame.commandTransmitted( command, True, 1, True, True )
+        testFrame.roboSend( command, True, 1, True, True )
         self.assertRaises( ValueError, testFrame.sendDCCommand, axis= 'A', dir= '+' )
         
         UTIL.DC_robMoving = False
@@ -569,17 +569,17 @@ class Mainframe_test(unittest.TestCase):
         command = testFrame.sendGcodeCommand()[1]
         self.assertEqual( command, UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate( x= 1, y= 3.2, z= 1, rx= 1
                                                                               ,ry= 1, rz= 1, q= 1, ext= 1 )
-                                               ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) ) )
+                                               ,Tool= UTIL.ToolCommand(fibDeliv_steps= 10, pnmtcFiber_yn= True) ) )
         
         UTIL.DC_robMoving = False
-        testFrame.commandTransmitted(command, True, 1, True, True)
+        testFrame.roboSend(command, True, 1, True, True)
         testFrame.TERM_entry_gcodeInterp.setText('G1 X1 Z3')
         UTIL.ROB_telem.Coor = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
         UTIL.DC_currZero    = UTIL.Coordinate( 1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8 )
 
         command = testFrame.sendGcodeCommand()[1]
         self.assertEqual( command, UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate( 2.1,2.2,6.3,4.4,5.5,6.6,7.7,8.8 )
-                                               ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) ) )
+                                               ,Tool= UTIL.ToolCommand(fibDeliv_steps= 10, pnmtcFiber_yn= True) ) )
         
         UTIL.DC_robMoving = False
         UTIL.ROB_telem.Coor = UTIL.Coordinate()
@@ -603,7 +603,7 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual( command, UTIL.QEntry( id= 1, z=0, Coor1= UTIL.Coordinate(x= 1, y= 2.2, z= 3) ) )
         
         UTIL.DC_robMoving = False
-        testFrame.commandTransmitted( command, True, 1, True, True )
+        testFrame.roboSend( command, True, 1, True, True )
         UTIL.ROB_telem.Coor = UTIL.Coordinate( 1,1,1,1,1,1,0,1 )
         testFrame.DC_drpd_moveType.setCurrentText('JOINT')
 
@@ -627,7 +627,7 @@ class Mainframe_test(unittest.TestCase):
                          ,UTIL.QEntry( id= 1, pt= 'Q', z= 50
                                       ,Coor1= UTIL.Coordinate( x= 1, y= 2, z= 3, rx= 4
                                                               ,ry= 5, rz= 6, q= 7, ext= 600 )
-                                      ,Tool= UTIL.ToolCommand(m2_steps= 10, pnmtcFiber_yn= True) ))
+                                      ,Tool= UTIL.ToolCommand(fibDeliv_steps= 10, pnmtcFiber_yn= True) ))
         
         UTIL.SC_currCommId = 1
     
@@ -687,11 +687,11 @@ class Mainframe_test(unittest.TestCase):
         command = testFrame.forcedStopCommand()[1]
         self.assertEqual( command, UTIL.QEntry( id= 1, mt= 'S' ) )
 
-        testFrame.commandTransmitted(command, True, 1, True, True)
+        testFrame.roboSend(command, True, 1, True, True)
         command = testFrame.robotStopCommand()[1]
         self.assertEqual( command, UTIL.QEntry( id= 1, mt= 'E' ) )
 
-        testFrame.commandTransmitted(command, True, 1, True, True)
+        testFrame.roboSend(command, True, 1, True, True)
         testFrame.robotStopCommand(directly= False)
 
         self.assertEqual( UTIL.SC_queue.display()
