@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\mainframe_v2.ui'
+# Form implementation generated from reading ui file 'mainframe_v2.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -1432,6 +1432,524 @@ class Ui_MainWindow(object):
         self.TERM_btt_rapidInterp.raise_()
         self.TERM_chk_autoScroll.raise_()
         self.tab.addTab(self.DIRECT_tab, "")
+        self.AMCON_tab = QtWidgets.QWidget()
+        self.AMCON_tab.setAcceptDrops(False)
+        self.AMCON_tab.setObjectName("AMCON_tab")
+        self.ADC_frame = QtWidgets.QFrame(self.AMCON_tab)
+        self.ADC_frame.setGeometry(QtCore.QRect(30, 20, 591, 301))
+        self.ADC_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.ADC_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.ADC_frame.setObjectName("ADC_frame")
+        self.ADC_0_framelabel = QtWidgets.QLabel(self.ADC_frame)
+        self.ADC_0_framelabel.setGeometry(QtCore.QRect(10, 20, 281, 51))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(22)
+        self.ADC_0_framelabel.setFont(font)
+        self.ADC_0_framelabel.setStyleSheet("border: 0px;\n"
+"font-size: 22pt;\n"
+"padding: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ADC_0_framelabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.ADC_0_framelabel.setObjectName("ADC_0_framelabel")
+        self.ADC_lbl_panning = QtWidgets.QLabel(self.ADC_frame)
+        self.ADC_lbl_panning.setGeometry(QtCore.QRect(280, 110, 141, 51))
+        self.ADC_lbl_panning.setStyleSheet("border: 0px;\n"
+"font-size: 12pt;\n"
+"background-color: #5d707f;\n"
+"color: #E1E5EE;")
+        self.ADC_lbl_panning.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ADC_lbl_panning.setObjectName("ADC_lbl_panning")
+        self.ADC_num_panning = QtWidgets.QDoubleSpinBox(self.ADC_frame)
+        self.ADC_num_panning.setEnabled(True)
+        self.ADC_num_panning.setGeometry(QtCore.QRect(420, 120, 131, 41))
+        self.ADC_num_panning.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ADC_num_panning.setSuffix("")
+        self.ADC_num_panning.setDecimals(0)
+        self.ADC_num_panning.setMinimum(0.0)
+        self.ADC_num_panning.setMaximum(2000.0)
+        self.ADC_num_panning.setSingleStep(10.0)
+        self.ADC_num_panning.setProperty("value", 0.0)
+        self.ADC_num_panning.setObjectName("ADC_num_panning")
+        self.ADC_num_fibDeliv = QtWidgets.QDoubleSpinBox(self.ADC_frame)
+        self.ADC_num_fibDeliv.setGeometry(QtCore.QRect(420, 170, 131, 41))
+        self.ADC_num_fibDeliv.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ADC_num_fibDeliv.setSuffix("")
+        self.ADC_num_fibDeliv.setDecimals(0)
+        self.ADC_num_fibDeliv.setMinimum(-1.0)
+        self.ADC_num_fibDeliv.setMaximum(200.0)
+        self.ADC_num_fibDeliv.setSingleStep(1.0)
+        self.ADC_num_fibDeliv.setProperty("value", 100.0)
+        self.ADC_num_fibDeliv.setObjectName("ADC_num_fibDeliv")
+        self.ADC_lbl_fibDeliv = QtWidgets.QLabel(self.ADC_frame)
+        self.ADC_lbl_fibDeliv.setGeometry(QtCore.QRect(280, 160, 141, 51))
+        self.ADC_lbl_fibDeliv.setStyleSheet("border: 0px;\n"
+"font-size: 12pt;\n"
+"background-color: #5d707f;\n"
+"color: #E1E5EE;")
+        self.ADC_lbl_fibDeliv.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ADC_lbl_fibDeliv.setObjectName("ADC_lbl_fibDeliv")
+        self.ADC_btt_clamp = QtWidgets.QPushButton(self.ADC_frame)
+        self.ADC_btt_clamp.setGeometry(QtCore.QRect(60, 120, 161, 31))
+        self.ADC_btt_clamp.setStyleSheet("QPushButton {\n"
+"    background-color: #40a6a8;\n"
+"}\n"
+"\n"
+"QPushButton:checked {\n"
+"    background-color: #61fcff;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    border: 2px solid #abfbff;\n"
+"}\n"
+"\n"
+"QPushButton:checked:hover {\n"
+"    border: 2px solid #40a6a8;\n"
+"}")
+        self.ADC_btt_clamp.setCheckable(True)
+        self.ADC_btt_clamp.setChecked(False)
+        self.ADC_btt_clamp.setObjectName("ADC_btt_clamp")
+        self.ADC_btt_knifePos = QtWidgets.QPushButton(self.ADC_frame)
+        self.ADC_btt_knifePos.setGeometry(QtCore.QRect(60, 160, 161, 31))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(14)
+        font.setKerning(True)
+        self.ADC_btt_knifePos.setFont(font)
+        self.ADC_btt_knifePos.setStyleSheet("QPushButton {\n"
+"    background-color: #40a6a8;\n"
+"}\n"
+"\n"
+"QPushButton:checked {\n"
+"    background-color: #61fcff;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    border: 2px solid #abfbff;\n"
+"}\n"
+"\n"
+"QPushButton:checked:hover {\n"
+"    border: 2px solid #40a6a8;\n"
+"}")
+        self.ADC_btt_knifePos.setCheckable(True)
+        self.ADC_btt_knifePos.setChecked(False)
+        self.ADC_btt_knifePos.setObjectName("ADC_btt_knifePos")
+        self.ADC_btt_knife = QtWidgets.QPushButton(self.ADC_frame)
+        self.ADC_btt_knife.setGeometry(QtCore.QRect(60, 200, 161, 31))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(14)
+        font.setKerning(True)
+        self.ADC_btt_knife.setFont(font)
+        self.ADC_btt_knife.setStyleSheet("QPushButton {\n"
+"    background-color: #40a6a8;\n"
+"}\n"
+"\n"
+"QPushButton:checked {\n"
+"    background-color: #61fcff;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    border: 2px solid #abfbff;\n"
+"}\n"
+"\n"
+"QPushButton:checked:hover {\n"
+"    border: 2px solid #40a6a8;\n"
+"}")
+        self.ADC_btt_knife.setCheckable(True)
+        self.ADC_btt_knife.setChecked(False)
+        self.ADC_btt_knife.setObjectName("ADC_btt_knife")
+        self.ADC_btt_fiberPnmtc = QtWidgets.QPushButton(self.ADC_frame)
+        self.ADC_btt_fiberPnmtc.setGeometry(QtCore.QRect(60, 240, 161, 31))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(14)
+        font.setKerning(True)
+        self.ADC_btt_fiberPnmtc.setFont(font)
+        self.ADC_btt_fiberPnmtc.setStyleSheet("QPushButton {\n"
+"    background-color: #40a6a8;\n"
+"}\n"
+"\n"
+"QPushButton:checked {\n"
+"    background-color: #61fcff;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    border: 2px solid #abfbff;\n"
+"}\n"
+"\n"
+"QPushButton:checked:hover {\n"
+"    border: 2px solid #40a6a8;\n"
+"}")
+        self.ADC_btt_fiberPnmtc.setCheckable(True)
+        self.ADC_btt_fiberPnmtc.setChecked(False)
+        self.ADC_btt_fiberPnmtc.setObjectName("ADC_btt_fiberPnmtc")
+        self.ADC_btt_resetAll = QtWidgets.QPushButton(self.ADC_frame)
+        self.ADC_btt_resetAll.setGeometry(QtCore.QRect(350, 240, 201, 31))
+        self.ADC_btt_resetAll.setObjectName("ADC_btt_resetAll")
+        self.ADC_indi_robotMoving = QtWidgets.QLabel(self.ADC_frame)
+        self.ADC_indi_robotMoving.setGeometry(QtCore.QRect(510, 40, 41, 41))
+        self.ADC_indi_robotMoving.setStyleSheet("border-radius: 20px;\n"
+"background-color: #4c4a48;")
+        self.ADC_indi_robotMoving.setText("")
+        self.ADC_indi_robotMoving.setObjectName("ADC_indi_robotMoving")
+        self.ADC_lbl_robotMoving = QtWidgets.QLabel(self.ADC_frame)
+        self.ADC_lbl_robotMoving.setGeometry(QtCore.QRect(370, 40, 131, 41))
+        self.ADC_lbl_robotMoving.setStyleSheet("border: 0px;\n"
+"font-size: 12pt;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ADC_lbl_robotMoving.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ADC_lbl_robotMoving.setObjectName("ADC_lbl_robotMoving")
+        self.ASC_frame = QtWidgets.QFrame(self.AMCON_tab)
+        self.ASC_frame.setGeometry(QtCore.QRect(660, 20, 611, 301))
+        self.ASC_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.ASC_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.ASC_frame.setObjectName("ASC_frame")
+        self.ASC_0_framelabel = QtWidgets.QLabel(self.ASC_frame)
+        self.ASC_0_framelabel.setGeometry(QtCore.QRect(10, 20, 281, 51))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(22)
+        self.ASC_0_framelabel.setFont(font)
+        self.ASC_0_framelabel.setStyleSheet("border: 0px;\n"
+"font-size: 22pt;\n"
+"padding: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ASC_0_framelabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.ASC_0_framelabel.setObjectName("ASC_0_framelabel")
+        self.ASC_lbl_panning = QtWidgets.QLabel(self.ASC_frame)
+        self.ASC_lbl_panning.setGeometry(QtCore.QRect(290, 110, 141, 51))
+        self.ASC_lbl_panning.setStyleSheet("border: 0px;\n"
+"font-size: 12pt;\n"
+"background-color: #5d707f;\n"
+"color: #E1E5EE;")
+        self.ASC_lbl_panning.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ASC_lbl_panning.setObjectName("ASC_lbl_panning")
+        self.ASC_num_panning = QtWidgets.QDoubleSpinBox(self.ASC_frame)
+        self.ASC_num_panning.setEnabled(True)
+        self.ASC_num_panning.setGeometry(QtCore.QRect(430, 120, 131, 41))
+        self.ASC_num_panning.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ASC_num_panning.setSuffix("")
+        self.ASC_num_panning.setDecimals(0)
+        self.ASC_num_panning.setMinimum(0.0)
+        self.ASC_num_panning.setMaximum(2000.0)
+        self.ASC_num_panning.setSingleStep(10.0)
+        self.ASC_num_panning.setProperty("value", 0.0)
+        self.ASC_num_panning.setObjectName("ASC_num_panning")
+        self.ASC_num_fibDeliv = QtWidgets.QDoubleSpinBox(self.ASC_frame)
+        self.ASC_num_fibDeliv.setGeometry(QtCore.QRect(430, 170, 131, 41))
+        self.ASC_num_fibDeliv.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ASC_num_fibDeliv.setSuffix("")
+        self.ASC_num_fibDeliv.setDecimals(0)
+        self.ASC_num_fibDeliv.setMinimum(-1.0)
+        self.ASC_num_fibDeliv.setMaximum(200.0)
+        self.ASC_num_fibDeliv.setSingleStep(1.0)
+        self.ASC_num_fibDeliv.setProperty("value", 100.0)
+        self.ASC_num_fibDeliv.setObjectName("ASC_num_fibDeliv")
+        self.ASC_lbl_fibDeliv = QtWidgets.QLabel(self.ASC_frame)
+        self.ASC_lbl_fibDeliv.setGeometry(QtCore.QRect(290, 160, 141, 51))
+        self.ASC_lbl_fibDeliv.setStyleSheet("border: 0px;\n"
+"font-size: 12pt;\n"
+"background-color: #5d707f;\n"
+"color: #E1E5EE;")
+        self.ASC_lbl_fibDeliv.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ASC_lbl_fibDeliv.setObjectName("ASC_lbl_fibDeliv")
+        self.ASC_btt_clamp = QtWidgets.QPushButton(self.ASC_frame)
+        self.ASC_btt_clamp.setGeometry(QtCore.QRect(70, 120, 161, 31))
+        self.ASC_btt_clamp.setStyleSheet("QPushButton {\n"
+"    background-color: #40a6a8;\n"
+"}\n"
+"\n"
+"QPushButton:checked {\n"
+"    background-color: #61fcff;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    border: 2px solid #abfbff;\n"
+"}\n"
+"\n"
+"QPushButton:checked:hover {\n"
+"    border: 2px solid #40a6a8;\n"
+"}")
+        self.ASC_btt_clamp.setCheckable(True)
+        self.ASC_btt_clamp.setChecked(False)
+        self.ASC_btt_clamp.setObjectName("ASC_btt_clamp")
+        self.ASC_btt_knifePos = QtWidgets.QPushButton(self.ASC_frame)
+        self.ASC_btt_knifePos.setGeometry(QtCore.QRect(70, 160, 161, 31))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(14)
+        font.setKerning(True)
+        self.ASC_btt_knifePos.setFont(font)
+        self.ASC_btt_knifePos.setStyleSheet("QPushButton {\n"
+"    background-color: #40a6a8;\n"
+"}\n"
+"\n"
+"QPushButton:checked {\n"
+"    background-color: #61fcff;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    border: 2px solid #abfbff;\n"
+"}\n"
+"\n"
+"QPushButton:checked:hover {\n"
+"    border: 2px solid #40a6a8;\n"
+"}")
+        self.ASC_btt_knifePos.setCheckable(True)
+        self.ASC_btt_knifePos.setChecked(False)
+        self.ASC_btt_knifePos.setObjectName("ASC_btt_knifePos")
+        self.ASC_btt_knife = QtWidgets.QPushButton(self.ASC_frame)
+        self.ASC_btt_knife.setGeometry(QtCore.QRect(70, 200, 161, 31))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(14)
+        font.setKerning(True)
+        self.ASC_btt_knife.setFont(font)
+        self.ASC_btt_knife.setStyleSheet("QPushButton {\n"
+"    background-color: #40a6a8;\n"
+"}\n"
+"\n"
+"QPushButton:checked {\n"
+"    background-color: #61fcff;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    border: 2px solid #abfbff;\n"
+"}\n"
+"\n"
+"QPushButton:checked:hover {\n"
+"    border: 2px solid #40a6a8;\n"
+"}")
+        self.ASC_btt_knife.setCheckable(True)
+        self.ASC_btt_knife.setChecked(False)
+        self.ASC_btt_knife.setObjectName("ASC_btt_knife")
+        self.ASC_btt_fiberPnmtc = QtWidgets.QPushButton(self.ASC_frame)
+        self.ASC_btt_fiberPnmtc.setGeometry(QtCore.QRect(70, 240, 161, 31))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(14)
+        font.setKerning(True)
+        self.ASC_btt_fiberPnmtc.setFont(font)
+        self.ASC_btt_fiberPnmtc.setStyleSheet("QPushButton {\n"
+"    background-color: #40a6a8;\n"
+"}\n"
+"\n"
+"QPushButton:checked {\n"
+"    background-color: #61fcff;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    border: 2px solid #abfbff;\n"
+"}\n"
+"\n"
+"QPushButton:checked:hover {\n"
+"    border: 2px solid #40a6a8;\n"
+"}")
+        self.ASC_btt_fiberPnmtc.setCheckable(True)
+        self.ASC_btt_fiberPnmtc.setChecked(False)
+        self.ASC_btt_fiberPnmtc.setObjectName("ASC_btt_fiberPnmtc")
+        self.ASC_btt_overwrSC = QtWidgets.QPushButton(self.ASC_frame)
+        self.ASC_btt_overwrSC.setGeometry(QtCore.QRect(399, 230, 161, 51))
+        self.ASC_btt_overwrSC.setObjectName("ASC_btt_overwrSC")
+        self.ASC_indi_qProcessing = QtWidgets.QLabel(self.ASC_frame)
+        self.ASC_indi_qProcessing.setGeometry(QtCore.QRect(520, 40, 41, 41))
+        self.ASC_indi_qProcessing.setStyleSheet("border-radius: 20px;\n"
+"background-color: #4c4a48;")
+        self.ASC_indi_qProcessing.setText("")
+        self.ASC_indi_qProcessing.setObjectName("ASC_indi_qProcessing")
+        self.ASC_lbl_qProcessing = QtWidgets.QLabel(self.ASC_frame)
+        self.ASC_lbl_qProcessing.setGeometry(QtCore.QRect(380, 40, 131, 41))
+        self.ASC_lbl_qProcessing.setStyleSheet("border: 0px;\n"
+"font-size: 12pt;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.ASC_lbl_qProcessing.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ASC_lbl_qProcessing.setObjectName("ASC_lbl_qProcessing")
+        self.ASC_num_SCLines = QtWidgets.QSpinBox(self.ASC_frame)
+        self.ASC_num_SCLines.setGeometry(QtCore.QRect(290, 240, 101, 41))
+        self.ASC_num_SCLines.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ASC_num_SCLines.setObjectName("ASC_num_SCLines")
+        self.PUMP_frame = QtWidgets.QFrame(self.AMCON_tab)
+        self.PUMP_frame.setGeometry(QtCore.QRect(30, 360, 941, 451))
+        self.PUMP_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.PUMP_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.PUMP_frame.setObjectName("PUMP_frame")
+        self.PUMP_disp_freq = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_disp_freq.setGeometry(QtCore.QRect(259, 195, 131, 41))
+        self.PUMP_disp_freq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.PUMP_disp_freq.setObjectName("PUMP_disp_freq")
+        self.PUMP_lbl_freq = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_lbl_freq.setGeometry(QtCore.QRect(59, 195, 191, 41))
+        self.PUMP_lbl_freq.setStyleSheet("border: 0px;\n"
+"font-size: 14pt;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.PUMP_lbl_freq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.PUMP_lbl_freq.setObjectName("PUMP_lbl_freq")
+        self.PUMP_lbl_volt = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_lbl_volt.setGeometry(QtCore.QRect(89, 255, 161, 31))
+        self.PUMP_lbl_volt.setStyleSheet("border: 0px;\n"
+"font-size: 14pt;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.PUMP_lbl_volt.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.PUMP_lbl_volt.setObjectName("PUMP_lbl_volt")
+        self.PUMP_disp_volt = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_disp_volt.setGeometry(QtCore.QRect(259, 250, 131, 41))
+        self.PUMP_disp_volt.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.PUMP_disp_volt.setObjectName("PUMP_disp_volt")
+        self.PUMP_disp_amps = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_disp_amps.setGeometry(QtCore.QRect(259, 306, 131, 41))
+        self.PUMP_disp_amps.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.PUMP_disp_amps.setObjectName("PUMP_disp_amps")
+        self.PUMP_disp_torq = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_disp_torq.setGeometry(QtCore.QRect(259, 365, 131, 41))
+        self.PUMP_disp_torq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.PUMP_disp_torq.setObjectName("PUMP_disp_torq")
+        self.PUMP_lbl_amps = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_lbl_amps.setGeometry(QtCore.QRect(89, 311, 161, 31))
+        self.PUMP_lbl_amps.setStyleSheet("border: 0px;\n"
+"font-size: 14pt;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.PUMP_lbl_amps.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.PUMP_lbl_amps.setObjectName("PUMP_lbl_amps")
+        self.PUMP_lbl_torq = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_lbl_torq.setGeometry(QtCore.QRect(60, 370, 191, 31))
+        self.PUMP_lbl_torq.setStyleSheet("border: 0px;\n"
+"font-size: 14pt;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.PUMP_lbl_torq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.PUMP_lbl_torq.setObjectName("PUMP_lbl_torq")
+        self.PUMP_btt_plus1 = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_plus1.setGeometry(QtCore.QRect(710, 170, 71, 31))
+        self.PUMP_btt_plus1.setObjectName("PUMP_btt_plus1")
+        self.PUMP_btt_minus1 = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_minus1.setGeometry(QtCore.QRect(810, 170, 71, 31))
+        self.PUMP_btt_minus1.setObjectName("PUMP_btt_minus1")
+        self.PUMP_lbl_setSpeed = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_lbl_setSpeed.setGeometry(QtCore.QRect(510, 130, 131, 41))
+        self.PUMP_lbl_setSpeed.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.PUMP_lbl_setSpeed.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.PUMP_lbl_setSpeed.setObjectName("PUMP_lbl_setSpeed")
+        self.PUMP_disp_currSpeed = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_disp_currSpeed.setGeometry(QtCore.QRect(710, 80, 171, 51))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(18)
+        self.PUMP_disp_currSpeed.setFont(font)
+        self.PUMP_disp_currSpeed.setStyleSheet("font-size: 18pt;")
+        self.PUMP_disp_currSpeed.setScaledContents(False)
+        self.PUMP_disp_currSpeed.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.PUMP_disp_currSpeed.setObjectName("PUMP_disp_currSpeed")
+        self.PUMP_btt_setSpeed = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_setSpeed.setGeometry(QtCore.QRect(449, 230, 191, 31))
+        self.PUMP_btt_setSpeed.setObjectName("PUMP_btt_setSpeed")
+        self.PUMP_btt_stop = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_stop.setGeometry(QtCore.QRect(710, 310, 171, 41))
+        self.PUMP_btt_stop.setObjectName("PUMP_btt_stop")
+        self.PUMP_num_setSpeed = QtWidgets.QSpinBox(self.PUMP_frame)
+        self.PUMP_num_setSpeed.setGeometry(QtCore.QRect(450, 170, 191, 51))
+        self.PUMP_num_setSpeed.setStyleSheet("font-size: 16pt;")
+        self.PUMP_num_setSpeed.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.PUMP_num_setSpeed.setMinimum(-100)
+        self.PUMP_num_setSpeed.setMaximum(100)
+        self.PUMP_num_setSpeed.setObjectName("PUMP_num_setSpeed")
+        self.PUMP_btt_reverse = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_reverse.setGeometry(QtCore.QRect(710, 360, 171, 41))
+        self.PUMP_btt_reverse.setObjectName("PUMP_btt_reverse")
+        self.PUMP_lbl_currSpeed = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_lbl_currSpeed.setGeometry(QtCore.QRect(710, 50, 171, 31))
+        self.PUMP_lbl_currSpeed.setStyleSheet("border: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;\n"
+"font-size: 18pt;")
+        self.PUMP_lbl_currSpeed.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.PUMP_lbl_currSpeed.setObjectName("PUMP_lbl_currSpeed")
+        self.PUMP_0_frameLabel = QtWidgets.QLabel(self.PUMP_frame)
+        self.PUMP_0_frameLabel.setGeometry(QtCore.QRect(20, 20, 161, 51))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(22)
+        self.PUMP_0_frameLabel.setFont(font)
+        self.PUMP_0_frameLabel.setStyleSheet("border: 0px;\n"
+"font-size: 22pt;\n"
+"padding: 0px;\n"
+"background-color: #5D707F;\n"
+"color: #E1E5EE;")
+        self.PUMP_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.PUMP_0_frameLabel.setObjectName("PUMP_0_frameLabel")
+        self.PUMP_btt_minus10 = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_minus10.setGeometry(QtCore.QRect(810, 210, 71, 31))
+        self.PUMP_btt_minus10.setObjectName("PUMP_btt_minus10")
+        self.PUMP_btt_plus10 = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_plus10.setGeometry(QtCore.QRect(710, 210, 71, 31))
+        self.PUMP_btt_plus10.setObjectName("PUMP_btt_plus10")
+        self.PUMP_btt_plus25 = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_plus25.setGeometry(QtCore.QRect(710, 250, 71, 31))
+        self.PUMP_btt_plus25.setObjectName("PUMP_btt_plus25")
+        self.PUMP_btt_minus25 = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_minus25.setGeometry(QtCore.QRect(810, 250, 71, 31))
+        self.PUMP_btt_minus25.setObjectName("PUMP_btt_minus25")
+        self.PUMP_btt_ccToDefault = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_ccToDefault.setGeometry(QtCore.QRect(450, 310, 191, 41))
+        self.PUMP_btt_ccToDefault.setObjectName("PUMP_btt_ccToDefault")
+        self.PUMP_btt_scToDefault = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_scToDefault.setGeometry(QtCore.QRect(450, 360, 191, 41))
+        self.PUMP_btt_scToDefault.setObjectName("PUMP_btt_scToDefault")
+        self.PUMP_btt_pinchValve = QtWidgets.QPushButton(self.PUMP_frame)
+        self.PUMP_btt_pinchValve.setGeometry(QtCore.QRect(450, 80, 191, 41))
+        self.PUMP_btt_pinchValve.setStyleSheet("QPushButton {\n"
+"    background-color: #40a6a8;\n"
+"}\n"
+"\n"
+"QPushButton:checked {\n"
+"    background-color: #61fcff;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    border: 2px solid #abfbff;\n"
+"}\n"
+"\n"
+"QPushButton:checked:hover {\n"
+"    border: 2px solid #40a6a8;\n"
+"}")
+        self.PUMP_btt_pinchValve.setCheckable(True)
+        self.PUMP_btt_pinchValve.setChecked(False)
+        self.PUMP_btt_pinchValve.setObjectName("PUMP_btt_pinchValve")
+        self.PUMP_lbl_currSpeed.raise_()
+        self.PUMP_lbl_setSpeed.raise_()
+        self.PUMP_disp_freq.raise_()
+        self.PUMP_lbl_freq.raise_()
+        self.PUMP_lbl_volt.raise_()
+        self.PUMP_disp_volt.raise_()
+        self.PUMP_disp_amps.raise_()
+        self.PUMP_disp_torq.raise_()
+        self.PUMP_lbl_amps.raise_()
+        self.PUMP_lbl_torq.raise_()
+        self.PUMP_btt_plus1.raise_()
+        self.PUMP_btt_minus1.raise_()
+        self.PUMP_disp_currSpeed.raise_()
+        self.PUMP_btt_setSpeed.raise_()
+        self.PUMP_btt_stop.raise_()
+        self.PUMP_num_setSpeed.raise_()
+        self.PUMP_btt_reverse.raise_()
+        self.PUMP_0_frameLabel.raise_()
+        self.PUMP_btt_minus10.raise_()
+        self.PUMP_btt_plus10.raise_()
+        self.PUMP_btt_plus25.raise_()
+        self.PUMP_btt_minus25.raise_()
+        self.PUMP_btt_ccToDefault.raise_()
+        self.PUMP_btt_scToDefault.raise_()
+        self.PUMP_btt_pinchValve.raise_()
+        self.tab.addTab(self.AMCON_tab, "")
         self.SET_tab = QtWidgets.QWidget()
         self.SET_tab.setObjectName("SET_tab")
         self.TCP_frame = QtWidgets.QFrame(self.SET_tab)
@@ -2283,7 +2801,7 @@ class Ui_MainWindow(object):
         self.SET_TE_btt_default.setGeometry(QtCore.QRect(670, 190, 171, 31))
         self.SET_TE_btt_default.setObjectName("SET_TE_btt_default")
         self.SET_TE_lbl_fllwBhvrInterv = QtWidgets.QLabel(self.SET_TE_frame)
-        self.SET_TE_lbl_fllwBhvrInterv.setGeometry(QtCore.QRect(30, 107, 141, 51))
+        self.SET_TE_lbl_fllwBhvrInterv.setGeometry(QtCore.QRect(30, 100, 141, 51))
         self.SET_TE_lbl_fllwBhvrInterv.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2301,7 +2819,7 @@ class Ui_MainWindow(object):
         self.SET_TE_num_fllwBhvrInterv.setDisplayIntegerBase(10)
         self.SET_TE_num_fllwBhvrInterv.setObjectName("SET_TE_num_fllwBhvrInterv")
         self.SET_TE_lbl_fllwBhvrSkip = QtWidgets.QLabel(self.SET_TE_frame)
-        self.SET_TE_lbl_fllwBhvrSkip.setGeometry(QtCore.QRect(40, 167, 131, 51))
+        self.SET_TE_lbl_fllwBhvrSkip.setGeometry(QtCore.QRect(40, 160, 131, 51))
         self.SET_TE_lbl_fllwBhvrSkip.setStyleSheet("border: 0px;\n"
 "font-size: 12pt;\n"
 "background-color: #5d707f;\n"
@@ -2323,524 +2841,6 @@ class Ui_MainWindow(object):
         self.TCP_frame.raise_()
         self.SET_TE_frame.raise_()
         self.tab.addTab(self.SET_tab, "")
-        self.AMCON_tab = QtWidgets.QWidget()
-        self.AMCON_tab.setAcceptDrops(False)
-        self.AMCON_tab.setObjectName("AMCON_tab")
-        self.ADC_frame = QtWidgets.QFrame(self.AMCON_tab)
-        self.ADC_frame.setGeometry(QtCore.QRect(30, 20, 611, 381))
-        self.ADC_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.ADC_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.ADC_frame.setObjectName("ADC_frame")
-        self.ADC_0_framelabel = QtWidgets.QLabel(self.ADC_frame)
-        self.ADC_0_framelabel.setGeometry(QtCore.QRect(10, 30, 281, 51))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(22)
-        self.ADC_0_framelabel.setFont(font)
-        self.ADC_0_framelabel.setStyleSheet("border: 0px;\n"
-"font-size: 22pt;\n"
-"padding: 0px;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ADC_0_framelabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.ADC_0_framelabel.setObjectName("ADC_0_framelabel")
-        self.ADC_lbl_panning = QtWidgets.QLabel(self.ADC_frame)
-        self.ADC_lbl_panning.setGeometry(QtCore.QRect(290, 114, 141, 51))
-        self.ADC_lbl_panning.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5d707f;\n"
-"color: #E1E5EE;")
-        self.ADC_lbl_panning.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
-        self.ADC_lbl_panning.setObjectName("ADC_lbl_panning")
-        self.ADC_num_panning = QtWidgets.QDoubleSpinBox(self.ADC_frame)
-        self.ADC_num_panning.setEnabled(True)
-        self.ADC_num_panning.setGeometry(QtCore.QRect(430, 120, 131, 41))
-        self.ADC_num_panning.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.ADC_num_panning.setSuffix("")
-        self.ADC_num_panning.setDecimals(0)
-        self.ADC_num_panning.setMinimum(0.0)
-        self.ADC_num_panning.setMaximum(2000.0)
-        self.ADC_num_panning.setSingleStep(10.0)
-        self.ADC_num_panning.setProperty("value", 0.0)
-        self.ADC_num_panning.setObjectName("ADC_num_panning")
-        self.ADC_num_fibDeliv = QtWidgets.QDoubleSpinBox(self.ADC_frame)
-        self.ADC_num_fibDeliv.setGeometry(QtCore.QRect(430, 180, 131, 41))
-        self.ADC_num_fibDeliv.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.ADC_num_fibDeliv.setSuffix("")
-        self.ADC_num_fibDeliv.setDecimals(0)
-        self.ADC_num_fibDeliv.setMinimum(-1.0)
-        self.ADC_num_fibDeliv.setMaximum(200.0)
-        self.ADC_num_fibDeliv.setSingleStep(1.0)
-        self.ADC_num_fibDeliv.setProperty("value", 100.0)
-        self.ADC_num_fibDeliv.setObjectName("ADC_num_fibDeliv")
-        self.ADC_lbl_fibDeliv = QtWidgets.QLabel(self.ADC_frame)
-        self.ADC_lbl_fibDeliv.setGeometry(QtCore.QRect(290, 174, 141, 51))
-        self.ADC_lbl_fibDeliv.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5d707f;\n"
-"color: #E1E5EE;")
-        self.ADC_lbl_fibDeliv.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
-        self.ADC_lbl_fibDeliv.setObjectName("ADC_lbl_fibDeliv")
-        self.ADC_btt_clamp = QtWidgets.QPushButton(self.ADC_frame)
-        self.ADC_btt_clamp.setGeometry(QtCore.QRect(70, 120, 161, 41))
-        self.ADC_btt_clamp.setStyleSheet("QPushButton {\n"
-"    background-color: #40a6a8;\n"
-"}\n"
-"\n"
-"QPushButton:checked {\n"
-"    background-color: #61fcff;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    border: 2px solid #abfbff;\n"
-"}\n"
-"\n"
-"QPushButton:checked:hover {\n"
-"    border: 2px solid #40a6a8;\n"
-"}")
-        self.ADC_btt_clamp.setCheckable(True)
-        self.ADC_btt_clamp.setChecked(False)
-        self.ADC_btt_clamp.setObjectName("ADC_btt_clamp")
-        self.ADC_btt_knifePos = QtWidgets.QPushButton(self.ADC_frame)
-        self.ADC_btt_knifePos.setGeometry(QtCore.QRect(70, 180, 161, 41))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(14)
-        font.setKerning(True)
-        self.ADC_btt_knifePos.setFont(font)
-        self.ADC_btt_knifePos.setStyleSheet("QPushButton {\n"
-"    background-color: #40a6a8;\n"
-"}\n"
-"\n"
-"QPushButton:checked {\n"
-"    background-color: #61fcff;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    border: 2px solid #abfbff;\n"
-"}\n"
-"\n"
-"QPushButton:checked:hover {\n"
-"    border: 2px solid #40a6a8;\n"
-"}")
-        self.ADC_btt_knifePos.setCheckable(True)
-        self.ADC_btt_knifePos.setChecked(False)
-        self.ADC_btt_knifePos.setObjectName("ADC_btt_knifePos")
-        self.ADC_btt_knife = QtWidgets.QPushButton(self.ADC_frame)
-        self.ADC_btt_knife.setGeometry(QtCore.QRect(70, 240, 161, 41))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(14)
-        font.setKerning(True)
-        self.ADC_btt_knife.setFont(font)
-        self.ADC_btt_knife.setStyleSheet("QPushButton {\n"
-"    background-color: #40a6a8;\n"
-"}\n"
-"\n"
-"QPushButton:checked {\n"
-"    background-color: #61fcff;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    border: 2px solid #abfbff;\n"
-"}\n"
-"\n"
-"QPushButton:checked:hover {\n"
-"    border: 2px solid #40a6a8;\n"
-"}")
-        self.ADC_btt_knife.setCheckable(True)
-        self.ADC_btt_knife.setChecked(False)
-        self.ADC_btt_knife.setObjectName("ADC_btt_knife")
-        self.ADC_btt_fiberPnmtc = QtWidgets.QPushButton(self.ADC_frame)
-        self.ADC_btt_fiberPnmtc.setGeometry(QtCore.QRect(70, 300, 161, 41))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(14)
-        font.setKerning(True)
-        self.ADC_btt_fiberPnmtc.setFont(font)
-        self.ADC_btt_fiberPnmtc.setStyleSheet("QPushButton {\n"
-"    background-color: #40a6a8;\n"
-"}\n"
-"\n"
-"QPushButton:checked {\n"
-"    background-color: #61fcff;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    border: 2px solid #abfbff;\n"
-"}\n"
-"\n"
-"QPushButton:checked:hover {\n"
-"    border: 2px solid #40a6a8;\n"
-"}")
-        self.ADC_btt_fiberPnmtc.setCheckable(True)
-        self.ADC_btt_fiberPnmtc.setChecked(False)
-        self.ADC_btt_fiberPnmtc.setObjectName("ADC_btt_fiberPnmtc")
-        self.ADC_btt_resetAll = QtWidgets.QPushButton(self.ADC_frame)
-        self.ADC_btt_resetAll.setGeometry(QtCore.QRect(359, 280, 201, 61))
-        self.ADC_btt_resetAll.setObjectName("ADC_btt_resetAll")
-        self.ADC_indi_robotMoving = QtWidgets.QLabel(self.ADC_frame)
-        self.ADC_indi_robotMoving.setGeometry(QtCore.QRect(500, 30, 51, 51))
-        self.ADC_indi_robotMoving.setStyleSheet("border-radius: 25px;\n"
-"background-color: #4c4a48;")
-        self.ADC_indi_robotMoving.setText("")
-        self.ADC_indi_robotMoving.setObjectName("ADC_indi_robotMoving")
-        self.ADC_lbl_robotMoving = QtWidgets.QLabel(self.ADC_frame)
-        self.ADC_lbl_robotMoving.setGeometry(QtCore.QRect(360, 35, 131, 41))
-        self.ADC_lbl_robotMoving.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ADC_lbl_robotMoving.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.ADC_lbl_robotMoving.setObjectName("ADC_lbl_robotMoving")
-        self.ASC_frame = QtWidgets.QFrame(self.AMCON_tab)
-        self.ASC_frame.setGeometry(QtCore.QRect(680, 20, 611, 381))
-        self.ASC_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.ASC_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.ASC_frame.setObjectName("ASC_frame")
-        self.ASC_0_framelabel = QtWidgets.QLabel(self.ASC_frame)
-        self.ASC_0_framelabel.setGeometry(QtCore.QRect(10, 30, 281, 51))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(22)
-        self.ASC_0_framelabel.setFont(font)
-        self.ASC_0_framelabel.setStyleSheet("border: 0px;\n"
-"font-size: 22pt;\n"
-"padding: 0px;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ASC_0_framelabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.ASC_0_framelabel.setObjectName("ASC_0_framelabel")
-        self.ASC_lbl_panning = QtWidgets.QLabel(self.ASC_frame)
-        self.ASC_lbl_panning.setGeometry(QtCore.QRect(290, 114, 141, 51))
-        self.ASC_lbl_panning.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5d707f;\n"
-"color: #E1E5EE;")
-        self.ASC_lbl_panning.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
-        self.ASC_lbl_panning.setObjectName("ASC_lbl_panning")
-        self.ASC_num_panning = QtWidgets.QDoubleSpinBox(self.ASC_frame)
-        self.ASC_num_panning.setEnabled(True)
-        self.ASC_num_panning.setGeometry(QtCore.QRect(430, 120, 131, 41))
-        self.ASC_num_panning.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.ASC_num_panning.setSuffix("")
-        self.ASC_num_panning.setDecimals(0)
-        self.ASC_num_panning.setMinimum(0.0)
-        self.ASC_num_panning.setMaximum(2000.0)
-        self.ASC_num_panning.setSingleStep(10.0)
-        self.ASC_num_panning.setProperty("value", 0.0)
-        self.ASC_num_panning.setObjectName("ASC_num_panning")
-        self.ASC_num_fibDeliv = QtWidgets.QDoubleSpinBox(self.ASC_frame)
-        self.ASC_num_fibDeliv.setGeometry(QtCore.QRect(430, 180, 131, 41))
-        self.ASC_num_fibDeliv.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.ASC_num_fibDeliv.setSuffix("")
-        self.ASC_num_fibDeliv.setDecimals(0)
-        self.ASC_num_fibDeliv.setMinimum(-1.0)
-        self.ASC_num_fibDeliv.setMaximum(200.0)
-        self.ASC_num_fibDeliv.setSingleStep(1.0)
-        self.ASC_num_fibDeliv.setProperty("value", 100.0)
-        self.ASC_num_fibDeliv.setObjectName("ASC_num_fibDeliv")
-        self.ASC_lbl_fibDeliv = QtWidgets.QLabel(self.ASC_frame)
-        self.ASC_lbl_fibDeliv.setGeometry(QtCore.QRect(290, 174, 141, 51))
-        self.ASC_lbl_fibDeliv.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5d707f;\n"
-"color: #E1E5EE;")
-        self.ASC_lbl_fibDeliv.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
-        self.ASC_lbl_fibDeliv.setObjectName("ASC_lbl_fibDeliv")
-        self.ASC_btt_clamp = QtWidgets.QPushButton(self.ASC_frame)
-        self.ASC_btt_clamp.setGeometry(QtCore.QRect(70, 120, 161, 41))
-        self.ASC_btt_clamp.setStyleSheet("QPushButton {\n"
-"    background-color: #40a6a8;\n"
-"}\n"
-"\n"
-"QPushButton:checked {\n"
-"    background-color: #61fcff;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    border: 2px solid #abfbff;\n"
-"}\n"
-"\n"
-"QPushButton:checked:hover {\n"
-"    border: 2px solid #40a6a8;\n"
-"}")
-        self.ASC_btt_clamp.setCheckable(True)
-        self.ASC_btt_clamp.setChecked(False)
-        self.ASC_btt_clamp.setObjectName("ASC_btt_clamp")
-        self.ASC_btt_knifePos = QtWidgets.QPushButton(self.ASC_frame)
-        self.ASC_btt_knifePos.setGeometry(QtCore.QRect(70, 180, 161, 41))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(14)
-        font.setKerning(True)
-        self.ASC_btt_knifePos.setFont(font)
-        self.ASC_btt_knifePos.setStyleSheet("QPushButton {\n"
-"    background-color: #40a6a8;\n"
-"}\n"
-"\n"
-"QPushButton:checked {\n"
-"    background-color: #61fcff;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    border: 2px solid #abfbff;\n"
-"}\n"
-"\n"
-"QPushButton:checked:hover {\n"
-"    border: 2px solid #40a6a8;\n"
-"}")
-        self.ASC_btt_knifePos.setCheckable(True)
-        self.ASC_btt_knifePos.setChecked(False)
-        self.ASC_btt_knifePos.setObjectName("ASC_btt_knifePos")
-        self.ASC_btt_knife = QtWidgets.QPushButton(self.ASC_frame)
-        self.ASC_btt_knife.setGeometry(QtCore.QRect(70, 240, 161, 41))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(14)
-        font.setKerning(True)
-        self.ASC_btt_knife.setFont(font)
-        self.ASC_btt_knife.setStyleSheet("QPushButton {\n"
-"    background-color: #40a6a8;\n"
-"}\n"
-"\n"
-"QPushButton:checked {\n"
-"    background-color: #61fcff;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    border: 2px solid #abfbff;\n"
-"}\n"
-"\n"
-"QPushButton:checked:hover {\n"
-"    border: 2px solid #40a6a8;\n"
-"}")
-        self.ASC_btt_knife.setCheckable(True)
-        self.ASC_btt_knife.setChecked(False)
-        self.ASC_btt_knife.setObjectName("ASC_btt_knife")
-        self.ASC_btt_fiberPnmtc = QtWidgets.QPushButton(self.ASC_frame)
-        self.ASC_btt_fiberPnmtc.setGeometry(QtCore.QRect(70, 300, 161, 41))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(14)
-        font.setKerning(True)
-        self.ASC_btt_fiberPnmtc.setFont(font)
-        self.ASC_btt_fiberPnmtc.setStyleSheet("QPushButton {\n"
-"    background-color: #40a6a8;\n"
-"}\n"
-"\n"
-"QPushButton:checked {\n"
-"    background-color: #61fcff;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    border: 2px solid #abfbff;\n"
-"}\n"
-"\n"
-"QPushButton:checked:hover {\n"
-"    border: 2px solid #40a6a8;\n"
-"}")
-        self.ASC_btt_fiberPnmtc.setCheckable(True)
-        self.ASC_btt_fiberPnmtc.setChecked(False)
-        self.ASC_btt_fiberPnmtc.setObjectName("ASC_btt_fiberPnmtc")
-        self.ASC_btt_overwrSC = QtWidgets.QPushButton(self.ASC_frame)
-        self.ASC_btt_overwrSC.setGeometry(QtCore.QRect(399, 280, 161, 61))
-        self.ASC_btt_overwrSC.setObjectName("ASC_btt_overwrSC")
-        self.ASC_indi_qProcessing = QtWidgets.QLabel(self.ASC_frame)
-        self.ASC_indi_qProcessing.setGeometry(QtCore.QRect(500, 30, 51, 51))
-        self.ASC_indi_qProcessing.setStyleSheet("border-radius: 25px;\n"
-"background-color: #4c4a48;")
-        self.ASC_indi_qProcessing.setText("")
-        self.ASC_indi_qProcessing.setObjectName("ASC_indi_qProcessing")
-        self.ASC_lbl_qProcessing = QtWidgets.QLabel(self.ASC_frame)
-        self.ASC_lbl_qProcessing.setGeometry(QtCore.QRect(360, 35, 131, 41))
-        self.ASC_lbl_qProcessing.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ASC_lbl_qProcessing.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.ASC_lbl_qProcessing.setObjectName("ASC_lbl_qProcessing")
-        self.ASC_num_SCLines = QtWidgets.QSpinBox(self.ASC_frame)
-        self.ASC_num_SCLines.setGeometry(QtCore.QRect(290, 286, 101, 51))
-        self.ASC_num_SCLines.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.ASC_num_SCLines.setObjectName("ASC_num_SCLines")
-        self.PUMP_frame = QtWidgets.QFrame(self.AMCON_tab)
-        self.PUMP_frame.setGeometry(QtCore.QRect(30, 440, 1261, 491))
-        self.PUMP_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.PUMP_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.PUMP_frame.setObjectName("PUMP_frame")
-        self.PUMP_disp_freq = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_freq.setGeometry(QtCore.QRect(250, 160, 131, 51))
-        self.PUMP_disp_freq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.PUMP_disp_freq.setObjectName("PUMP_disp_freq")
-        self.PUMP_lbl_freq = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_freq.setGeometry(QtCore.QRect(50, 154, 191, 61))
-        self.PUMP_lbl_freq.setStyleSheet("border: 0px;\n"
-"font-size: 14pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.PUMP_lbl_freq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.PUMP_lbl_freq.setObjectName("PUMP_lbl_freq")
-        self.PUMP_lbl_volt = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_volt.setGeometry(QtCore.QRect(80, 234, 161, 61))
-        self.PUMP_lbl_volt.setStyleSheet("border: 0px;\n"
-"font-size: 14pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.PUMP_lbl_volt.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.PUMP_lbl_volt.setObjectName("PUMP_lbl_volt")
-        self.PUMP_disp_volt = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_volt.setGeometry(QtCore.QRect(250, 240, 131, 51))
-        self.PUMP_disp_volt.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.PUMP_disp_volt.setObjectName("PUMP_disp_volt")
-        self.PUMP_disp_amps = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_amps.setGeometry(QtCore.QRect(250, 316, 131, 51))
-        self.PUMP_disp_amps.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.PUMP_disp_amps.setObjectName("PUMP_disp_amps")
-        self.PUMP_disp_torq = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_torq.setGeometry(QtCore.QRect(250, 395, 131, 51))
-        self.PUMP_disp_torq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.PUMP_disp_torq.setObjectName("PUMP_disp_torq")
-        self.PUMP_lbl_amps = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_amps.setGeometry(QtCore.QRect(80, 310, 161, 61))
-        self.PUMP_lbl_amps.setStyleSheet("border: 0px;\n"
-"font-size: 14pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.PUMP_lbl_amps.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.PUMP_lbl_amps.setObjectName("PUMP_lbl_amps")
-        self.PUMP_lbl_torq = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_torq.setGeometry(QtCore.QRect(50, 390, 191, 61))
-        self.PUMP_lbl_torq.setStyleSheet("border: 0px;\n"
-"font-size: 14pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.PUMP_lbl_torq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.PUMP_lbl_torq.setObjectName("PUMP_lbl_torq")
-        self.PUMP_btt_plus1 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_plus1.setGeometry(QtCore.QRect(920, 180, 81, 41))
-        self.PUMP_btt_plus1.setObjectName("PUMP_btt_plus1")
-        self.PUMP_btt_minus1 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_minus1.setGeometry(QtCore.QRect(920, 240, 81, 41))
-        self.PUMP_btt_minus1.setObjectName("PUMP_btt_minus1")
-        self.PUMP_lbl_setSpeed = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_setSpeed.setGeometry(QtCore.QRect(590, 120, 131, 41))
-        self.PUMP_lbl_setSpeed.setStyleSheet("border: 0px;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.PUMP_lbl_setSpeed.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
-        self.PUMP_lbl_setSpeed.setObjectName("PUMP_lbl_setSpeed")
-        self.PUMP_disp_currSpeed = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_currSpeed.setGeometry(QtCore.QRect(1030, 70, 171, 71))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(20)
-        self.PUMP_disp_currSpeed.setFont(font)
-        self.PUMP_disp_currSpeed.setStyleSheet("font-size: 20pt;")
-        self.PUMP_disp_currSpeed.setScaledContents(False)
-        self.PUMP_disp_currSpeed.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.PUMP_disp_currSpeed.setObjectName("PUMP_disp_currSpeed")
-        self.PUMP_btt_setSpeed = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_setSpeed.setGeometry(QtCore.QRect(530, 220, 191, 51))
-        self.PUMP_btt_setSpeed.setObjectName("PUMP_btt_setSpeed")
-        self.PUMP_btt_stop = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_stop.setGeometry(QtCore.QRect(920, 320, 281, 51))
-        self.PUMP_btt_stop.setObjectName("PUMP_btt_stop")
-        self.PUMP_num_setSpeed = QtWidgets.QSpinBox(self.PUMP_frame)
-        self.PUMP_num_setSpeed.setGeometry(QtCore.QRect(531, 160, 191, 51))
-        self.PUMP_num_setSpeed.setStyleSheet("font-size: 14pt;")
-        self.PUMP_num_setSpeed.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.PUMP_num_setSpeed.setMinimum(-100)
-        self.PUMP_num_setSpeed.setMaximum(100)
-        self.PUMP_num_setSpeed.setObjectName("PUMP_num_setSpeed")
-        self.PUMP_btt_reverse = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_reverse.setGeometry(QtCore.QRect(920, 390, 281, 51))
-        self.PUMP_btt_reverse.setObjectName("PUMP_btt_reverse")
-        self.PUMP_lbl_currSpeed = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_currSpeed.setGeometry(QtCore.QRect(890, 50, 131, 91))
-        self.PUMP_lbl_currSpeed.setStyleSheet("border: 0px;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;\n"
-"font-size: 18pt;")
-        self.PUMP_lbl_currSpeed.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
-        self.PUMP_lbl_currSpeed.setObjectName("PUMP_lbl_currSpeed")
-        self.PUMP_0_frameLabel = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_0_frameLabel.setGeometry(QtCore.QRect(20, 20, 161, 51))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(22)
-        self.PUMP_0_frameLabel.setFont(font)
-        self.PUMP_0_frameLabel.setStyleSheet("border: 0px;\n"
-"font-size: 22pt;\n"
-"padding: 0px;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.PUMP_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.PUMP_0_frameLabel.setObjectName("PUMP_0_frameLabel")
-        self.PUMP_btt_minus10 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_minus10.setGeometry(QtCore.QRect(1020, 240, 81, 41))
-        self.PUMP_btt_minus10.setObjectName("PUMP_btt_minus10")
-        self.PUMP_btt_plus10 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_plus10.setGeometry(QtCore.QRect(1020, 180, 81, 41))
-        self.PUMP_btt_plus10.setObjectName("PUMP_btt_plus10")
-        self.PUMP_btt_plus25 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_plus25.setGeometry(QtCore.QRect(1120, 180, 81, 41))
-        self.PUMP_btt_plus25.setObjectName("PUMP_btt_plus25")
-        self.PUMP_btt_minus25 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_minus25.setGeometry(QtCore.QRect(1120, 240, 81, 41))
-        self.PUMP_btt_minus25.setObjectName("PUMP_btt_minus25")
-        self.PUMP_btt_currDefault = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_currDefault.setGeometry(QtCore.QRect(530, 320, 191, 51))
-        self.PUMP_btt_currDefault.setObjectName("PUMP_btt_currDefault")
-        self.PUMP_btt_SCDefault = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_SCDefault.setGeometry(QtCore.QRect(530, 390, 191, 51))
-        self.PUMP_btt_SCDefault.setObjectName("PUMP_btt_SCDefault")
-        self.PUMP_btt_pinchValve = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_pinchValve.setGeometry(QtCore.QRect(530, 50, 191, 51))
-        self.PUMP_btt_pinchValve.setStyleSheet("QPushButton {\n"
-"    background-color: #40a6a8;\n"
-"}\n"
-"\n"
-"QPushButton:checked {\n"
-"    background-color: #61fcff;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    border: 2px solid #abfbff;\n"
-"}\n"
-"\n"
-"QPushButton:checked:hover {\n"
-"    border: 2px solid #40a6a8;\n"
-"}")
-        self.PUMP_btt_pinchValve.setCheckable(True)
-        self.PUMP_btt_pinchValve.setChecked(False)
-        self.PUMP_btt_pinchValve.setObjectName("PUMP_btt_pinchValve")
-        self.PUMP_lbl_setSpeed.raise_()
-        self.PUMP_disp_freq.raise_()
-        self.PUMP_lbl_freq.raise_()
-        self.PUMP_lbl_volt.raise_()
-        self.PUMP_disp_volt.raise_()
-        self.PUMP_disp_amps.raise_()
-        self.PUMP_disp_torq.raise_()
-        self.PUMP_lbl_amps.raise_()
-        self.PUMP_lbl_torq.raise_()
-        self.PUMP_btt_plus1.raise_()
-        self.PUMP_btt_minus1.raise_()
-        self.PUMP_disp_currSpeed.raise_()
-        self.PUMP_btt_setSpeed.raise_()
-        self.PUMP_btt_stop.raise_()
-        self.PUMP_num_setSpeed.raise_()
-        self.PUMP_btt_reverse.raise_()
-        self.PUMP_lbl_currSpeed.raise_()
-        self.PUMP_0_frameLabel.raise_()
-        self.PUMP_btt_minus10.raise_()
-        self.PUMP_btt_plus10.raise_()
-        self.PUMP_btt_plus25.raise_()
-        self.PUMP_btt_minus25.raise_()
-        self.PUMP_btt_currDefault.raise_()
-        self.PUMP_btt_SCDefault.raise_()
-        self.PUMP_btt_pinchValve.raise_()
-        self.tab.addTab(self.AMCON_tab, "")
         self.MONITOR_tab = QtWidgets.QWidget()
         self.MONITOR_tab.setObjectName("MONITOR_tab")
         self.ICQ_frame = QtWidgets.QFrame(self.MONITOR_tab)
@@ -3431,6 +3431,56 @@ class Ui_MainWindow(object):
         self.TERM_btt_rapidInterp.setText(_translate("MainWindow", "SEND"))
         self.TERM_chk_autoScroll.setText(_translate("MainWindow", "enable auto scroll"))
         self.tab.setTabText(self.tab.indexOf(self.DIRECT_tab), _translate("MainWindow", "     DIRECT CONTROL     "))
+        self.ADC_0_framelabel.setText(_translate("MainWindow", "DIRECT CONTROL"))
+        self.ADC_lbl_panning.setText(_translate("MainWindow", "panning value \n"
+"(step-driven servor)"))
+        self.ADC_lbl_fibDeliv.setText(_translate("MainWindow", "fiber delivery ratio\n"
+"(MT dependent) [%]"))
+        self.ADC_btt_clamp.setText(_translate("MainWindow", "CLAMP"))
+        self.ADC_btt_knifePos.setText(_translate("MainWindow", "KNIFE POS"))
+        self.ADC_btt_knife.setText(_translate("MainWindow", "KNIFE"))
+        self.ADC_btt_fiberPnmtc.setText(_translate("MainWindow", "FIBER PNMTC"))
+        self.ADC_btt_resetAll.setText(_translate("MainWindow", "RESET ALL"))
+        self.ADC_lbl_robotMoving.setText(_translate("MainWindow", "ROBOT MOVING"))
+        self.ASC_0_framelabel.setText(_translate("MainWindow", "SCRIPT CONTROL"))
+        self.ASC_lbl_panning.setText(_translate("MainWindow", "panning value \n"
+"(step-driven servor)"))
+        self.ASC_lbl_fibDeliv.setText(_translate("MainWindow", "fiber delivery ratio\n"
+"(MT dependent) [%]"))
+        self.ASC_btt_clamp.setText(_translate("MainWindow", "CLAMP"))
+        self.ASC_btt_knifePos.setText(_translate("MainWindow", "KNIFE POS"))
+        self.ASC_btt_knife.setText(_translate("MainWindow", "KNIFE"))
+        self.ASC_btt_fiberPnmtc.setText(_translate("MainWindow", "FIBER PNMTC"))
+        self.ASC_btt_overwrSC.setText(_translate("MainWindow", "OVERWRITE\n"
+"SC LINES"))
+        self.ASC_lbl_qProcessing.setText(_translate("MainWindow", "QUEUE\n"
+"PROCESSING"))
+        self.PUMP_disp_freq.setText(_translate("MainWindow", "0.0"))
+        self.PUMP_lbl_freq.setText(_translate("MainWindow", "motor frequency [%]"))
+        self.PUMP_lbl_volt.setText(_translate("MainWindow", "coil voltage [?V]"))
+        self.PUMP_disp_volt.setText(_translate("MainWindow", "0.0"))
+        self.PUMP_disp_amps.setText(_translate("MainWindow", "0.0"))
+        self.PUMP_disp_torq.setText(_translate("MainWindow", "0.0"))
+        self.PUMP_lbl_amps.setText(_translate("MainWindow", "coil current [?A]"))
+        self.PUMP_lbl_torq.setText(_translate("MainWindow", "shaft torque [?Nm]"))
+        self.PUMP_btt_plus1.setText(_translate("MainWindow", "+ 1%"))
+        self.PUMP_btt_minus1.setText(_translate("MainWindow", "- 1%"))
+        self.PUMP_lbl_setSpeed.setText(_translate("MainWindow", "set speed"))
+        self.PUMP_disp_currSpeed.setText(_translate("MainWindow", "0%"))
+        self.PUMP_btt_setSpeed.setText(_translate("MainWindow", "SET"))
+        self.PUMP_btt_stop.setText(_translate("MainWindow", "⛔ STOP"))
+        self.PUMP_num_setSpeed.setSuffix(_translate("MainWindow", "%"))
+        self.PUMP_btt_reverse.setText(_translate("MainWindow", "REVERSE DIRECTION"))
+        self.PUMP_lbl_currSpeed.setText(_translate("MainWindow", "current speed"))
+        self.PUMP_0_frameLabel.setText(_translate("MainWindow", "PUMP CTRL"))
+        self.PUMP_btt_minus10.setText(_translate("MainWindow", "- 10%"))
+        self.PUMP_btt_plus10.setText(_translate("MainWindow", "+ 10%"))
+        self.PUMP_btt_plus25.setText(_translate("MainWindow", "+ 25%"))
+        self.PUMP_btt_minus25.setText(_translate("MainWindow", "- 25%"))
+        self.PUMP_btt_ccToDefault.setText(_translate("MainWindow", "CC 🡆 DEFAULT"))
+        self.PUMP_btt_scToDefault.setText(_translate("MainWindow", "SC 🡆 DEFAULT"))
+        self.PUMP_btt_pinchValve.setText(_translate("MainWindow", "PINCH VALVE"))
+        self.tab.setTabText(self.tab.indexOf(self.AMCON_tab), _translate("MainWindow", "     AMCON && PUMP     "))
         self.TCP_0_frameLabel.setText(_translate("MainWindow", "TCP SETTINGS"))
         self.TCP_ROB_lbl_bytesToRead.setText(_translate("MainWindow", "TCP bytes to read"))
         self.TCP_ROB_disp_bytesWritten.setText(_translate("MainWindow", "0"))
@@ -3556,57 +3606,6 @@ class Ui_MainWindow(object):
         self.SET_TE_lbl_fllwBhvrSkip.setText(_translate("MainWindow", "follow behavior\n"
 "skip length"))
         self.tab.setTabText(self.tab.indexOf(self.SET_tab), _translate("MainWindow", "     SETTINGS     "))
-        self.ADC_0_framelabel.setText(_translate("MainWindow", "DIRECT CONTROL"))
-        self.ADC_lbl_panning.setText(_translate("MainWindow", "panning value \n"
-"(step-driven servor)"))
-        self.ADC_lbl_fibDeliv.setText(_translate("MainWindow", "fiber delivery ratio\n"
-"(MT dependent) [%]"))
-        self.ADC_btt_clamp.setText(_translate("MainWindow", "CLAMP"))
-        self.ADC_btt_knifePos.setText(_translate("MainWindow", "KNIFE POS"))
-        self.ADC_btt_knife.setText(_translate("MainWindow", "KNIFE"))
-        self.ADC_btt_fiberPnmtc.setText(_translate("MainWindow", "FIBER PNMTC"))
-        self.ADC_btt_resetAll.setText(_translate("MainWindow", "RESET ALL"))
-        self.ADC_lbl_robotMoving.setText(_translate("MainWindow", "ROBOT MOVING"))
-        self.ASC_0_framelabel.setText(_translate("MainWindow", "SCRIPT CONTROL"))
-        self.ASC_lbl_panning.setText(_translate("MainWindow", "panning value \n"
-"(step-driven servor)"))
-        self.ASC_lbl_fibDeliv.setText(_translate("MainWindow", "fiber delivery ratio\n"
-"(MT dependent) [%]"))
-        self.ASC_btt_clamp.setText(_translate("MainWindow", "CLAMP"))
-        self.ASC_btt_knifePos.setText(_translate("MainWindow", "KNIFE POS"))
-        self.ASC_btt_knife.setText(_translate("MainWindow", "KNIFE"))
-        self.ASC_btt_fiberPnmtc.setText(_translate("MainWindow", "FIBER PNMTC"))
-        self.ASC_btt_overwrSC.setText(_translate("MainWindow", "OVERWRITE\n"
-"SC LINES"))
-        self.ASC_lbl_qProcessing.setText(_translate("MainWindow", "QUEUE\n"
-"PROCESSING"))
-        self.PUMP_disp_freq.setText(_translate("MainWindow", "0.0"))
-        self.PUMP_lbl_freq.setText(_translate("MainWindow", "motor frequency [%]"))
-        self.PUMP_lbl_volt.setText(_translate("MainWindow", "coil voltage [?V]"))
-        self.PUMP_disp_volt.setText(_translate("MainWindow", "0.0"))
-        self.PUMP_disp_amps.setText(_translate("MainWindow", "0.0"))
-        self.PUMP_disp_torq.setText(_translate("MainWindow", "0.0"))
-        self.PUMP_lbl_amps.setText(_translate("MainWindow", "coil current [?A]"))
-        self.PUMP_lbl_torq.setText(_translate("MainWindow", "shaft torque [?Nm]"))
-        self.PUMP_btt_plus1.setText(_translate("MainWindow", "+ 1%"))
-        self.PUMP_btt_minus1.setText(_translate("MainWindow", "- 1%"))
-        self.PUMP_lbl_setSpeed.setText(_translate("MainWindow", "set speed"))
-        self.PUMP_disp_currSpeed.setText(_translate("MainWindow", "0%"))
-        self.PUMP_btt_setSpeed.setText(_translate("MainWindow", "SET"))
-        self.PUMP_btt_stop.setText(_translate("MainWindow", "⛔ STOP"))
-        self.PUMP_num_setSpeed.setSuffix(_translate("MainWindow", "%"))
-        self.PUMP_btt_reverse.setText(_translate("MainWindow", "REVERSE DIRECTION"))
-        self.PUMP_lbl_currSpeed.setText(_translate("MainWindow", "current\n"
-"speed"))
-        self.PUMP_0_frameLabel.setText(_translate("MainWindow", "PUMP CTRL"))
-        self.PUMP_btt_minus10.setText(_translate("MainWindow", "- 10%"))
-        self.PUMP_btt_plus10.setText(_translate("MainWindow", "+ 10%"))
-        self.PUMP_btt_plus25.setText(_translate("MainWindow", "+ 25%"))
-        self.PUMP_btt_minus25.setText(_translate("MainWindow", "- 25%"))
-        self.PUMP_btt_currDefault.setText(_translate("MainWindow", "DEFAULT (curr)"))
-        self.PUMP_btt_SCDefault.setText(_translate("MainWindow", "SC 🡆 DEFAULT"))
-        self.PUMP_btt_pinchValve.setText(_translate("MainWindow", "PINCH VALVE"))
-        self.tab.setTabText(self.tab.indexOf(self.AMCON_tab), _translate("MainWindow", "     AMCON && PUMP     "))
         __sortingEnabled = self.ICQ_arr_terminal.isSortingEnabled()
         self.ICQ_arr_terminal.setSortingEnabled(False)
         item = self.ICQ_arr_terminal.item(0)
@@ -3650,6 +3649,7 @@ class Ui_MainWindow(object):
         self.TRANS_disp_xEnd.setText(_translate("MainWindow", "0.0"))
         self.TRANS_lbl_newOrient.setText(_translate("MainWindow", "NEW ORIENTATION"))
         self.tab.setTabText(self.tab.indexOf(self.MONITOR_tab), _translate("MainWindow", "     SYSTEM MONITOR     "))
+
 
 
 
