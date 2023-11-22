@@ -90,19 +90,19 @@ while toggle:
 				time_id	 		= struct.unpack('<i',data[151:155])[0]
 				time_time 		= struct.unpack('<i',data[155:159])[0]
 			
-				print(f"ID: {ID}\nMT: {MT}\nPT: {PT}\
-					    \nX1: {X1}\tY1: {Y1}\tZ1: {Z1}\
-					 	\tRx: {Rx}\tRy: {Ry}\tRz: {Rz}\tQ: {Q}\
-						\tExt: {EXT}\
-						\nX2: {X2}\tY2: {Y2}\tZ2: {Z2}\
-						\tRx2: {Rx2}\tRy2: {Ry2}\tRz2: {Rz2}\tQ2: {Q2}\
-						\tExt2: {EXT2}\
-						\nACR: {ACR}\tDCR: {DCR}\tTS: {TS}\tOS: {OS}\
-						\tT: {T}\tSC: {SC}\tZ: {Z}\
-						\nM1_ID: {m1_id}\tM1_ST: {m1_steps}\tM2_ID: {m2_id}\tM2_ST: {m2_steps}\
-						\tM3_ID: {m3_id}\tM3_ST: {m3_steps}\tPC_ID: {pnmtcClamp_id}\tPC_YN: {pnmtcClamp_yn}\
-						\tK_ID: {knife_id}\tK_YN: {knife_yn}\tM4_ID: {m4_id}\tM4_ST: {m4_steps}\
-						\tPF_ID: {pnmtcFiber_id}\tPF_YN: {pnmtcFiber_yn}\tT_ID: {time_id}\tT_T: {time_time}")
+				print( f"ID: {ID}\nMT: {MT}\nPT: {PT}"
+					   f"\nX1: {X1} Y1: {Y1} Z1: {Z1} "
+					   f"Rx: {Rx} Ry: {Ry} Rz: {Rz} Q: {Q} "
+					   f"Ext: {EXT}"
+					   f"\nX2: {X2} Y2: {Y2} Z2: {Z2} "
+					   f"Rx2: {Rx2} Ry2: {Ry2} Rz2: {Rz2} Q2: {Q2} "
+					   f"Ext2: {EXT2}"
+					   f"\nACR: {ACR} DCR: {DCR} TS: {TS} OS: {OS} "
+					   f"T: {T} SC: {SC} Z: {Z}"
+					   f"\nM1_ID: {m1_id} M1_ST: {m1_steps} M2_ID: {m2_id} M2_ST: {m2_steps} "
+					   f"M3_ID: {m3_id} M3_ST: {m3_steps} PC_ID: {pnmtcClamp_id} PC_YN: {pnmtcClamp_yn} "
+					   f"K_ID: {knife_id} K_YN: {knife_yn} M4_ID: {m4_id} M4_ST: {m4_steps} "
+					   f"PF_ID: {pnmtcFiber_id} PF_YN: {pnmtcFiber_yn} T_ID: {time_id} T_T: {time_time}" )
 				
 
 	a = input("Connection closed...  Wait for reconnect? Y/N\n")

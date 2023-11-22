@@ -322,7 +322,7 @@ class RoboCommWorker( QObject ):
                 mutex.unlock()
             
             else: 
-                print( " Message Error " )
+                print( f" Message Error: {msgLen} " )
                 self.sendElem.emit( command, msg, msgLen, directCtrl, False )
             
             if( numToSend == 0 ):

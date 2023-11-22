@@ -1181,13 +1181,13 @@ class TCPIP:
             if( len(message) != self.w_bl ):  return ValueError, len(message) 
             
             try:                self.Socket.sendall( message )
-            except OSError:     return OSError, 0
+            except OSError:     return False, OSError
             
-            print( f"SEND:    {entry.id}, length: {len(message)}" )
+            print( f"SEND:    { entry.id }, length: { len(message) }" )
             return True, len(message)
         
         except Exception as err:
-            return err, 0
+            return False, err
 
 
 

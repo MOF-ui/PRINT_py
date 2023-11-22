@@ -147,7 +147,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # AMCON CONTROL
         self.ADC_btt_resetAll.pressed.connect               ( self.loadAdcDefaults )
         self.ADC_num_panning.valueChanged.connect           ( self.adcUserChange )
-        self.ASC_btt_overwrSC.pressed.connect               ( self.amconScriptOverwrite )
+        self.ADC_num_fibDeliv.valueChanged.connect          ( self.adcUserChange )
+        self.ADC_btt_clamp.released.connect                 ( self.adcUserChange )
+        self.ADC_btt_knifePos.released.connect              ( self.adcUserChange )
+        self.ADC_btt_knife.released.connect                 ( self.adcUserChange )
+        self.ADC_btt_fiberPnmtc.released.connect            ( self.adcUserChange )
+        self.ASC_btt_overwrSC.released.connect              ( self.amconScriptOverwrite )
 
         # DIRECT CONTROL
         self.DC_btt_xPlus.pressed.connect                   ( lambda: self.sendDCCommand('X','+') )
@@ -352,12 +357,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def loadAdcDefaults( self ):
         """ load ADC default values """
 
+        # stop UI changes to retrigger themselfs
+        self.setUpdatesEnabled(False)
+
         self.ADC_num_panning.setValue       ( UTIL.DEF_AMC_PANNING )
         self.ADC_num_fibDeliv.setValue      ( UTIL.DEF_AMC_FIB_DELIV )
         self.ADC_btt_clamp.setChecked       ( UTIL.DEF_AMC_CLAMP )
         self.ADC_btt_knifePos.setChecked    ( UTIL.DEF_AMC_KNIFE_POS )
         self.ADC_btt_knife.setChecked       ( UTIL.DEF_AMC_KNIFE )
         self.ADC_btt_fiberPnmtc.setChecked  ( UTIL.DEF_AMC_FIBER_PNMTC )
+        self.adcUserChange()
+
+        self.setUpdatesEnabled(True)
         
 
 
@@ -534,20 +545,20 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.TCP_ROB_disp_writeBuffer.setText   ( str(command) )
             self.TCP_ROB_disp_bytesWritten.setText  ( str(numSend) )
 
-        elif( msg == ValueError ):
-            self.logEntry( 'CONN', f"TCPIP class 'ROB_tcpip' encountered ValueError in sendCommand, data length: {numSend}" )
+        elif( numSend == ValueError ):
+            self.logEntry( 'CONN', f"TCPIP class 'ROB_tcpip' encountered ValueError in sendCommand: {numSend}" )
             self.TCP_ROB_disp_writeBuffer.setText   ( 'ValueError' )
             self.TCP_ROB_disp_bytesWritten.setText  ( str(numSend) )
             UTIL.SC_currCommId += 1
         
-        elif( msg == RuntimeError or msg == OSError ):
+        elif( numSend == RuntimeError or numSend == OSError ):
             self.logEntry( 'CONN', 'TCPIP class "ROB_tcpip" encountered RuntimeError/OSError in sendCommand..' )
             self.TCP_ROB_disp_writeBuffer.setText   ( 'RuntimeError/OSError' )
             self.TCP_ROB_disp_bytesWritten.setText  ( str(numSend) )
             UTIL.SC_currCommId += 1
         
         else:
-            self.logEntry( 'CONN', f"TCPIP class 'ROB_tcpip' encountered {msg}" )
+            self.logEntry( 'CONN', f"TCPIP class 'ROB_tcpip' encountered {numSend}" )
             self.TCP_ROB_disp_writeBuffer.setText   ( 'unspecified error' )
             self.TCP_ROB_disp_bytesWritten.setText  ( str(numSend) )
             UTIL.SC_currCommId += 1
@@ -908,8 +919,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ASC_btt_knifePos.setChecked    ( entry.Tool.knifePos_yn )
         self.ADC_btt_knife.setChecked       ( entry.Tool.knife_yn )
         self.ASC_btt_knife.setChecked       ( entry.Tool.knife_yn )
-        self.ADC_btt_fiberPnmtc.setChecked  ( entry.Tool.fiberPnmtc_yn )
-        self.ASC_btt_fiberPnmtc.setChecked  ( entry.Tool.fiberPnmtc_yn )
+        self.ADC_btt_fiberPnmtc.setChecked  ( entry.Tool.pnmtcFiber_yn )
+        self.ASC_btt_fiberPnmtc.setChecked  ( entry.Tool.pnmtcFiber_yn )
 
 
 
@@ -1159,13 +1170,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_indi_qProcessing.setStyleSheet   ( css )
         self.TCP_indi_qProcessing.setStyleSheet     ( css )
         self.ASC_indi_qProcessing.setStyleSheet     ( css )
-        self.ASC_num_panning.setEnable              ( False )
-        self.ASC_num_fibDeliv.setEnable             ( False )
-        self.ASC_btt_clamp.setEnable                ( False )
-        self.ASC_btt_knifePos.setEnable             ( False )
-        self.ASC_btt_knife.setEnable                ( False )
-        self.ASC_btt_fiberPnmtc.setEnable           ( False )
-        self.ASC_btt_overwrSC.setEnable             ( False )
+        self.ASC_num_panning.setEnabled             ( False )
+        self.ASC_num_fibDeliv.setEnabled            ( False )
+        self.ASC_btt_clamp.setEnabled               ( False )
+        self.ASC_btt_knifePos.setEnabled            ( False )
+        self.ASC_btt_knife.setEnabled               ( False )
+        self.ASC_btt_fiberPnmtc.setEnabled          ( False )
+        self.ASC_btt_overwrSC.setEnabled            ( False )
         self.switchRobMoving()
 
         self.labelUpdate_onQueueChange()
@@ -1194,13 +1205,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.switchRobMoving( end= True )
             css = "border-radius: 20px; background-color: #4c4a48;"
 
-            self.ASC_num_panning.setEnable      ( True )
-            self.ASC_num_fibDeliv.setEnable     ( True )
-            self.ASC_btt_clamp.setEnable        ( True )
-            self.ASC_btt_knifePos.setEnable     ( True )
-            self.ASC_btt_knife.setEnable        ( True )
-            self.ASC_btt_fiberPnmtc.setEnable   ( True )
-            self.ASC_btt_overwrSC.setEnable     ( True )
+            self.ASC_num_panning.setEnabled     ( True )
+            self.ASC_num_fibDeliv.setEnabled    ( True )
+            self.ASC_btt_clamp.setEnabled       ( True )
+            self.ASC_btt_knifePos.setEnabled    ( True )
+            self.ASC_btt_knife.setEnabled       ( True )
+            self.ASC_btt_fiberPnmtc.setEnabled  ( True )
+            self.ASC_btt_overwrSC.setEnabled    ( True )
 
         # update GUI
         self.SCTRL_indi_qProcessing.setStyleSheet   ( css )
@@ -1415,13 +1426,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             UTIL.DC_robMoving   = True
             buttonToggle        = False
         
-        self.ADC_num_panning.setEnable      ( buttonToggle )
-        self.ADC_num_fibDeliv.setEnable     ( buttonToggle )
-        self.ADC_btt_clamp.setEnable        ( buttonToggle )
-        self.ADC_btt_knifePos.setEnable     ( buttonToggle )
-        self.ADC_btt_knife.setEnable        ( buttonToggle )
-        self.ADC_btt_fiberPnmtc.setEnable   ( buttonToggle )
-        self.ADC_btt_resetAll.setEnable     ( buttonToggle )
+        self.ADC_num_panning.setEnabled     ( buttonToggle )
+        self.ADC_num_fibDeliv.setEnabled    ( buttonToggle )
+        self.ADC_btt_clamp.setEnabled       ( buttonToggle )
+        self.ADC_btt_knifePos.setEnabled    ( buttonToggle )
+        self.ADC_btt_knife.setEnabled       ( buttonToggle )
+        self.ADC_btt_fiberPnmtc.setEnabled  ( buttonToggle )
+        self.ADC_btt_resetAll.setEnabled    ( buttonToggle )
         
         self.DC_indi_robotMoving.setStyleSheet ( css )
         self.ADC_indi_robotMoving.setStyleSheet( css )
@@ -1791,63 +1802,74 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def amconScriptOverwrite( self ):
         """ override entire/partial SC queue with custom Amcon settings """
 
-        # windows vista dialog
-        userDialog = strdDialog( f"You about to overwrite every command in SC_queue to contain the "
-                                 f"the displayed Amcon commands, are you sure?"
-                                ,f"Overwrite warning" )
-        userDialog.exec()
-        if( userDialog.result() == 0): return
-
         # actual overwrite
-        idRange = self.ASC_num_SCLines.text()
-        if( idRange < 1 ):
-            userInfo = strdDialog( 'SC lines value is lower than 1, nothing was done.', 'Command error' )
+        idRange  = self.ASC_num_SCLines.text()
+        start    = int(re.findall( '\d+', idRange )[ 0 ])
+        SC_first = 1
+        usrTxt   = ''
+
+        try:                    SC_first = UTIL.SC_queue[0].id
+        except AttributeError:  usrTxt   = 'SC queue contains no commands, nothing was done'
+
+        if( start < SC_first ): usrTxt   = 'SC lines value is lower than lowest SC queue ID, nothing was done.'
+        if( usrTxt ):
+            userInfo = strdDialog( usrTxt , 'Command error' )
             userInfo.exec()
             return None
         
-        panVal      = self.ADC_num_panning.value()
-        fibDeliv    = self.ADC_num_fibDeliv.value()
-        clamp       = self.ADC_btt_clamp.isChecked()
-        knifePos    = self.ADC_btt_knifePos.isChecked()
-        knife       = self.ADC_btt_knife.isChecked()
-        fiberPnmtc  = self.ADC_btt_fiberPnmtc.isChecked()
+        panVal      = self.ASC_num_panning.value()
+        fibDeliv    = self.ASC_num_fibDeliv.value()
+        clamp       = self.ASC_btt_clamp.isChecked()
+        knifePos    = self.ASC_btt_knifePos.isChecked()
+        knife       = self.ASC_btt_knife.isChecked()
+        fiberPnmtc  = self.ASC_btt_fiberPnmtc.isChecked()
         
         if( '..' in idRange ):
-            ids     = re.findall( '\d+', idRange )
-            if( len(ids) != 2 ): 
+            idStart = re.findall( '\d+', idRange )
+            if( len(idStart) != 2 ): 
                 userInfo = strdDialog( 'Worng syntax used in SC lines value, nothing was done.', 'Command error' )
                 userInfo.exec()
                 return None
+            
+            idStart = int(idStart[ 0 ])
+            idEnd   = int(idStart[ 1 ])
 
             mutex.lock()
-            for i in range( ids[1] - ids[0] ):
-                j = UTIL.SC_queue.idPos( i + ids[0] )
-                UTIL.SC_queue[ j ].Tool.pan_steps        = panVal
-                UTIL.SC_queue[ j ].Tool.fibDeliv_steps   = fibDeliv
-                UTIL.SC_queue[ j ].Tool.clamp_yn         = clamp
-                UTIL.SC_queue[ j ].Tool.knifePos_yn      = knifePos
-                UTIL.SC_queue[ j ].Tool.knife_yn         = knife
-                UTIL.SC_queue[ j ].Tool.fiberPnmtc       = fiberPnmtc
+            for i in range( idEnd - idStart ):
+
+                try:                    j = UTIL.SC_queue.idPos( i + idStart ) 
+                except AttributeError:  break
+
+                UTIL.SC_queue[ j ].Tool.pan_steps        = int (panVal)
+                UTIL.SC_queue[ j ].Tool.fibDeliv_steps   = int (fibDeliv)
+                UTIL.SC_queue[ j ].Tool.clamp_yn         = bool(clamp)
+                UTIL.SC_queue[ j ].Tool.knifePos_yn      = bool(knifePos)
+                UTIL.SC_queue[ j ].Tool.knife_yn         = bool(knife)
+                UTIL.SC_queue[ j ].Tool.fiberPnmtc_yn    = bool(fiberPnmtc)
             mutex.unlock()
 
         else:
-            ids     = re.findall( '\d+', idRange )
+            ids = re.findall( '\d+', idRange )
             if( len(ids) != 1 ): 
                 userInfo = strdDialog( 'Worng syntax used in SC lines value, nothing was done.', 'Command error' )
                 userInfo.exec()
                 return None
+            
+            idStart = int(ids[ 0 ])
 
             mutex.lock()
-            j = UTIL.SC_queue.idPos( ids[0] )
-            UTIL.SC_queue[ j ].Tool.pan_steps        = panVal
-            UTIL.SC_queue[ j ].Tool.fibDeliv_steps   = fibDeliv
-            UTIL.SC_queue[ j ].Tool.clamp_yn         = clamp
-            UTIL.SC_queue[ j ].Tool.knifePos_yn      = knifePos
-            UTIL.SC_queue[ j ].Tool.knife_yn         = knife
-            UTIL.SC_queue[ j ].Tool.fiberPnmtc       = fiberPnmtc
+            try:                    j = UTIL.SC_queue.idPos( idStart )
+            except AttributeError:  return
+            
+            UTIL.SC_queue[ j ].Tool.pan_steps        = int (panVal)
+            UTIL.SC_queue[ j ].Tool.fibDeliv_steps   = int (fibDeliv)
+            UTIL.SC_queue[ j ].Tool.clamp_yn         = bool(clamp)
+            UTIL.SC_queue[ j ].Tool.knifePos_yn      = bool(knifePos)
+            UTIL.SC_queue[ j ].Tool.knife_yn         = bool(knife)
+            UTIL.SC_queue[ j ].Tool.fiberPnmtc_yn    = bool(fiberPnmtc)
             mutex.unlock()
 
-        tool = UTIL.SC_queue[ ids( 0 ) ].Tool 
+        tool = UTIL.SC_queue[ SC_first ].Tool 
         self.logEntry( 'ACON', f"{ idRange } SC commands overwritten to new tool settings: ({ tool })" )
 
 
@@ -1871,6 +1893,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         command = UTIL.QEntry( id       = UTIL.SC_currCommId
                               ,Coor1    = pos
                               ,Speed    = copy.deepcopy( UTIL.DC_speed )
+                              ,z        = 0
                               ,Tool     = tool )
         
         self.logEntry( 'ACON', f"updating tool status by user: ({ tool })" )
