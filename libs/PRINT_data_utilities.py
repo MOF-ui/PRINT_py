@@ -1347,7 +1347,7 @@ def reShort( regEx, txt, default, fallbackRegEx = '' ):
 
 
 
-def gcodeToQEntry( mutPos, mutSpeed, zone, txt = '' ):
+def gcodeToQEntry( mutPos, mutSpeed, zone, txt = '', wTool= False ):
     """ converts a single line of GCode G1 command to a QEntry, can be used in loops for multiline code,
         "pos" should be the pos before this command is executed (before its EXECUTED, not before its added  
         to SC_queue) as its the fallback option if no new X, Y, Z or EXT posistion is passed"""
@@ -1404,8 +1404,9 @@ def gcodeToQEntry( mutPos, mutSpeed, zone, txt = '' ):
             entry.Coor1 = round( entry.Coor1, 2 )
 
             # set tool settings
-            entry.Tool.fibDeliv_steps   = int( TOOL_fibRatio * DEF_TOOL_FIB_STPS )
-            entry.Tool.pnmtcFiber_yn    = True
+            if( wTool ):
+                entry.Tool.fibDeliv_steps   = int( TOOL_fibRatio * DEF_TOOL_FIB_STPS )
+                entry.Tool.pnmtcFiber_yn    = True
             
         case 'G28':
             entry = QEntry( id = 0, Coor1 = pos, Speed = speed, z  = zone )
@@ -1435,7 +1436,7 @@ def gcodeToQEntry( mutPos, mutSpeed, zone, txt = '' ):
 
 
 
-def rapidToQEntry( txt = '' ):
+def rapidToQEntry( txt = '', wTool= False ):
     """ converts a single line of MoveL, MoveJ, MoveC or Move* Offs command (no Reltool) to a QEntry (relative to
         DC_curr_zero), can be used in loops for multiline code, returns entry and any Exceptions"""
     global DC_currZero
@@ -1482,8 +1483,10 @@ def rapidToQEntry( txt = '' ):
         entry.Speed.acr = int(res_speed[ 2 ])
         entry.Speed.dcr = int(res_speed[ 3 ])
 
-        zone,res        = reShort( 'z\d+', txt, 10 )
+        zone, res       = reShort( 'z\d+', txt, 10 )
         entry.z         = int(zone[ 1: ])
+
+        entry.Coor1 = round( entry.Coor1, 5 )
 
         # # for later, if tool is implemented
         # tool    = reShort(',[^,]*$',txt,'tool0')[0]
@@ -1491,8 +1494,9 @@ def rapidToQEntry( txt = '' ):
         # tool    = tool [: len(tool) - 1]
 
         # set tool settings
-        entry.Tool.fibDeliv_steps   = int( TOOL_fibRatio * DEF_TOOL_FIB_STPS )
-        entry.Tool.pnmtcFiber_yn    = True
+        if( wTool ):
+            entry.Tool.fibDeliv_steps   = int( TOOL_fibRatio * DEF_TOOL_FIB_STPS )
+            entry.Tool.pnmtcFiber_yn    = True
 
     except Exception as e:
         return None,e
@@ -1541,9 +1545,10 @@ def addToCommProtocol( txt ):
 #                                    GLOBALS
 #############################################################################################
 
-############################ global constants
+###################################### global constants #####################################
 # defaut connection settings (the byte length for writing to the robot wont be user setable
 # for safety reasons, it can only be changed here, but only if you know what your doing!)
+
 DEF_TCP_ROB =      { "IP":       "192.168.125.1"
                     ,"PORT":     10001
                     ,"C_TOUT":   60000
@@ -1596,7 +1601,8 @@ DEF_TOOL_FIB_STPS   = 10
 DEF_TOOL_FIB_RATIO  = 1.0
 
 
-############################ global variables
+###################################### global variables ######################################
+
 ADC_panning         = DEF_AMC_PANNING
 ADC_fibDeliv        = DEF_AMC_FIB_DELIV
 ADC_clamp           = DEF_AMC_CLAMP

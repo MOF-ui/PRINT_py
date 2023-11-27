@@ -14,9 +14,9 @@ from pathlib    import Path
 from datetime   import datetime
 
 # appending the parent directory path
-current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir  = os.path.dirname(current_dir)
-sys.path.append(parent_dir)
+current_dir = os.path.dirname( os.path.realpath(__file__) )
+parent_dir  = os.path.dirname( current_dir )
+sys.path.append( parent_dir )
 
 
 # PyQt stuff
@@ -59,7 +59,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                           SETUP                                                   #
     #####################################################################################################
     
-    def __init__( self, lpath = None, connDef = (False,False), testrun = False, parent=None ):
+    def __init__( self, lpath= None, connDef= ( False, False ), testrun= False, parent= None ):
         """ setup main and daq UI, start subsystems & threads """
 
         super().__init__( parent )
@@ -145,7 +145,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ create signal-slot-links for UI buttons """
 
         # AMCON CONTROL
-        self.ADC_btt_resetAll.pressed.connect               ( self.loadAdcDefaults )
+        self.ADC_btt_resetAll.pressed.connect               ( lambda: self.loadAdcDefaults( sendChanges= True ) )
         self.ADC_num_panning.valueChanged.connect           ( self.adcUserChange )
         self.ADC_num_fibDeliv.valueChanged.connect          ( self.adcUserChange )
         self.ADC_btt_clamp.released.connect                 ( self.adcUserChange )
@@ -155,60 +155,60 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ASC_btt_overwrSC.released.connect              ( self.amconScriptOverwrite )
 
         # DIRECT CONTROL
-        self.DC_btt_xPlus.pressed.connect                   ( lambda: self.sendDCCommand('X','+') )
-        self.DC_btt_xMinus.pressed.connect                  ( lambda: self.sendDCCommand('X','-') )
-        self.DC_btt_yPlus.pressed.connect                   ( lambda: self.sendDCCommand('Y','+') )
-        self.DC_btt_yMinus.pressed.connect                  ( lambda: self.sendDCCommand('Y','-') )
-        self.DC_btt_zPlus.pressed.connect                   ( lambda: self.sendDCCommand('Z','+') )
-        self.DC_btt_zMinus.pressed.connect                  ( lambda: self.sendDCCommand('Z','-') )
-        self.DC_btt_extPlus.pressed.connect                 ( lambda: self.sendDCCommand('EXT','+') )
-        self.DC_btt_extMinus.pressed.connect                ( lambda: self.sendDCCommand('EXT','-') )
-        self.DC_btt_xyzZero.pressed.connect                 ( lambda: self.setZero      ([1,2,3]) )
-        self.DC_btt_extZero.pressed.connect                 ( lambda: self.setZero      ([8]) )
+        self.DC_btt_xPlus.pressed.connect                   ( lambda: self.sendDCCommand( 'X',   '+' ) )
+        self.DC_btt_xMinus.pressed.connect                  ( lambda: self.sendDCCommand( 'X',   '-' ) )
+        self.DC_btt_yPlus.pressed.connect                   ( lambda: self.sendDCCommand( 'Y',   '+' ) )
+        self.DC_btt_yMinus.pressed.connect                  ( lambda: self.sendDCCommand( 'Y',   '-' ) )
+        self.DC_btt_zPlus.pressed.connect                   ( lambda: self.sendDCCommand( 'Z',   '+' ) )
+        self.DC_btt_zMinus.pressed.connect                  ( lambda: self.sendDCCommand( 'Z',   '-' ) )
+        self.DC_btt_extPlus.pressed.connect                 ( lambda: self.sendDCCommand( 'EXT', '+' ) )
+        self.DC_btt_extMinus.pressed.connect                ( lambda: self.sendDCCommand( 'EXT', '-' ) )
+        self.DC_btt_xyzZero.pressed.connect                 ( lambda: self.setZero      ( [ 1,2,3 ] ) )
+        self.DC_btt_extZero.pressed.connect                 ( lambda: self.setZero      ( [ 8 ] ) )
         self.DC_btt_home.pressed.connect                    ( self.homeCommand )
 
         # FILE IO
         self.IO_btt_newFile.pressed.connect                 ( self.openFile )
         self.IO_btt_loadFile.pressed.connect                ( self.loadFile )
-        self.IO_btt_addByID.pressed.connect                 ( lambda: self.loadFile(lf_atID= True) )
-        self.IO_btt_xyzextZero.pressed.connect              ( lambda: self.setZero ([1,2,3,8]) )
-        self.IO_btt_orientZero.pressed.connect              ( lambda: self.setZero ([4,5,6]) )
+        self.IO_btt_addByID.pressed.connect                 ( lambda: self.loadFile( lf_atID= True ) )
+        self.IO_btt_xyzextZero.pressed.connect              ( lambda: self.setZero ( [ 1,2,3,8 ] ) )
+        self.IO_btt_orientZero.pressed.connect              ( lambda: self.setZero ( [ 4,5,6 ] ) )
 
         # NUMERIC CONTROL
         self.NC_btt_getValues.pressed.connect               ( self.valuesToDcSpinbox )
-        self.NC_btt_xyzSend.pressed.connect                 ( lambda: self.sendNCCommand([1,2,3]) )
-        self.NC_btt_xyzExtSend.pressed.connect              ( lambda: self.sendNCCommand([1,2,3,8]) )
-        self.NC_btt_orientSend.pressed.connect              ( lambda: self.sendNCCommand([4,5,6]) )
-        self.NC_btt_orientZero.pressed.connect              ( lambda: self.setZero      ([4,5,6]) )
+        self.NC_btt_xyzSend.pressed.connect                 ( lambda: self.sendNCCommand( [ 1,2,3 ] ) )
+        self.NC_btt_xyzExtSend.pressed.connect              ( lambda: self.sendNCCommand( [ 1,2,3,8 ] ) )
+        self.NC_btt_orientSend.pressed.connect              ( lambda: self.sendNCCommand( [ 4,5,6 ] ) )
+        self.NC_btt_orientZero.pressed.connect              ( lambda: self.setZero      ( [ 4,5,6 ] ) )
 
         # PUMP CONTROL
         self.PUMP_btt_setSpeed.pressed.connect              ( self.setSpeed )
-        self.PUMP_btt_plus1.pressed.connect                 ( lambda: self.setSpeed( '1') )
-        self.PUMP_btt_minus1.pressed.connect                ( lambda: self.setSpeed('-1') )
-        self.PUMP_btt_plus10.pressed.connect                ( lambda: self.setSpeed( '10') )
-        self.PUMP_btt_minus10.pressed.connect               ( lambda: self.setSpeed('-10') )
-        self.PUMP_btt_plus25.pressed.connect                ( lambda: self.setSpeed( '25') )
-        self.PUMP_btt_minus25.pressed.connect               ( lambda: self.setSpeed('-25') )
-        self.PUMP_btt_stop.pressed.connect                  ( lambda: self.setSpeed('0') )
-        self.PUMP_btt_reverse.pressed.connect               ( lambda: self.setSpeed('r') )
-        self.SCTRL_num_liveAd_pump1.valueChanged.connect    ( lambda: self.setSpeed('c') )
-        self.PUMP_btt_ccToDefault.pressed.connect           ( lambda: self.setSpeed('def') )
+        self.PUMP_btt_plus1.pressed.connect                 ( lambda: self.setSpeed(   '1' ) )
+        self.PUMP_btt_minus1.pressed.connect                ( lambda: self.setSpeed(  '-1' ) )
+        self.PUMP_btt_plus10.pressed.connect                ( lambda: self.setSpeed(  '10' ) )
+        self.PUMP_btt_minus10.pressed.connect               ( lambda: self.setSpeed( '-10' ) )
+        self.PUMP_btt_plus25.pressed.connect                ( lambda: self.setSpeed(  '25' ) )
+        self.PUMP_btt_minus25.pressed.connect               ( lambda: self.setSpeed( '-25' ) )
+        self.PUMP_btt_stop.pressed.connect                  ( lambda: self.setSpeed(   '0' ) )
+        self.PUMP_btt_reverse.pressed.connect               ( lambda: self.setSpeed(   'r' ) )
+        self.SCTRL_num_liveAd_pump1.valueChanged.connect    ( lambda: self.setSpeed(   'c' ) )
+        self.PUMP_btt_ccToDefault.pressed.connect           ( lambda: self.setSpeed( 'def' ) )
         self.PUMP_btt_scToDefault.pressed.connect           ( self.pumpScriptOverwrite )
         self.PUMP_btt_pinchValve.pressed.connect            ( self.pinchValveToggle )
 
         # SCRIPT CONTROL
         self.SCTRL_btt_forcedStop.pressed.connect           ( self.forcedStopCommand )
         self.SCTRL_btt_startQProcessing.pressed.connect     ( self.startSCTRLQueue )
-        self.SCTRL_btt_holdQProcessing.pressed.connect      ( lambda: self.stopSCTRLQueue   (prepEnd = True) )
+        self.SCTRL_btt_holdQProcessing.pressed.connect      ( lambda: self.stopSCTRLQueue   ( prepEnd = True ) )
         self.SCTRL_num_liveAd_robot.valueChanged.connect    ( self.updateRobLiveAd )
-        self.SCTRL_btt_addSIB1_atFront.pressed.connect      ( lambda: self.addSIB           (1) )
-        self.SCTRL_btt_addSIB2_atFront.pressed.connect      ( lambda: self.addSIB           (2) )
-        self.SCTRL_btt_addSIB3_atFront.pressed.connect      ( lambda: self.addSIB           (3) )
-        self.SCTRL_btt_addSIB1_atEnd.pressed.connect        ( lambda: self.addSIB           (1, atEnd = True) )
-        self.SCTRL_btt_addSIB2_atEnd.pressed.connect        ( lambda: self.addSIB           (2, atEnd = True) )
-        self.SCTRL_btt_addSIB3_atEnd.pressed.connect        ( lambda: self.addSIB           (3, atEnd = True) )
-        self.SCTRL_btt_clrQ.pressed.connect                 ( lambda: self.clrQueue         (partial = False) )
-        self.SCTRL_btt_clrByID.pressed.connect              ( lambda: self.clrQueue         (partial = True) )
+        self.SCTRL_btt_addSIB1_atFront.pressed.connect      ( lambda: self.addSIB           ( 1 ) )
+        self.SCTRL_btt_addSIB2_atFront.pressed.connect      ( lambda: self.addSIB           ( 2 ) )
+        self.SCTRL_btt_addSIB3_atFront.pressed.connect      ( lambda: self.addSIB           ( 3 ) )
+        self.SCTRL_btt_addSIB1_atEnd.pressed.connect        ( lambda: self.addSIB           ( 1, atEnd = True ) )
+        self.SCTRL_btt_addSIB2_atEnd.pressed.connect        ( lambda: self.addSIB           ( 2, atEnd = True ) )
+        self.SCTRL_btt_addSIB3_atEnd.pressed.connect        ( lambda: self.addSIB           ( 3, atEnd = True ) )
+        self.SCTRL_btt_clrQ.pressed.connect                 ( lambda: self.clrQueue         ( partial = False ) )
+        self.SCTRL_btt_clrByID.pressed.connect              ( lambda: self.clrQueue         ( partial = True ) )
         self.SCTRL_chk_autoScroll.stateChanged.connect      ( lambda: self.SCTRL_arr_queue.scrollToBottom() )
         self.ICQ_chk_autoScroll.stateChanged.connect        ( lambda: self.ICQ_arr_terminal.scrollToBottom() )
         
@@ -225,24 +225,24 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SGLC_btt_rapidSglComm.pressed.connect          ( self.addRapidSgl )
         self.SGLC_btt_sendFirstQComm.pressed.connect        ( lambda: self.sendCommand( UTIL.SC_queue.popFirstItem() ) )
         self.SGLC_btt_gcodeSglComm_addByID.pressed.connect  ( lambda: self.addGcodeSgl( atID = True
-                                                                                       ,ID = self.SGLC_num_gcodeSglComm_addByID.value()) )
+                                                                                       ,ID = self.SGLC_num_gcodeSglComm_addByID.value() ) )
         self.SGLC_btt_rapidSglComm_addByID.pressed.connect  ( lambda: self.addRapidSgl( atID = True
-                                                                                       ,ID = self.SGLC_num_rapidSglComm_addByID.value()) )
+                                                                                       ,ID = self.SGLC_num_rapidSglComm_addByID.value() ) )
 
         # CONNECTIONS
         # self.TCP_ROB_btt_reconn.pressed.connect             ( lambda: self.connectTCP(1) )
-        self.TCP_PUMP1_btt_reconn.pressed.connect           ( lambda: self.connectTCP(2) )
-        self.TCP_PUMP2_btt_reconn.pressed.connect           ( lambda: self.connectTCP(3) )
-        self.TCP_ROB_btt_discon.pressed.connect             ( lambda: self.disconnectTCP(1) )
-        self.TCP_PUMP1_btt_discon.pressed.connect           ( lambda: self.disconnectTCP(2) )
-        self.TCP_PUMP2_btt_discon.pressed.connect           ( lambda: self.disconnectTCP(3) )
+        self.TCP_PUMP1_btt_reconn.pressed.connect           ( lambda: self.connectTCP   ( 2 ) )
+        self.TCP_PUMP2_btt_reconn.pressed.connect           ( lambda: self.connectTCP   ( 3 ) )
+        self.TCP_ROB_btt_discon.pressed.connect             ( lambda: self.disconnectTCP( 1 ) )
+        self.TCP_PUMP1_btt_discon.pressed.connect           ( lambda: self.disconnectTCP( 2 ) )
+        self.TCP_PUMP2_btt_discon.pressed.connect           ( lambda: self.disconnectTCP( 3 ) )
         
         # TERMINAL
         self.TERM_btt_gcodeInterp.pressed.connect           ( self.sendGcodeCommand )
         self.TERM_btt_rapidInterp.pressed.connect           ( self.sendRapidCommand )
 
         # ZERO
-        self.ZERO_btt_newZero.pressed.connect               ( lambda: self.setZero( axis= [1,2,3,4,5,6,8], fromSysMonitor= True ) )
+        self.ZERO_btt_newZero.pressed.connect               ( lambda: self.setZero( axis= [ 1,2,3,4,5,6,8 ], fromSysMonitor= True ) )
 
 
 
@@ -275,21 +275,21 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         # SCRIPT CONTROL
         self.ctrl_S.activated.connect       ( self.startSCTRLQueue )
-        self.ctrl_A.activated.connect       ( lambda: self.stopSCTRLQueue (prepEnd = True) )
+        self.ctrl_A.activated.connect       ( lambda: self.stopSCTRLQueue ( prepEnd = True ) )
         self.ctrl_F.activated.connect       ( lambda: self.sendCommand    ( UTIL.SC_queue.popFirstItem() ) )
-        self.ctrl_Raute.activated.connect   ( lambda: self.clrQueue       (partial = False) )
+        self.ctrl_Raute.activated.connect   ( lambda: self.clrQueue       ( partial = False ) )
         self.ctrl_Q.activated.connect       ( self.forcedStopCommand )
         self.ctrl_alt_I.activated.connect   ( self.resetScId )
 
         # DIRECT CONTROL
-        self.ctrl_U.activated.connect       ( lambda: self.sendDCCommand('X','+') )
-        self.ctrl_J.activated.connect       ( lambda: self.sendDCCommand('X','-') )
-        self.ctrl_I.activated.connect       ( lambda: self.sendDCCommand('Y','+') )
-        self.ctrl_K.activated.connect       ( lambda: self.sendDCCommand('Y','-') )
-        self.ctrl_O.activated.connect       ( lambda: self.sendDCCommand('Z','+') )
-        self.ctrl_L.activated.connect       ( lambda: self.sendDCCommand('Z','-') )
-        self.ctrl_P.activated.connect       ( lambda: self.sendDCCommand('EXT','+') )
-        self.ctrl_OE.activated.connect      ( lambda: self.sendDCCommand('EXT','-') )
+        self.ctrl_U.activated.connect       ( lambda: self.sendDCCommand( 'X',   '+' ) )
+        self.ctrl_J.activated.connect       ( lambda: self.sendDCCommand( 'X',   '-' ) )
+        self.ctrl_I.activated.connect       ( lambda: self.sendDCCommand( 'Y',   '+' ) )
+        self.ctrl_K.activated.connect       ( lambda: self.sendDCCommand( 'Y',   '-' ) )
+        self.ctrl_O.activated.connect       ( lambda: self.sendDCCommand( 'Z',   '+' ) )
+        self.ctrl_L.activated.connect       ( lambda: self.sendDCCommand( 'Z',   '-' ) )
+        self.ctrl_P.activated.connect       ( lambda: self.sendDCCommand( 'EXT', '+' ) )
+        self.ctrl_OE.activated.connect      ( lambda: self.sendDCCommand( 'EXT', '-' ) )
         
         # NUMERIC CONTROL
         self.ctrl_T.activated.connect       ( self.valuesToDcSpinbox )
@@ -299,15 +299,15 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ctrl_M.activated.connect       ( self.loadFile )
 
         # PUMP CONTROL
-        self.ctrl_E.activated.connect       ( lambda: self.setSpeed('0') )
-        self.ctrl_R.activated.connect       ( lambda: self.setSpeed('-1') )
+        self.ctrl_E.activated.connect       ( lambda: self.setSpeed(  '0' ) )
+        self.ctrl_R.activated.connect       ( lambda: self.setSpeed( '-1' ) )
 
 
 
 
 
 
-    def loadDefaults( self, setup = False ):
+    def loadDefaults( self, setup= False ):
         """ load default general settings to user display """
 
         self.SET_float_volPerMM.setValue        ( UTIL.DEF_SC_VOL_PER_M )
@@ -324,7 +324,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SET_num_decelRamp_print.setValue   ( UTIL.DEF_PRIN_SPEED.dcr )
 
         if(not setup): 
-            self.logEntry('SETS','User resetted general properties to default values.')
+            self.logEntry( 'SETS', 'User resetted general properties to default values.' )
         else:
             self.TCP_num_commForerun.setValue   ( UTIL.DEF_ROB_COMM_FR )
 
@@ -341,11 +341,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def loadTeDefaults( self, setup = False ):
+    def loadTeDefaults( self, setup= False ):
         """ load default Tool/External settings to user display """
 
-        self.SET_TE_num_fllwBhvrInterv.setValue ( UTIL.DEF_SC_EXT_FLLW_BHVR[0] )
-        self.SET_TE_num_fllwBhvrSkip.setValue   ( UTIL.DEF_SC_EXT_FLLW_BHVR[1] )
+        self.SET_TE_num_fllwBhvrInterv.setValue ( UTIL.DEF_SC_EXT_FLLW_BHVR[ 0 ] )
+        self.SET_TE_num_fllwBhvrSkip.setValue   ( UTIL.DEF_SC_EXT_FLLW_BHVR[ 1 ] )
 
         if(not setup):  self.logEntry( 'SETS', 'User resetted TE properties to default values.' )
 
@@ -354,7 +354,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def loadAdcDefaults( self ):
+    def loadAdcDefaults( self, sendChanges= False ):
         """ load ADC default values """
 
         # stop UI changes to retrigger themselfs
@@ -366,7 +366,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ADC_btt_knifePos.setChecked    ( UTIL.DEF_AMC_KNIFE_POS )
         self.ADC_btt_knife.setChecked       ( UTIL.DEF_AMC_KNIFE )
         self.ADC_btt_fiberPnmtc.setChecked  ( UTIL.DEF_AMC_FIBER_PNMTC )
-        self.adcUserChange()
+
+        if( sendChanges ): self.adcUserChange()
 
         self.setUpdatesEnabled(True)
         
@@ -380,7 +381,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                        CONNECTIONS                                                #
     #####################################################################################################
 
-    def connectTCP( self,TCPslot = 0 ):
+    def connectTCP( self, TCPslot= 0 ):
         """ slot-wise connection management, mostly to shrink code length, maybe more functionality later """
 
         css = ( "border-radius: 25px; background-color: #00aaff;" )
@@ -397,8 +398,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                     self.logEntry               ( 'CONN', f"connected to {conn[0]} at {conn[1]}." )
                     return True
                 
-                elif (res == TimeoutError):             self.logEntry( 'CONN', f"timed out while trying to connect {conn[0]} at {conn[1]} ." )
-                elif (res == ConnectionRefusedError):   self.logEntry( 'CONN', f"server {conn[0]} at {conn[1]} refused the connection." )
+                elif( res == TimeoutError ):            self.logEntry( 'CONN', f"timed out while trying to connect {conn[0]} at {conn[1]} ." )
+                elif( res == ConnectionRefusedError ):  self.logEntry( 'CONN', f"server {conn[0]} at {conn[1]} refused the connection." )
                 else:                                   self.logEntry( 'CONN', f"connection to {conn[0]} at {conn[1]} failed ({res})!" )
                 return False
 
@@ -440,7 +441,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def disconnectTCP( self,TCPslot = 0 ):
+    def disconnectTCP( self, TCPslot= 0 ):
         """ disconnect works, reconnect crashes the app, problem probably lies here
             should also send E command to robot on disconnect """
 
@@ -629,10 +630,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          WATCHDOGS                                                #
     #####################################################################################################
 
-    def setWatchdog( self, dognumber= 0 ):
+    def setWatchdog( self, dogNum= 0 ):
         """ set Watchdog, check data updates from robot and pump occure at least every 10 sec """
 
-        match dognumber:
+        match dogNum:
             case 1:
                 self.robReceiveWD = QTimer()
                 self.robReceiveWD.setSingleShot    ( True )
@@ -658,10 +659,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def resetWatchdog( self, dognumber= 0 ):
+    def resetWatchdog( self, dogNum= 0 ):
         """ reset the Watchdogs, robReceiveWD on every newly received data block """
 
-        match dognumber:
+        match dogNum:
             case 1:   self.robReceiveWD.start()
             case 2:   self.pumpOneReceiveWD.start()
             case _:   self.logEntry( 'WDOG', 'Watchdog reset failed, invalid dog number given' )
@@ -670,10 +671,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def watchdogBite( self, dognumber= 0 ):
+    def watchdogBite( self, dogNum= 0 ):
         """ close the UI on any biting WD, log info """
 
-        match dognumber:
+        match dogNum:
             case 1:   wdNum = '1'
 
             case 2:
@@ -726,10 +727,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def killWatchdog( self, dognumber= 0 ):
+    def killWatchdog( self, dogNum= 0 ):
         """ put them to sleep (dont do this to real dogs) """
 
-        match dognumber:
+        match dogNum:
             case 1:   self.robReceiveWD.stop()
             case 2:   self.pumpOneReceiveWD.stop()
             case _:   pass
@@ -909,6 +910,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         except AttributeError:  pass
 
         # update Amcon & Pump tab
+        self.setUpdatesEnabled( False )
+
         self.ADC_num_panning.setValue       ( entry.Tool.pan_steps )
         self.ASC_num_panning.setValue       ( entry.Tool.pan_steps )
         self.ADC_num_fibDeliv.setValue      ( entry.Tool.fibDeliv_steps )
@@ -921,6 +924,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ASC_btt_knife.setChecked       ( entry.Tool.knife_yn )
         self.ADC_btt_fiberPnmtc.setChecked  ( entry.Tool.pnmtcFiber_yn )
         self.ASC_btt_fiberPnmtc.setChecked  ( entry.Tool.pnmtcFiber_yn )
+
+        self.setUpdatesEnabled( True )
 
 
 
@@ -1418,24 +1423,40 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         mutex.lock()
         if( end ):
-            css = "border-radius: 25px; background-color: #4c4a48;"
             UTIL.DC_robMoving   = False
             buttonToggle        = True
+            self.DC_indi_robotMoving.setStyleSheet ( "border-radius: 25px; background-color: #4c4a48;" )
+            self.ADC_indi_robotMoving.setStyleSheet( "border-radius: 20px; background-color: #4c4a48;" )
         else:
-            css = "border-radius: 25px; background-color: #00aaff;"
             UTIL.DC_robMoving   = True
             buttonToggle        = False
+            self.DC_indi_robotMoving.setStyleSheet ( "border-radius: 25px; background-color: #00aaff;" )
+            self.ADC_indi_robotMoving.setStyleSheet( "border-radius: 20px; background-color: #00aaff;" )
         
-        self.ADC_num_panning.setEnabled     ( buttonToggle )
-        self.ADC_num_fibDeliv.setEnabled    ( buttonToggle )
-        self.ADC_btt_clamp.setEnabled       ( buttonToggle )
-        self.ADC_btt_knifePos.setEnabled    ( buttonToggle )
-        self.ADC_btt_knife.setEnabled       ( buttonToggle )
-        self.ADC_btt_fiberPnmtc.setEnabled  ( buttonToggle )
-        self.ADC_btt_resetAll.setEnabled    ( buttonToggle )
-        
-        self.DC_indi_robotMoving.setStyleSheet ( css )
-        self.ADC_indi_robotMoving.setStyleSheet( css )
+        self.ADC_num_panning.setEnabled         ( buttonToggle )
+        self.ADC_num_fibDeliv.setEnabled        ( buttonToggle )
+        self.ADC_btt_clamp.setEnabled           ( buttonToggle )
+        self.ADC_btt_knifePos.setEnabled        ( buttonToggle )
+        self.ADC_btt_knife.setEnabled           ( buttonToggle )
+        self.ADC_btt_fiberPnmtc.setEnabled      ( buttonToggle )
+        self.ADC_btt_resetAll.setEnabled        ( buttonToggle )
+
+        self.DC_btt_xPlus.setEnabled            ( buttonToggle )
+        self.DC_btt_xMinus.setEnabled           ( buttonToggle )
+        self.DC_btt_yPlus.setEnabled            ( buttonToggle )
+        self.DC_btt_yMinus.setEnabled           ( buttonToggle )
+        self.DC_btt_zPlus.setEnabled            ( buttonToggle )
+        self.DC_btt_zMinus.setEnabled           ( buttonToggle )
+        self.DC_btt_extPlus.setEnabled          ( buttonToggle )
+        self.DC_btt_extMinus.setEnabled         ( buttonToggle )
+        self.DC_btt_home.setEnabled             ( buttonToggle )
+
+        self.NC_btt_xyzSend.setEnabled          ( buttonToggle )
+        self.NC_btt_xyzExtSend.setEnabled       ( buttonToggle )
+        self.NC_btt_orientSend.setEnabled       ( buttonToggle )
+
+        self.TERM_btt_gcodeInterp.setEnabled    ( buttonToggle )
+        self.TERM_btt_rapidInterp.setEnabled    ( buttonToggle )
         mutex.unlock()
 
 
@@ -1457,7 +1478,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                               ,z        = 0)
         
         self.logEntry( 'DCom', 'sending DC home command...' )
-        return self.sendCommand( command, DC = True )
+        return self.sendCommand( command, DC= True )
         
 
 
@@ -1499,7 +1520,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                               ,z        = 0)
         
         self.logEntry( 'DCom', f"sending DC command: ({command})" )
-        return self.sendCommand( command, DC = True )
+        return self.sendCommand( command, DC= True )
 
 
 
@@ -1533,7 +1554,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                               ,z        = 0)
         
         self.logEntry( 'DCom', f"sending NC command: ({newPos})" )
-        return self.sendCommand( command, DC = True )
+        return self.sendCommand( command, DC= True )
     
 
 
@@ -1568,7 +1589,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         entry.id = UTIL.SC_currCommId
 
         self.logEntry('DCom',f"sending GCode DC command: ({entry})")
-        return self.sendCommand( entry, DC = True )
+        return self.sendCommand( entry, DC= True )
 
 
 
@@ -1592,7 +1613,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         entry.id = UTIL.SC_currCommId
 
         self.logEntry( 'DCom', f"sending RAPID DC command: ({entry})" )
-        return self.sendCommand( entry, DC = True )
+        return self.sendCommand( entry, DC= True )
 
 
 
@@ -1606,7 +1627,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         command = UTIL.QEntry( id = 1
                               ,mt = 'S')
         
-        if( self.testrun ): return self.sendCommand( command, DC = True )
+        if( self.testrun ): return self.sendCommand( command, DC= True )
         FSWarning = strdDialog( 'WARNING!\n\nRobot will stop after current movement!\
                                  OK to delete buffered commands on robot;\
                                  Cancel to continue queue processing.'
@@ -1615,7 +1636,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         if( FSWarning.result() ):
             self.stopSCTRLQueue()
-            self.sendCommand( command, DC = True )
+            self.sendCommand( command, DC= True )
 
             mutex.lock()
 
@@ -1645,8 +1666,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def robotStopCommand( self, directly= True ):
         """ close connection signal for robot, add it to Queue or gives it to the actual sendCommand function """
 
-        command = UTIL.QEntry( id = 1
-                              ,mt = 'E')
+        command = UTIL.QEntry( id= 1, mt= 'E' )
         
         if( directly ):
             self.logEntry( 'SysC', "sending robot stop command directly" )
@@ -1657,7 +1677,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             UTIL.ROB_sendList.clear()
             mutex.unlock()
 
-            return self.sendCommand( command, DC = True )
+            return self.sendCommand( command, DC= True )
         
         else:
             command.id = 0
@@ -1788,7 +1808,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def pinchValveToggle( self ):
         """ not implemented yet """
 
-        raise ProcessLookupError('pinch valve routine does not exist, yet!')
+        usrInfo = strdDialog( 'Pinch valve not supported, yet!', 'Process does not exist' )
+        usrInfo.exec()
 
 
 
@@ -1803,13 +1824,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ override entire/partial SC queue with custom Amcon settings """
 
         # actual overwrite
-        idRange  = self.ASC_num_SCLines.text()
-        start    = int(re.findall( '\d+', idRange )[ 0 ])
+        idRange  = self.ASC_entry_SCLines.text()
         SC_first = 1
         usrTxt   = ''
 
+        try:                    start    = int(re.findall( '\d+', idRange )[ 0 ])
+        except IndexError:      usrTxt   = 'Invalid command in SC lines.'
         try:                    SC_first = UTIL.SC_queue[0].id
-        except AttributeError:  usrTxt   = 'SC queue contains no commands, nothing was done'
+        except AttributeError:  usrTxt   = 'SC queue contains no commands, nothing was done.'
 
         if( start < SC_first ): usrTxt   = 'SC lines value is lower than lowest SC queue ID, nothing was done.'
         if( usrTxt ):
@@ -1825,17 +1847,17 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         fiberPnmtc  = self.ASC_btt_fiberPnmtc.isChecked()
         
         if( '..' in idRange ):
-            idStart = re.findall( '\d+', idRange )
-            if( len(idStart) != 2 ): 
+            ids = re.findall( '\d+', idRange )
+            if( len(ids) != 2 ): 
                 userInfo = strdDialog( 'Worng syntax used in SC lines value, nothing was done.', 'Command error' )
                 userInfo.exec()
                 return None
             
-            idStart = int(idStart[ 0 ])
-            idEnd   = int(idStart[ 1 ])
+            idStart = int(ids[ 0 ])
+            idEnd   = int(ids[ 1 ])
 
             mutex.lock()
-            for i in range( idEnd - idStart ):
+            for i in range( idEnd - idStart + 1 ):
 
                 try:                    j = UTIL.SC_queue.idPos( i + idStart ) 
                 except AttributeError:  break
@@ -1869,7 +1891,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             UTIL.SC_queue[ j ].Tool.fiberPnmtc_yn    = bool(fiberPnmtc)
             mutex.unlock()
 
-        tool = UTIL.SC_queue[ SC_first ].Tool 
+        checkEntry  = UTIL.SC_queue.idPos( idStart ) 
+        tool        = UTIL.SC_queue[ checkEntry ].Tool
         self.logEntry( 'ACON', f"{ idRange } SC commands overwritten to new tool settings: ({ tool })" )
 
 
@@ -1897,7 +1920,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                               ,Tool     = tool )
         
         self.logEntry( 'ACON', f"updating tool status by user: ({ tool })" )
-        return self.sendCommand( command, DC = True )
+        return self.sendCommand( command, DC= True )
 
 
 
@@ -1920,7 +1943,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         
         if( UTIL.ROB_tcpip.connected ):
             self.logEntry               ( 'CONN', 'closing robot TCP connection...' )
-            self.robotStopCommand       ()
+            UTIL.ROB_tcpip.send         ( UTIL.QEntry( id= 1, mt= 'E' ) )
             UTIL.ROB_tcpip.close        ( end= True )
             self.roboCommThread.quit    ()
             self.roboCommThread.wait    ()

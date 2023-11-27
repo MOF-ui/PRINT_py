@@ -182,7 +182,7 @@ class RoboCommWorker( QObject ):
     def receive( self ):
         """ receive 36-byte data block, write to ROB vars """
 
-        telem,rawData,state = UTIL.ROB_tcpip.receive()
+        telem, rawData, state = UTIL.ROB_tcpip.receive()
 
         if( state == True ):
             if( telem is not None ): 
