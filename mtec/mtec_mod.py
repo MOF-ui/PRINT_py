@@ -1,5 +1,5 @@
 
-# I modified this library to use it in a QThread, original by m-tec.com, 
+# I modified this library to use it in a QThread, original by Paul Richter from m-tec.com, 
 # see https://github.com/m-tec-com/m-tecConnectModbus (2023-06-27)
 
 ####################################################   IMPORTS   ####################################################

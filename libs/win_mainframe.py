@@ -30,11 +30,11 @@ from ui.UI_mainframe_v6 import Ui_MainWindow
 
 
 # import my own libs
-from libs.PRINT_win_daq         import daqWindow
-from libs.PRINT_win_dialogs     import strdDialog, fileDialog
-from libs.PRINT_pump_utilities  import defaultMode as PU_defMode
-import libs.PRINT_threads           as WORKERS
-import libs.PRINT_data_utilities    as UTIL
+from libs.win_daq         import daqWindow
+from libs.win_dialogs     import strdDialog, fileDialog
+from libs.pump_utilities  import defaultMode as PU_defMode
+import libs.threads           as WORKERS
+import libs.data_utilities    as UTIL
 
 
 
@@ -47,8 +47,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
     logpath     = ''            # reference for logEntry, set by __init__
     testrun     = False         # switch for mainframe_test.py
-    pump1Conn   = False         # switch to enable pump1
-    pump2Conn   = False         # switch to enable pump2
     DAQ         = None          # reference for DAQ main window, instance is loaded in __init__
     firstPos    = True          # one-time switch to get robot home position
 
@@ -116,7 +114,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         
         # ROBOT CONNECTION SETUP
         self.logEntry( 'GNRL', 'connect to Robot...' ) 
-        res = self.connectTCP(1)
+        res = self.connectTCP( 'ROB' )
 
         # if connection fails, suicide after the actual .exec is finished, exit without chrash
         if(res == False):
@@ -127,10 +125,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # PUMP CONNECTIONS SETUP
         if (connDef[0]): 
             self.logEntry   ( 'GNRL', 'connect to pump1...' )
-            self.connectTCP ( 2 )
+            self.connectTCP ( 'P1' )
         if (connDef[1]):  
             self.logEntry   ( 'GNRL', 'connect to pump2...' )
-            self.connectTCP ( 3 )
+            self.connectTCP ( 'P1' )
 
         # FINISH SETUP
         self.logEntry( 'GNRL', 'setup finished.' )
@@ -182,17 +180,17 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.NC_btt_orientZero.pressed.connect              ( lambda: self.setZero      ( [ 4,5,6 ] ) )
 
         # PUMP CONTROL
-        self.PUMP_btt_setSpeed.pressed.connect              ( self.setSpeed )
-        self.PUMP_btt_plus1.pressed.connect                 ( lambda: self.setSpeed(   '1' ) )
-        self.PUMP_btt_minus1.pressed.connect                ( lambda: self.setSpeed(  '-1' ) )
-        self.PUMP_btt_plus10.pressed.connect                ( lambda: self.setSpeed(  '10' ) )
-        self.PUMP_btt_minus10.pressed.connect               ( lambda: self.setSpeed( '-10' ) )
-        self.PUMP_btt_plus25.pressed.connect                ( lambda: self.setSpeed(  '25' ) )
-        self.PUMP_btt_minus25.pressed.connect               ( lambda: self.setSpeed( '-25' ) )
-        self.PUMP_btt_stop.pressed.connect                  ( lambda: self.setSpeed(   '0' ) )
-        self.PUMP_btt_reverse.pressed.connect               ( lambda: self.setSpeed(   'r' ) )
-        self.SCTRL_num_liveAd_pump1.valueChanged.connect    ( lambda: self.setSpeed(   'c' ) )
-        self.PUMP_btt_ccToDefault.pressed.connect           ( lambda: self.setSpeed( 'def' ) )
+        self.PUMP_btt_setSpeed.pressed.connect              ( self.pumpSetSpeed )
+        self.PUMP_btt_plus1.pressed.connect                 ( lambda: self.pumpSetSpeed(   '1' ) )
+        self.PUMP_btt_minus1.pressed.connect                ( lambda: self.pumpSetSpeed(  '-1' ) )
+        self.PUMP_btt_plus10.pressed.connect                ( lambda: self.pumpSetSpeed(  '10' ) )
+        self.PUMP_btt_minus10.pressed.connect               ( lambda: self.pumpSetSpeed( '-10' ) )
+        self.PUMP_btt_plus25.pressed.connect                ( lambda: self.pumpSetSpeed(  '25' ) )
+        self.PUMP_btt_minus25.pressed.connect               ( lambda: self.pumpSetSpeed( '-25' ) )
+        self.PUMP_btt_stop.pressed.connect                  ( lambda: self.pumpSetSpeed(   '0' ) )
+        self.PUMP_btt_reverse.pressed.connect               ( lambda: self.pumpSetSpeed(   'r' ) )
+        self.SCTRL_num_liveAd_pump1.valueChanged.connect    ( lambda: self.pumpSetSpeed(   'c' ) )
+        self.PUMP_btt_ccToDefault.pressed.connect           ( lambda: self.pumpSetSpeed( 'def' ) )
         self.PUMP_btt_scToDefault.pressed.connect           ( self.pumpScriptOverwrite )
         self.PUMP_btt_pinchValve.pressed.connect            ( self.pinchValveToggle )
 
@@ -204,11 +202,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_btt_addSIB1_atFront.pressed.connect      ( lambda: self.addSIB           ( 1 ) )
         self.SCTRL_btt_addSIB2_atFront.pressed.connect      ( lambda: self.addSIB           ( 2 ) )
         self.SCTRL_btt_addSIB3_atFront.pressed.connect      ( lambda: self.addSIB           ( 3 ) )
-        self.SCTRL_btt_addSIB1_atEnd.pressed.connect        ( lambda: self.addSIB           ( 1, atEnd = True ) )
-        self.SCTRL_btt_addSIB2_atEnd.pressed.connect        ( lambda: self.addSIB           ( 2, atEnd = True ) )
-        self.SCTRL_btt_addSIB3_atEnd.pressed.connect        ( lambda: self.addSIB           ( 3, atEnd = True ) )
-        self.SCTRL_btt_clrQ.pressed.connect                 ( lambda: self.clrQueue         ( partial = False ) )
-        self.SCTRL_btt_clrByID.pressed.connect              ( lambda: self.clrQueue         ( partial = True ) )
+        self.SCTRL_btt_addSIB1_atEnd.pressed.connect        ( lambda: self.addSIB           ( 1, atEnd= True ) )
+        self.SCTRL_btt_addSIB2_atEnd.pressed.connect        ( lambda: self.addSIB           ( 2, atEnd= True ) )
+        self.SCTRL_btt_addSIB3_atEnd.pressed.connect        ( lambda: self.addSIB           ( 3, atEnd= True ) )
+        self.SCTRL_btt_clrQ.pressed.connect                 ( lambda: self.clrQueue         ( partial= False ) )
+        self.SCTRL_btt_clrByID.pressed.connect              ( lambda: self.clrQueue         ( partial= True ) )
         self.SCTRL_chk_autoScroll.stateChanged.connect      ( lambda: self.SCTRL_arr_queue.scrollToBottom() )
         self.ICQ_chk_autoScroll.stateChanged.connect        ( lambda: self.ICQ_arr_terminal.scrollToBottom() )
         
@@ -224,18 +222,20 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SGLC_btt_gcodeSglComm.pressed.connect          ( self.addGcodeSgl )
         self.SGLC_btt_rapidSglComm.pressed.connect          ( self.addRapidSgl )
         self.SGLC_btt_sendFirstQComm.pressed.connect        ( lambda: self.sendCommand( UTIL.SC_queue.popFirstItem() ) )
-        self.SGLC_btt_gcodeSglComm_addByID.pressed.connect  ( lambda: self.addGcodeSgl( atID = True
-                                                                                       ,ID = self.SGLC_num_gcodeSglComm_addByID.value() ) )
-        self.SGLC_btt_rapidSglComm_addByID.pressed.connect  ( lambda: self.addRapidSgl( atID = True
-                                                                                       ,ID = self.SGLC_num_rapidSglComm_addByID.value() ) )
+        self.SGLC_btt_gcodeSglComm_addByID.pressed.connect  ( lambda: self.addGcodeSgl( atID= True
+                                                                                       ,ID=   self.SGLC_num_gcodeSglComm_addByID.value() ) )
+        self.SGLC_btt_rapidSglComm_addByID.pressed.connect  ( lambda: self.addRapidSgl( atID= True
+                                                                                       ,ID=   self.SGLC_num_rapidSglComm_addByID.value() ) )
 
         # CONNECTIONS
-        # self.TCP_ROB_btt_reconn.pressed.connect             ( lambda: self.connectTCP(1) )
-        self.TCP_PUMP1_btt_reconn.pressed.connect           ( lambda: self.connectTCP   ( 2 ) )
-        self.TCP_PUMP2_btt_reconn.pressed.connect           ( lambda: self.connectTCP   ( 3 ) )
-        self.TCP_ROB_btt_discon.pressed.connect             ( lambda: self.disconnectTCP( 1 ) )
-        self.TCP_PUMP1_btt_discon.pressed.connect           ( lambda: self.disconnectTCP( 2 ) )
-        self.TCP_PUMP2_btt_discon.pressed.connect           ( lambda: self.disconnectTCP( 3 ) )
+        # self.TCP_ROB_btt_reconn.pressed.connect             ( lambda: self.connectTCP( 'ROB' ) )
+        self.TCP_PUMP1_btt_reconn.pressed.connect           ( lambda: self.connectTCP   ( 'P1' ) )
+        self.TCP_PUMP2_btt_reconn.pressed.connect           ( lambda: self.connectTCP   ( 'P2' ) )
+        self.TCP_MIXER_btt_reconn.pressed.connect           ( lambda: self.connectTCP   ( 'MIX' ) )
+        self.TCP_ROB_btt_discon.pressed.connect             ( lambda: self.disconnectTCP( 'ROB' ) )
+        self.TCP_PUMP1_btt_discon.pressed.connect           ( lambda: self.disconnectTCP( 'P1' ) )
+        self.TCP_PUMP2_btt_discon.pressed.connect           ( lambda: self.disconnectTCP( 'P2' ) )
+        self.TCP_MIXER_btt_discon.pressed.connect           ( lambda: self.disconnectTCP( 'MIX' ) )
         
         # TERMINAL
         self.TERM_btt_gcodeInterp.pressed.connect           ( self.sendGcodeCommand )
@@ -299,8 +299,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ctrl_M.activated.connect       ( self.loadFile )
 
         # PUMP CONTROL
-        self.ctrl_E.activated.connect       ( lambda: self.setSpeed(  '0' ) )
-        self.ctrl_R.activated.connect       ( lambda: self.setSpeed( '-1' ) )
+        self.ctrl_E.activated.connect       ( lambda: self.pumpSetSpeed(  '0' ) )
+        self.ctrl_R.activated.connect       ( lambda: self.pumpSetSpeed( '-1' ) )
 
 
 
@@ -381,21 +381,21 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                        CONNECTIONS                                                #
     #####################################################################################################
 
-    def connectTCP( self, TCPslot= 0 ):
+    def connectTCP( self, TCPslot= '' ):
         """ slot-wise connection management, mostly to shrink code length, maybe more functionality later """
 
         css = ( "border-radius: 25px; background-color: #00aaff;" )
 
         match TCPslot:
-            case 1:  
-                res, conn = UTIL.ROB_tcpip.connect()
+            case 'ROB':  
+                res, conn = UTIL.ROB_tcp.connect()
                 self.TCP_ROB_indi_connected.setStyleSheet( css )
                 
                 if( res == True ):
                     # if successful, start threading and watchdog
-                    self.roboCommThread.start   ()
-                    self.setWatchdog            ( 1 )
-                    self.logEntry               ( 'CONN', f"connected to {conn[0]} at {conn[1]}." )
+                    self.roboCommThread.start()
+                    self.setWatchdog         ( 'ROB' )
+                    self.logEntry            ( 'CONN', f"connected to {conn[0]} at {conn[1]}." )
                     return True
                 
                 elif( res == TimeoutError ):            self.logEntry( 'CONN', f"timed out while trying to connect {conn[0]} at {conn[1]} ." )
@@ -403,34 +403,61 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 else:                                   self.logEntry( 'CONN', f"connection to {conn[0]} at {conn[1]} failed ({res})!" )
                 return False
 
-            case 2:
-                if( 'COM' in UTIL.PUMP1_tcpip.port ): 
-                    # no check if connection is possible (done via mtec lib), start threading and WD in good hope
-                    self.pumpCommThread.start()
-                    self.setWatchdog( 2 )
+            case 'P1':
+                if( 'COM' in UTIL.PUMP1_tcp.port ): 
+                    UTIL.PUMP1_serial.serial_port = UTIL.PUMP1_tcp.port
+                    UTIL.PUMP1_serial.connect()
+
+                    if( UTIL.PUMP1_serial.connected ):   
+                        if( not self.pumpCommThread.isRunning() ): self.pumpCommThread.start()
+                        self.logEntry   ( 'GNRL', f"connected to Pump1 at {UTIL.PUMP1_tcp.port}." )
+                        self.setWatchdog( 'P1' )
+                        self.TCP_PUMP1_indi_connected.setStyleSheet( css )
+                        return True
+                    
+                    else:
+                        self.logEntry( 'CONN', 'connecting to Pump1 failed!')
+                        return False
+                    
                 else:
-                    raise ConnectionError( 'TCP not supported' ) 
+                    raise ConnectionError( 'TCP not supported, yet' ) 
                     # res,conn = UTIL.PUMP1_tcpip.connect()
 
-                self.logEntry( 'GNRL', f"connected to Pump1 at {UTIL.PUMP1_tcpip.port}." )
-                self.TCP_PUMP1_indi_connected.setStyleSheet( css )
-                self.pump1Conn = True
-                return True
 
-            case 3:  
-                raise ConnectionError( 'PUMP2 not supported, yet' )
-            #     if('COM' in UTIL.PUMP2_tcpip.port): 
-            #         # no check if connection is possible (done via mtec lib), start threading and WD in good hope
-            #         self.pumpTwoCommThread.start()
-            #         self.setWatchdog(3)
-            #     else:
-            #         raise ConnectionError('TCP not supported') 
-            #         # res,conn = UTIL.PUMP1_tcpip.connect()
+            case 'P2': 
+                if( 'COM' in UTIL.PUMP1_tcp.port ): 
+                    UTIL.PUMP2_serial.serial_port = UTIL.PUMP2_tcp.port
+                    UTIL.PUMP2_serial.connect()
 
-            #     self.logEntry('GNRL',f"connected to Pump2 at {UTIL.PUMP2_tcpip.port}.")
-            #     self.TCP_PUMP2_indi_connected.setStyleSheet(css)
-            #     self.pump2Conn = True
-            #     return True
+                    if( UTIL.PUMP2_serial.connected ):   
+                        if( not self.pumpCommThread.isRunning() ): self.pumpCommThread.start()
+                        self.logEntry   ( 'GNRL', f"connected to Pump2 at {UTIL.PUMP1_tcp.port}." )
+                        self.setWatchdog( 'P2' )
+                        self.TCP_PUMP2_indi_connected.setStyleSheet( css )
+                        return True
+                    
+                    else:
+                        self.logEntry( 'CONN', 'connecting to Pump2 failed!')
+                        return False
+                    
+                else:
+                    raise ConnectionError( 'TCP not supported, yet' ) 
+                    # res,conn = UTIL.PUMP1_tcpip.connect()
+
+            case 'MIX':  
+                res, conn = UTIL.MIXER_tcp.connect()
+                
+                if( res == True ):
+                    if( not self.pumpCommThread.isRunning() ): self.pumpCommThread.start()
+                    self.logEntry   ( 'CONN', f"connected to {conn[0]} at {conn[1]}." )
+                    self.setWatchdog( 'MIX' )
+                    self.TCP_MIXER_indi_connected.setStyleSheet( css )
+                    return True
+                
+                elif( res == TimeoutError ):            self.logEntry( 'CONN', f"timed out while trying to connect {conn[0]} at {conn[1]} ." )
+                elif( res == ConnectionRefusedError ):  self.logEntry( 'CONN', f"server {conn[0]} at {conn[1]} refused the connection." )
+                else:                                   self.logEntry( 'CONN', f"connection to {conn[0]} at {conn[1]} failed ({res})!" )
+                return False
 
             case _:
                 return False        
@@ -441,39 +468,67 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def disconnectTCP( self, TCPslot= 0 ):
+    def disconnectTCP( self, TCPslot= '' ):
         """ disconnect works, reconnect crashes the app, problem probably lies here
             should also send E command to robot on disconnect """
 
         css = ( "border-radius: 25px; background-color: #4c4a48;" )
 
         match TCPslot:
-            case 1:  
-                self.killWatchdog( 1 )
+            case 'ROB':  
+                self.killWatchdog( 'ROB' )
                 self.roboCommThread.quit()
                 self.roboCommThread.wait()
-                UTIL.ROB_tcpip.close()
+                UTIL.ROB_tcp.close()
 
                 self.logEntry( 'CONN', f"user disconnected robot." )
                 self.TCP_ROB_indi_connected.setStyleSheet( css )
 
-            case 2:  
-                if( 'COM' in UTIL.PUMP1_tcpip.port ):
-                    self.killWatchdog( 2 )
-                    self.pumpCommThread.quit()
-                    self.pumpCommThread.wait()
+            case 'P1':  
+                if( 'COM' in UTIL.PUMP1_tcp.port ):
+                    self.killWatchdog( 'P1' )
+                    if(    not UTIL.PUMP1_serial.connected
+                       and not UTIL.PUMP2_serial.connected
+                       and not UTIL.MIXER_tcp.connected ):
+                        self.pumpCommThread.quit()
+                        self.pumpCommThread.wait()
+
+                    self.logEntry( 'CONN', f"user disconnected Pump1." )
+                    self.TCP_PUMP1_indi_connected.setStyleSheet( css )
+
                 else:
                     raise ConnectionError( 'TCP not supported, unable to disconnect' ) 
                     # UTIL.PUMP1_tcpip.close()
                 
-            case 3:  
-                pass
-                # if( 'COM' in UTIL.PUMP2_tcpip.PORT ):
-                #     self.pumpCommThread_2.quit()
-                #     self.pumpCommThread_2.wait()
-                # else:
-                #     raise ConnectionError('TCP not supported, unable to disconnect') # UTIL.PUMP1_tcpip.close()
+            case 'P2':
+                if( 'COM' in UTIL.PUMP2_tcp.port ):
+                    self.killWatchdog( 'P2' )
+                    if(    not UTIL.PUMP1_serial.connected
+                       and not UTIL.PUMP2_serial.connected
+                       and not UTIL.MIXER_tcp.connected ):
+                        self.pumpCommThread.quit()
+                        self.pumpCommThread.wait()
+
+                    self.logEntry( 'CONN', f"user disconnected Pump2." )
+                    self.TCP_PUMP2_indi_connected.setStyleSheet( css )
+
+                else:
+                    raise ConnectionError( 'TCP not supported, unable to disconnect' ) 
+                    # UTIL.PUMP1_tcpip.close()
             
+            case 'MIX':
+                self.killWatchdog( 'MIX' )
+                UTIL.ROB_tcp.close()
+
+                if(    not UTIL.PUMP1_serial.connected
+                and not UTIL.PUMP2_serial.connected
+                and not UTIL.MIXER_tcp.connected ):
+                    self.pumpCommThread.quit()
+                    self.pumpCommThread.wait()
+
+                self.logEntry( 'CONN', f"user disconnected mixer." )
+                self.TCP_MIXER_indi_connected.setStyleSheet( css )
+
             case _:
                 pass
 
@@ -497,9 +552,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.roboCommThread.started.connect         ( self.roboCommWorker.run )
         self.roboCommThread.finished.connect        ( self.roboCommWorker.stop )
         self.roboCommThread.finished.connect        ( self.roboCommWorker.deleteLater )
-        self.roboCommWorker.dataReceived.connect    ( lambda: self.resetWatchdog( 1 ) )
+        self.roboCommWorker.dataReceived.connect    ( lambda: self.resetWatchdog( 'ROB' ) )
         self.roboCommWorker.dataReceived.connect    ( self.labelUpdate_onTerminalChange )
-        self.roboCommWorker.dataUpdated.connect     ( self.roboReceived )
+        self.roboCommWorker.dataUpdated.connect     ( self.roboRecv )
         self.roboCommWorker.endDcMoving.connect     ( lambda: self.switchRobMoving( end= True ) )
         self.roboCommWorker.endProcessing.connect   ( self.stopSCTRLQueue )
         self.roboCommWorker.logError.connect        ( self.logEntry )
@@ -513,9 +568,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.pumpCommThread.finished.connect        ( self.pumpCommWorker.stop )
         self.pumpCommThread.finished.connect        ( self.pumpCommWorker.deleteLater )
         self.pumpCommWorker.logError.connect        ( self.logEntry )
-        self.pumpCommWorker.dataSend.connect        ( self.pump1Send )
-        self.pumpCommWorker.dataReceived.connect    ( self.pump1Received )
-        self.pumpCommWorker.connActive.connect      ( lambda: self.resetWatchdog( 2 ) )
+        self.pumpCommWorker.dataSend.connect        ( self.pumpSend )
+        self.pumpCommWorker.dataMixerSend.connect   ( self.mixerSend )
+        self.pumpCommWorker.dataRecv.connect        ( self.pumpRecv )
+        self.pumpCommWorker.dataMixerRecv.connect   ( self.mixerRecv )
+        self.pumpCommWorker.connActive.connect      ( self.resetWatchdog )
 
         self.loadFileThread = QThread()
         self.loadFileWorker = WORKERS.LoadFileWorker()
@@ -568,7 +625,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def roboReceived( self, rawDataString, telem ):
+    def roboRecv( self, rawDataString, telem ):
         """ write robots telemetry to log & user displays, resetting globals position variables is done
             by RobCommWorker """
 
@@ -588,37 +645,87 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def pump1Send( self, newSpeed, command, ans ):
+    def pumpSend( self, newSpeed, command, ans, source ):
         """ display pump communication, global vars are set by PumpCommWorker """
 
-        mutex.lock()
-        UTIL.PUMP1_speed = newSpeed
-        mutex.unlock()
+        match source:
+            case 'P1':
+                mutex.lock()
+                UTIL.PUMP1_speed = newSpeed
+                mutex.unlock()
 
-        self.TCP_PUMP1_disp_writeBuffer.setText     ( str(command) )
-        self.TCP_PUMP1_disp_bytesWritten.setText    ( str(len(command)) )
-        self.TCP_PUMP1_disp_readBuffer.setText      ( str(ans) )
-    
-        self.logEntry( 'PMP1', f"speed set to {UTIL.PUMP1_speed}, command: {command}" )
+                self.TCP_PUMP1_disp_writeBuffer.setText     ( str(command) )
+                self.TCP_PUMP1_disp_bytesWritten.setText    ( str(len(command)) )
+                self.TCP_PUMP1_disp_readBuffer.setText      ( str(ans) )
+            
+                self.logEntry( 'PMP1', f"speed set to {UTIL.PUMP1_speed}, command: {command}" )
+
+            case 'P2':
+                mutex.lock()
+                UTIL.PUMP2_speed = newSpeed
+                mutex.unlock()
+
+                self.TCP_PUMP2_disp_writeBuffer.setText     ( str(command) )
+                self.TCP_PUMP2_disp_bytesWritten.setText    ( str(len(command)) )
+                self.TCP_PUMP2_disp_readBuffer.setText      ( str(ans) )
+            
+                self.logEntry( 'PMP2', f"speed set to {UTIL.PUMP2_speed}, command: {command}" )
+            
+            case _:
+                self.logEntry( 'CONN', 'ERROR! Pump dataSend signal from unspecified source.' )
+                print( 'ERROR! Pump dataSend signal from unspecified source.' )
 
 
 
 
 
-    def pump1Received( self, telem ):
+    def pumpRecv( self, telem, source ):
         """ display pump telemetry, global vars are set by PumpCommWorker """
 
-        # telemetry contains no info about the rotation direction, interpret according to setting
-        if( UTIL.PUMP1_speed < 0 ): telem.freq *= -1
+        match source:
+            case 'P1':
+                # display & log
+                self.PUMP_disp_freqP1.setText         ( f"{UTIL.STT_dataBlock.Pump1.freq}%" )
+                self.PUMP_disp_voltP1.setText         ( f"{UTIL.STT_dataBlock.Pump1.volt} V" )
+                self.PUMP_disp_ampsP1.setText         ( f"{UTIL.STT_dataBlock.Pump1.amps} A" )
+                self.PUMP_disp_torqP1.setText         ( f"{UTIL.STT_dataBlock.Pump1.torq} Nm" )
+                self.PUMP_disp_currSpeedP1.setText    ( f"{telem.freq}%" )
 
-        # display & log
-        self.PUMP_disp_freq.setText         ( str(UTIL.STT_dataBlock.Pump1.freq) )
-        self.PUMP_disp_volt.setText         ( str(UTIL.STT_dataBlock.Pump1.volt) )
-        self.PUMP_disp_amps.setText         ( str(UTIL.STT_dataBlock.Pump1.amps) )
-        self.PUMP_disp_torq.setText         ( str(UTIL.STT_dataBlock.Pump1.torq) )
-        self.PUMP_disp_currSpeed.setText    ( f"{telem.freq}%" )
+                self.logEntry( 'PTel', f"PUMP1, freq: {telem.freq}, volt: {telem.volt}, amps: {telem.amps}, torq: {telem.torq}" )
+                
+            case 'P2':
+                # display & log
+                self.PUMP_disp_freqP2.setText         ( f"{UTIL.STT_dataBlock.Pump2.freq}%" )
+                self.PUMP_disp_voltP2.setText         ( f"{UTIL.STT_dataBlock.Pump2.volt} V" )
+                self.PUMP_disp_ampsP2.setText         ( f"{UTIL.STT_dataBlock.Pump2.amps} A" )
+                self.PUMP_disp_torqP2.setText         ( f"{UTIL.STT_dataBlock.Pump2.torq} Nm" )
+                self.PUMP_disp_currSpeedP2.setText    ( f"{telem.freq}%" )
 
-        self.logEntry( 'PTel', f"PUMP1, freq: {telem.freq}, volt: {telem.volt}, amps: {telem.amps}, torq: {telem.torq}" )
+                self.logEntry( 'PTel', f"PUMP2, freq: {telem.freq}, volt: {telem.volt}, amps: {telem.amps}, torq: {telem.torq}" )
+            
+            case _:
+                self.logEntry( 'CONN', 'ERROR! Received PumpTelemetry from unspecified source.' )
+                print( 'ERROR! Received PumpTelemetry from unspecified source.' )
+    
+
+
+
+    def mixerSend( self, mixerSpeed, res, dataLen ):
+        """ display mixer communication """
+
+        self.TCP_MIXER_disp_writeBuffer.setText     ( str(mixerSpeed) )
+        self.TCP_MIXER_disp_bytesWritten.setText    ( str(dataLen) )
+        
+        self.logEntry( 'MIXR', f"speed set to {mixerSpeed}" )
+    
+
+
+
+    def mixerRecv( self, mixerSpeed ):
+        """ display mixer communication """
+
+        self.MIX_disp_currSpeed.setText( f"{mixerSpeed}%" )
+        self.logEntry( 'MTel', f"current speed at {mixerSpeed}%" )
 
 
 
@@ -630,27 +737,45 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          WATCHDOGS                                                #
     #####################################################################################################
 
-    def setWatchdog( self, dogNum= 0 ):
+    def setWatchdog( self, dogNum= '' ):
         """ set Watchdog, check data updates from robot and pump occure at least every 10 sec """
 
         match dogNum:
-            case 1:
+            case 'ROB':
                 self.robReceiveWD = QTimer()
                 self.robReceiveWD.setSingleShot    ( True )
                 self.robReceiveWD.setInterval      ( 10000 )
-                self.robReceiveWD.timeout.connect  ( lambda: self.watchdogBite( 1 ) )
+                self.robReceiveWD.timeout.connect  ( lambda: self.watchdogBite( 'ROB' ) )
 
                 self.robReceiveWD.start()
-                self.logEntry( 'WDOG', 'Watchdog 1 (robReceiveWD) started.' )
+                self.logEntry( 'WDOG', 'Watchdog ROB (robReceiveWD) started.' )
 
-            case 2: 
+            case 'P1': 
                 self.pumpOneReceiveWD = QTimer()
                 self.pumpOneReceiveWD.setSingleShot    ( True )
                 self.pumpOneReceiveWD.setInterval      ( 10000 )
-                self.pumpOneReceiveWD.timeout.connect  ( lambda: self.watchdogBite( 2 ) )
+                self.pumpOneReceiveWD.timeout.connect  ( lambda: self.watchdogBite( 'P1' ) )
 
                 self.pumpOneReceiveWD.start()
-                self.logEntry( 'WDOG', 'Watchdog 2 (pumpOneReceiveWD) started.' )
+                self.logEntry( 'WDOG', 'Watchdog P1 (pump1ReceiveWD) started.' )
+
+            case 'P2': 
+                self.pumpTwoReceiveWD = QTimer()
+                self.pumpTwoReceiveWD.setSingleShot    ( True )
+                self.pumpTwoReceiveWD.setInterval      ( 10000 )
+                self.pumpTwoReceiveWD.timeout.connect  ( lambda: self.watchdogBite( 'P2' ) )
+
+                self.pumpTwoReceiveWD.start()
+                self.logEntry( 'WDOG', 'Watchdog P2 (pump2ReceiveWD) started.' )
+
+            case 'MIX': 
+                self.mixerReceiveWD = QTimer()
+                self.mixerReceiveWD.setSingleShot    ( True )
+                self.mixerReceiveWD.setInterval      ( 10000 )
+                self.mixerReceiveWD.timeout.connect  ( lambda: self.watchdogBite( 'MIX' ) )
+
+                self.mixerReceiveWD.start()
+                self.logEntry( 'WDOG', 'Watchdog MIX (mixerReceiveWD) started.' )
 
             case _:
                 self.logEntry( 'WDOG', 'Watchdog setting failed, invalid dog number given' )
@@ -659,39 +784,65 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def resetWatchdog( self, dogNum= 0 ):
+    def resetWatchdog( self, dogNum= '' ):
         """ reset the Watchdogs, robReceiveWD on every newly received data block """
 
         match dogNum:
-            case 1:   self.robReceiveWD.start()
-            case 2:   self.pumpOneReceiveWD.start()
-            case _:   self.logEntry( 'WDOG', 'Watchdog reset failed, invalid dog number given' )
+            case 'ROB': self.robReceiveWD.start()
+            case 'P1':  self.pumpOneReceiveWD.start()
+            case 'P2':  self.pumpTwoReceiveWD.start()
+            case 'MIX': self.mixerReceiveWD.start()
+            case _:     self.logEntry( 'WDOG', 'Watchdog reset failed, invalid dog number given' )
 
 
 
 
 
-    def watchdogBite( self, dogNum= 0 ):
+    def watchdogBite( self, dogNum= '' ):
         """ close the UI on any biting WD, log info """
 
         match dogNum:
-            case 1:   wdNum = '1'
+            case 'ROB':   
+                wdNum  = 'ROB'
+                result = 'Robot offline'
+                self.TCP_ROB_indi_connected.setStyleSheet( "border-radius: 25px;background-color: #4c4a48;" )
+                UTIL.ROB_tcp.connected = False
+                self.killWatchdog( 'ROB' )
+                if( UTIL.SC_qProcessing ): cancelOperation= True
 
-            case 2:
-                watchdogWarning = strdDialog( f"Watchdog 2 (Pump 1) has bitten, connection lost, pump offline"
-                                              ,'WATCHDOG ALARM' )
-                watchdogWarning.exec()
-
+            case 'P1':
+                wdNum  = 'P1'
+                result = 'Pump 1 offline'
                 self.TCP_PUMP1_indi_connected.setStyleSheet( "border-radius: 25px; background-color: #4c4a48;" )
-                UTIL.PUMP1_tcpip.connected = False
-                self.killWatchdog( 2 )
+                UTIL.PUMP1_tcp.connected = False
+                self.killWatchdog( 'P1' )
+
                 self.pumpCommThread.quit()
                 self.pumpCommThread.wait()
-                return
+                if( UTIL.SC_qProcessing ): cancelOperation= True
 
-            case _:   wdNum = '(unidentified)'
+            case 'P2':
+                wdNum  = 'P2'
+                result = 'Pump 2 offline'
+                self.TCP_PUMP2_indi_connected.setStyleSheet( "border-radius: 25px; background-color: #4c4a48;" )
+                UTIL.PUMP1_tcp.connected = False
+                self.killWatchdog( 'P2' )
+
+                self.pumpCommThread.quit()
+                self.pumpCommThread.wait()
+                if( UTIL.SC_qProcessing ): cancelOperation= True
+            
+            case 'MIX':
+                wdNum  = 'MIX'
+                result = 'Mixer offline'
+                self.TCP_MIXER_indi_connected.setStyleSheet( "border-radius: 25px; background-color: #4c4a48;" )
+
+            case _:   
+                wdNum  = '(unidentified)'
+                result = 'Internal error'
         
-        if( UTIL.SC_qProcessing ):
+        # stop critical operations, build user text
+        if( cancelOperation ):
             self.logEntry           ( 'WDOG', f"Watchdog {wdNum} has bitten! Stopping script control & forwarding forced-stop to robot!" )
             self.forcedStopCommand  ()
             self.stopSCTRLQueue     ()
@@ -701,39 +852,34 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                     f"exit and close."
 
         else:
-
-            wdTxt = f"Watchdog {wdNum} has bitten!\n\nRobot disconnected.\nPress OK to keep PRINT_py running or Cancel to "\
+            wdTxt = f"Watchdog {wdNum} has bitten!\n\n{result}.\nPress OK to keep PRINT_py running or Cancel to "\
                     f"exit and close."
 
-        if( UTIL.ROB_tcpip.connected ):
-            watchdogWarning = strdDialog( wdTxt, 'WATCHDOG ALARM' )
-            watchdogWarning.exec()
+        # ask user to close application
+        watchdogWarning = strdDialog( wdTxt, 'WATCHDOG ALARM' )
+        watchdogWarning.exec()
 
-            if( watchdogWarning.result() ):
-                self.logEntry( 'WDOG', f"User chose to return to main screen." )
+        if( watchdogWarning.result() ):
+            self.logEntry( 'WDOG', f"User chose to return to main screen." )
 
-            else:
-                self.logEntry( 'WDOG', f"User chose to close PRINT_py, exiting..." )
-                self.close()
+        else:
+            self.logEntry( 'WDOG', f"User chose to close PRINT_py, exiting..." )
+            self.close()
 
-            if( not UTIL.SC_qProcessing ): 
-                self.logEntry( 'WDOG', f"Watchdog {wdNum} has bitten, robot disconnected!" )
-
-        self.TCP_ROB_indi_connected.setStyleSheet( "border-radius: 25px;background-color: #4c4a48;" )
-        UTIL.ROB_tcpip.connected = False
-        self.killWatchdog( 1 )
 
         
 
 
 
-    def killWatchdog( self, dogNum= 0 ):
+    def killWatchdog( self, dogNum= '' ):
         """ put them to sleep (dont do this to real dogs) """
 
         match dogNum:
-            case 1:   self.robReceiveWD.stop()
-            case 2:   self.pumpOneReceiveWD.stop()
-            case _:   pass
+            case 'ROB': self.robReceiveWD.stop()
+            case 'P1':  self.pumpOneReceiveWD.stop()
+            case 'P2':  self.pumpTwoReceiveWD.stop()
+            case 'MIX': self.mixerReceiveWD.stop()
+            case _:     pass
 
 
 
@@ -1450,6 +1596,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.DC_btt_extPlus.setEnabled          ( buttonToggle )
         self.DC_btt_extMinus.setEnabled         ( buttonToggle )
         self.DC_btt_home.setEnabled             ( buttonToggle )
+        self.DC_lbl_x.setEnabled                ( buttonToggle )
+        self.DC_lbl_y.setEnabled                ( buttonToggle )
+        self.DC_lbl_z.setEnabled                ( buttonToggle )
+        self.DC_lbl_ext.setEnabled              ( buttonToggle )
 
         self.NC_btt_xyzSend.setEnabled          ( buttonToggle )
         self.NC_btt_xyzExtSend.setEnabled       ( buttonToggle )
@@ -1753,7 +1903,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                         PUMP CONTROL                                              #
     #####################################################################################################
 
-    def setSpeed( self, type= '' ):
+    def pumpSetSpeed( self, type= '' ):
         """ handle user inputs regarding pump frequency """
 
         mutex.lock()
@@ -1791,12 +1941,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                                  f"'pMode default' command, are you sure?"
                                 ,f"Overwrite warning" )
         userDialog.exec()
-        if( userDialog.result() == 0): return
+        if( userDialog.result() == 0 ): return
 
         # overwrite
         mutex.lock()
         for i in range( len(UTIL.SC_queue) ):
-            UTIL.SC_queue[i].pMode = 'default'
+            UTIL.SC_queue[ i ].pMode = 'default'
         mutex.unlock()
         return
 
@@ -1817,7 +1967,28 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     
 
     #####################################################################################################
-    #                                       AMCON COMMANDS                                              #
+    #                                        MIXER CONTROL                                              #
+    #####################################################################################################
+
+    def mixerSetSpeed( self, type= '' ):
+        """ handle user inputs for 2K mixer """
+
+        match type:
+            case 'sld': speed = self.MIX_sld_speed.value()
+            case '0':   speed = 0
+            case _:     speed = self.MIX_num_setSpeed.value()
+
+        mutex.lock()
+        UTIL.MIXER_speed = speed
+        mutex.unlock()
+
+
+
+
+    
+
+    #####################################################################################################
+    #                                        AMCON CONTROL                                              #
     #####################################################################################################
 
     def amconScriptOverwrite( self ):
@@ -1941,17 +2112,17 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.logEntry( 'GNRL', 'closeEvent signal.' )
         self.logEntry( 'GNRL', 'end threading, delete threads...' )
         
-        if( UTIL.ROB_tcpip.connected ):
+        if( UTIL.ROB_tcp.connected ):
             self.logEntry               ( 'CONN', 'closing robot TCP connection...' )
-            UTIL.ROB_tcpip.send         ( UTIL.QEntry( id= 1, mt= 'E' ) )
-            UTIL.ROB_tcpip.close        ( end= True )
+            UTIL.ROB_tcp.send         ( UTIL.QEntry( id= 1, mt= 'E' ) )
+            UTIL.ROB_tcp.close        ( end= True )
             self.roboCommThread.quit    ()
             self.roboCommThread.wait    ()
 
         if( self.pump1Conn ):
             self.logEntry               ( 'CONN', 'closing pump connections...' )
             
-            if( 'COM' in UTIL.PUMP1_tcpip.port ):
+            if( 'COM' in UTIL.PUMP1_tcp.port ):
                 self.pumpCommThread.quit()
                 self.pumpCommThread.wait()
             else:
@@ -1994,19 +2165,19 @@ mutex = QMutex()
 # only do the following if run as main program
 if __name__ == '__main__':
 
-    from libs.PRINT_win_dialogs import strdDialog
-    import libs.PRINT_data_utilities as UTIL
+    from libs.win_dialogs       import strdDialog
+    import libs.data_utilities  as UTIL
 
     # import PyQT UIs (converted from .ui to .py)
-    from ui.UI_mainframe_v6 import Ui_MainWindow
+    from ui.UI_mainframe_v6     import Ui_MainWindow
 
 
 
     logpath = UTIL.createLogfile()
 
     # overwrite ROB_tcpip for testing, delete later
-    UTIL.ROB_tcpip.ip   = 'localhost'
-    UTIL.ROB_tcpip.port = 10001
+    UTIL.ROB_tcp.ip   = 'localhost'
+    UTIL.ROB_tcp.port = 10001
 
     # start the UI and assign to app
     app = 0                             # leave that here so app doesnt include the remnant of a previous QApplication instance

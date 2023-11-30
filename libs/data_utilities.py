@@ -16,6 +16,9 @@ from pathlib import Path
 from datetime import datetime
 # import time
 
+# import interface for Toshiba frequency modulator by M-TEC
+from mtec.mtec_mod  import MtecMod
+
 
 
 #############################################################################################
@@ -908,6 +911,7 @@ class PumpTelemetry:
 
 
 
+
 class DaqBlock:
     """ structure for DAQ
     ATTRIBUTES:
@@ -1031,8 +1035,11 @@ class DaqBlock:
 
 
 
+
+
+
 class TCPIP:
-    """ setup class for TCP/IP connection, provides all functions concerning the connection, cement pump communication not yet implemented
+    """ setup class for TCP/IP connection, provides all functions concerning the connection
 
     ATTRIBUTES:
         IP:
@@ -1054,10 +1061,10 @@ class TCPIP:
 
         connect:
             tries to connect to the IP and PORT given, returns errors if not possible
-        send: 
-            sends data to server, packing according to robots protocol, additional function for pump needed
+        send:
+            send data to server according to class attributes
         receive:
-            receives and unpacks data from robot, addtional function needed for pump
+            receive according to class attributes
         close:
             close TCP/IP connection
     """
@@ -1124,11 +1131,83 @@ class TCPIP:
         except ConnectionRefusedError:
             self.connected = 0
             return ConnectionError, server_address
-        
+    
 
+
+    def send( self, data= None):
+        """ send data to server according to class attributes """
+        
+        try:
+            if( len(data) != self.w_bl ):  return False, ValueError( 'wrong message length' ) 
+            
+            try:                self.Socket.sendall( data )
+            except OSError:     return False, OSError
+            
+            return True, len(data)
+        
+        except Exception as err:
+            return False, err
+    
+
+
+    def receive( self ):
+        """ receive according to class attributes """
+
+        data = ""
+
+        try:
+            while ( len(data) < self.r_bl ):  
+                data = self.Socket.recv( self.r_bl )
+
+        except Exception as err:    
+            return False, err
+
+        if len(data) != self.r_bl:  
+            return False, ValueError( 'wrong server answer length' )
+        
+        return True, data
+
+
+
+
+    def close( self, end= False ):
+        """ close TCP connection """
+        
+        self.Socket.close()
+        self.connected  = False
+        if( not end ): self.Socket = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
+
+
+
+
+
+
+class RobConnection( TCPIP ):
+    """ sets robot specific send/receive operations, inherits from TCPIP class, overwrites send & receive functions 
+
+    ATTRIBUTES:
+        IP:
+            endpoint IP address
+        PORT:
+            endpoint port nummber
+        C_TOUT:
+            timeout for connection attempts to endpoint
+        RW_TOUT:
+            timeout for reading from or writing to endpoint
+        R_BL:
+            data block length to read
+        W_BL:
+            data block length to write
+    
+    FUNCTIONS:
+        send: 
+            sends a QEntry object to server, packing according to robots protocol
+        receive:
+            receives and unpacks data from robot, returns it as RobTelemetry object
+    """
 
     def send( self, entry ):
-        """ sends data to server, packing according to robots protocol, additional function for pump needed """
+        """ sends QEntry object to robot, packing according to robots protocol """
 
         message = [] 
         if( not self.connected ): return ConnectionError, 0
@@ -1178,7 +1257,7 @@ class TCPIP:
                                    ,entry.Tool.time_id
                                    ,entry.Tool.time_time )
             
-            if( len(message) != self.w_bl ):  return ValueError, len(message) 
+            if( len(message) != self.w_bl ):  return False, ValueError( 'wrong message length' ) 
             
             try:                self.Socket.sendall( message )
             except OSError:     return False, OSError
@@ -1192,7 +1271,7 @@ class TCPIP:
 
 
     def receive( self ):
-        """ receives and unpacks data from robot, addtional function needed for pump """
+        """ receives and unpacks data from robot """
 
         data = ""
 
@@ -1213,15 +1292,8 @@ class TCPIP:
             self.Telemetry.Coor.rz  = struct.unpack( '<f',data[28:32] )[0]
             self.Telemetry.Coor.ext = struct.unpack( '<f',data[32:36] )[0]
             return self.Telemetry,data,True
-            
 
 
-    def close( self, end= False ):
-        """ close TCP connection """
-        
-        self.Socket.close()
-        self.connected  = False
-        if( not end ): self.Socket = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
 
 
 
@@ -1549,12 +1621,12 @@ def addToCommProtocol( txt ):
 # defaut connection settings (the byte length for writing to the robot wont be user setable
 # for safety reasons, it can only be changed here, but only if you know what your doing!)
 
-DEF_TCP_ROB =      { "IP":       "192.168.125.1"
-                    ,"PORT":     10001
-                    ,"C_TOUT":   60000
-                    ,"RW_TOUT":  5
-                    ,"R_BL":     36
-                    ,"W_BL":     159 }
+DEF_TCP_MIXER =    { "IP":       "193.0.0.1"
+                    ,"PORT":     "3000"
+                    ,"C_TOUT":   10000
+                    ,"RW_TOUT":  10
+                    ,"R_BL":     4
+                    ,"W_BL":     4  }
 
 DEF_TCP_PUMP1 =    { "IP":       ""
                     ,"PORT":     "COM3"
@@ -1569,6 +1641,13 @@ DEF_TCP_PUMP2 =    { "IP":       ""
                     ,"RW_TOUT":  0
                     ,"R_BL":     0
                     ,"W_BL":     0  }
+
+DEF_TCP_ROB =      { "IP":       "192.168.125.1"
+                    ,"PORT":     10001
+                    ,"C_TOUT":   60000
+                    ,"RW_TOUT":  5
+                    ,"R_BL":     36
+                    ,"W_BL":     159 }
 
 # default user settings
 DEF_AMC_PANNING     = 0
@@ -1618,40 +1697,56 @@ IO_currFilepath     = None
 IO_frToTs           = DEF_IO_FR_TO_TS
 IO_zone             = DEF_IO_ZONE
 
+MIXER_lastSpeed     = 0
+MIXER_speed         = 0
+MIXER_actWithPump   = False
+MIXER_tcp           = TCPIP( DEF_TCP_MIXER["IP"]
+                            ,DEF_TCP_MIXER["PORT"]
+                            ,DEF_TCP_MIXER["C_TOUT"]
+                            ,DEF_TCP_MIXER["RW_TOUT"]
+                            ,DEF_TCP_MIXER["R_BL"]
+                            ,DEF_TCP_MIXER["W_BL"])
+
 PRIN_speed          = copy.deepcopy(DEF_PRIN_SPEED)
 
-PUMP1_tcpip         = TCPIP( DEF_TCP_PUMP1["IP"]
+PUMP1_lastTelem     = PumpTelemetry()
+PUMP1_literPerS     = DEF_PUMP_LPS
+PUMP1_liveAd        = 1.0
+PUMP1_speed         = 0
+PUMP1_serial        = MtecMod( '01' )
+PUMP1_tcp           = TCPIP( DEF_TCP_PUMP1["IP"]
                             ,DEF_TCP_PUMP1["PORT"]
                             ,DEF_TCP_PUMP1["C_TOUT"]
                             ,DEF_TCP_PUMP1["RW_TOUT"]
                             ,DEF_TCP_PUMP1["R_BL"]
                             ,DEF_TCP_PUMP1["W_BL"])
-PUMP1_lastTelem     = PumpTelemetry()
-PUMP1_literPerS     = DEF_PUMP_LPS
-PUMP1_liveAd        = 1.0
-PUMP1_speed         = 0
 
-PUMP2_tcpip         = TCPIP( DEF_TCP_PUMP2["IP"]
+PUMP2_lastTelem     = PumpTelemetry()
+PUMP2_literPerS     = DEF_PUMP_LPS
+PUMP2_liveAd        = 1.0
+PUMP2_speed         = 0
+PUMP2_serial        = MtecMod( '02' )
+PUMP2_tcp           = TCPIP( DEF_TCP_PUMP2["IP"]
                             ,DEF_TCP_PUMP2["PORT"]
                             ,DEF_TCP_PUMP2["C_TOUT"]
                             ,DEF_TCP_PUMP2["RW_TOUT"]
                             ,DEF_TCP_PUMP2["R_BL"]
                             ,DEF_TCP_PUMP2["W_BL"])
 
-ROB_tcpip          = TCPIP( DEF_TCP_ROB["IP"]
-                           ,DEF_TCP_ROB["PORT"]
-                           ,DEF_TCP_ROB["C_TOUT"]
-                           ,DEF_TCP_ROB["RW_TOUT"]
-                           ,DEF_TCP_ROB["R_BL"]
-                           ,DEF_TCP_ROB["W_BL"])
 ROB_commFr          = DEF_ROB_COMM_FR
 ROB_commQueue       = Queue()
-ROB_telem           = RoboTelemetry()
 ROB_lastTelem       = RoboTelemetry()
+ROB_telem           = RoboTelemetry()
 ROB_movStartP       = Coordinate()
 ROB_movEndP         = Coordinate()
 ROB_sendList        = []
 ROB_liveAd          = 1.0
+ROB_tcp             = RobConnection( DEF_TCP_ROB["IP"]
+                                    ,DEF_TCP_ROB["PORT"]
+                                    ,DEF_TCP_ROB["C_TOUT"]
+                                    ,DEF_TCP_ROB["RW_TOUT"]
+                                    ,DEF_TCP_ROB["R_BL"]
+                                    ,DEF_TCP_ROB["W_BL"])
 
 SC_volPerM          = DEF_SC_VOL_PER_M
 SC_currCommId       = 1

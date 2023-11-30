@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1945</width>
-    <height>1126</height>
+    <width>1949</width>
+    <height>1135</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -277,6 +277,7 @@ QFrame#ASC_frame,
 QFrame#DC_frame,
 QFrame#ICQ_frame,
 QFrame#IO_frame,
+QFrame#MIX_frame,
 QFrame#NC_frame,
 QFrame#PUMP_frame,
 QFrame#SCRTL_frame,
@@ -375,7 +376,7 @@ QTabBar::tab:!selected:hover {
 }</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="PRINT_tab">
      <property name="styleSheet">
@@ -3427,7 +3428,7 @@ color: #f2f4f3;
        <rect>
         <x>30</x>
         <y>20</y>
-        <width>591</width>
+        <width>611</width>
         <height>301</height>
        </rect>
       </property>
@@ -3469,7 +3470,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="ADC_lbl_panning">
        <property name="geometry">
         <rect>
-         <x>280</x>
+         <x>300</x>
          <y>110</y>
          <width>141</width>
          <height>51</height>
@@ -3492,7 +3493,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="ADC_lbl_fibDeliv">
        <property name="geometry">
         <rect>
-         <x>280</x>
+         <x>300</x>
          <y>160</y>
          <width>141</width>
          <height>51</height>
@@ -3515,7 +3516,7 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="ADC_btt_clamp">
        <property name="geometry">
         <rect>
-         <x>60</x>
+         <x>80</x>
          <y>120</y>
          <width>161</width>
          <height>31</height>
@@ -3551,7 +3552,7 @@ QPushButton:checked:hover {
       <widget class="QPushButton" name="ADC_btt_knifePos">
        <property name="geometry">
         <rect>
-         <x>60</x>
+         <x>80</x>
          <y>160</y>
          <width>161</width>
          <height>31</height>
@@ -3594,7 +3595,7 @@ QPushButton:checked:hover {
       <widget class="QPushButton" name="ADC_btt_knife">
        <property name="geometry">
         <rect>
-         <x>60</x>
+         <x>80</x>
          <y>200</y>
          <width>161</width>
          <height>31</height>
@@ -3637,7 +3638,7 @@ QPushButton:checked:hover {
       <widget class="QPushButton" name="ADC_btt_fiberPnmtc">
        <property name="geometry">
         <rect>
-         <x>60</x>
+         <x>80</x>
          <y>240</y>
          <width>161</width>
          <height>31</height>
@@ -3680,7 +3681,7 @@ QPushButton:checked:hover {
       <widget class="QPushButton" name="ADC_btt_resetAll">
        <property name="geometry">
         <rect>
-         <x>350</x>
+         <x>370</x>
          <y>240</y>
          <width>201</width>
          <height>31</height>
@@ -3693,7 +3694,7 @@ QPushButton:checked:hover {
       <widget class="QLabel" name="ADC_indi_robotMoving">
        <property name="geometry">
         <rect>
-         <x>510</x>
+         <x>530</x>
          <y>40</y>
          <width>41</width>
          <height>41</height>
@@ -3710,7 +3711,7 @@ background-color: #4c4a48;</string>
       <widget class="QLabel" name="ADC_lbl_robotMoving">
        <property name="geometry">
         <rect>
-         <x>370</x>
+         <x>390</x>
          <y>40</y>
          <width>131</width>
          <height>41</height>
@@ -3732,7 +3733,7 @@ color: #E1E5EE;</string>
       <widget class="QSpinBox" name="ADC_num_panning">
        <property name="geometry">
         <rect>
-         <x>420</x>
+         <x>440</x>
          <y>120</y>
          <width>131</width>
          <height>41</height>
@@ -3751,7 +3752,7 @@ color: #E1E5EE;</string>
       <widget class="QSpinBox" name="ADC_num_fibDeliv">
        <property name="geometry">
         <rect>
-         <x>420</x>
+         <x>440</x>
          <y>170</y>
          <width>131</width>
          <height>41</height>
@@ -3771,8 +3772,8 @@ color: #E1E5EE;</string>
      <widget class="QFrame" name="ASC_frame">
       <property name="geometry">
        <rect>
-        <x>660</x>
-        <y>20</y>
+        <x>30</x>
+        <y>360</y>
         <width>611</width>
         <height>301</height>
        </rect>
@@ -3816,7 +3817,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>110</y>
+         <y>100</y>
          <width>141</width>
          <height>51</height>
         </rect>
@@ -3839,7 +3840,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>160</y>
+         <y>150</y>
          <width>141</width>
          <height>51</height>
         </rect>
@@ -4027,7 +4028,7 @@ QPushButton:checked:hover {
        <property name="geometry">
         <rect>
          <x>399</x>
-         <y>230</y>
+         <y>220</y>
          <width>161</width>
          <height>51</height>
         </rect>
@@ -4081,7 +4082,7 @@ PROCESSING</string>
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>240</y>
+         <y>230</y>
          <width>101</width>
          <height>41</height>
         </rect>
@@ -4094,7 +4095,7 @@ PROCESSING</string>
        <property name="geometry">
         <rect>
          <x>430</x>
-         <y>170</y>
+         <y>160</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -4113,7 +4114,7 @@ PROCESSING</string>
        <property name="geometry">
         <rect>
          <x>430</x>
-         <y>120</y>
+         <y>110</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -4132,10 +4133,10 @@ PROCESSING</string>
      <widget class="QFrame" name="PUMP_frame">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>360</y>
+        <x>680</x>
+        <y>20</y>
         <width>941</width>
-        <height>451</height>
+        <height>411</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -4148,7 +4149,7 @@ PROCESSING</string>
        <property name="geometry">
         <rect>
          <x>259</x>
-         <y>195</y>
+         <y>165</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -4164,7 +4165,7 @@ PROCESSING</string>
        <property name="geometry">
         <rect>
          <x>59</x>
-         <y>195</y>
+         <y>165</y>
          <width>191</width>
          <height>41</height>
         </rect>
@@ -4186,7 +4187,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>89</x>
-         <y>255</y>
+         <y>225</y>
          <width>161</width>
          <height>31</height>
         </rect>
@@ -4208,7 +4209,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>259</x>
-         <y>250</y>
+         <y>220</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -4224,7 +4225,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>259</x>
-         <y>306</y>
+         <y>276</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -4240,7 +4241,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>259</x>
-         <y>365</y>
+         <y>335</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -4256,7 +4257,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>89</x>
-         <y>311</y>
+         <y>281</y>
          <width>161</width>
          <height>31</height>
         </rect>
@@ -4278,7 +4279,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>370</y>
+         <y>340</y>
          <width>191</width>
          <height>31</height>
         </rect>
@@ -4299,8 +4300,8 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="PUMP_btt_plus1">
        <property name="geometry">
         <rect>
-         <x>710</x>
-         <y>170</y>
+         <x>460</x>
+         <y>270</y>
          <width>71</width>
          <height>31</height>
         </rect>
@@ -4312,8 +4313,8 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="PUMP_btt_minus1">
        <property name="geometry">
         <rect>
-         <x>810</x>
-         <y>170</y>
+         <x>560</x>
+         <y>270</y>
          <width>71</width>
          <height>31</height>
         </rect>
@@ -4326,7 +4327,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>510</x>
-         <y>130</y>
+         <y>120</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -4347,7 +4348,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>710</x>
-         <y>80</y>
+         <y>70</y>
          <width>171</width>
          <height>51</height>
         </rect>
@@ -4374,9 +4375,9 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="PUMP_btt_setSpeed">
        <property name="geometry">
         <rect>
-         <x>449</x>
-         <y>230</y>
-         <width>191</width>
+         <x>459</x>
+         <y>220</y>
+         <width>171</width>
          <height>31</height>
         </rect>
        </property>
@@ -4388,7 +4389,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>710</x>
-         <y>310</y>
+         <y>160</y>
          <width>171</width>
          <height>41</height>
         </rect>
@@ -4400,9 +4401,9 @@ color: #E1E5EE;</string>
       <widget class="QSpinBox" name="PUMP_num_setSpeed">
        <property name="geometry">
         <rect>
-         <x>450</x>
-         <y>170</y>
-         <width>191</width>
+         <x>460</x>
+         <y>160</y>
+         <width>171</width>
          <height>51</height>
         </rect>
        </property>
@@ -4426,7 +4427,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>710</x>
-         <y>360</y>
+         <y>210</y>
          <width>171</width>
          <height>41</height>
         </rect>
@@ -4439,7 +4440,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>710</x>
-         <y>50</y>
+         <y>40</y>
          <width>171</width>
          <height>31</height>
         </rect>
@@ -4489,8 +4490,8 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="PUMP_btt_minus10">
        <property name="geometry">
         <rect>
-         <x>810</x>
-         <y>210</y>
+         <x>560</x>
+         <y>310</y>
          <width>71</width>
          <height>31</height>
         </rect>
@@ -4502,8 +4503,8 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="PUMP_btt_plus10">
        <property name="geometry">
         <rect>
-         <x>710</x>
-         <y>210</y>
+         <x>460</x>
+         <y>310</y>
          <width>71</width>
          <height>31</height>
         </rect>
@@ -4515,8 +4516,8 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="PUMP_btt_plus25">
        <property name="geometry">
         <rect>
-         <x>710</x>
-         <y>250</y>
+         <x>460</x>
+         <y>350</y>
          <width>71</width>
          <height>31</height>
         </rect>
@@ -4528,8 +4529,8 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="PUMP_btt_minus25">
        <property name="geometry">
         <rect>
-         <x>810</x>
-         <y>250</y>
+         <x>560</x>
+         <y>350</y>
          <width>71</width>
          <height>31</height>
         </rect>
@@ -4538,38 +4539,12 @@ color: #E1E5EE;</string>
         <string>- 25%</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="PUMP_btt_ccToDefault">
-       <property name="geometry">
-        <rect>
-         <x>450</x>
-         <y>310</y>
-         <width>191</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>CC 🡆 DEFAULT</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="PUMP_btt_scToDefault">
-       <property name="geometry">
-        <rect>
-         <x>450</x>
-         <y>360</y>
-         <width>191</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>SC 🡆 DEFAULT</string>
-       </property>
-      </widget>
       <widget class="QPushButton" name="PUMP_btt_pinchValve">
        <property name="geometry">
         <rect>
-         <x>450</x>
-         <y>80</y>
-         <width>191</width>
+         <x>460</x>
+         <y>70</y>
+         <width>171</width>
          <height>41</height>
         </rect>
        </property>
@@ -4600,6 +4575,32 @@ QPushButton:checked:hover {
         <bool>false</bool>
        </property>
       </widget>
+      <widget class="QPushButton" name="PUMP_btt_ccToDefault">
+       <property name="geometry">
+        <rect>
+         <x>710</x>
+         <y>290</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>CC 🡆 DEFAULT</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="PUMP_btt_scToDefault">
+       <property name="geometry">
+        <rect>
+         <x>710</x>
+         <y>340</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>SC 🡆 DEFAULT</string>
+       </property>
+      </widget>
       <zorder>PUMP_lbl_currSpeed</zorder>
       <zorder>PUMP_lbl_setSpeed</zorder>
       <zorder>PUMP_disp_freq</zorder>
@@ -4622,9 +4623,270 @@ QPushButton:checked:hover {
       <zorder>PUMP_btt_plus10</zorder>
       <zorder>PUMP_btt_plus25</zorder>
       <zorder>PUMP_btt_minus25</zorder>
+      <zorder>PUMP_btt_pinchValve</zorder>
       <zorder>PUMP_btt_ccToDefault</zorder>
       <zorder>PUMP_btt_scToDefault</zorder>
-      <zorder>PUMP_btt_pinchValve</zorder>
+     </widget>
+     <widget class="QFrame" name="MIX_frame">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>470</y>
+        <width>941</width>
+        <height>191</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="MIX_0_frameLabel_2">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>20</y>
+         <width>161</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>22</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 22pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>MIXER CTRL</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="MIX_btt_stop">
+       <property name="geometry">
+        <rect>
+         <x>710</x>
+         <y>120</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>⛔ STOP</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="MIX_disp_currSpeed">
+       <property name="geometry">
+        <rect>
+         <x>710</x>
+         <y>60</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0%</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="MIX_num_setSpeed">
+       <property name="geometry">
+        <rect>
+         <x>471</x>
+         <y>120</y>
+         <width>111</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="MIX_lbl_currSpeed">
+       <property name="geometry">
+        <rect>
+         <x>750</x>
+         <y>30</y>
+         <width>131</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>current speed</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="MIX_lbl_setSpeed">
+       <property name="geometry">
+        <rect>
+         <x>330</x>
+         <y>130</y>
+         <width>131</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>set speed</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="MIX_chk_actWithPump">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>30</y>
+         <width>151</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: #5d707f;
+font-size: 12pt;
+color: #f2f4f3;
+</string>
+       </property>
+       <property name="text">
+        <string>activate with pump</string>
+       </property>
+      </widget>
+      <widget class="QSlider" name="MIX_sld_speed">
+       <property name="geometry">
+        <rect>
+         <x>381</x>
+         <y>64</y>
+         <width>261</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>100</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="MIX_btt_setSpeed">
+       <property name="geometry">
+        <rect>
+         <x>590</x>
+         <y>120</y>
+         <width>51</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>SET</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="MIX_lbl_step0">
+       <property name="geometry">
+        <rect>
+         <x>374</x>
+         <y>90</y>
+         <width>20</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;
+font-size: 10pt;</string>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="MIX_lbl_step100">
+       <property name="geometry">
+        <rect>
+         <x>600</x>
+         <y>90</y>
+         <width>51</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;
+font-size: 10pt;</string>
+       </property>
+       <property name="text">
+        <string>100 [%]</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="MIX_lbl_step50">
+       <property name="geometry">
+        <rect>
+         <x>500</x>
+         <y>90</y>
+         <width>21</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;
+font-size: 10pt;</string>
+       </property>
+       <property name="text">
+        <string>50</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+      <zorder>MIX_0_frameLabel_2</zorder>
+      <zorder>MIX_btt_stop</zorder>
+      <zorder>MIX_num_setSpeed</zorder>
+      <zorder>MIX_lbl_currSpeed</zorder>
+      <zorder>MIX_lbl_setSpeed</zorder>
+      <zorder>MIX_chk_actWithPump</zorder>
+      <zorder>MIX_sld_speed</zorder>
+      <zorder>MIX_btt_setSpeed</zorder>
+      <zorder>MIX_lbl_step0</zorder>
+      <zorder>MIX_lbl_step100</zorder>
+      <zorder>MIX_lbl_step50</zorder>
+      <zorder>MIX_disp_currSpeed</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="SET_tab">

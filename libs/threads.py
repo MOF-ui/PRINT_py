@@ -12,20 +12,16 @@ import copy
 import math as m
 
 # appending the parent directory path
-current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir  = os.path.dirname(current_dir)
-sys.path.append(parent_dir)
+current_dir = os.path.dirname( os.path.realpath(__file__) )
+parent_dir  = os.path.dirname( current_dir )
+sys.path.append( parent_dir )
 
 # PyQt stuff
 from PyQt5.QtCore   import QObject,QTimer,QMutex,pyqtSignal
 
-
-# import interface for Toshiba frequency modulator by M-TEC
-from mtec.mtec_mod  import MtecMod
-
 # import my own libs
-import libs.PRINT_data_utilities    as UTIL
-import libs.PRINT_pump_utilities    as PUTIL
+import libs.data_utilities    as UTIL
+import libs.pump_utilities    as PUTIL
 
 
 
@@ -38,12 +34,12 @@ import libs.PRINT_pump_utilities    as PUTIL
 class PumpCommWorker( QObject ):
     """ manages data updates and keepalive commands to pump """
 
-    connActive      = pyqtSignal()
-    dataReceived    = pyqtSignal( UTIL.PumpTelemetry )
-    dataSend        = pyqtSignal( int, str, int )
+    connActive      = pyqtSignal( str )
+    dataRecv        = pyqtSignal( UTIL.PumpTelemetry, str )
+    dataMixerRecv   = pyqtSignal( int )
+    dataSend        = pyqtSignal( int, str, int, str )
+    dataMixerSend   = pyqtSignal( int, bool, int )
     logError        = pyqtSignal( str, str )
-
-    mtecInterface   = MtecMod( '01' )
 
 
 
@@ -57,22 +53,15 @@ class PumpCommWorker( QObject ):
         self.loopTimer.setInterval      ( 250 )
         self.loopTimer.timeout.connect  ( self.send )
         self.loopTimer.timeout.connect  ( self.receive )
-        self.loopTimer.timeout.connect  ( self.mtecInterface.keepAlive )
         self.loopTimer.start()
-
-        self.mtecInterface.serial_port = UTIL.PUMP1_tcpip.port
-        self.mtecInterface.connect()
-
 
 
 
 
     def stop( self ):
         """ stop loop """
-        
+
         self.loopTimer.stop()
-        self.mtecInterface.stop()
-        self.mtecInterface.disconnect()
         self.loopTimer.deleteLater()
 
 
@@ -83,19 +72,51 @@ class PumpCommWorker( QObject ):
         """ send pump speed to pump, uses modified setter in mtec's script (changed to function),
             which recognizes a value change and returns the machines answer and the original command string,
             uses user-set pump speed if no script is running """
+        global PCW_p1Active
+        global PCW_p2Active
+        global PCW_lastMixerSpeed
 
-        if( UTIL.SC_qProcessing ):  newSpeed = PUTIL.calcSpeed()
-        else:                       newSpeed = UTIL.PUMP1_speed
+        # SEND TO PUMPS
+        pumpSpeed = PUTIL.calcSpeed() if( UTIL.SC_qProcessing ) else UTIL.PUMP1_speed
 
-        if( newSpeed is not None ):
-            res = self.mtecInterface.setSpeed( int(newSpeed * UTIL.PUMP1_liveAd) )
+        if( PCW_p1Active and PCW_p1Active ): 
+            pump1Speed = pumpSpeed * PUTIL.outputRatio
+            pump2Speed = pumpSpeed * ( 1 - PUTIL.outputRatio )
+        else:
+            pump1Speed = pump2Speed = pumpSpeed
 
-            if( res is not None ): 
-                command, ans = res[ 0 ], res[ 1 ]
-                self.dataSend.emit( newSpeed, command, ans )
+        if( pumpSpeed is not None ):
+            # send to P1 & keepAlive
+            if(  UTIL.PUMP1_serial.connected ):
+                res = UTIL.PUMP1_serial.setSpeed( int(pump1Speed * UTIL.PUMP1_liveAd) )
+                if( res is not None ): 
+                    self.dataSend.emit( pump1Speed, res[ 0 ], res[ 1 ], 'P1' )
+
+                UTIL.PUMP1_serial.keepAlive()
+                
+            # send to P2 & keepAlive
+            if(  UTIL.PUMP2_serial.connected ):
+                res = UTIL.PUMP2_serial.setSpeed( int(pump2Speed * UTIL.PUMP2_liveAd) )
+                if( res is not None ): 
+                    self.dataSend.emit( pump2Speed, res[ 0 ], res[ 1 ], 'P2' )
+
+                UTIL.PUMP2_serial.keepAlive()
         
         else:
-            self.logError.emit( 'CONN', 'Pump1 - Error during speed calculation for queue processing' )
+            self.logError.emit( 'CONN', 'Pumps - Error during speed calculation for queue processing' )
+        
+        # SEND TO MIXER
+        if( UTIL.MIXER_tcp.connected ):
+            mixerSpeed   = pumpSpeed if( UTIL.MIXER_actWithPump ) else UTIL.MIXER_speed
+            
+            if( mixerSpeed != PCW_lastMixerSpeed ):
+                res, dataLen = UTIL.MIXER_tcp.send( int(mixerSpeed) )
+                if( res ):  
+                    PCW_lastMixerSpeed = mixerSpeed
+                    self.dataMixerSend.emit( mixerSpeed, res, dataLen )
+                else:       
+                    self.logError.emit( 'CONN', f"MIXER - sending data failed ({dataLen})" )
+
     
 
 
@@ -104,27 +125,73 @@ class PumpCommWorker( QObject ):
     def receive( self ):
         """ request data updates for frequency, voltage, current and torque from pump, pass to mainframe """
 
-        # get data 
-        freq    = self.mtecInterface.frequency
-        volt    = self.mtecInterface.voltage
-        amps    = self.mtecInterface.current
-        torq    = self.mtecInterface.torque
- 
-        if( None in [ freq, volt, amps, torq ] ): 
-            self.logError.emit( 'CONN', 'Pump1 telemetry package broken or not received...' )
+        # RECEIVE FROM PUMPS, first P1:
+        if( UTIL.PUMP1_serial.connected ):
+            freq    = UTIL.PUMP1_serial.frequency
+            volt    = UTIL.PUMP1_serial.voltage
+            amps    = UTIL.PUMP1_serial.current
+            torq    = UTIL.PUMP1_serial.torque
+    
+            if( None in [ freq, volt, amps, torq ] ): 
+                self.logError.emit( 'CONN', 'Pump1 telemetry package broken or not received...' )
         
-        else:
-            telem = UTIL.PumpTelemetry( freq, volt, amps, torq )
-            telem = round( telem, 3 )
-            
-            if( telem != UTIL.PUMP1_lastTelem ):
-                mutex.lock()
-                UTIL.PUMP1_lastTelem     = telem
-                UTIL.STT_dataBlock.Pump1 = telem
-                mutex.unlock()
-                self.dataReceived.emit( telem )
-            
-            self.connActive.emit()
+            else:
+                # telemetry contains no info about the rotation direction, interpret according to settings
+                if( UTIL.PUMP1_speed < 0 ): telem.freq *= -1
+
+                telem = UTIL.PumpTelemetry( freq, volt, amps, torq )
+                telem = round( telem, 3 )
+                self.connActive.emit( 'P1' )
+                
+                if( telem != UTIL.PUMP1_lastTelem ):
+                    mutex.lock()
+                    UTIL.PUMP1_lastTelem     = telem
+                    UTIL.STT_dataBlock.Pump1 = telem
+                    mutex.unlock()
+                    self.dataRecv.emit( telem, 'P1' )
+
+        # P2
+        if( UTIL.PUMP2_serial.connected ):
+            freq    = self.mtecInterface2.frequency
+            volt    = self.mtecInterface2.voltage
+            amps    = self.mtecInterface2.current
+            torq    = self.mtecInterface2.torque
+    
+            if( None in [ freq, volt, amps, torq ] ): 
+                self.logError.emit( 'CONN', 'Pump2 telemetry package broken or not received...' )
+        
+            else:
+                # telemetry contains no info about the rotation direction, interpret according to settings
+                if( UTIL.PUMP2_speed < 0 ): telem.freq *= -1
+
+                telem = UTIL.PumpTelemetry( freq, volt, amps, torq )
+                telem = round( telem, 3 )
+                self.connActive.emit( 'P2' )
+                
+                if( telem != UTIL.PUMP2_lastTelem ):
+                    mutex.lock()
+                    UTIL.PUMP2_lastTelem     = telem
+                    UTIL.STT_dataBlock.Pump2 = telem
+                    mutex.unlock()
+                    self.dataRecv.emit( telem, 'P2' )
+        
+
+        # RECEIVE FROM MIXER
+        if( UTIL.MIXER_tcp.connected ):
+            res, data = UTIL.MIXER_tcp.receive()
+            if( res ):  
+                self.connActive.emit( 'MIX' )
+
+                if( data != UTIL.MIXER_lastSpeed ):
+                    mutex.lock()
+                    UTIL.MIXER_lastSpeed            = data
+                    UTIL.STT_dataBlock.kPump_freq   = data
+                    mutex.unlock()
+
+                    self.dataMixerRecv.emit( data )
+
+            else:
+                self.logError.emit( 'CONN', f"MIXER - receiving data failed ({data})" )
 
         
 
@@ -182,7 +249,7 @@ class RoboCommWorker( QObject ):
     def receive( self ):
         """ receive 36-byte data block, write to ROB vars """
 
-        telem, rawData, state = UTIL.ROB_tcpip.receive()
+        telem, rawData, state = UTIL.ROB_tcp.receive()
 
         if( state == True ):
             if( telem is not None ): 
@@ -305,10 +372,10 @@ class RoboCommWorker( QObject ):
 
             command.Speed.ts = int( command.Speed.ts * UTIL.ROB_liveAd )
             
-            if( not testrun):   msg, msgLen = UTIL.ROB_tcpip.send( command )
-            else:               msg, msgLen = True, 159
+            if( not testrun):   res, msgLen = UTIL.ROB_tcp.send( command )
+            else:               res, msgLen = True, 159
 
-            if( msg ):
+            if( res ):
                 
                 numSend += 1
                 
@@ -323,11 +390,11 @@ class RoboCommWorker( QObject ):
             
             else: 
                 print( f" Message Error: {msgLen} " )
-                self.sendElem.emit( command, msg, msgLen, directCtrl, False )
+                self.sendElem.emit( command, res, msgLen, directCtrl, False )
             
             if( numToSend == 0 ):
                 if( not testrun ): print( " Block send " )
-                self.sendElem.emit( command, msg, numSend, directCtrl, True )
+                self.sendElem.emit( command, res, numSend, directCtrl, True )
             # else                :   self.sendElem.emit(command, msg, msgLen, directCtrl, False)
 
     
@@ -574,6 +641,7 @@ class LoadFileWorker( QObject ):
 
 mutex           = QMutex()
 
+# LoadFileWorker:
 LFW_filePath    = None
 LFW_lineID      = 0
 LFW_pCtrl       = False

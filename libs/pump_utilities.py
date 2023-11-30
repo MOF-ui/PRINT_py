@@ -17,7 +17,7 @@ parent_dir  = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 # import my own libs
-import libs.PRINT_data_utilities as UTIL
+import libs.data_utilities as UTIL
 
 
 
@@ -221,6 +221,7 @@ END_SUPP_PTS    = [   { 'until': 5.0,   'base': 'default',  'mode': 'instant' },
                       { 'until': 0.0,   'base': 'zero',     'mode': 'instant' } ]
 
 retractSpeed    = -50.0
+outputRatio     = 0.5
 
 preceedingCom   = None
 preceedingSpeed = 0.0

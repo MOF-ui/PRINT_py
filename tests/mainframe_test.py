@@ -638,16 +638,16 @@ class Mainframe_test(unittest.TestCase):
 
         UTIL.PUMP1_speed = 10
 
-        testFrame.setSpeed( type= '1' )
+        testFrame.pumpSetSpeed( type= '1' )
         self.assertEqual  ( UTIL.PUMP1_speed, 11 )
-        testFrame.setSpeed( type= '0' )
+        testFrame.pumpSetSpeed( type= '0' )
         self.assertEqual  ( UTIL.PUMP1_speed, 0 )
-        testFrame.setSpeed( type= '-1' )
+        testFrame.pumpSetSpeed( type= '-1' )
         self.assertEqual  ( UTIL.PUMP1_speed, -1 )
-        testFrame.setSpeed( type= 'r' )
+        testFrame.pumpSetSpeed( type= 'r' )
         self.assertEqual  ( UTIL.PUMP1_speed, 1 )
         testFrame.PUMP_num_setSpeed.setValue(5)
-        testFrame.setSpeed()
+        testFrame.pumpSetSpeed()
         self.assertEqual  ( UTIL.PUMP1_speed, 5 )
 
         UTIL.PUMP1_speed = 0
@@ -709,9 +709,9 @@ class Mainframe_test(unittest.TestCase):
 
         testFrame.close()
 
-        UTIL.ROB_tcpip.close  (end= True)
-        UTIL.PUMP1_tcpip.close(end= True)
-        UTIL.PUMP2_tcpip.close(end= True)
+        UTIL.ROB_tcp.close  (end= True)
+        UTIL.PUMP1_tcp.close(end= True)
+        UTIL.PUMP2_tcp.close(end= True)
         UTIL.TERM_log.clear()
 
 

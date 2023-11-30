@@ -109,9 +109,9 @@ from PyQt5.QtWidgets import QApplication
 
 
 # import my own libs and UIs
-from libs.PRINT_win_dialogs      import strdDialog, connDialog
-from libs.PRINT_win_mainframe    import Mainframe
-import libs.PRINT_data_utilities as UTIL
+from libs.win_dialogs      import strdDialog, connDialog
+from libs.win_mainframe    import Mainframe
+import libs.data_utilities as UTIL
 
 
 
@@ -134,9 +134,9 @@ csConnDef   = ( connectionSetup[4], connectionSetup[5] )
 
 if (not csResult):    exit()
 else:
-    UTIL.ROB_tcpip.setParams(csRobot)
-    UTIL.PUMP1_tcpip.setParams(csPump1)
-    UTIL.PUMP2_tcpip.setParams(csPump2)
+    UTIL.ROB_tcp.setParams(csRobot)
+    UTIL.PUMP1_tcp.setParams(csPump1)
+    UTIL.PUMP2_tcp.setParams(csPump2)
 
 
 # overwrite ROBO_tcpip for testing, delete later
@@ -146,8 +146,8 @@ else:
 
 # get the go from user
 welcText =  f"STARTING PRINT APP...\n\n" \
-            f"You're about to establish a TCP connection with the robot at {UTIL.ROB_tcpip.ip}.\n" \
-            f"This can take up to {UTIL.ROB_tcpip.c_tout} s. You may begin.\n\n"
+            f"You're about to establish a TCP connection with the robot at {UTIL.ROB_tcp.ip}.\n" \
+            f"This can take up to {UTIL.ROB_tcp.c_tout} s. You may begin.\n\n"
 
 welcChoice = strdDialog(welcText, 'Welcome to PRINT_py', standalone=True)
 if(not welcChoice):    exit()
