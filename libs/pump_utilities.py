@@ -84,8 +84,10 @@ def defaultMode( command= None ):
 
     if( command is None ):   return None
     if( command != lastDefCommand ):
-                # ([mm/s]          * [L/m]           * [m/mm] / [L/s]                ) * 100.0  =  [%]
-        speed = ( command.Speed.ts * UTIL.SC_volPerM * 0.001  / UTIL.PUMP1_literPerS ) * 100.0
+        # determine current volume output:
+        lps = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP2_literPerS ) )
+        #       ( [mm/s]          * [L/m]           * [m/mm]  / [L/s])* 100.0  =  [%]
+        speed = ( command.Speed.ts * UTIL.SC_volPerM * 0.001  / lps ) * 100.0
         lastDefCommand = copy.deepcopy(command)
 
     else:
@@ -103,7 +105,8 @@ def profileMode( command= None, profile= None ):
     global lastSpeed
 
     if( None in [command, profile] ): return None
-    speed = ( command.Speed.ts * UTIL.SC_volPerM * 0.001 / UTIL.PUMP1_literPerS ) * 100.0
+    lps   = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP2_literPerS ) )
+    speed = ( command.Speed.ts * UTIL.SC_volPerM * 0.001 / lps ) * 100.0
 
     # as more complex pump scripts should only apply to linear movements, 
     # the remaining travel distance can be calculated using pythagoras
@@ -185,18 +188,18 @@ def profileMode( command= None, profile= None ):
 
 
 def getBaseSpeed(base = 'default', fallback = 0.0):
-    global retractSpeed
 
     match base:
         case 'zero':    baseSpeed = 0.0
         case 'max':     baseSpeed = 100.0
         case 'min':     baseSpeed = -100.0
         case 'default': baseSpeed = fallback
-        case 'retract': baseSpeed = retractSpeed
+        case 'retract': baseSpeed = UTIL.PUMP_retractSpeed
         case 'conn':    
             try:
                 nextCommand = UTIL.ROB_commQueue[1]
-                baseSpeed = ( nextCommand.Speed.ts * UTIL.SC_volPerM * 0.001 / UTIL.PUMP1_literPerS ) * 100.0
+                lps       = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP2_literPerS ) )
+                baseSpeed = ( nextCommand.Speed.ts * UTIL.SC_volPerM * 0.001 / lps ) * 100.0
             except AttributeError:  
                 baseSpeed = fallback
         case _: return None
@@ -219,9 +222,6 @@ START_SUPP_PTS  = [   { 'until': 5.0,   'base': 'zero',     'mode': 'instant' },
 END_SUPP_PTS    = [   { 'until': 5.0,   'base': 'default',  'mode': 'instant' },
                       { 'until': 1.0,   'base': 'retract',  'mode': 'smoothstep' },
                       { 'until': 0.0,   'base': 'zero',     'mode': 'instant' } ]
-
-retractSpeed    = -50.0
-outputRatio     = 0.5
 
 preceedingCom   = None
 preceedingSpeed = 0.0

@@ -14,7 +14,8 @@
 #   that can easily cause a lot of damage. Also, I am not a programmer (nor is english my first language
 #   for that matter). Therefore you can not count on me following standard industrial procedures or that 
 #   all of the docstrings convey the meaning I intended. I tried to build this application according to the 
-#   standards that I know of, though. 
+#   standards that I know of, though. The script style doesn't follow PEP8 closely, I'll change that, if I 
+#   find the time.
 #
 #   LICENSE
 #   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)

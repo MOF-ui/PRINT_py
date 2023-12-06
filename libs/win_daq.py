@@ -26,7 +26,7 @@ from ui.UI_daq import Ui_DAQWindow
 from influxdb import InfluxDBClient
 
 # import my own libs
-import libs.PRINT_data_utilities as UTIL
+import libs.data_utilities as UTIL
 
 
 

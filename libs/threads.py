@@ -72,32 +72,52 @@ class PumpCommWorker( QObject ):
         """ send pump speed to pump, uses modified setter in mtec's script (changed to function),
             which recognizes a value change and returns the machines answer and the original command string,
             uses user-set pump speed if no script is running """
-        global PCW_p1Active
-        global PCW_p2Active
         global PCW_lastMixerSpeed
 
         # SEND TO PUMPS
-        pumpSpeed = PUTIL.calcSpeed() if( UTIL.SC_qProcessing ) else UTIL.PUMP1_speed
+        pumpSpeed = PUTIL.calcSpeed() if( UTIL.SC_qProcessing ) else UTIL.PUMP_speed
 
-        if( PCW_p1Active and PCW_p1Active ): 
-            pump1Speed = pumpSpeed * PUTIL.outputRatio
-            pump2Speed = pumpSpeed * ( 1 - PUTIL.outputRatio )
+        # get speed
+        if( UTIL.PUMP1_serial.connected and UTIL.PUMP2_serial.connected ): 
+            pump1Speed = pumpSpeed * UTIL.PUMP_outputRatio
+            pump2Speed = pumpSpeed * ( 1 - UTIL.PUMP_outputRatio )
         else:
             pump1Speed = pump2Speed = pumpSpeed
+        
+        # look for user overwrite
+        if( UTIL.PUMP1_userSpeed != -999 ):
+            pump1Speed  = UTIL.PUMP1_userSpeed
+            pumpSpeed   = 1
+            mutex.lock()
+            UTIL.PUMP1_userSpeed = -999
+            mutex.unlock()
+        if( UTIL.PUMP2_userSpeed != -999 ):
+            pump2Speed  = UTIL.PUMP2_userSpeed
+            pumpSpeed   = 1
+            mutex.lock()
+            UTIL.PUMP2_userSpeed = -999
+            mutex.unlock()
 
+        # send to P1 and P2 & keepAlive both
         if( pumpSpeed is not None ):
-            # send to P1 & keepAlive
-            if(  UTIL.PUMP1_serial.connected ):
+            if( UTIL.PUMP1_serial.connected ):
                 res = UTIL.PUMP1_serial.setSpeed( int(pump1Speed * UTIL.PUMP1_liveAd) )
-                if( res is not None ): 
+                
+                if( res is not None ):
+                    mutex.lock()
+                    UTIL.PUMP1_speed = pump1Speed
+                    mutex.unlock()
                     self.dataSend.emit( pump1Speed, res[ 0 ], res[ 1 ], 'P1' )
 
                 UTIL.PUMP1_serial.keepAlive()
                 
-            # send to P2 & keepAlive
-            if(  UTIL.PUMP2_serial.connected ):
+            if( UTIL.PUMP2_serial.connected ):
                 res = UTIL.PUMP2_serial.setSpeed( int(pump2Speed * UTIL.PUMP2_liveAd) )
-                if( res is not None ): 
+                
+                if( res is not None ):
+                    mutex.lock()
+                    UTIL.PUMP2_speed = pump2Speed
+                    mutex.unlock()
                     self.dataSend.emit( pump2Speed, res[ 0 ], res[ 1 ], 'P2' )
 
                 UTIL.PUMP2_serial.keepAlive()

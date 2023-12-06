@@ -1667,6 +1667,8 @@ DEF_ICQ_MAX_LINES   = 200
 DEF_PRIN_SPEED      = SpeedVector()
 
 DEF_PUMP_LPS        = 0.5
+DEF_PUMP_RETR_SPEED = -50
+DEF_PUMP_OUTP_RATIO = 1.0
 
 DEF_ROB_COMM_FR     = 10
 
@@ -1709,11 +1711,16 @@ MIXER_tcp           = TCPIP( DEF_TCP_MIXER["IP"]
 
 PRIN_speed          = copy.deepcopy(DEF_PRIN_SPEED)
 
+PUMP_retractSpeed   = DEF_PUMP_RETR_SPEED
+PUMP_outputRatio    = DEF_PUMP_OUTP_RATIO
+PUMP_speed          = 0
+
 PUMP1_lastTelem     = PumpTelemetry()
 PUMP1_literPerS     = DEF_PUMP_LPS
 PUMP1_liveAd        = 1.0
 PUMP1_speed         = 0
 PUMP1_serial        = MtecMod( '01' )
+PUMP1_userSpeed     = -999
 PUMP1_tcp           = TCPIP( DEF_TCP_PUMP1["IP"]
                             ,DEF_TCP_PUMP1["PORT"]
                             ,DEF_TCP_PUMP1["C_TOUT"]
@@ -1726,6 +1733,7 @@ PUMP2_literPerS     = DEF_PUMP_LPS
 PUMP2_liveAd        = 1.0
 PUMP2_speed         = 0
 PUMP2_serial        = MtecMod( '02' )
+PUMP2_userSpeed     = -999
 PUMP2_tcp           = TCPIP( DEF_TCP_PUMP2["IP"]
                             ,DEF_TCP_PUMP2["PORT"]
                             ,DEF_TCP_PUMP2["C_TOUT"]

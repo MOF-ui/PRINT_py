@@ -20,6 +20,7 @@ sys.path.append( parent_dir )
 
 
 # PyQt stuff
+from PyQt5              import QtWidgets
 from PyQt5.QtCore       import Qt
 from PyQt5.QtCore       import QTimer, QMutex, QThread
 from PyQt5.QtWidgets    import QApplication, QMainWindow, QShortcut
@@ -67,6 +68,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.setWindowTitle ( "---   PRINT_py  -  Main Window  ---" )
         self.setWindowFlags ( Qt.WindowMaximizeButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint )
         self.testrun = testrun
+
+        # GROUP UI ELEMENTS
+        self.ADC_group  = self.ADC_frame.findChildren( ( QtWidgets.QPushButton, QtWidgets.QSpinBox ) )
+        self.ASC_group  = self.ASC_frame.findChildren( ( QtWidgets.QPushButton, QtWidgets.QSpinBox ) )
+        self.DC_group   = self.DC_btt_xPlus, self.DC_btt_xMinus\
+                         ,self.DC_btt_yPlus, self.DC_btt_yMinus\
+                         ,self.DC_btt_zPlus, self.DC_btt_zMinus\
+                         ,self.DC_btt_extPlus, self.DC_btt_extMinus\
+                         ,self.DC_btt_home\
+                         ,self.DC_lbl_x, self.DC_lbl_y, self.DC_lbl_z, self.DC_lbl_ext
+        self.NC_group   = self.NC_btt_xyzSend, self.NC_btt_xyzExtSend, self.NC_btt_orientSend
+        self.TERM_group = self.TERM_btt_gcodeInterp, self.TERM_btt_rapidInterp
 
         # LOGFILE SETUP
         if(lpath is None):
@@ -180,7 +193,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.NC_btt_orientZero.pressed.connect              ( lambda: self.setZero      ( [ 4,5,6 ] ) )
 
         # PUMP CONTROL
-        self.PUMP_btt_setSpeed.pressed.connect              ( self.pumpSetSpeed )
+        self.SCTRL_num_liveAd_pump1.valueChanged.connect    ( lambda: self.pumpSetSpeed(  'c1' ) )
+        self.SCTRL_num_liveAd_pump2.valueChanged.connect    ( lambda: self.pumpSetSpeed(  'c2' ) )
+        self.PUMP_btt_setSpeedP1.pressed.connect            ( lambda: self.pumpSetSpeed(  's1' ) )
+        self.PUMP_btt_setSpeedP2.pressed.connect            ( lambda: self.pumpSetSpeed(  's2' ) )
         self.PUMP_btt_plus1.pressed.connect                 ( lambda: self.pumpSetSpeed(   '1' ) )
         self.PUMP_btt_minus1.pressed.connect                ( lambda: self.pumpSetSpeed(  '-1' ) )
         self.PUMP_btt_plus10.pressed.connect                ( lambda: self.pumpSetSpeed(  '10' ) )
@@ -189,10 +205,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.PUMP_btt_minus25.pressed.connect               ( lambda: self.pumpSetSpeed( '-25' ) )
         self.PUMP_btt_stop.pressed.connect                  ( lambda: self.pumpSetSpeed(   '0' ) )
         self.PUMP_btt_reverse.pressed.connect               ( lambda: self.pumpSetSpeed(   'r' ) )
-        self.SCTRL_num_liveAd_pump1.valueChanged.connect    ( lambda: self.pumpSetSpeed(   'c' ) )
         self.PUMP_btt_ccToDefault.pressed.connect           ( lambda: self.pumpSetSpeed( 'def' ) )
+        self.PUMP_btt_setSpeed.pressed.connect              ( self.pumpSetSpeed )
         self.PUMP_btt_scToDefault.pressed.connect           ( self.pumpScriptOverwrite )
         self.PUMP_btt_pinchValve.pressed.connect            ( self.pinchValveToggle )
+        self.PUMP_sld_outputRatio.sliderMoved.connect       ( self.updateOutputRatio )
 
         # SCRIPT CONTROL
         self.SCTRL_btt_forcedStop.pressed.connect           ( self.forcedStopCommand )
@@ -228,7 +245,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                                                                                        ,ID=   self.SGLC_num_rapidSglComm_addByID.value() ) )
 
         # CONNECTIONS
-        # self.TCP_ROB_btt_reconn.pressed.connect             ( lambda: self.connectTCP( 'ROB' ) )
+        self.TCP_ROB_btt_reconn.pressed.connect             ( lambda: self.connectTCP   ( 'ROB' ) )
         self.TCP_PUMP1_btt_reconn.pressed.connect           ( lambda: self.connectTCP   ( 'P1' ) )
         self.TCP_PUMP2_btt_reconn.pressed.connect           ( lambda: self.connectTCP   ( 'P2' ) )
         self.TCP_MIXER_btt_reconn.pressed.connect           ( lambda: self.connectTCP   ( 'MIX' ) )
@@ -312,7 +329,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.SET_float_volPerMM.setValue        ( UTIL.DEF_SC_VOL_PER_M )
         self.SET_float_frToMms.setValue         ( UTIL.DEF_IO_FR_TO_TS )
-        self.SET_float_pumpVolFlow.setValue     ( UTIL.DEF_PUMP_LPS )
         self.SET_num_zone.setValue              ( UTIL.DEF_IO_ZONE )
         self.SET_num_transSpeed_dc.setValue     ( UTIL.DEF_DC_SPEED.ts )
         self.SET_num_orientSpeed_dc.setValue    ( UTIL.DEF_DC_SPEED.os )
@@ -326,6 +342,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if(not setup): 
             self.logEntry( 'SETS', 'User resetted general properties to default values.' )
         else:
+            self.loadTeDefaults()
             self.TCP_num_commForerun.setValue   ( UTIL.DEF_ROB_COMM_FR )
 
             self.loadAdcDefaults()
@@ -346,6 +363,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         self.SET_TE_num_fllwBhvrInterv.setValue ( UTIL.DEF_SC_EXT_FLLW_BHVR[ 0 ] )
         self.SET_TE_num_fllwBhvrSkip.setValue   ( UTIL.DEF_SC_EXT_FLLW_BHVR[ 1 ] )
+        self.SET_TE_float_p1VolFlow.setValue    ( UTIL.DEF_PUMP_LPS )
+        self.SET_TE_float_p2VolFlow.setValue    ( UTIL.DEF_PUMP_LPS )
+        self.SET_TE_num_retractSpeed.setValue   ( UTIL.DEF_PUMP_RETR_SPEED )
 
         if(not setup):  self.logEntry( 'SETS', 'User resetted TE properties to default values.' )
 
@@ -358,7 +378,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ load ADC default values """
 
         # stop UI changes to retrigger themselfs
-        self.setUpdatesEnabled(False)
+        for widget in self.ADC_group:    widget.blockSignals(True)
 
         self.ADC_num_panning.setValue       ( UTIL.DEF_AMC_PANNING )
         self.ADC_num_fibDeliv.setValue      ( UTIL.DEF_AMC_FIB_DELIV )
@@ -366,10 +386,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ADC_btt_knifePos.setChecked    ( UTIL.DEF_AMC_KNIFE_POS )
         self.ADC_btt_knife.setChecked       ( UTIL.DEF_AMC_KNIFE )
         self.ADC_btt_fiberPnmtc.setChecked  ( UTIL.DEF_AMC_FIBER_PNMTC )
-
         if( sendChanges ): self.adcUserChange()
 
-        self.setUpdatesEnabled(True)
+        for widget in self.ADC_group:   widget.blockSignals(False)
         
 
 
@@ -706,6 +725,23 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             case _:
                 self.logEntry( 'CONN', 'ERROR! Received PumpTelemetry from unspecified source.' )
                 print( 'ERROR! Received PumpTelemetry from unspecified source.' )
+                return
+        
+        if( UTIL.PUMP1_serial.connected and UTIL.PUMP2_serial.connected ):
+            currTotal   = UTIL.STT_dataBlock.Pump1.freq + UTIL.STT_dataBlock.Pump2.freq
+            p1Ratio     = round( ( UTIL.STT_dataBlock.Pump1.freq * 100 / currTotal ), 0 )
+            p2Ratio     = 100 - p1Ratio
+            currTotal   = round( ( currTotal / 2 ), 1 )
+
+        else:
+            currTotal   = telem.freq
+            p1Ratio     = 100 if( source == 'P1' ) else 0
+            p2Ratio     = 100 if( source == 'P2' ) else 0
+
+
+        self.PUMP_disp_currSpeed.setText    ( f"{currTotal}%" )
+        self.PUMP_disp_outputRatio.setText  ( f"{p1Ratio} / {p2Ratio}" )
+        self.PUMP_sld_outputRatio.setValue  ( f"{p2Ratio}" )
     
 
 
@@ -801,6 +837,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def watchdogBite( self, dogNum= '' ):
         """ close the UI on any biting WD, log info """
 
+        cancelOperation = False
         match dogNum:
             case 'ROB':   
                 wdNum  = 'ROB'
@@ -906,6 +943,15 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         mutex.lock()
         UTIL.ROB_liveAd = self.SCTRL_num_liveAd_robot.value() / 100.0
         mutex.unlock()
+    
+
+
+    def updateOutputRatio( self ):
+        """ new factor for QEntry.Speed.ts, applied before sending """
+
+        mutex.lock()
+        UTIL.PUMP_outputRatio = self.PUMP_sld_outputRatio.value() / 100.0
+        mutex.unlock()
 
 
 
@@ -915,7 +961,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         mutex.lock()
         UTIL.SC_volPerM         = self.SET_float_volPerMM.value()
         UTIL.IO_frToTs          = self.SET_float_frToMms.value()
-        UTIL.PUMP1_literPerS    = self.SET_float_pumpVolFlow.value()
         UTIL.IO_zone            = self.SET_num_zone.value()
         UTIL.DC_speed.ts        = self.SET_num_transSpeed_dc.value()
         UTIL.DC_speed.os        = self.SET_num_orientSpeed_dc.value()
@@ -939,7 +984,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ load default settings to settings display """
         
         mutex.lock()
-        UTIL.SC_extFllwBhvr = ( self.SET_TE_lbl_fllwBhvrInterv.value(), self.SET_TE_lbl_fllwBhvrSkip.value() )
+        UTIL.SC_extFllwBhvr     = ( self.SET_TE_num_fllwBhvrInterv.value(), self.SET_TE_num_fllwBhvrSkip.value() )
+        UTIL.PUMP_retractSpeed  = self.SET_TE_num_retractSpeed.value()
+        UTIL.PUMP1_literPerS    = self.SET_TE_float_p1VolFlow.value()
+        UTIL.PUMP2_literPerS    = self.SET_TE_float_p2VolFlow.value()
         mutex.unlock()
 
         self.logEntry( 'SETS', f"TE settings updated -- FB_inter: {UTIL.SC_extFllwBhvr[0]}, FB_skip: {UTIL.SC_extFllwBhvr[1]}" )
@@ -1006,13 +1054,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.DC_disp_ext.setText                ( str( round( pos.ext - zero.ext,3 )) )
 
         # NUMERIC CONTROL
-        self.NC_disp_x.setText                  ( str(pos.x) )
-        self.NC_disp_y.setText                  ( str(pos.y) )
-        self.NC_disp_z.setText                  ( str(pos.z) )
-        self.NC_disp_xOrient.setText            ( str(pos.rx) )
-        self.NC_disp_yOrient.setText            ( str(pos.ry) )
-        self.NC_disp_zOrient.setText            ( str(pos.rz) )
-        self.NC_disp_ext.setText                ( str(pos.ext) )
+        self.NC_disp_x.setText                  ( f"{pos.x}" )
+        self.NC_disp_y.setText                  ( f"{pos.y}" )
+        self.NC_disp_z.setText                  ( f"{pos.z}" )
+        self.NC_disp_xOrient.setText            ( f"{pos.rx}°" )
+        self.NC_disp_yOrient.setText            ( f"{pos.ry}°" )
+        self.NC_disp_zOrient.setText            ( f"{pos.rz}°" )
+        self.NC_disp_ext.setText                ( f"{pos.ext}" )
 
         # TERMINAL
         self.TERM_disp_tcpSpeed.setText         ( str(UTIL.ROB_telem.tSpeed) )
@@ -1056,7 +1104,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         except AttributeError:  pass
 
         # update Amcon & Pump tab
-        self.setUpdatesEnabled( False )
+        for widget in self.ADC_group:   widget.blockSignals( True )
+        for widget in self.ASC_group:   widget.blockSignals( True )
 
         self.ADC_num_panning.setValue       ( entry.Tool.pan_steps )
         self.ASC_num_panning.setValue       ( entry.Tool.pan_steps )
@@ -1071,7 +1120,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ADC_btt_fiberPnmtc.setChecked  ( entry.Tool.pnmtcFiber_yn )
         self.ASC_btt_fiberPnmtc.setChecked  ( entry.Tool.pnmtcFiber_yn )
 
-        self.setUpdatesEnabled( True )
+        for widget in self.ADC_group:   widget.blockSignals( False )
+        for widget in self.ASC_group:   widget.blockSignals( False )
 
 
 
@@ -1321,13 +1371,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_indi_qProcessing.setStyleSheet   ( css )
         self.TCP_indi_qProcessing.setStyleSheet     ( css )
         self.ASC_indi_qProcessing.setStyleSheet     ( css )
-        self.ASC_num_panning.setEnabled             ( False )
-        self.ASC_num_fibDeliv.setEnabled            ( False )
-        self.ASC_btt_clamp.setEnabled               ( False )
-        self.ASC_btt_knifePos.setEnabled            ( False )
-        self.ASC_btt_knife.setEnabled               ( False )
-        self.ASC_btt_fiberPnmtc.setEnabled          ( False )
-        self.ASC_btt_overwrSC.setEnabled            ( False )
+
+        for widget in self.ASC_group:   widget.setEnabled( False )
         self.switchRobMoving()
 
         self.labelUpdate_onQueueChange()
@@ -1355,14 +1400,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.labelUpdate_onQueueChange()
             self.switchRobMoving( end= True )
             css = "border-radius: 20px; background-color: #4c4a48;"
-
-            self.ASC_num_panning.setEnabled     ( True )
-            self.ASC_num_fibDeliv.setEnabled    ( True )
-            self.ASC_btt_clamp.setEnabled       ( True )
-            self.ASC_btt_knifePos.setEnabled    ( True )
-            self.ASC_btt_knife.setEnabled       ( True )
-            self.ASC_btt_fiberPnmtc.setEnabled  ( True )
-            self.ASC_btt_overwrSC.setEnabled    ( True )
+            
+            for widget in self.ASC_group:   widget.setEnabled( True )
 
         # update GUI
         self.SCTRL_indi_qProcessing.setStyleSheet   ( css )
@@ -1579,34 +1618,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.DC_indi_robotMoving.setStyleSheet ( "border-radius: 25px; background-color: #00aaff;" )
             self.ADC_indi_robotMoving.setStyleSheet( "border-radius: 20px; background-color: #00aaff;" )
         
-        self.ADC_num_panning.setEnabled         ( buttonToggle )
-        self.ADC_num_fibDeliv.setEnabled        ( buttonToggle )
-        self.ADC_btt_clamp.setEnabled           ( buttonToggle )
-        self.ADC_btt_knifePos.setEnabled        ( buttonToggle )
-        self.ADC_btt_knife.setEnabled           ( buttonToggle )
-        self.ADC_btt_fiberPnmtc.setEnabled      ( buttonToggle )
-        self.ADC_btt_resetAll.setEnabled        ( buttonToggle )
-
-        self.DC_btt_xPlus.setEnabled            ( buttonToggle )
-        self.DC_btt_xMinus.setEnabled           ( buttonToggle )
-        self.DC_btt_yPlus.setEnabled            ( buttonToggle )
-        self.DC_btt_yMinus.setEnabled           ( buttonToggle )
-        self.DC_btt_zPlus.setEnabled            ( buttonToggle )
-        self.DC_btt_zMinus.setEnabled           ( buttonToggle )
-        self.DC_btt_extPlus.setEnabled          ( buttonToggle )
-        self.DC_btt_extMinus.setEnabled         ( buttonToggle )
-        self.DC_btt_home.setEnabled             ( buttonToggle )
-        self.DC_lbl_x.setEnabled                ( buttonToggle )
-        self.DC_lbl_y.setEnabled                ( buttonToggle )
-        self.DC_lbl_z.setEnabled                ( buttonToggle )
-        self.DC_lbl_ext.setEnabled              ( buttonToggle )
-
-        self.NC_btt_xyzSend.setEnabled          ( buttonToggle )
-        self.NC_btt_xyzExtSend.setEnabled       ( buttonToggle )
-        self.NC_btt_orientSend.setEnabled       ( buttonToggle )
-
-        self.TERM_btt_gcodeInterp.setEnabled    ( buttonToggle )
-        self.TERM_btt_rapidInterp.setEnabled    ( buttonToggle )
+        for widget in self.ADC_group:   widget.setEnabled( buttonToggle )
+        for widget in self.DC_group:    widget.setEnabled( buttonToggle )
+        for widget in self.NC_group:    widget.setEnabled( buttonToggle )
+        for widget in self.TERM_group:  widget.setEnabled( buttonToggle )
         mutex.unlock()
 
 
@@ -1849,6 +1864,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def sendCommand( self, command, DC= False ):
         """ passing new commands to RoboCommWorker """
         
+        # error catching for fast-clicking users
+        if( len(UTIL.ROB_sendList) != 0 ):
+            lastCom, dummy = UTIL.ROB_sendList[ len(UTIL.ROB_sendList) - 1 ]
+            if( command.id <= lastCom.id ): command.id = lastCom.id + 1
+        
+        # pass command to sendList
         mutex.lock()
         UTIL.ROB_sendList.append( (command, DC) )
         mutex.unlock()
@@ -1907,25 +1928,27 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ handle user inputs regarding pump frequency """
 
         mutex.lock()
-        UTIL.PUMP1_liveAd = self.SCTRL_num_liveAd_pump1.value() / 100.0
         match type:
-            case   '1':     UTIL.PUMP1_speed += 1
-            case  '-1':     UTIL.PUMP1_speed -= 1
-            case  '10':     UTIL.PUMP1_speed += 10
-            case '-10':     UTIL.PUMP1_speed -= 10
-            case  '25':     UTIL.PUMP1_speed += 25
-            case '-25':     UTIL.PUMP1_speed -= 25
-            case   '0':     UTIL.PUMP1_speed =  0
-            case   'r':     UTIL.PUMP1_speed *= -1
-            case   'c':     pass
+            case   '1':     UTIL.PUMP_speed += 1
+            case  '-1':     UTIL.PUMP_speed -= 1
+            case  '10':     UTIL.PUMP_speed += 10
+            case '-10':     UTIL.PUMP_speed -= 10
+            case  '25':     UTIL.PUMP_speed += 25
+            case '-25':     UTIL.PUMP_speed -= 25
+            case   '0':     UTIL.PUMP_speed =  0
+            case   'r':     UTIL.PUMP_speed *= -1
+            case  'c1':     UTIL.PUMP1_liveAd = self.SCTRL_num_liveAd_pump1.value() / 100.0
+            case  'c2':     UTIL.PUMP2_liveAd = self.SCTRL_num_liveAd_pump2.value() / 100.0
+            case  's1':     UTIL.PUMP1_userSpeed = self.PUMP_num_setSpeedP1.value()
+            case  's2':     UTIL.PUMP2_userSpeed = self.PUMP_num_setSpeedP2.value()
             case 'def':     
                 if( len(UTIL.ROB_commQueue) != 0 ): 
-                    UTIL.PUMP1_speed = PU_defMode( UTIL.ROB_commQueue[0] )
+                    UTIL.PUMP_speed = PU_defMode( UTIL.ROB_commQueue[0] )
                 else:
                     userInfo = strdDialog( 'No current command!', 'Action not possible' )
                     userInfo.exec()
 
-            case _:         UTIL.PUMP1_speed = self.PUMP_num_setSpeed.value()
+            case _:         UTIL.PUMP_speed = self.PUMP_num_setSpeed.value()
         mutex.unlock()
 
 
@@ -2112,6 +2135,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.logEntry( 'GNRL', 'closeEvent signal.' )
         self.logEntry( 'GNRL', 'end threading, delete threads...' )
         
+        # disconnect robot
         if( UTIL.ROB_tcp.connected ):
             self.logEntry               ( 'CONN', 'closing robot TCP connection...' )
             UTIL.ROB_tcp.send         ( UTIL.QEntry( id= 1, mt= 'E' ) )
@@ -2119,22 +2143,28 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.roboCommThread.quit    ()
             self.roboCommThread.wait    ()
 
-        if( self.pump1Conn ):
-            self.logEntry               ( 'CONN', 'closing pump connections...' )
+        # disconnect pumps, if needed
+        connClosed = 0
+        if( UTIL.PUMP1_serial.connected ): 
+            UTIL.PUMP1_serial.stop() 
+            UTIL.PUMP1_serial.disconnect()
+            connClosed += 1
+        if( UTIL.PUMP2_serial.connected ): 
+            UTIL.PUMP2_serial.stop() 
+            UTIL.PUMP2_serial.disconnect()
+            connClosed += 1
+        if( UTIL.MIXER_tcp.connected ): 
+            UTIL.MIXER_tcp.send( 0 )
+            UTIL.MIXER_tcp.close()
+            connClosed += 1
             
-            if( 'COM' in UTIL.PUMP1_tcp.port ):
-                self.pumpCommThread.quit()
-                self.pumpCommThread.wait()
-            else:
-                raise ConnectionError( 'TCP not supported, unable to disconnect' ) # UTIL.PUMP1_tcpip.close()
+        if( connClosed != 0 ):
+            self.pumpCommThread.quit()
+            self.pumpCommThread.wait()
+            self.logEntry( 'CONN', f"closing pump/mixer connections ({connClosed} done)" )
 
-        # if(self.pump2Conn):
-        #     if( 'COM' in UTIL.PUMP2_tcpip.PORT ):
-        #         self.pumpCommThread_2.quit()
-        #         self.pumpCommThread_2.wait()
-        #     else:
-        #         raise ConnectionError('TCP not supported, unable to disconnect') # UTIL.PUMP1_tcpip.close()
-
+        # stop threading
+        self.logEntry( 'GNRL', 'stop threading...' )
         self.roboCommThread.deleteLater()
         self.pumpCommThread.deleteLater()
         self.loadFileWorker.deleteLater()
@@ -2142,6 +2172,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.loadFileThread.wait()
         self.loadFileThread.deleteLater()
 
+        # bye
         self.logEntry( 'GNRL', 'exiting GUI.' )
         self.DAQTimer.stop()
         self.DAQ.close()
