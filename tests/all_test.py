@@ -13,15 +13,10 @@ from util_test          import UTIL_test
 from putil_test         import PUTIL_test
 from thread_test        import Thread_test
 
-# reimport everything so its up to date
-import mainframe_test
-import importlib
-importlib.reload(mainframe_test)
-
 # appending the parent directory path
-current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir  = os.path.dirname(current_dir)
-sys.path.append(parent_dir)  
+current_dir = os.path.dirname( os.path.realpath(__file__) )
+parent_dir  = os.path.dirname( current_dir )
+sys.path.append( parent_dir )
 
 
 
@@ -29,11 +24,11 @@ sys.path.append(parent_dir)
 ############################################### MAIN ###################################################
 
 # see if all of the libs can be run without errors
-import libs.PRINT_data_utilities
-import libs.PRINT_threads
-import libs.PRINT_win_daq
-import libs.PRINT_win_dialogs
-import libs.PRINT_win_mainframe
+import libs.data_utilities
+import libs.threads
+import libs.win_daq
+import libs.win_dialogs
+import libs.win_mainframe
 
 # run unittest
 unittest.main()

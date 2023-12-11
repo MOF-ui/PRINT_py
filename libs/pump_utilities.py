@@ -47,7 +47,7 @@ def calcSpeed():
     match pMode:
         
         case 'None':    
-            speed = UTIL.PUMP1_speed
+            speed = UTIL.PUMP_speed
 
         case 'default': 
             speed = defaultMode( command= currCommand )
@@ -85,9 +85,9 @@ def defaultMode( command= None ):
     if( command is None ):   return None
     if( command != lastDefCommand ):
         # determine current volume output:
-        lps = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP2_literPerS ) )
-        #       ( [mm/s]          * [L/m]           * [m/mm]  / [L/s])* 100.0  =  [%]
-        speed = ( command.Speed.ts * UTIL.SC_volPerM * 0.001  / lps ) * 100.0
+        lps = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP_outputRatio ) )
+        #       ( [mm/s]          * [L/m]            * [m/mm]/ [L/s])* 100.0  =  [%]
+        speed = ( command.Speed.ts * UTIL.SC_volPerM * 0.001 / lps ) * 100.0
         lastDefCommand = copy.deepcopy(command)
 
     else:
@@ -105,7 +105,7 @@ def profileMode( command= None, profile= None ):
     global lastSpeed
 
     if( None in [command, profile] ): return None
-    lps   = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP2_literPerS ) )
+    lps   = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP_outputRatio ) )
     speed = ( command.Speed.ts * UTIL.SC_volPerM * 0.001 / lps ) * 100.0
 
     # as more complex pump scripts should only apply to linear movements, 
@@ -198,7 +198,7 @@ def getBaseSpeed(base = 'default', fallback = 0.0):
         case 'conn':    
             try:
                 nextCommand = UTIL.ROB_commQueue[1]
-                lps       = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP2_literPerS ) )
+                lps       = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP_outputRatio ) )
                 baseSpeed = ( nextCommand.Speed.ts * UTIL.SC_volPerM * 0.001 / lps ) * 100.0
             except AttributeError:  
                 baseSpeed = fallback

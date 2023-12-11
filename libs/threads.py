@@ -84,19 +84,15 @@ class PumpCommWorker( QObject ):
         else:
             pump1Speed = pump2Speed = pumpSpeed
         
-        # look for user overwrite
+        # look for user overwrite, no mutex, as changing global PUMP_userSpeed would not harm the process
         if( UTIL.PUMP1_userSpeed != -999 ):
             pump1Speed  = UTIL.PUMP1_userSpeed
-            pumpSpeed   = 1
-            mutex.lock()
             UTIL.PUMP1_userSpeed = -999
-            mutex.unlock()
+            pumpSpeed   = 1
         if( UTIL.PUMP2_userSpeed != -999 ):
             pump2Speed  = UTIL.PUMP2_userSpeed
-            pumpSpeed   = 1
-            mutex.lock()
             UTIL.PUMP2_userSpeed = -999
-            mutex.unlock()
+            pumpSpeed   = 1
 
         # send to P1 and P2 & keepAlive both
         if( pumpSpeed is not None ):
@@ -127,7 +123,7 @@ class PumpCommWorker( QObject ):
         
         # SEND TO MIXER
         if( UTIL.MIXER_tcp.connected ):
-            mixerSpeed   = pumpSpeed if( UTIL.MIXER_actWithPump ) else UTIL.MIXER_speed
+            mixerSpeed = pumpSpeed if( UTIL.MIXER_actWithPump ) else UTIL.MIXER_speed
             
             if( mixerSpeed != PCW_lastMixerSpeed ):
                 res, dataLen = UTIL.MIXER_tcp.send( int(mixerSpeed) )
@@ -153,7 +149,7 @@ class PumpCommWorker( QObject ):
             torq    = UTIL.PUMP1_serial.torque
     
             if( None in [ freq, volt, amps, torq ] ): 
-                self.logError.emit( 'CONN', 'Pump1 telemetry package broken or not received...' )
+                self.logError.emit( 'PTel', 'Pump1 telemetry package broken or not received...' )
         
             else:
                 # telemetry contains no info about the rotation direction, interpret according to settings
@@ -172,13 +168,13 @@ class PumpCommWorker( QObject ):
 
         # P2
         if( UTIL.PUMP2_serial.connected ):
-            freq    = self.mtecInterface2.frequency
-            volt    = self.mtecInterface2.voltage
-            amps    = self.mtecInterface2.current
-            torq    = self.mtecInterface2.torque
+            freq    = UTIL.PUMP2_serial.frequency
+            volt    = UTIL.PUMP2_serial.voltage
+            amps    = UTIL.PUMP2_serial.current
+            torq    = UTIL.PUMP2_serial.torque
     
             if( None in [ freq, volt, amps, torq ] ): 
-                self.logError.emit( 'CONN', 'Pump2 telemetry package broken or not received...' )
+                self.logError.emit( 'PTel', 'Pump2 telemetry package broken or not received...' )
         
             else:
                 # telemetry contains no info about the rotation direction, interpret according to settings
@@ -211,7 +207,7 @@ class PumpCommWorker( QObject ):
                     self.dataMixerRecv.emit( data )
 
             else:
-                self.logError.emit( 'CONN', f"MIXER - receiving data failed ({data})" )
+                self.logError.emit( 'MTel', f"MIXER - receiving data failed ({data})" )
 
         
 
@@ -330,7 +326,7 @@ class RoboCommWorker( QObject ):
 
             
         elif( telem is not None ):
-            self.logError.emit( 'CONN', f"error ({telem}) from TCPIP class ROB_tcpip, data: {rawData}" )
+            self.logError.emit( 'RTel', f"error ({telem}) from TCPIP class ROB_tcpip, data: {rawData}" )
 
             mutex.lock()
             UTIL.addToCommProtocol( f"RECV:    error ({telem}) from TCPIP class ROB_tcpip, data: {rawData}" )

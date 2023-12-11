@@ -1136,7 +1136,8 @@ class TCPIP:
 
     def send( self, data= None):
         """ send data to server according to class attributes """
-        
+
+        if( not self.connected ): return False, ConnectionError        
         try:
             if( len(data) != self.w_bl ):  return False, ValueError( 'wrong message length' ) 
             
@@ -1154,12 +1155,11 @@ class TCPIP:
         """ receive according to class attributes """
 
         data = ""
-
         try:
-            while ( len(data) < self.r_bl ):  
+            while ( len(data) < self.r_bl ):
                 data = self.Socket.recv( self.r_bl )
 
-        except Exception as err:    
+        except Exception as err:
             return False, err
 
         if len(data) != self.r_bl:  
@@ -1210,7 +1210,7 @@ class RobConnection( TCPIP ):
         """ sends QEntry object to robot, packing according to robots protocol """
 
         message = [] 
-        if( not self.connected ): return ConnectionError, 0
+        if( not self.connected ): return False, ConnectionError
 
         try:
             message = struct.pack( '<iccffffffffffffffffiiiiiciiiiiiiiiiiiiiiii'
@@ -1419,7 +1419,7 @@ def reShort( regEx, txt, default, fallbackRegEx = '' ):
 
 
 
-def gcodeToQEntry( mutPos, mutSpeed, zone, txt = '', wTool= False ):
+def gcodeToQEntry( mutPos, mutSpeed, zone, txt = '' ):
     """ converts a single line of GCode G1 command to a QEntry, can be used in loops for multiline code,
         "pos" should be the pos before this command is executed (before its EXECUTED, not before its added  
         to SC_queue) as its the fallback option if no new X, Y, Z or EXT posistion is passed"""
@@ -1476,7 +1476,7 @@ def gcodeToQEntry( mutPos, mutSpeed, zone, txt = '', wTool= False ):
             entry.Coor1 = round( entry.Coor1, 2 )
 
             # set tool settings
-            if( wTool ):
+            if( 'TOOL' in txt ):
                 entry.Tool.fibDeliv_steps   = int( TOOL_fibRatio * DEF_TOOL_FIB_STPS )
                 entry.Tool.pnmtcFiber_yn    = True
             
@@ -1508,7 +1508,7 @@ def gcodeToQEntry( mutPos, mutSpeed, zone, txt = '', wTool= False ):
 
 
 
-def rapidToQEntry( txt = '', wTool= False ):
+def rapidToQEntry( txt = '' ):
     """ converts a single line of MoveL, MoveJ, MoveC or Move* Offs command (no Reltool) to a QEntry (relative to
         DC_curr_zero), can be used in loops for multiline code, returns entry and any Exceptions"""
     global DC_currZero
@@ -1566,7 +1566,7 @@ def rapidToQEntry( txt = '', wTool= False ):
         # tool    = tool [: len(tool) - 1]
 
         # set tool settings
-        if( wTool ):
+        if( 'TOOL' in txt ):
             entry.Tool.fibDeliv_steps   = int( TOOL_fibRatio * DEF_TOOL_FIB_STPS )
             entry.Tool.pnmtcFiber_yn    = True
 
@@ -1676,7 +1676,7 @@ DEF_SC_VOL_PER_M    = 0.4       # calculated for 1m of 4cm wide and 1cm high fil
 DEF_SC_MAX_LINES    = 400
 DEF_SC_EXT_FLLW_BHVR= (500,200)
 
-DEF_TERM_MAX_LINES  = 400
+DEF_TERM_MAX_LINES  = 300
 
 DEF_TOOL_FIB_STPS   = 10
 DEF_TOOL_FIB_RATIO  = 1.0
