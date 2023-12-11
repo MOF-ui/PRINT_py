@@ -222,6 +222,7 @@ class RoboCommWorker( QObject ):
         checks the TCPIP connection every 50 ms and writes the result to global vars """
 
 
+    commLost        = pyqtSignal( int )
     dataReceived    = pyqtSignal()
     dataUpdated     = pyqtSignal( str, UTIL.RoboTelemetry )
     endDcMoving     = pyqtSignal()
@@ -235,16 +236,19 @@ class RoboCommWorker( QObject ):
     def run( self ):
         """ start timer, receive and send on timeout """
 
+        self.bedTimer = QTimer()
+        self.bedTimer.setInterval      ( 10 )
+        self.bedTimer.timeout.connect  ( self.bedtimeCheck )
+        self.bedTimer.start()
+
         self.commTimer = QTimer()
         self.commTimer.setInterval      ( 10 )
         self.commTimer.timeout.connect  ( self.receive )
         self.commTimer.timeout.connect  ( self.send )
-        self.commTimer.start()
 
         self.checkTimer = QTimer()
         self.checkTimer.setInterval     ( 200 )
         self.checkTimer.timeout.connect ( self.checkSC_queue )
-        self.checkTimer.start()
 
 
 
@@ -256,8 +260,27 @@ class RoboCommWorker( QObject ):
         self.commTimer.deleteLater()
 
         self.checkTimer.stop()
-        self.checkTimer.deleteLater()    
+        self.checkTimer.deleteLater() 
 
+
+
+    def bedtimeCheck( self ):
+        """  """
+        global RCW_paused
+        global RCW_switch
+
+        if( RCW_switch ):
+            RCW_switch = False
+
+            if( RCW_paused ):
+                self.commTimer.start()
+                self.checkTimer.start()
+                RCW_paused = False
+            else:
+                self.commTimer.stop()
+                self.checkTimer.stop()
+                if( len(UTIL.ROB_sendList) != 0 ): self.commLost.emit( len(UTIL.ROB_sendList) )
+                RCW_paused = True
 
 
 
@@ -380,15 +403,15 @@ class RoboCommWorker( QObject ):
 
             commTuple   = UTIL.ROB_sendList.pop( 0 )
             numToSend   = len( UTIL.ROB_sendList )
-            command     = commTuple[ 0 ]
-            directCtrl  = commTuple[ 1 ]
+            command     = commTuple[0]
+            directCtrl  = commTuple[1]
 
             if    ( command == IndexError ):    break
             while ( command.id > 3000 ):        command.id -= 3000
 
             command.Speed.ts = int( command.Speed.ts * UTIL.ROB_liveAd )
             
-            if( not testrun):   res, msgLen = UTIL.ROB_tcp.send( command )
+            if( not testrun ):  res, msgLen = UTIL.ROB_tcp.send( command )
             else:               res, msgLen = True, 159
 
             if( res ):
@@ -564,9 +587,9 @@ class LoadFileWorker( QObject ):
             startVector.Coor1.x     += LFW_preRunTime
             startVector.Coor1.y     += LFW_preRunTime
             startVector.pMode       =  'zero'
-            startVector.Speed       =  UTIL.SpeedVector( acr= 50, dcr= 50, ts= 200, os=100 )
+            startVector.Speed       =  UTIL.SpeedVector( acr= 50, dcr= 50, ts= 200, ors=100 )
 
-            self.comList[0].Speed   =  UTIL.SpeedVector( acr= 1, dcr= 1, ts= 1, os=1 )
+            self.comList[0].Speed   =  UTIL.SpeedVector( acr= 1, dcr= 1, ts= 1, ors=1 )
             self.comList[0].pMode   =  'start'
             self.comList.add( startVector, threadCall= True )
 
@@ -656,6 +679,10 @@ class LoadFileWorker( QObject ):
 ####################################################   MAIN  ####################################################
 
 mutex           = QMutex()
+
+# RoboCommWorker:
+RCW_paused      = True
+RCW_switch      = False
 
 # LoadFileWorker:
 LFW_filePath    = None

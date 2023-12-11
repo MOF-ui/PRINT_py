@@ -331,11 +331,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SET_float_frToMms.setValue         ( UTIL.DEF_IO_FR_TO_TS )
         self.SET_num_zone.setValue              ( UTIL.DEF_IO_ZONE )
         self.SET_num_transSpeed_dc.setValue     ( UTIL.DEF_DC_SPEED.ts )
-        self.SET_num_orientSpeed_dc.setValue    ( UTIL.DEF_DC_SPEED.os )
+        self.SET_num_orientSpeed_dc.setValue    ( UTIL.DEF_DC_SPEED.ors )
         self.SET_num_accelRamp_dc.setValue      ( UTIL.DEF_DC_SPEED.acr )
         self.SET_num_decelRamp_dc.setValue      ( UTIL.DEF_DC_SPEED.dcr )
         self.SET_num_transSpeed_print.setValue  ( UTIL.DEF_PRIN_SPEED.ts )
-        self.SET_num_orientSpeed_print.setValue ( UTIL.DEF_PRIN_SPEED.os )
+        self.SET_num_orientSpeed_print.setValue ( UTIL.DEF_PRIN_SPEED.ors )
         self.SET_num_accelRamp_print.setValue   ( UTIL.DEF_PRIN_SPEED.acr )
         self.SET_num_decelRamp_print.setValue   ( UTIL.DEF_PRIN_SPEED.dcr )
 
@@ -411,7 +411,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 
                 if( res == True ):
                     # if successful, start threading and watchdog
-                    self.roboCommThread.start()
+                    if( not self.roboCommThread.isRunning() ): self.roboCommThread.start()
+                    WORKERS.RCW_switch = True
                     self.setWatchdog         ( 'ROB' )
                     self.logEntry            ( 'CONN', f"connected to {conn[0]} at {conn[1]}." )
                     self.TCP_ROB_indi_connected.setStyleSheet( css )
@@ -486,21 +487,22 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ disconnect works, reconnect crashes the app, problem probably lies here
             should also send E command to robot on disconnect """
 
-        logTxt = 'user disconnected' if( internalCall ) else 'internal call to disconnect'
+        logTxt = 'internal call to disconnect' if( internalCall ) else 'user disconnected'
         css = ( "border-radius: 25px; background-color: #4c4a48;" )
         chkPumpThread = False
 
         match TCPslot:
-            case 'ROB':  
+            case 'ROB':
+                if( not UTIL.ROB_tcp.connected ): return
+                WORKERS.RCW_switch = True
                 self.killWatchdog( 'ROB' )
-                self.roboCommThread.quit()
-                self.roboCommThread.wait()
                 UTIL.ROB_tcp.close()
 
                 self.logEntry( 'CONN', f"{logTxt} robot." )
                 self.TCP_ROB_indi_connected.setStyleSheet( css )
 
-            case 'P1':  
+            case 'P1':
+                if( not UTIL.PUMP1_serial.connected ): return
                 if( 'COM' in UTIL.PUMP1_tcp.port ):
                     self.killWatchdog( 'P1' )
                     UTIL.PUMP1_serial.disconnect()
@@ -514,6 +516,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                     # UTIL.PUMP1_tcpip.close()
                 
             case 'P2':
+                if( not UTIL.PUMP2_serial.connected ): return
                 if( 'COM' in UTIL.PUMP2_tcp.port ):
                     self.killWatchdog( 'P2' )
                     UTIL.PUMP2_serial.disconnect()
@@ -527,6 +530,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                     # UTIL.PUMP1_tcpip.close()
             
             case 'MIX':
+                if( not UTIL.MIXER_tcp.connected ): return
                 self.killWatchdog( 'MIX' )
                 UTIL.MIXER_tcp.close()
                 chkPumpThread = True
@@ -789,13 +793,17 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     def resetWatchdog( self, dogNum= '' ):
-        """ reset the Watchdogs, robReceiveWD on every newly received data block """
+        """ reset the Watchdog on every newly received data block, check connection everytime if disconnected inbetween """
 
         match dogNum:
-            case 'ROB': self.robReceiveWD.start()
-            case 'P1':  self.pumpOneReceiveWD.start()
-            case 'P2':  self.pumpTwoReceiveWD.start()
-            case 'MIX': self.mixerReceiveWD.start()
+            case 'ROB': 
+                if( UTIL.ROB_tcp.connected ): self.robReceiveWD.start()
+            case 'P1':  
+                if( UTIL.PUMP1_serial.connected ): self.pumpOneReceiveWD.start()
+            case 'P2':  
+                if( UTIL.PUMP2_serial.connected ): self.pumpTwoReceiveWD.start()
+            case 'MIX': 
+                if( UTIL.MIXER_tcp.connected ): self.mixerReceiveWD.start()
             case _:     self.logEntry( 'WDOG', 'Watchdog reset failed, invalid dog number given' )
 
 
@@ -840,6 +848,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                     f"exit and close."
 
         else:
+            self.logEntry( 'WDOG', f"Watchdog {dogNum} has bitten!" )
             wdTxt = f"Watchdog {dogNum} has bitten!\n\n{result}.\nPress OK to keep PRINT_py running or Cancel to "\
                     f"exit and close."
 
@@ -863,10 +872,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ put them to sleep (dont do this to real dogs) """
 
         match dogNum:
-            case 'ROB': self.robReceiveWD.stop()
-            case 'P1':  self.pumpOneReceiveWD.stop()
-            case 'P2':  self.pumpTwoReceiveWD.stop()
-            case 'MIX': self.mixerReceiveWD.stop()
+            case 'ROB': 
+                self.robReceiveWD.stop()
+                self.robReceiveWD.deleteLater()
+            case 'P1':  
+                self.pumpOneReceiveWD.stop()
+                self.pumpOneReceiveWD.deleteLater()
+            case 'P2':  
+                self.pumpTwoReceiveWD.stop()
+                self.pumpTwoReceiveWD.deleteLater()
+            case 'MIX': 
+                self.mixerReceiveWD.stop()
+                self.mixerReceiveWD.deleteLater()
             case _:     pass
 
 
@@ -914,20 +931,20 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         UTIL.IO_frToTs          = self.SET_float_frToMms.value()
         UTIL.IO_zone            = self.SET_num_zone.value()
         UTIL.DC_speed.ts        = self.SET_num_transSpeed_dc.value()
-        UTIL.DC_speed.os        = self.SET_num_orientSpeed_dc.value()
+        UTIL.DC_speed.ors       = self.SET_num_orientSpeed_dc.value()
         UTIL.DC_speed.acr       = self.SET_num_accelRamp_dc.value()
         UTIL.DC_speed.dcr       = self.SET_num_decelRamp_dc.value()
         UTIL.PRIN_speed.ts      = self.SET_num_transSpeed_print.value()
-        UTIL.PRIN_speed.os      = self.SET_num_orientSpeed_print.value()
+        UTIL.PRIN_speed.ors     = self.SET_num_orientSpeed_print.value()
         UTIL.PRIN_speed.acr     = self.SET_num_accelRamp_print.value()
         UTIL.PRIN_speed.dcr     = self.SET_num_decelRamp_print.value()
         mutex.unlock()
 
         self.logEntry('SETS', f"General settings updated -- VolPerMM: {UTIL.SC_volPerM}"
                               f", FR2TS: {UTIL.IO_frToTs}, IOZ: {UTIL.IO_zone}"
-                              f", PrinTS: {UTIL.PRIN_speed.ts}, PrinOS: {UTIL.PRIN_speed.os}"
+                              f", PrinTS: {UTIL.PRIN_speed.ts}, PrinOS: {UTIL.PRIN_speed.ors}"
                               f", PrinACR: {UTIL.PRIN_speed.acr} PrinDCR: {UTIL.PRIN_speed.dcr}, DCTS: {UTIL.DC_speed.ts}"
-                              f", DCOS: {UTIL.DC_speed.os}, DCACR: {UTIL.DC_speed.acr}, DCDCR: {UTIL.DC_speed.dcr}")
+                              f", DCOS: {UTIL.DC_speed.ors}, DCACR: {UTIL.DC_speed.acr}, DCDCR: {UTIL.DC_speed.dcr}")
 
 
 

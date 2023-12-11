@@ -48,7 +48,7 @@ class UTIL_test( unittest.TestCase ):
         """ test Speed class, used to store acceleration and travel speed settings """
         
         # __init__ & __str__
-        self.assertEqual( str( UTIL.SpeedVector( acr= 1.2, dcr= 3.4, ts= 5.6, os= 7.8 ) )
+        self.assertEqual( str( UTIL.SpeedVector( acr= 1.2, dcr= 3.4, ts= 5.6, ors= 7.8 ) )
                          ,f"TS: {6}   OS: {8}   ACR: {1}   DCR: {3}")
         self.assertEqual( str( UTIL.SpeedVector() )
                          ,f"TS: {200}   OS: {50}   ACR: {50}   DCR: {50}")

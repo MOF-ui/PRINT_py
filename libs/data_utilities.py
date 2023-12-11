@@ -184,25 +184,25 @@ class SpeedVector:
                  ,acr    = 50 
                  ,dcr    = 50 
                  ,ts     = 200 
-                 ,os     = 50):
+                 ,ors    = 50):
         
         self.acr    = int( round( acr, 0) )
         self.dcr    = int( round( dcr, 0) )
         self.ts     = int( round( ts,  0) )
-        self.os     = int( round( os,  0) )
+        self.ors    = int( round( ors,  0) )
 
 
 
     def __str__( self ):
 
-        return f"TS: {self.ts}   OS: {self.os}   ACR: {self.acr}   DCR: {self.dcr}"
+        return f"TS: {self.ts}   OS: {self.ors}   ACR: {self.acr}   DCR: {self.dcr}"
     
 
 
     def __mul__( self, other ):
 
         return SpeedVector( ts  = int( round( self.ts *  other, 0) ) 
-                           ,os  = int( round( self.os *  other, 0) ) 
+                           ,ors = int( round( self.ors * other, 0) ) 
                            ,acr = int( round( self.acr * other, 0) ) 
                            ,dcr = int( round( self.dcr * other, 0) ) )
     
@@ -220,7 +220,7 @@ class SpeedVector:
             if(     self.acr == other.acr
                 and self.dcr == other.dcr
                 and self.ts  == other.ts
-                and self.os  == other.os):
+                and self.ors == other.ors):
                 return True
             else: return False
 
@@ -1124,13 +1124,9 @@ class TCPIP:
             self.Socket.settimeout( self.rw_tout )
             return True,server_address
         
-        except TimeoutError:
+        except Exception as err:
             self.connected = 0
-            return TimeoutError, server_address
-        
-        except ConnectionRefusedError:
-            self.connected = 0
-            return ConnectionError, server_address
+            return err, server_address
     
 
 
@@ -1236,7 +1232,7 @@ class RobConnection( TCPIP ):
                                    ,entry.Speed.acr
                                    ,entry.Speed.dcr
                                    ,entry.Speed.ts
-                                   ,entry.Speed.os
+                                   ,entry.Speed.ors
                                    ,entry.sbt
                                    ,bytes(entry.sc,"utf-8")
                                    ,entry.z
@@ -1551,7 +1547,7 @@ def rapidToQEntry( txt = '' ):
         entry.Coor1.q   = res_coor[ 6 ]
         entry.Coor1.ext = ext
         entry.Speed.ts  = int(res_speed[ 0 ])
-        entry.Speed.os  = int(res_speed[ 1 ])
+        entry.Speed.ors = int(res_speed[ 1 ])
         entry.Speed.acr = int(res_speed[ 2 ])
         entry.Speed.dcr = int(res_speed[ 3 ])
 

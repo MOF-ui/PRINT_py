@@ -165,7 +165,7 @@ while toggle:
 					   f"\nX2: {x2} Y2: {y2} Z2: {z2} "
 					   f"Rx2: {rx2} Ry2: {ry2} Rz2: {rz2} Q2: {q2} "
 					   f"Ext2: {ext2}"
-					   f"\nACR: {acr} DCR: {dcr} TS: {ts} OS: {os} "
+					   f"\nACR: {acr} DCR: {dcr} TS: {ts} OS: {ors} "
 					   f"T: {t} SC: {sc} Z: {z}"
 					   f"\nM1_ID: {m1_id} M1_ST: {m1_steps} M2_ID: {m2_id} M2_ST: {m2_steps} "
 					   f"M3_ID: {m3_id} M3_ST: {m3_steps} PC_ID: {pnmtcClamp_id} PC_YN: {pnmtcClamp_yn} "
