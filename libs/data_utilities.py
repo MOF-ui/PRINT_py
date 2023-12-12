@@ -8,6 +8,7 @@
 import re 
 import os
 import copy
+import serial
 import socket
 import struct
 import math as m
@@ -1604,7 +1605,41 @@ def addToCommProtocol( txt ):
     TERM_log.append( txt )
 
     if( len(TERM_log) > DEF_TERM_MAX_LINES ):   TERM_log.__delitem__( 0 )
+
+
+
+def connectPump( pNum ):
+    """ creates the defalt serial connection if needed, connects required pump. necessary to do this via
+        default bus, as multiple connections to on COM port are forbitten by pyserial """
+    global PUMP_serialDefBus
+    global PUMP1_serial
+    global PUMP2_serial
+    global DEF_SERIAL_PUMP
     
+    if( PUMP_serialDefBus is None ): 
+        PUMP_serialDefBus = serial.Serial( baudrate=   DEF_SERIAL_PUMP['BR']
+                                          ,parity=     DEF_SERIAL_PUMP['P']
+                                          ,stopbits=   DEF_SERIAL_PUMP['SB']
+                                          ,bytesize=   DEF_SERIAL_PUMP['BS']
+                                          ,port=       DEF_SERIAL_PUMP['PORT'] )
+        PUMP1_serial.serialDefault = PUMP_serialDefBus
+        PUMP2_serial.serialDefault = PUMP_serialDefBus
+
+    match pNum:
+        case 'P1':  PUMP1_serial.connect()
+        case 'P2':  PUMP2_serial.connect()
+        case _:     raise ValueError( f"wrong pNum given: {pNum}" )
+
+
+
+def calcPumpRatio( p1Speed, p2Speed ):
+    """ keep track if pumpRatio changes """
+    
+    currTotal   = p1Speed + p2Speed
+    p1Ratio     = ( p1Speed / currTotal ) if( currTotal != 0 ) else 0.5
+    currTotal   = currTotal / 2
+
+    return currTotal, p1Ratio
 
 
 
@@ -1624,19 +1659,18 @@ DEF_TCP_MIXER =    { "IP":       "193.0.0.1"
                     ,"R_BL":     4
                     ,"W_BL":     4  }
 
-DEF_TCP_PUMP1 =    { "IP":       ""
+DEF_TCP_PUMP =     { "IP":       ""
                     ,"PORT":     "COM3"
                     ,"C_TOUT":   0
                     ,"RW_TOUT":  0
                     ,"R_BL":     0
                     ,"W_BL":     0  }
 
-DEF_TCP_PUMP2 =    { "IP":       ""
-                    ,"PORT":     "COM4"
-                    ,"C_TOUT":   0
-                    ,"RW_TOUT":  0
-                    ,"R_BL":     0
-                    ,"W_BL":     0  }
+DEF_SERIAL_PUMP =  { "BR":       19200
+                    ,"P":        serial.PARITY_NONE
+                    ,"SB":       serial.STOPBITS_TWO
+                    ,"BS":       serial.EIGHTBITS
+                    ,"PORT":     'COM3'}
 
 DEF_TCP_ROB =      { "IP":       "192.168.125.1"
                     ,"PORT":     10001
@@ -1709,33 +1743,34 @@ PRIN_speed          = copy.deepcopy(DEF_PRIN_SPEED)
 
 PUMP_retractSpeed   = DEF_PUMP_RETR_SPEED
 PUMP_outputRatio    = DEF_PUMP_OUTP_RATIO
+PUMP_serialDefBus   = None   # is created after user input in win_mainframe
 PUMP_speed          = 0
 
 PUMP1_lastTelem     = PumpTelemetry()
 PUMP1_literPerS     = DEF_PUMP_LPS
 PUMP1_liveAd        = 1.0
 PUMP1_speed         = 0
-PUMP1_serial        = MtecMod( '01' )
+PUMP1_serial        = MtecMod( None, '01' )
 PUMP1_userSpeed     = -999
-PUMP1_tcp           = TCPIP( DEF_TCP_PUMP1["IP"]
-                            ,DEF_TCP_PUMP1["PORT"]
-                            ,DEF_TCP_PUMP1["C_TOUT"]
-                            ,DEF_TCP_PUMP1["RW_TOUT"]
-                            ,DEF_TCP_PUMP1["R_BL"]
-                            ,DEF_TCP_PUMP1["W_BL"])
+PUMP1_tcp           = TCPIP( DEF_TCP_PUMP["IP"]
+                            ,DEF_TCP_PUMP["PORT"]
+                            ,DEF_TCP_PUMP["C_TOUT"]
+                            ,DEF_TCP_PUMP["RW_TOUT"]
+                            ,DEF_TCP_PUMP["R_BL"]
+                            ,DEF_TCP_PUMP["W_BL"])
 
 PUMP2_lastTelem     = PumpTelemetry()
 PUMP2_literPerS     = DEF_PUMP_LPS
 PUMP2_liveAd        = 1.0
 PUMP2_speed         = 0
-PUMP2_serial        = MtecMod( '02' )
+PUMP2_serial        = MtecMod( None, '02' )
 PUMP2_userSpeed     = -999
-PUMP2_tcp           = TCPIP( DEF_TCP_PUMP2["IP"]
-                            ,DEF_TCP_PUMP2["PORT"]
-                            ,DEF_TCP_PUMP2["C_TOUT"]
-                            ,DEF_TCP_PUMP2["RW_TOUT"]
-                            ,DEF_TCP_PUMP2["R_BL"]
-                            ,DEF_TCP_PUMP2["W_BL"])
+PUMP2_tcp           = TCPIP( DEF_TCP_PUMP["IP"]
+                            ,DEF_TCP_PUMP["PORT"]
+                            ,DEF_TCP_PUMP["C_TOUT"]
+                            ,DEF_TCP_PUMP["RW_TOUT"]
+                            ,DEF_TCP_PUMP["R_BL"]
+                            ,DEF_TCP_PUMP["W_BL"])
 
 ROB_commFr          = DEF_ROB_COMM_FR
 ROB_commQueue       = Queue()

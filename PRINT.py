@@ -122,8 +122,8 @@ import libs.data_utilities as UTIL
 
 # ask user if default TCP (or USB) connection parameters are to be used, otherwise set new ones
 connectionSetup = connDialog( rob_tcp_default   = UTIL.DEF_TCP_ROB
-                             ,pump1_tcp_default = UTIL.DEF_TCP_PUMP1
-                             ,pump2_tcp_default = UTIL.DEF_TCP_PUMP2
+                             ,pump1_tcp_default = UTIL.DEF_TCP_PUMP
+                             ,pump2_tcp_default = UTIL.DEF_TCP_PUMP
                              ,usrTitle          = "Welcome to PRINT_py  --  Connection setup"
                              ,standalone        = True )
 
@@ -138,11 +138,6 @@ else:
     UTIL.ROB_tcp.setParams(csRobot)
     UTIL.PUMP1_tcp.setParams(csPump1)
     UTIL.PUMP2_tcp.setParams(csPump2)
-
-
-# overwrite ROBO_tcpip for testing, delete later
-# UTIL.ROB_tcpip.ip      = 'localhost'
-# UTIL.ROB_tcpip.port    = 10001
 
 
 # get the go from user

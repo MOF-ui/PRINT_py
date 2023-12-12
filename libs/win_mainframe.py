@@ -83,9 +83,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         # LOGFILE SETUP
         if(lpath is None):
-            logWarning = strdDialog ( 'No path for logfile!\n\nPress OK to continue anyways or\
-                                       Cancel to exit the program.'
-                                      ,'LOGFILE ERROR' )
+            logWarning = strdDialog ( 'No path for logfile!\n\nPress OK to continue anyways or Cancel to exit the program.'
+                                     ,'LOGFILE ERROR' )
             logWarning.exec()
 
             if( logWarning.result() == 0 ):   
@@ -400,12 +399,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                        CONNECTIONS                                                #
     #####################################################################################################
 
-    def connectTCP( self, TCPslot= '' ):
+    def connectTCP( self, connSlot= '' ):
         """ slot-wise connection management, mostly to shrink code length, maybe more functionality later """
 
         css = ( "border-radius: 25px; background-color: #00aaff;" )
 
-        match TCPslot:
+        match connSlot:
             case 'ROB':  
                 res, conn = UTIL.ROB_tcp.connect()
                 
@@ -420,12 +419,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             case 'P1':
                 if( 'COM' in UTIL.PUMP1_tcp.port ): 
-                    UTIL.PUMP1_serial.serial_port = UTIL.PUMP1_tcp.port
-                    UTIL.PUMP1_serial.connect()
+                    UTIL.connectPump( connSlot )
 
                     if( UTIL.PUMP1_serial.connected ):   
                         if( not self.pumpCommThread.isRunning() ): self.pumpCommThread.start()
-                        self.logEntry   ( 'CONN', f"connected to Pump1 at {UTIL.PUMP1_tcp.port}." )
+                        self.logEntry   ( 'CONN', f"connected to Pump1 as inverter {UTIL.PUMP1_serial.settings_frequencyInverterID} at {UTIL.PUMP1_tcp.port}." )
                         self.setWatchdog( 'P1' )
                         self.TCP_PUMP1_indi_connected.setStyleSheet( css )
                         return True
@@ -441,12 +439,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             case 'P2': 
                 if( 'COM' in UTIL.PUMP1_tcp.port ): 
-                    UTIL.PUMP2_serial.serial_port = UTIL.PUMP2_tcp.port
-                    UTIL.PUMP2_serial.connect()
+                    UTIL.connectPump( connSlot )
 
                     if( UTIL.PUMP2_serial.connected ):   
                         if( not self.pumpCommThread.isRunning() ): self.pumpCommThread.start()
-                        self.logEntry   ( 'CONN', f"connected to Pump2 at {UTIL.PUMP1_tcp.port}." )
+                        self.logEntry   ( 'CONN', f"connected to Pump2 as inverter {UTIL.PUMP2_serial.settings_frequencyInverterID} at {UTIL.PUMP1_tcp.port}." )
                         self.setWatchdog( 'P2' )
                         self.TCP_PUMP2_indi_connected.setStyleSheet( css )
                         return True
@@ -489,7 +486,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         logTxt = 'internal call to disconnect' if( internalCall ) else 'user disconnected'
         css = ( "border-radius: 25px; background-color: #4c4a48;" )
-        chkPumpThread = False
 
         match TCPslot:
             case 'ROB':
@@ -506,7 +502,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 if( 'COM' in UTIL.PUMP1_tcp.port ):
                     self.killWatchdog( 'P1' )
                     UTIL.PUMP1_serial.disconnect()
-                    chkPumpThread = True
 
                     self.logEntry( 'CONN', f"{logTxt} pump 1." )
                     self.TCP_PUMP1_indi_connected.setStyleSheet( css )
@@ -520,7 +515,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 if( 'COM' in UTIL.PUMP2_tcp.port ):
                     self.killWatchdog( 'P2' )
                     UTIL.PUMP2_serial.disconnect()
-                    chkPumpThread = True
 
                     self.logEntry( 'CONN', f"{logTxt} pump 2." )
                     self.TCP_PUMP2_indi_connected.setStyleSheet( css )
@@ -533,21 +527,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 if( not UTIL.MIXER_tcp.connected ): return
                 self.killWatchdog( 'MIX' )
                 UTIL.MIXER_tcp.close()
-                chkPumpThread = True
 
                 self.logEntry( 'CONN', f"{logTxt} mixer." )
                 self.TCP_MIXER_indi_connected.setStyleSheet( css )
 
             case _:
                 pass
-
-
-        if( chkPumpThread ):
-            if(    not UTIL.PUMP1_serial.connected
-                and not UTIL.PUMP2_serial.connected
-                and not UTIL.MIXER_tcp.connected ):
-                self.pumpCommThread.quit()
-                self.pumpCommThread.wait()
 
 
 
@@ -595,6 +580,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.loadFileWorker = WORKERS.LoadFileWorker()
         self.loadFileWorker.moveToThread            ( self.loadFileThread )
         self.loadFileThread.started.connect         ( self.loadFileWorker.start )
+        self.loadFileThread.finished.connect        ( self.loadFileWorker.deleteLater )
         self.loadFileWorker.convFailed.connect      ( self.loadFileFailed )
         self.loadFileWorker.convFinished.connect    ( self.loadFileFinished )
 
@@ -657,10 +643,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         match source:
             case 'P1':
-                mutex.lock()
-                UTIL.PUMP1_speed = newSpeed
-                mutex.unlock()
-
                 self.TCP_PUMP1_disp_writeBuffer.setText     ( str(command) )
                 self.TCP_PUMP1_disp_bytesWritten.setText    ( str(len(command)) )
                 self.TCP_PUMP1_disp_readBuffer.setText      ( str(ans) )
@@ -668,10 +650,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 self.logEntry( 'PMP1', f"speed set to {UTIL.PUMP1_speed}, command: {command}" )
 
             case 'P2':
-                mutex.lock()
-                UTIL.PUMP2_speed = newSpeed
-                mutex.unlock()
-
                 self.TCP_PUMP2_disp_writeBuffer.setText     ( str(command) )
                 self.TCP_PUMP2_disp_bytesWritten.setText    ( str(len(command)) )
                 self.TCP_PUMP2_disp_readBuffer.setText      ( str(ans) )
@@ -681,6 +659,26 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             case _:
                 self.logEntry( 'CONN', 'ERROR! Pump dataSend signal from unspecified source.' )
                 print( 'ERROR! Pump dataSend signal from unspecified source.' )
+                return
+        
+        # keep track of PUMP_speed in case of user overwrite:
+        if( UTIL.PUMP1_serial.connected and UTIL.PUMP2_serial.connected ): 
+            currTotal, p1Ratio = UTIL.calcPumpRatio( UTIL.PUMP1_speed, UTIL.PUMP2_speed )
+            mutex.lock()
+            UTIL.PUMP_speed = currTotal
+            UTIL.PUMP_outputRatio = p1Ratio
+            mutex.unlock()
+        elif( source == 'P1' ):
+            currTotal = newSpeed
+            p1Ratio   = 1.0
+        elif( source == 'P2' ):
+            currTotal = newSpeed
+            p1Ratio   = 0.0
+
+        sld = int(( 1 - p1Ratio ) * 100)
+        self.PUMP_disp_currSpeed.setText    ( f"{round( currTotal, 2 )}%" )
+        self.PUMP_disp_outputRatio.setText  ( f"{ int(p1Ratio * 100) } / { sld }" )
+        if( not self.PUMP_sld_outputRatio.isSliderDown() ): self.PUMP_sld_outputRatio.setValue  ( sld )
 
 
 
@@ -712,23 +710,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 self.logEntry( 'CONN', 'ERROR! Received PumpTelemetry from unspecified source.' )
                 print( 'ERROR! Received PumpTelemetry from unspecified source.' )
                 return
-        
-        # calculate ratio between pump outputs
-        if( UTIL.PUMP1_serial.connected and UTIL.PUMP2_serial.connected ):
-            currTotal   = UTIL.STT_dataBlock.Pump1.freq + UTIL.STT_dataBlock.Pump2.freq
-            p1Ratio     = int( round( ( UTIL.STT_dataBlock.Pump1.freq * 100 / currTotal ), 0 ) )
-            p2Ratio     = 100 - p1Ratio
-            currTotal   = round( ( currTotal / 2 ), 1 )
-
-        else:
-            currTotal   = telem.freq
-            p1Ratio     = 100 if( source == 'P1' ) else 0
-            p2Ratio     = 100 if( source == 'P2' ) else 0
-
-
-        self.PUMP_disp_currSpeed.setText    ( f"{currTotal}%" )
-        self.PUMP_disp_outputRatio.setText  ( f"{p1Ratio} / {p2Ratio}" )
-        self.PUMP_sld_outputRatio.setValue  ( p2Ratio )
     
 
 
@@ -918,7 +899,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """ new factor for QEntry.Speed.ts, applied before sending """
 
         mutex.lock()
-        UTIL.PUMP_outputRatio = self.PUMP_sld_outputRatio.value() / 100.0
+        UTIL.PUMP_outputRatio = 1 - ( self.PUMP_sld_outputRatio.value() / 100.0 )
         mutex.unlock()
 
 
@@ -1360,7 +1341,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         
         else:
             mutex.lock()
-            UTIL.PUMP1_speed    = 0
+            UTIL.PUMP_speed     = 0
             UTIL.SC_qPrepEnd    = False
             UTIL.SC_qProcessing = False
             mutex.unlock()
@@ -2109,25 +2090,23 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # disconnect robot
         if( UTIL.ROB_tcp.connected ):
             UTIL.ROB_tcp.send   ( UTIL.QEntry( id= 1, mt= 'E' ) )
+            self.roboCommThread.quit()
+            self.roboCommThread.wait()
             self.disconnectTCP  ( 'ROB', internalCall= True )
         
-        # disconnect pumps, if needed
-        if( UTIL.PUMP1_serial.connected ): 
-            UTIL.PUMP1_serial.stop() 
-            self.disconnectTCP( 'P1', internalCall= True )
-
-        if( UTIL.PUMP2_serial.connected ): 
-            UTIL.PUMP2_serial.stop() 
-            self.disconnectTCP( 'P2', internalCall= True )
-
-        if( UTIL.MIXER_tcp.connected ): 
-            self.disconnectTCP( 'MIX', internalCall= True )
+        # disconnect pumps
+        if( self.pumpCommThread.isRunning() ):
+            self.pumpCommThread.quit()
+            self.pumpCommThread.wait()
+        
+        self.disconnectTCP( 'P1', internalCall= True )
+        self.disconnectTCP( 'P2', internalCall= True )
+        self.disconnectTCP( 'MIX', internalCall= True )
 
         # stop threading
         self.logEntry( 'GNRL', 'stop threading...' )
         self.roboCommThread.deleteLater()
         self.pumpCommThread.deleteLater()
-        self.loadFileWorker.deleteLater()
         self.loadFileThread.quit()
         self.loadFileThread.wait()
         self.loadFileThread.deleteLater()

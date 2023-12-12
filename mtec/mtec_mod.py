@@ -14,11 +14,12 @@ import time
 ####################################################    CLASS     ####################################################
 
 class MtecMod:
-    def __init__(self, frequencyInverterID = "01"):
+    def __init__(self, serialBusDef= None, frequencyInverterID = "01"):
         self.settings_frequencyInverterID   = frequencyInverterID
         self.settings_keepAlive_command     = "03FD000001"
         self.settings_keepAlive_active      = True
 
+        self.serialDefault                  = serialBusDef
         self.settings_serial_baudRate       = 19200
         self.settings_serial_dataBits       = serial.EIGHTBITS
         self.settings_serial_stopBits       = serial.STOPBITS_TWO
@@ -36,11 +37,15 @@ class MtecMod:
 
     def connect(self):
         if( not self.connected ):
-            self.serial         = serial.Serial( baudrate   = self.settings_serial_baudRate
-                                                ,parity     = self.settings_serial_parity
-                                                ,stopbits   = self.settings_serial_stopBits
-                                                ,bytesize   = self.settings_serial_dataBits
-                                                ,port       = self.serial_port)
+            if( self.serialDefault is None ):
+                self.serial = serial.Serial( baudrate   = self.settings_serial_baudRate
+                                            ,parity     = self.settings_serial_parity
+                                            ,stopbits   = self.settings_serial_stopBits
+                                            ,bytesize   = self.settings_serial_dataBits
+                                            ,port       = self.serial_port)
+            else:
+                self.serial = self.serialDefault
+            
             self.connected      = True
             self.temp_sendReady = True
         
@@ -93,6 +98,8 @@ class MtecMod:
 
 
     def send(self, command):
+        if( not self.connected ): return None
+
         self.temp_sendReady = False
         self.serial.write(bytes.fromhex(command))
         self.waitForResponse()
@@ -108,6 +115,9 @@ class MtecMod:
         timeout = time.time_ns() + (200 * 1000 * 1000)  #200ms
 
         while True:
+            if( self.connected == False ):
+                print("Receive error: serial partner disconnected")
+                return False
             if self.serial.inWaiting() >= 2:
                 break
             if time.time_ns() > timeout:

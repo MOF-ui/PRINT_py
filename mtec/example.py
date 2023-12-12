@@ -46,7 +46,7 @@ def keepAliveRoutine():
 
 import tkinter
 
-pump            = MtecMod("01")
+pump            = MtecMod( None, "02")
 keepAliveTmr    = Timer(0.25, keepAliveRoutine)
 keepAliveStt    = True
 

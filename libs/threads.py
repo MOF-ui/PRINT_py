@@ -78,7 +78,8 @@ class PumpCommWorker( QObject ):
         pumpSpeed = PUTIL.calcSpeed() if( UTIL.SC_qProcessing ) else UTIL.PUMP_speed
 
         # get speed
-        if( UTIL.PUMP1_serial.connected and UTIL.PUMP2_serial.connected ): 
+        if( UTIL.PUMP1_serial.connected and UTIL.PUMP2_serial.connected ):
+            pumpSpeed *= 2 
             pump1Speed = pumpSpeed * UTIL.PUMP_outputRatio
             pump2Speed = pumpSpeed * ( 1 - UTIL.PUMP_outputRatio )
         else:
@@ -88,40 +89,36 @@ class PumpCommWorker( QObject ):
         if( UTIL.PUMP1_userSpeed != -999 ):
             pump1Speed  = UTIL.PUMP1_userSpeed
             UTIL.PUMP1_userSpeed = -999
-            pumpSpeed   = 1
         if( UTIL.PUMP2_userSpeed != -999 ):
             pump2Speed  = UTIL.PUMP2_userSpeed
             UTIL.PUMP2_userSpeed = -999
-            pumpSpeed   = 1
 
         # send to P1 and P2 & keepAlive both
-        if( pumpSpeed is not None ):
-            if( UTIL.PUMP1_serial.connected ):
-                res = UTIL.PUMP1_serial.setSpeed( int(pump1Speed * UTIL.PUMP1_liveAd) )
-                
-                if( res is not None ):
-                    mutex.lock()
-                    UTIL.PUMP1_speed = pump1Speed
-                    mutex.unlock()
-                    self.dataSend.emit( pump1Speed, res[ 0 ], res[ 1 ], 'P1' )
+        if( UTIL.PUMP1_serial.connected and ( pump1Speed is not None ) ):
+            res = UTIL.PUMP1_serial.setSpeed( int(pump1Speed * UTIL.PUMP1_liveAd) )
+            
+            if( res is not None ):
+                mutex.lock()
+                UTIL.PUMP1_speed = pump1Speed
+                mutex.unlock()
+                print( f"P1: {pump1Speed}" )
+                self.dataSend.emit( pump1Speed, res[ 0 ], res[ 1 ], 'P1' )
 
-                UTIL.PUMP1_serial.keepAlive()
-                
-            if( UTIL.PUMP2_serial.connected ):
-                res = UTIL.PUMP2_serial.setSpeed( int(pump2Speed * UTIL.PUMP2_liveAd) )
-                
-                if( res is not None ):
-                    mutex.lock()
-                    UTIL.PUMP2_speed = pump2Speed
-                    mutex.unlock()
-                    self.dataSend.emit( pump2Speed, res[ 0 ], res[ 1 ], 'P2' )
+            UTIL.PUMP1_serial.keepAlive()
+            
+        if( UTIL.PUMP2_serial.connected and ( pump2Speed is not None ) ):
+            res = UTIL.PUMP2_serial.setSpeed( int(pump2Speed * UTIL.PUMP2_liveAd) )
+            
+            if( res is not None ):
+                mutex.lock()
+                UTIL.PUMP2_speed = pump2Speed
+                mutex.unlock()
+                print( f"P2: {pump2Speed}" )
+                self.dataSend.emit( pump2Speed, res[ 0 ], res[ 1 ], 'P2' )
 
-                UTIL.PUMP2_serial.keepAlive()
+            UTIL.PUMP2_serial.keepAlive()
         
-        else:
-            self.logError.emit( 'CONN', 'Pumps - Error during speed calculation for queue processing' )
-        
-        # SEND TO MIXER
+        # send to mixer
         if( UTIL.MIXER_tcp.connected ):
             mixerSpeed = pumpSpeed if( UTIL.MIXER_actWithPump ) else UTIL.MIXER_speed
             
@@ -152,12 +149,12 @@ class PumpCommWorker( QObject ):
                 self.logError.emit( 'PTel', 'Pump1 telemetry package broken or not received...' )
         
             else:
-                # telemetry contains no info about the rotation direction, interpret according to settings
-                if( UTIL.PUMP1_speed < 0 ): telem.freq *= -1
-
                 telem = UTIL.PumpTelemetry( freq, volt, amps, torq )
                 telem = round( telem, 3 )
                 self.connActive.emit( 'P1' )
+
+                # telemetry contains no info about the rotation direction, interpret according to settings
+                if( UTIL.PUMP1_speed < 0 ): telem.freq *= -1
                 
                 if( telem != UTIL.PUMP1_lastTelem ):
                     mutex.lock()
@@ -177,12 +174,12 @@ class PumpCommWorker( QObject ):
                 self.logError.emit( 'PTel', 'Pump2 telemetry package broken or not received...' )
         
             else:
-                # telemetry contains no info about the rotation direction, interpret according to settings
-                if( UTIL.PUMP2_speed < 0 ): telem.freq *= -1
-
                 telem = UTIL.PumpTelemetry( freq, volt, amps, torq )
                 telem = round( telem, 3 )
                 self.connActive.emit( 'P2' )
+
+                # telemetry contains no info about the rotation direction, interpret according to settings
+                if( UTIL.PUMP2_speed < 0 ): telem.freq *= -1
                 
                 if( telem != UTIL.PUMP2_lastTelem ):
                     mutex.lock()
