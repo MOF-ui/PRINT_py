@@ -21,8 +21,8 @@
 #define MAXATTEMPTS     10
 
 // status vars 
-bool mixerRunning       = false;
-bool admixtureRunning   = false;
+bool mixerSpeed         = false;
+bool admixture          = false;
 bool pinched            = false;
 bool clientConnected    = false;
 
@@ -43,6 +43,9 @@ remoteCommand   lastComm;
 const int       commLen = sizeof( remoteCommand );
 byte            recvMsg[ commLen + 2 ]; // command + checksum
 byte            lastRecvMsg[ commLen + 2 ];
+
+// internal vars
+bool mutexLock = false;     // simple check for mutual exclusion
 
 //classes
 AccelStepper    stepper(AccelStepper::DRIVER, STEP_PIN, DIR_PIN);
@@ -94,19 +97,26 @@ void core0assignments( void *pvParameters ) {
                             newSpeed[k] = recvMsg[k];
                             newAdmix[k] = recvMsg[k + 4];
                         }
+
+                        // stop loop check while copying & delay to wait for the loop to stop
+                        mutexLock = true;
+                        delay( 10 );
                         memcpy( &currComm.mixerSpeed, &newSpeed, sizeof(float) );
                         memcpy( &currComm.admixture, &newAdmix, sizeof(float) );
                         currComm.pinch = recvMsg[8];
+
                         if( 0.0 <= currComm.mixerSpeed && currComm.mixerSpeed <= 100.0
                             && 0.0 <= currComm.admixture && currComm.admixture <= 50.0 ) {
 
                             client.write(true);
                             Serial.println( "received valid" );
+
                         } else {
                             client.write(false);
                             Serial.println( "data out of range, not acknowlegded" );
                             currComm = remoteCommand();
                         }
+                        mutexLock = false;
                     }
                     
                     // set lastRecvMsg to newest buffer
@@ -193,12 +203,11 @@ void setup() {
 
 
 void loop() {
-
-    mixerRunning = ( currComm.mixerSpeed != 0.0 ) ? true : false;
-    admixtureRunning = ( currComm.admixture != 0.0 ) ? true : false;
-    move_motor();
-
-    if( pinched != currComm.pinch ) switch_pinch_valve();
+    if( !mutexLock ) {
+        if( ( mixerSpeed != currComm.mixerSpeed ) || ( admixture != currComm.admixture ) ) move_motor();
+        if( pinched != currComm.pinch ) switch_pinch_valve();
+    }
+    delay( 10 );
 }
 
 
@@ -206,7 +215,7 @@ void loop() {
 void move_motor(){
 // set motor to desired speed, set admixutre pump as well (to do)
 
-    if( !mixerRunning ) {
+    if( currComm.mixerSpeed != 0.0 ) {
         stepper.enableOutputs();
         stepper.setSpeed( currComm.mixerSpeed );
         stepper.runSpeed();
@@ -214,6 +223,8 @@ void move_motor(){
         stepper.stop();
         stepper.disableOutputs();
     }
+    mixerSpeed = currComm.mixerSpeed;
+    admixture  = currComm.admixture;
 }
 
 void switch_pinch_valve() {
