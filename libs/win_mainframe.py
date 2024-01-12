@@ -676,7 +676,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             p1Ratio   = 0.0
 
         sld = int(( 1 - p1Ratio ) * 100)
-        self.PUMP_disp_currSpeed.setText    ( f"{round( currTotal, 2 )}%" )
+        self.PUMP_disp_currSpeed.setText    ( f"{ round( currTotal, 2 ) }%" )
         self.PUMP_disp_outputRatio.setText  ( f"{ int(p1Ratio * 100) } / { sld }" )
         if( not self.PUMP_sld_outputRatio.isSliderDown() ): self.PUMP_sld_outputRatio.setValue  ( sld )
 
@@ -1745,9 +1745,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                               ,mt = 'S')
         
         if( self.testrun ): return self.sendCommand( command, DC= True )
-        FSWarning = strdDialog( 'WARNING!\n\nRobot will stop after current movement!\
-                                 OK to delete buffered commands on robot;\
-                                 Cancel to continue queue processing.'
+        FSWarning = strdDialog( f"WARNING!\n\nRobot will stop after current movement!"
+                                f"OK to delete buffered commands on robot;"
+                                f"Cancel to continue queue processing."
                                 ,'FORCED STOP COMMIT')
         FSWarning.exec()
 

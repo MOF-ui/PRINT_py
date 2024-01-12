@@ -1183,18 +1183,7 @@ class RobConnection( TCPIP ):
     """ sets robot specific send/receive operations, inherits from TCPIP class, overwrites send & receive functions 
 
     ATTRIBUTES:
-        IP:
-            endpoint IP address
-        PORT:
-            endpoint port nummber
-        C_TOUT:
-            timeout for connection attempts to endpoint
-        RW_TOUT:
-            timeout for reading from or writing to endpoint
-        R_BL:
-            data block length to read
-        W_BL:
-            data block length to write
+        inherited from TCPIP class
     
     FUNCTIONS:
         send: 
@@ -1207,9 +1196,9 @@ class RobConnection( TCPIP ):
         """ sends QEntry object to robot, packing according to robots protocol """
 
         message = [] 
-        if( not self.connected ): return False, ConnectionError
 
         try:
+            if( not self.connected ): raise ConnectionError
             message = struct.pack( '<iccffffffffffffffffiiiiiciiiiiiiiiiiiiiiii'
                                    ,entry.id
                                    ,bytes(entry.mt,"utf-8")
@@ -1254,41 +1243,94 @@ class RobConnection( TCPIP ):
                                    ,entry.Tool.time_id
                                    ,entry.Tool.time_time )
             
-            if( len(message) != self.w_bl ):  return False, ValueError( 'wrong message length' ) 
-            
-            try:                self.Socket.sendall( message )
-            except OSError:     return False, OSError
-            
-            print( f"SEND:    { entry.id }, length: { len(message) }" )
-            return True, len(message)
+            if( len(message) != self.w_bl ):  raise ValueError( 'wrong message length' ) 
+            self.Socket.sendall( message )
         
         except Exception as err:
             return False, err
+
+        print( f"SEND:    { entry.id }, length: { len(message) }" )
+        return True, len(message)
 
 
 
     def receive( self ):
         """ receives and unpacks data from robot """
 
-        data = ""
+        data = []
 
         try:
-            while ( len(data) < self.r_bl ):        data = self.Socket.recv( self.r_bl )
+            while ( len(data) < self.r_bl ): data = self.Socket.recv( self.r_bl )
+            if len(data) != self.r_bl: raise ValueError
+
         except TimeoutError:        return None, None, False
         except Exception as err:    return err, data, False
+        
+        self.Telemetry.tSpeed   = struct.unpack( '<f',data[0:4]   )[0]
+        self.Telemetry.id       = struct.unpack( '<i',data[4:8]   )[0]
+        self.Telemetry.Coor.x   = struct.unpack( '<f',data[8:12]  )[0]
+        self.Telemetry.Coor.y   = struct.unpack( '<f',data[12:16] )[0]
+        self.Telemetry.Coor.z   = struct.unpack( '<f',data[16:20] )[0]
+        self.Telemetry.Coor.rx  = struct.unpack( '<f',data[20:24] )[0]
+        self.Telemetry.Coor.ry  = struct.unpack( '<f',data[24:28] )[0]
+        self.Telemetry.Coor.rz  = struct.unpack( '<f',data[28:32] )[0]
+        self.Telemetry.Coor.ext = struct.unpack( '<f',data[32:36] )[0]
+        return self.Telemetry,data,True
 
-        if len(data) != self.r_bl:       return ValueError,data,False
-        else:
-            self.Telemetry.tSpeed   = struct.unpack( '<f',data[0:4]   )[0]
-            self.Telemetry.id       = struct.unpack( '<i',data[4:8]   )[0]
-            self.Telemetry.Coor.x   = struct.unpack( '<f',data[8:12]  )[0]
-            self.Telemetry.Coor.y   = struct.unpack( '<f',data[12:16] )[0]
-            self.Telemetry.Coor.z   = struct.unpack( '<f',data[16:20] )[0]
-            self.Telemetry.Coor.rx  = struct.unpack( '<f',data[20:24] )[0]
-            self.Telemetry.Coor.ry  = struct.unpack( '<f',data[24:28] )[0]
-            self.Telemetry.Coor.rz  = struct.unpack( '<f',data[28:32] )[0]
-            self.Telemetry.Coor.ext = struct.unpack( '<f',data[32:36] )[0]
-            return self.Telemetry,data,True
+
+
+
+
+
+class MixerConnection( TCPIP ):
+    """ sets robot specific send/receive operations, inherits from TCPIP class, overwrites send & receive functions 
+
+    ATTRIBUTES:
+        inherited from TCPIP class
+    
+    FUNCTIONS:
+        send: 
+            sends instruction block to mixer: speed[float], admixture[float], pinch[bool]; packing according to mixer protocol
+        receive:
+            receives and unpacks data from robot, returns it as ??
+    """
+
+    def send( self, msg ):
+        """ sends instruction block to mixer: speed[float], admixture[float], pinch[bool]; packing according to mixer protocol """
+
+        message = [] 
+        try:
+
+            if( not self.connected ): raise ConnectionError
+            message = struct.pack( '<ffb'
+                                   ,msg[0:4]
+                                   ,msg[4:8]
+                                   ,msg[8] )
+            
+            if( len(message) != self.w_bl ): raise ValueError( 'wrong message length' ) 
+            self.Socket.sendall( message )
+        
+        except Exception as err:
+            return False, err
+        
+        return True, len(message)
+
+
+
+    def receive( self ):
+        """ receives and unpacks data from robot """
+
+        data = []
+
+        try:
+            while ( len(data) < self.r_bl ): data = self.Socket.recv( self.r_bl )
+            if len(data) != self.r_bl: raise ValueError
+
+        except TimeoutError:        return None, None, False
+        except Exception as err:    return err, data, False
+        
+        ack = data[0]
+        return ack
 
 
 
@@ -1430,7 +1472,7 @@ def gcodeToQEntry( mutPos, mutSpeed, zone, txt = '' ):
     speed = copy.deepcopy( mutSpeed )
     zero  = copy.deepcopy( DC_currZero )
 
-    try:                command = reShort( '^G\d+', txt, 0, '^;' )[0]
+    try:                command = reShort( 'G\d+', txt, 0, '^;' )[0]
     except IndexError:  return None, None
 
     # act according to GCode command
@@ -1472,11 +1514,23 @@ def gcodeToQEntry( mutPos, mutSpeed, zone, txt = '' ):
             
             entry.Coor1 = round( entry.Coor1, 2 )
 
+            # set pump settings
+            pump = re.findall( 'P_([a-zA-Z]+)', txt )
+            if( pump ): pump = pump[0]
+            if( 'start' in pump
+                or 'end' in pump
+                or 'default' in pump ):
+                entry.pMode = pump
+            elif( 'class' in pump ):
+                pClass = re.findall( 'P_(class\d+)', txt )
+                if( pClass ): entry.pMode = pClass[0]
+                else: return None, None
+
             # set tool settings
             if( 'TOOL' in txt ):
                 entry.Tool.fibDeliv_steps   = int( TOOL_fibRatio * DEF_TOOL_FIB_STPS )
                 entry.Tool.pnmtcFiber_yn    = True
-            
+
         case 'G28':
             entry = QEntry( id = 0, Coor1 = pos, Speed = speed, z  = zone )
             if( 'X0'   in txt ):  entry.Coor1.x   = zero.x
@@ -1485,29 +1539,40 @@ def gcodeToQEntry( mutPos, mutSpeed, zone, txt = '' ):
             if( 'EXT0' in txt ):  entry.Coor1.ext = zero.ext
 
             # set tool settings
-            entry.Tool.fibDeliv_steps         = 0
+            entry.Tool.fibDeliv_steps   = 0
             entry.Tool.pnmtcFiber_yn    = False
-        
+            
+            pump = re.findall( 'P_([a-zA-Z]+)', txt )
+            if( pump ): pump = pump[0]
+            if( 'start' in pump
+                or 'end' in pump
+                or 'default' in pump ):
+                entry.pMode = pump
+            elif( 'class' in pump ):
+                pClass = re.findall( 'P_(class\d+)', txt )
+                if( pClass ): entry.pMode = pClass[0]
+                else: return None, None
+
         case 'G92':
             if( 'X0'   in txt ):  DC_currZero.x   = pos.x
             if( 'Y0'   in txt ):  DC_currZero.y   = pos.y
             if( 'Z0'   in txt ):  DC_currZero.z   = pos.z
             if( 'EXT0' in txt ):  DC_currZero.ext = pos.ext
             return None, command
-        
+
         case ';':
             return None, command
-        
+
         case _:
             return None, None
-        
+
     return entry, command
 
 
 
 def rapidToQEntry( txt = '' ):
     """ converts a single line of MoveL, MoveJ, MoveC or Move* Offs command (no Reltool) to a QEntry (relative to
-        DC_curr_zero), can be used in loops for multiline code, returns entry and any Exceptions"""
+        DC_curr_zero for 'Offs'), can be used in loops for multiline code, returns entry and any Exceptions"""
     global DC_currZero
     global TOOL_fibRatio
     global DEF_TOOL_FIB_STPS
@@ -1555,7 +1620,7 @@ def rapidToQEntry( txt = '' ):
         zone, res       = reShort( 'z\d+', txt, 10 )
         entry.z         = int(zone[ 1: ])
 
-        entry.Coor1 = round( entry.Coor1, 5 )
+        entry.Coor1 = round( entry.Coor1, 2 )
 
         # # for later, if tool is implemented
         # tool    = reShort(',[^,]*$',txt,'tool0')[0]
@@ -1566,6 +1631,14 @@ def rapidToQEntry( txt = '' ):
         if( 'TOOL' in txt ):
             entry.Tool.fibDeliv_steps   = int( TOOL_fibRatio * DEF_TOOL_FIB_STPS )
             entry.Tool.pnmtcFiber_yn    = True
+            
+        pump = re.findall( 'P_([a-zA-Z]+)', txt )
+        if( pump ): pump = pump[0]
+        if( 'start' in pump
+            or 'end' in pump
+            or 'default' in pump
+            or 'None' in pump ):
+            entry.pMode = pump
 
     except Exception as e:
         return None,e
@@ -1593,7 +1666,7 @@ def createLogfile():
         print( f"Exception occured during log file creation: { e }" )
         return None
 
-    return ( logpath )
+    return logpath 
 
 
 
@@ -1699,6 +1772,8 @@ DEF_PRIN_SPEED      = SpeedVector()
 DEF_PUMP_LPS        = 0.5
 DEF_PUMP_RETR_SPEED = -50
 DEF_PUMP_OUTP_RATIO = 1.0
+DEF_PUMP_CLASS1     = 75.0
+DEF_PUMP_CLASS2     = 50.0
 
 DEF_ROB_COMM_FR     = 10
 

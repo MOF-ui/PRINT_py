@@ -45,24 +45,14 @@ def calcSpeed():
             preceedingSpeed = lastSpeed
 
     match pMode:
-        
-        case 'None':    
-            speed = UTIL.PUMP_speed
-
-        case 'default': 
-            speed = defaultMode( command= currCommand )
-        
-        case 'start':
-            speed = profileMode( command= currCommand, profile= START_SUPP_PTS )
-
-        case 'end':
-            speed = profileMode( command= currCommand, profile= END_SUPP_PTS )
-        
-        case 'zero':
-            speed = 0
-
-        case _:        
-            speed = 0
+        case 'None':    speed = UTIL.PUMP_speed
+        case 'default': speed = defaultMode( command= currCommand )
+        case 'start':   speed = profileMode( command= currCommand, profile= START_SUPP_PTS )
+        case 'end':     speed = profileMode( command= currCommand, profile= END_SUPP_PTS )
+        case 'class1':  speed = UTIL.DEF_PUMP_CLASS1
+        case 'class2':  speed = UTIL.DEF_PUMP_CLASS2
+        case 'zero':    speed = 0
+        case _:         speed = 0
 
     # check value domain for speed
     if( speed is None ):  return None

@@ -17,7 +17,7 @@ parent_dir  = os.path.dirname( current_dir )
 sys.path.append( parent_dir )
 
 # PyQt stuff
-from PyQt5.QtCore   import QObject,QTimer,QMutex,pyqtSignal
+from PyQt5.QtCore   import QObject, QTimer, QMutex, pyqtSignal
 
 # import my own libs
 import libs.data_utilities    as UTIL
@@ -584,9 +584,9 @@ class LoadFileWorker( QObject ):
             startVector.Coor1.x     += LFW_preRunTime
             startVector.Coor1.y     += LFW_preRunTime
             startVector.pMode       =  'zero'
-            startVector.Speed       =  UTIL.SpeedVector( acr= 50, dcr= 50, ts= 200, ors=100 )
+            startVector.Speed       =  UTIL.SpeedVector( acr= 50, dcr= 50, ts= 200, ors= 100 )
 
-            self.comList[0].Speed   =  UTIL.SpeedVector( acr= 1, dcr= 1, ts= 1, ors=1 )
+            self.comList[0].Speed   =  UTIL.SpeedVector( acr= 1, dcr= 1, ts= 1, ors= 1 )
             self.comList[0].pMode   =  'start'
             self.comList.add( startVector, threadCall= True )
 
