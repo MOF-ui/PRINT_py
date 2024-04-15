@@ -228,15 +228,17 @@ class RoboCommWorker( QObject ):
     queueEmtpy      = pyqtSignal()
     sendElem        = pyqtSignal( UTIL.QEntry, object, int, bool, bool )
 
+    transmitting    = False
+
 
 
     def run( self ):
         """ start timer, receive and send on timeout """
 
-        self.bedTimer = QTimer()
-        self.bedTimer.setInterval      ( 10 )
-        self.bedTimer.timeout.connect  ( self.bedtimeCheck )
-        self.bedTimer.start()
+        self.statusCheckTimer = QTimer()
+        self.statusCheckTimer.setInterval      ( 10 )
+        self.statusCheckTimer.timeout.connect  ( self.newStatusCheck )
+        self.statusCheckTimer.start()
 
         self.commTimer = QTimer()
         self.commTimer.setInterval      ( 10 )
@@ -259,25 +261,27 @@ class RoboCommWorker( QObject ):
         self.checkTimer.stop()
         self.checkTimer.deleteLater() 
 
+        self.statusCheckTimer.stop()
+        self.statusCheckTimer.deleteLater()
 
 
-    def bedtimeCheck( self ):
-        """  """
-        global RCW_paused
-        global RCW_switch
 
-        if( RCW_switch ):
-            RCW_switch = False
+    def newStatusCheck( self ):
+        """ change connection status if requested, request via permanent check of global variable as I'm unwilling 
+            to program a custom QThread class with the according slot and also havent figured out another way yet """
+        global RCW_newStatus
 
-            if( RCW_paused ):
-                self.commTimer.start()
-                self.checkTimer.start()
-                RCW_paused = False
-            else:
-                self.commTimer.stop()
-                self.checkTimer.stop()
-                if( len(UTIL.ROB_sendList) != 0 ): self.commLost.emit( len(UTIL.ROB_sendList) )
-                RCW_paused = True
+        if( RCW_newStatus == self.transmitting ): return
+
+        if( RCW_newStatus ):
+            self.commTimer.start()
+            self.checkTimer.start()
+            self.transmitting = True
+        else:
+            self.commTimer.stop()
+            self.checkTimer.stop()
+            self.transmitting = False
+            if( len(UTIL.ROB_sendList) != 0 ): self.commLost.emit( len(UTIL.ROB_sendList) )
 
 
 
@@ -529,6 +533,7 @@ class LoadFileWorker( QObject ):
         startID = lineID
 
         # iterate over file rows
+        print( f"streaming file: {filePath}" )
         if( filePath.suffix == '.gcode' ):
             for row in rows:
                 entry,command = self.gcodeConv( ID= lineID, txt= row ) 
@@ -570,6 +575,7 @@ class LoadFileWorker( QObject ):
             umConvRes = self.addUmTool( umDist )
             if( umConvRes is not None ):
                 self.convFailed.emit( umConvRes )
+                LFW_running = False
                 return
 
         # automatic pump control
@@ -678,8 +684,7 @@ class LoadFileWorker( QObject ):
 mutex           = QMutex()
 
 # RoboCommWorker:
-RCW_paused      = True
-RCW_switch      = False
+RCW_newStatus      = False
 
 # LoadFileWorker:
 LFW_filePath    = None

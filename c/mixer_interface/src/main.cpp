@@ -130,6 +130,35 @@ void core0assignments( void *pvParameters ) {
 }
 
 
+
+void move_motor(){
+// set motor to desired speed, set admixutre pump as well (to do)
+
+    if( currComm.mixerSpeed != 0.0 ) {
+        stepper.enableOutputs();
+        stepper.setSpeed( currComm.mixerSpeed );
+        stepper.runSpeed();
+    } else {
+        stepper.stop();
+        stepper.disableOutputs();
+    }
+    mixerSpeed = currComm.mixerSpeed;
+    admixture  = currComm.admixture;
+}
+
+void switch_pinch_valve() {
+// switch 3-2 pressure valve
+
+    if( pinched ) {
+        digitalWrite( PINCH_PIN, LOW );
+        pinched = false;
+    } else {
+        digitalWrite( PINCH_PIN, HIGH );
+        pinched = true;
+    }
+}
+
+
 //program
 void setup() {
     
@@ -208,33 +237,4 @@ void loop() {
         if( pinched != currComm.pinch ) switch_pinch_valve();
     }
     delay( 10 );
-}
-
-
-
-void move_motor(){
-// set motor to desired speed, set admixutre pump as well (to do)
-
-    if( currComm.mixerSpeed != 0.0 ) {
-        stepper.enableOutputs();
-        stepper.setSpeed( currComm.mixerSpeed );
-        stepper.runSpeed();
-    } else {
-        stepper.stop();
-        stepper.disableOutputs();
-    }
-    mixerSpeed = currComm.mixerSpeed;
-    admixture  = currComm.admixture;
-}
-
-void switch_pinch_valve() {
-// switch 3-2 pressure valve
-
-    if( pinched ) {
-        digitalWrite( PINCH_PIN, LOW );
-        pinched = false;
-    } else {
-        digitalWrite( PINCH_PIN, HIGH );
-        pinched = true;
-    }
 }

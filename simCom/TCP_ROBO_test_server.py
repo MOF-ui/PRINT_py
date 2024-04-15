@@ -29,7 +29,12 @@ def stt_update():
 	while toggle:
 		if( id < 0 ): id = 0
 		idAns = id - idOffs
-		conn.sendall( struct.pack( '<fifffffff', 99.0, idAns, x1, y1, z1, rx, ry, rz, ext ) )
+		try:
+			conn.sendall( struct.pack( '<fifffffff', 99.0, idAns, x1, y1, z1, rx, ry, rz, ext ) )
+		except OSError: 
+			print( 'OSError in stt_update, last package lost..' )
+			toggle = 0
+			break
 		sleep(1)
 
 

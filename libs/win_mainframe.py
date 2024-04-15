@@ -411,11 +411,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 if( res == True ):
                     # if successful, start threading and watchdog
                     if( not self.roboCommThread.isRunning() ): self.roboCommThread.start()
-                    WORKERS.RCW_switch = True
-                    self.setWatchdog         ( 'ROB' )
-                    self.logEntry            ( 'CONN', f"connected to {conn[0]} at {conn[1]}." )
+                    WORKERS.RCW_newStatus = True
+                    self.setWatchdog( 'ROB' )
+                    self.logEntry   ( 'CONN', f"connected to {conn[0]} at {conn[1]}." )
                     self.TCP_ROB_indi_connected.setStyleSheet( css )
                     return True
+                return False
 
             case 'P1':
                 if( 'COM' in UTIL.PUMP1_tcp.port ): 
@@ -490,7 +491,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         match TCPslot:
             case 'ROB':
                 if( not UTIL.ROB_tcp.connected ): return
-                WORKERS.RCW_switch = True
+                WORKERS.RCW_newStatus = False
                 self.killWatchdog( 'ROB' )
                 UTIL.ROB_tcp.close()
 
@@ -580,7 +581,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.loadFileWorker = WORKERS.LoadFileWorker()
         self.loadFileWorker.moveToThread            ( self.loadFileThread )
         self.loadFileThread.started.connect         ( self.loadFileWorker.start )
-        self.loadFileThread.finished.connect        ( self.loadFileWorker.deleteLater )
+        self.loadFileThread.destroyed.connect       ( self.loadFileWorker.deleteLater )
         self.loadFileWorker.convFailed.connect      ( self.loadFileFailed )
         self.loadFileWorker.convFinished.connect    ( self.loadFileFinished )
 
@@ -740,15 +741,15 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                          WATCHDOGS                                                #
     #####################################################################################################
 
-    def setWatchdog( self, dogNum= '' ):
+    def setWatchdog( self, dog= '' ):
         """ set Watchdog, check data updates from robot and pump occure at least every 10 sec """
 
         watchdog = QTimer()
         watchdog.setSingleShot  ( True )
         watchdog.setInterval    ( 10000 )
-        watchdog.timeout.connect( lambda: self.watchdogBite( dogNum ) )
+        watchdog.timeout.connect( lambda: self.watchdogBite( dog ) )
 
-        match dogNum:
+        match dog:
             case 'ROB':
                 self.robReceiveWD = watchdog
                 self.robReceiveWD.start()
@@ -768,15 +769,15 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             case _: 
                 raise ValueError( 'Watchdog setting failed, invalid dog number given' )
 
-        self.logEntry( 'WDOG', f"Watchdog {dogNum} started." )
+        self.logEntry( 'WDOG', f"Watchdog {dog} started." )
         
 
 
 
-    def resetWatchdog( self, dogNum= '' ):
+    def resetWatchdog( self, dog= '' ):
         """ reset the Watchdog on every newly received data block, check connection everytime if disconnected inbetween """
 
-        match dogNum:
+        match dog:
             case 'ROB': 
                 if( UTIL.ROB_tcp.connected ): self.robReceiveWD.start()
             case 'P1':  
@@ -791,11 +792,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def watchdogBite( self, dogNum= '' ):
+    def watchdogBite( self, dog= '' ):
         """ close the UI on any biting WD, log info """
 
         cancelOperation = False
-        match dogNum:
+        match dog:
             case 'ROB':
                 result = 'Robot offline'
                 if( UTIL.SC_qProcessing ): cancelOperation = True
@@ -815,22 +816,22 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 result = 'Internal error'
                 return
         
-        self.killWatchdog ( dogNum )
-        self.disconnectTCP( TCPslot= dogNum, internalCall= True )
+        self.killWatchdog ( dog )
+        self.disconnectTCP( TCPslot= dog, internalCall= True )
 
         # stop critical operations, build user text
         if( cancelOperation ):
-            self.logEntry           ( 'WDOG', f"Watchdog {dogNum} has bitten! Stopping script control & forwarding forced-stop to robot!" )
+            self.logEntry           ( 'WDOG', f"Watchdog {dog} has bitten! Stopping script control & forwarding forced-stop to robot!" )
             self.forcedStopCommand  ()
             self.stopSCTRLQueue     ()
 
-            wdTxt = f"Watchdog {dogNum} has bitten!\n\nScript control was stopped and forced-stop "\
+            wdTxt = f"Watchdog {dog} has bitten!\n\nScript control was stopped and forced-stop "\
                     f"command was send to robot!\nPress OK to keep PRINT_py running or Cancel to "\
                     f"exit and close."
 
         else:
-            self.logEntry( 'WDOG', f"Watchdog {dogNum} has bitten!" )
-            wdTxt = f"Watchdog {dogNum} has bitten!\n\n{result}.\nPress OK to keep PRINT_py running or Cancel to "\
+            self.logEntry( 'WDOG', f"Watchdog {dog} has bitten!" )
+            wdTxt = f"Watchdog {dog} has bitten!\n\n{result}.\nPress OK to keep PRINT_py running or Cancel to "\
                     f"exit and close."
 
         # ask user to close application
@@ -849,10 +850,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-    def killWatchdog( self, dogNum= '' ):
+    def killWatchdog( self, dog= '' ):
         """ put them to sleep (dont do this to real dogs) """
 
-        match dogNum:
+        match dog:
             case 'ROB': 
                 self.robReceiveWD.stop()
                 self.robReceiveWD.deleteLater()
@@ -1248,7 +1249,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         mutex.unlock()
 
         self.IO_btt_loadFile.setStyleSheet( 'font-size: 16pt;' )
-        self.loadFileThread.quit()
+        self.loadFileThread.exit()
     
 
 
@@ -1279,7 +1280,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         mutex.unlock()
 
         self.IO_btt_loadFile.setStyleSheet( 'font-size: 16pt;' )
-        self.loadFileThread.quit()
+        self.loadFileThread.exit()
         
 
 
@@ -2086,19 +2087,19 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.logEntry( 'newline')
         self.logEntry( 'GNRL', 'closeEvent signal.' )
         self.logEntry( 'GNRL', 'cut connections...' )
-        
+
         # disconnect robot
         if( UTIL.ROB_tcp.connected ):
-            UTIL.ROB_tcp.send   ( UTIL.QEntry( id= 1, mt= 'E' ) )
+            UTIL.ROB_tcp.send( UTIL.QEntry( id= 1, mt= 'E' ) )
             self.roboCommThread.quit()
             self.roboCommThread.wait()
-            self.disconnectTCP  ( 'ROB', internalCall= True )
         
         # disconnect pumps
         if( self.pumpCommThread.isRunning() ):
             self.pumpCommThread.quit()
             self.pumpCommThread.wait()
         
+        self.disconnectTCP( 'ROB', internalCall= True )
         self.disconnectTCP( 'P1', internalCall= True )
         self.disconnectTCP( 'P2', internalCall= True )
         self.disconnectTCP( 'MIX', internalCall= True )
@@ -2107,8 +2108,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.logEntry( 'GNRL', 'stop threading...' )
         self.roboCommThread.deleteLater()
         self.pumpCommThread.deleteLater()
-        self.loadFileThread.quit()
-        self.loadFileThread.wait()
         self.loadFileThread.deleteLater()
 
         # bye
