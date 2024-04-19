@@ -4493,7 +4493,7 @@ class Ui_MainWindow(object):
         self.SET_TE_lbl_retractSpeed.setBuddy(self.SET_num_zone)
 
         self.retranslateUi(MainWindow)
-        self.tab.setCurrentIndex(4)
+        self.tab.setCurrentIndex(0)
         self.TCP_tab.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.tab, self.IO_btt_newFile)

@@ -1505,11 +1505,7 @@ class RobConnection(TCPIP):
         return True, len(message)
 
 
-    def receive(self) -> (
-        tuple[RoboTelemetry, bytes, bool]
-        | tuple[Exception, bytes, bool]
-        | tuple[None, None, bool]
-    ):
+    def receive(self) -> tuple[RoboTelemetry, bytes, bool] | tuple[None, None, bool]:
         """receives and unpacks data from robot"""
 
         data = []
@@ -1522,11 +1518,8 @@ class RobConnection(TCPIP):
             if len(data) != self.r_bl:
                 raise ValueError
 
-        except TimeoutError:
-            return None, None, False
-
         except Exception as err:
-            return err, data, False
+            return None, None, False
 
         Telem.t_speed = struct.unpack("<f", data[0:4])[0]
         Telem.id = struct.unpack("<i", data[4:8])[0]

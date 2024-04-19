@@ -282,7 +282,7 @@ class RoboCommWorker(QObject):
 
             Mutex.lock()
             du.add_to_comm_protocol(
-                f"RECV:    ID {Telem.id},   {Telem.Coor}   TCP: {Telem.tSpeed}"
+                f"RECV:    ID {Telem.id},   {Telem.Coor}   TCP: {Telem.t_speed}"
             )
 
             # check for ID overflow, reduce SC_queue IDs & get rid off ROB_commQueue entries with IDs at ~3000

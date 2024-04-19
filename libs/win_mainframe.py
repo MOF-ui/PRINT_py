@@ -54,12 +54,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     _testrun = False  # switch for mainframe_test.py
     _first_pos = True  # one-time switch to get robot home position
 
-    _RoboCommThread = QThread()
-    _RoboCommWorker = workers.RoboCommWorker()
-    _PumpCommThread = QThread()
-    _PumpCommWorker = workers.PumpCommWorker()
-    _LoadFileThread = QThread()
-    _LoadFileWorker = workers.LoadFileWorker()
+    _RoboCommThread = None
+    _RoboCommWorker = None
+    _PumpCommThread = None
+    _PumpCommWorker = None
+    _LoadFileThread = None
+    _LoadFileWorker = None
     
     _RobRecvWd = None
     _P1RecvWd = None
@@ -575,13 +575,26 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             case "ROB":
                 if not du.ROBTcp._connected:
                     return
-
+                
+                # send stop command to robot; stop threading & watchdog
+                du.ROBTcp.send(du.QEntry(id=1, mt="E"))
+                self._RoboCommThread.quit()
                 workers.rcw_new_status = False
                 self.kill_watchdog("ROB")
                 du.ROBTcp.close()
 
                 self.log_entry("CONN", f"{log_text} robot.")
                 self.TCP_ROB_indi_connected.setStyleSheet(css)
+
+                # safe positions and IDs:
+                self.log_entry('SAFE', f"-----------------------------------------------")
+                self.log_entry('SAFE', f"robot disconnected. Last positions were:")
+                self.log_entry('SAFE', f"zero: {du.DCCurrZero}")
+                self.log_entry('SAFE', f"curr: {du.ROBTelem.Coor}")
+                self.log_entry('SAFE', f"last active ID was: {du.ROBTelem.id}")
+                self.log_entry('SAFE', f"-----------------------------------------------")
+
+                self._RoboCommThread.wait()
 
             case "P1":
                 if not du.PMP1Serial.connected:
@@ -635,23 +648,28 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """load all threads from PRINT_threads and set signal-slot-connections"""
 
         # THREAD FOR COMMUNICATION WITH ROBOT
+        self._RoboCommThread = QThread()
+        self._RoboCommWorker = workers.RoboCommWorker()
+
         self._RoboCommWorker.moveToThread(self._RoboCommThread)
         self._RoboCommThread.started.connect(self._RoboCommWorker.run)
         self._RoboCommThread.finished.connect(self._RoboCommWorker.stop)
         self._RoboCommThread.finished.connect(self._RoboCommWorker.deleteLater)
         self._RoboCommWorker.dataReceived.connect(self.label_update_on_terminal_change)
+        self._RoboCommWorker.dataReceived.connect(lambda: self.reset_watchdog("ROB"))
         self._RoboCommWorker.dataUpdated.connect(self.robo_recv)
         self._RoboCommWorker.endProcessing.connect(self.stop_SCTRL_queue)
+        self._RoboCommWorker.endDcMoving.connect(lambda: self.switch_rob_moving(end=True))
         self._RoboCommWorker.logError.connect(self.log_entry)
         self._RoboCommWorker.sendElem.connect(self.robo_send)
-
-        self._RoboCommWorker.dataReceived.connect(lambda: self.reset_watchdog("ROB"))
-        self._RoboCommWorker.endDcMoving.connect(lambda: self.switch_rob_moving(end=True))
         self._RoboCommWorker.queueEmtpy.connect(
             lambda: self.stop_SCTRL_queue(prep_end=True)
         )
 
         # THREAD FOR COMMUNICATION WITH PUMPS
+        self._PumpCommThread = QThread()
+        self._PumpCommWorker = workers.PumpCommWorker()
+
         self._PumpCommWorker.moveToThread(self._PumpCommThread)
         self._PumpCommThread.started.connect(self._PumpCommWorker.run)
         self._PumpCommThread.finished.connect(self._PumpCommWorker.stop)
@@ -664,6 +682,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self._PumpCommWorker.connActive.connect(self.reset_watchdog)
 
         # THREAD FOR COMMUNICATION WITH INLINE MIXER
+        self._LoadFileThread = QThread()
+        self._LoadFileWorker = workers.LoadFileWorker()
+
         self._LoadFileWorker.moveToThread(self._LoadFileThread)
         self._LoadFileThread.started.connect(self._LoadFileWorker.start)
         self._LoadFileThread.destroyed.connect(self._LoadFileWorker.deleteLater)
@@ -2254,30 +2275,25 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                                           CLOSE UI                                                #
     #####################################################################################################
 
-    def close_event(self, event):
+    def closeEvent(self, event):
         """exit all threads and connections clean(ish)"""
 
         self.log_entry("newline")
         self.log_entry("GNRL", "closeEvent signal.")
         self.log_entry("GNRL", "cut connections...")
 
-        # disconnect robot
-        if du.ROBTcp._connected:
-            du.ROBTcp.send(du.QEntry(id=1, mt="E"))
-            self._RoboCommThread.quit()
-            self._RoboCommThread.wait()
-
-        # disconnect pumps
+        # stop pump thread
         if self._PumpCommThread.isRunning():
             self._PumpCommThread.quit()
             self._PumpCommThread.wait()
 
+        # disconnect everything
         self.disconnect_tcp("ROB", internal_call=True)
         self.disconnect_tcp("P1", internal_call=True)
         self.disconnect_tcp("P2", internal_call=True)
         self.disconnect_tcp("MIX", internal_call=True)
 
-        # stop threading
+        # delete threads
         self.log_entry("GNRL", "stop threading...")
         self._RoboCommThread.deleteLater()
         self._PumpCommThread.deleteLater()
