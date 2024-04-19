@@ -1,11 +1,11 @@
 #   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
-#   (https://creativecommons.org/licenses/by-sa/4.0/). Feel free to use, modify or distribute this code as  
+#   (https://creativecommons.org/licenses/by-sa/4.0/). Feel free to use, modify or distribute this code as
 #   far as you like, so long as you make anything based on it publicly avialable under the same license.
 
 
 #######################################     IMPORTS      #####################################################
 
-# import re 
+# import re
 import os
 import sys
 import copy
@@ -13,11 +13,11 @@ import math as m
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir  = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 # import my own libs
-import libs.data_utilities as UTIL
+import libs.data_utilities as du
 
 
 
@@ -25,179 +25,222 @@ import libs.data_utilities as UTIL
 #                                    FUNCTIONS
 #############################################################################################
 
-def calcSpeed():
-    """ main function to be called from outside this file, calculates speed the pump needs to
-        be set to for the current robot position """
+def calc_speed():
+    """main function to be called from outside this file, calculates speed the pump needs to
+    be set to for the current robot position"""
     global START_SUPP_PTS
     global END_SUPP_PTS
-    global preceedingCom
-    global preceedingSpeed
-    global lastSpeed
+    global preceeding_comm
+    global preceeding_speed
+    global last_speed
 
-    pMode = 'None'
-    try:                currCommand = UTIL.ROB_commQueue[0]
-    except IndexError:  currCommand = None
+    p_mode = "None"
+    try:
+        curr_comm = du.ROBCommQueue[0]
+    except IndexError:
+        curr_comm = None
 
-    if( currCommand is not None ): 
-        pMode = currCommand.pMode
-        if( currCommand != preceedingCom ):
-            preceedingCom   = copy.deepcopy( currCommand )
-            preceedingSpeed = lastSpeed
+    if isinstance(curr_comm, du.QEntry):
+        p_mode = curr_comm.p_mode
 
-    match pMode:
-        case 'None':    speed = UTIL.PUMP_speed
-        case 'default': speed = defaultMode( command= currCommand )
-        case 'start':   speed = profileMode( command= currCommand, profile= START_SUPP_PTS )
-        case 'end':     speed = profileMode( command= currCommand, profile= END_SUPP_PTS )
-        case 'class1':  speed = UTIL.DEF_PUMP_CLASS1
-        case 'class2':  speed = UTIL.DEF_PUMP_CLASS2
-        case 'zero':    speed = 0
-        case _:         speed = 0
+        if curr_comm != preceeding_comm:
+            preceeding_comm = copy.deepcopy(curr_comm)
+            preceeding_speed = last_speed
+
+    match p_mode:
+        case "None":
+            speed = du.PMP_speed
+        case "default":
+            speed = default_mode(command=curr_comm)
+        case "start":
+            speed = profile_mode(command=curr_comm, profile=START_SUPP_PTS)
+        case "end":
+            speed = profile_mode(command=curr_comm, profile=END_SUPP_PTS)
+        case "class1":
+            speed = du.DEF_PUMP_CLASS1
+        case "class2":
+            speed = du.DEF_PUMP_CLASS2
+        case "zero":
+            speed = 0
+        case _:
+            speed = 0
 
     # check value domain for speed
-    if( speed is None ):  return None
-    if( speed >  100.0 ): speed =  100.0
-    if( speed < -100.0 ): speed = -100.0
+    if speed is None:
+        return None
+    if speed > 100.0:
+        speed = 100.0
+    if speed < -100.0:
+        speed = -100.0
 
-    lastSpeed = speed
-    return int( round( speed, 0) )
+    last_speed = speed
+    return int(round(speed, 0))
 
 
+def default_mode(command=None):
+    """standard modus for script-controlled operation, just sets the speed according
+    to the current travel speed (TS)"""
+    global last_def_command
+    global last_speed
 
+    if not isinstance(command, du.QEntry):
+        return None
+    else:
+        Comm = command
 
-
-def defaultMode( command= None ):
-    """ standard modus for script-controlled operation, just sets the speed according
-        to the current travel speed (TS) """
-    global lastDefCommand
-    global lastSpeed
-
-    if( command is None ):   return None
-    if( command != lastDefCommand ):
+    if Comm != last_def_command:
         # determine current volume output:
-        lps = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP_outputRatio ) )
-        #       ( [mm/s]          * [L/m]            * [m/mm]/ [L/s])* 100.0  =  [%]
-        speed = ( command.Speed.ts * UTIL.SC_volPerM * 0.001 / lps ) * 100.0
-        lastDefCommand = copy.deepcopy(command)
+        lps = (du.PMP1_liter_per_s * du.PMP_output_ratio) + (
+            du.PMP2_liter_per_s * (1.0 - du.PMP_output_ratio)
+        )
+
+        # [%] = ( [mm/s]          * [L/m]            * [m/mm] / [L/s])* 100.0
+        speed = (Comm.Speed.ts * du.SC_vol_per_m * 0.001 / lps) * 100.0
+        last_def_command = copy.deepcopy(Comm)
 
     else:
-        speed = lastSpeed
+        speed = last_speed
 
     return speed
 
 
+def profile_mode(command=None, profile=None):
+    """pump mode for preset pump speed profiles, set with support points, can be used to
+    drive custom pump speed slopes before, while or after printing"""
+    global preceeding_speed
+    global last_speed
 
+    if None in [command, profile]:
+        return None
+    elif not isinstance(command, du.QEntry):
+        return None
+    else:
+        Comm = command
 
-def profileMode( command= None, profile= None ):
-    """ pump mode for preset pump speed profiles, set with support points, can be used to 
-        drive custom pump speed slopes before, while or after printing """
-    global preceedingSpeed
-    global lastSpeed
+    lps = (du.PMP1_liter_per_s * du.PMP_output_ratio) + (
+        du.PMP2_liter_per_s * (1.0 - du.PMP_output_ratio)
+    )
 
-    if( None in [command, profile] ): return None
-    lps   = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP_outputRatio ) )
-    speed = ( command.Speed.ts * UTIL.SC_volPerM * 0.001 / lps ) * 100.0
+    speed = Comm.Speed.ts * du.SC_vol_per_m * 0.001 / lps
+    speed *= 100
 
-    # as more complex pump scripts should only apply to linear movements, 
+    # as more complex pump scripts should only apply to linear movements,
     # the remaining travel distance can be calculated using pythagoras
-    curr = copy.deepcopy( UTIL.ROB_telem.Coor )
+    curr = copy.deepcopy(du.ROBTelem.Coor)
 
-    distRemainng    = m.sqrt(  m.pow(command.Coor1.x - curr.x, 2)
-                             + m.pow(command.Coor1.y - curr.y, 2)
-                             + m.pow(command.Coor1.z - curr.z, 2) )
+    dist_remaining = m.sqrt(
+        m.pow(Comm.Coor1.x - curr.x, 2)
+        + m.pow(Comm.Coor1.y - curr.y, 2)
+        + m.pow(Comm.Coor1.z - curr.z, 2)
+    )
 
     # get the remaining time ( [mm] / [mm/s] = [s] )
-    timeRemainung   = distRemainng / command.Speed.ts
+    time_remaining = dist_remaining / Comm.Speed.ts
 
     # get time-dependent settings
-    settings    = None
-    prevSett    = None
+    settings = None
+    prev_set = None
+
     for item in profile:
-        if( item['until'] <= timeRemainung ):
+        if item["until"] <= time_remaining:
             settings = copy.deepcopy(item)
             break
-        prevSett = item
-    
-    if( settings is None ): 
+        prev_set = item
+
+    if settings is None:
         return speed
-    
-    base = getBaseSpeed( settings['base'], speed )
 
-    match settings['mode']:
-        
-        case 'instant': speed = base
+    base = get_base_speed(settings["base"], speed)
+    match settings["mode"]:
 
-        case 'linear':  
-            # if settDur is 0.0 this is the first setting, need to calculate time from the 
+        case "instant":
+            speed = base
+
+        case "linear":
+            # if settDur is 0.0 this is the first setting, need to calculate time from the
             # movements starting point
-            timeNull = 0.0
-            baseNull = 0.0
-            if( prevSett is not None): 
-                timeNull = prevSett['until']
-                baseNull = getBaseSpeed( prevSett['base'], speed )
+            time_0 = 0.0
+            base_0 = 0.0
+            if prev_set is not None:
+                time_0 = prev_set["until"]
+                base_0 = get_base_speed(prev_set["base"], speed)
 
             else:
-                strt        = copy.deepcopy( UTIL.ROB_movStartP )
-                distTotal   = m.sqrt(  m.pow(command.Coor1.x - strt.x, 2)
-                                     + m.pow(command.Coor1.y - strt.y, 2)
-                                     + m.pow(command.Coor1.z - strt.z, 2) )
+                strt = copy.deepcopy(du.ROBMovStartP)
+                dist_total = m.sqrt(
+                    m.pow(Comm.Coor1.x - strt.x, 2)
+                    + m.pow(Comm.Coor1.y - strt.y, 2)
+                    + m.pow(Comm.Coor1.z - strt.z, 2)
+                )
 
                 # get the remaining time ( [mm] / [mm/s] = [s] )
-                timeNull = distTotal / command.Speed.ts
-                baseNull = preceedingSpeed
+                time_0 = dist_total / Comm.Speed.ts
+                base_0 = preceeding_speed
 
-            slope = ( base - baseNull ) / ( settings['until'] - timeNull )
-            speed = timeRemainung * slope + base
+            slope = (base - base_0) / (settings["until"] - time_0)
+            speed = time_remaining * slope + base
 
-        case 'smoothstep':
+        case "smoothstep":
             # same principle as 'linear' but as sigmoid-like smoothstep
-            timeNull = 0.0
-            baseNull = 0.0
-            if( prevSett is not None): 
-                timeNull = prevSett['until']
-                baseNull = getBaseSpeed( prevSett['base'], speed )
+            time_0 = 0.0
+            base_0 = 0.0
+            if prev_set is not None:
+                time_0 = prev_set["until"]
+                base_0 = get_base_speed(prev_set["base"], speed)
 
             else:
-                strt        = copy.deepcopy( UTIL.ROB_movStartP )
-                distTotal   = m.sqrt(  m.pow(command.Coor1.x - strt.x, 2)
-                                     + m.pow(command.Coor1.y - strt.y, 2)
-                                     + m.pow(command.Coor1.z - strt.z, 2) )
+                strt = copy.deepcopy(du.ROBMovStartP)
+                dist_total = m.sqrt(
+                    m.pow(Comm.Coor1.x - strt.x, 2)
+                    + m.pow(Comm.Coor1.y - strt.y, 2)
+                    + m.pow(Comm.Coor1.z - strt.z, 2)
+                )
 
                 # get the remaining time ( [mm] / [mm/s] = [s] )
-                timeNull = distTotal / command.Speed.ts
-                baseNull = preceedingSpeed
+                time_0 = dist_total / Comm.Speed.ts
+                base_0 = preceeding_speed
 
-            normalizedTime  = ( timeRemainung - timeNull ) / ( settings['until'] - timeNull )
+            normalized_t = (time_remaining - time_0) / (settings["until"] - time_0)
             # get sigmoid function with x * x * ( 3 - 2 * x )
-            speed           = baseNull + (base - baseNull) * normalizedTime * normalizedTime * ( 3 - 2 * normalizedTime )
+            speed = (
+                (base - base_0) * normalized_t * normalized_t * (3 - 2 * normalized_t)
+            )
+            speed += base_0
 
-    return speed    
-    
-    
+    return speed
 
 
-
-def getBaseSpeed(base = 'default', fallback = 0.0):
+def get_base_speed(base="default", fallback=0.0):
 
     match base:
-        case 'zero':    baseSpeed = 0.0
-        case 'max':     baseSpeed = 100.0
-        case 'min':     baseSpeed = -100.0
-        case 'default': baseSpeed = fallback
-        case 'retract': baseSpeed = UTIL.PUMP_retractSpeed
-        case 'conn':    
+        case "zero":
+            base_speed = 0.0
+        case "max":
+            base_speed = 100.0
+        case "min":
+            base_speed = -100.0
+        case "default":
+            base_speed = fallback
+        case "retract":
+            base_speed = du.PMP_retract_speed
+        case "conn":
+
             try:
-                nextCommand = UTIL.ROB_commQueue[1]
-                lps       = ( UTIL.PUMP1_literPerS * UTIL.PUMP_outputRatio ) + ( UTIL.PUMP2_literPerS * ( 1.0 - UTIL.PUMP_outputRatio ) )
-                baseSpeed = ( nextCommand.Speed.ts * UTIL.SC_volPerM * 0.001 / lps ) * 100.0
-            except AttributeError:  
-                baseSpeed = fallback
-        case _: return None
-        
-    return baseSpeed
+                next_comm = du.ROBCommQueue[1]
+                lps = (du.PMP1_liter_per_s * du.PMP_output_ratio) + (
+                    du.PMP2_liter_per_s * (1.0 - du.PMP_output_ratio)
+                )
 
+                base_speed = next_comm.Speed.ts * du.SC_vol_per_m * 0.001 / lps
+                base_speed *= 100
 
+            except AttributeError:
+                base_speed = fallback
 
+        case _:
+            return None
+
+    return base_speed
 
 
 
@@ -205,16 +248,20 @@ def getBaseSpeed(base = 'default', fallback = 0.0):
 #                                     GLOBALS
 #############################################################################################
 
-START_SUPP_PTS  = [   { 'until': 5.0,   'base': 'zero',     'mode': 'instant' },
-                      { 'until': 1.0,   'base': 'max',      'mode': 'instant' },
-                      { 'until': 0.0,   'base': 'conn',     'mode': 'linear'  } ]
+START_SUPP_PTS = [
+    {"until": 5.0, "base": "zero", "mode": "instant"},
+    {"until": 1.0, "base": "max", "mode": "instant"},
+    {"until": 0.0, "base": "conn", "mode": "linear"},
+]
 
-END_SUPP_PTS    = [   { 'until': 5.0,   'base': 'default',  'mode': 'instant' },
-                      { 'until': 1.0,   'base': 'retract',  'mode': 'smoothstep' },
-                      { 'until': 0.0,   'base': 'zero',     'mode': 'instant' } ]
+END_SUPP_PTS = [
+    {"until": 5.0, "base": "default", "mode": "instant"},
+    {"until": 1.0, "base": "retract", "mode": "smoothstep"},
+    {"until": 0.0, "base": "zero", "mode": "instant"},
+]
 
-preceedingCom   = None
-preceedingSpeed = 0.0
+preceeding_comm = None
+preceeding_speed = 0.0
 
-lastDefCommand  = None
-lastSpeed       = 0.0
+last_def_command = None
+last_speed = 0.0

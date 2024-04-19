@@ -7,138 +7,134 @@ import sys
 import unittest
 
 # appending the parent directory path
-current_dir = os.path.dirname( os.path.realpath(__file__) )
-parent_dir  = os.path.dirname( current_dir )
-sys.path.append( parent_dir )
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
-import libs.data_utilities as UTIL
-import libs.pump_utilities as PUTIL
+import libs.data_utilities as du
+import libs.pump_utilities as pu
 
 ############################################  CLASS  ##################################################
 
-class PUTIL_test( unittest.TestCase ):
 
-    def test_calcSpeed( self ):
-        """ cases 'default', 'start' and 'end' are tested seperately """
 
-        UTIL.PUMP_speed      = 89
+class PUTIL_test(unittest.TestCase):
+
+
+    def test_calcSpeed(self):
+        """cases 'default', 'start' and 'end' are tested seperately"""
+
+        du.PMP_speed = 89
 
         # domain control
-        UTIL.ROB_commQueue.clear()
-        testEntry = UTIL.QEntry ( Speed= UTIL.SpeedVector(ts= 2000), pMode= 'default' )
-        
-        UTIL.ROB_commQueue.add  ( testEntry )
-        self.assertEqual        ( PUTIL.calcSpeed(), 100.0) 
+        du.ROBCommQueue.clear()
+        testEntry = du.QEntry(Speed=du.SpeedVector(ts=2000), p_mode="default")
 
-        UTIL.ROB_commQueue[0].Speed.ts = -2000
-        self.assertEqual        ( PUTIL.calcSpeed(), -100.0)
+        du.ROBCommQueue.add(testEntry)
+        self.assertEqual(pu.calc_speed(), 100.0)
+
+        du.ROBCommQueue[0].Speed.ts = -2000
+        self.assertEqual(pu.calc_speed(), -100.0)
 
         # test empty ROB_commQueue
-        UTIL.ROB_commQueue.clear()
-        self.assertEqual( PUTIL.calcSpeed(), 89 )
+        du.ROBCommQueue.clear()
+        self.assertEqual(pu.calc_speed(), 89)
 
         # mode: None
-        testEntry = UTIL.QEntry ( Speed= UTIL.SpeedVector(ts= 123) )
-        UTIL.ROB_commQueue.add  ( testEntry )
-        self.assertEqual        ( PUTIL.calcSpeed(), 89 )
+        testEntry = du.QEntry(Speed=du.SpeedVector(ts=123))
+        du.ROBCommQueue.add(testEntry)
+        self.assertEqual(pu.calc_speed(), 89)
 
         # mode: default
-        testEntry = UTIL.QEntry( id= 1, Speed= UTIL.SpeedVector(ts= 234), pMode= 'default' )
-        UTIL.ROB_commQueue.add( testEntry )
-        self.assertEqual( PUTIL.calcSpeed(), 19 )
+        testEntry = du.QEntry(id=1, Speed=du.SpeedVector(ts=234), p_mode="default")
+        du.ROBCommQueue.add(testEntry)
+        self.assertEqual(pu.calc_speed(), 19)
+
+        du.ROBCommQueue.clear()
 
 
-        UTIL.ROB_commQueue.clear()
-    
-
-    def test_defaultMode( self ):
-        """  """
+    def test_defaultMode(self):
+        """ """
 
         # None
-        self.assertIsNone( PUTIL.defaultMode( None ) )
+        self.assertIsNone(pu.default_mode(None))
 
         # lastDefCommand
-        testEntry               = UTIL.QEntry( Coor1= UTIL.Coordinate( x= 10 ) )
-        PUTIL.lastDefCommand    = UTIL.QEntry( Coor1= UTIL.Coordinate( x= 10 ) )
-        PUTIL.lastSpeed         = 45
+        testEntry = du.QEntry(Coor1=du.Coordinate(x=10))
+        pu.last_def_command = du.QEntry(Coor1=du.Coordinate(x=10))
+        pu.last_speed = 45
 
-        self.assertEqual( PUTIL.defaultMode( testEntry), 45 )
+        self.assertEqual(pu.default_mode(testEntry), 45)
 
         # newCommand ( default Speed.ts for QEntry is 200 )
-        testEntry = UTIL.QEntry( Coor1= UTIL.Coordinate( x= 11 ) )
+        testEntry = du.QEntry(Coor1=du.Coordinate(x=11))
 
-        self.assertEqual( PUTIL.defaultMode( testEntry ), 16 )
+        self.assertEqual(pu.default_mode(testEntry), 16)
 
-    
 
-    def test_profileMode( self ): 
-        """  """
-        
-        UTIL.ROB_commQueue.add( UTIL.QEntry() )
-        UTIL.ROB_commQueue.add( UTIL.QEntry() )
-        UTIL.ROB_telem.Coor   = UTIL.Coordinate()
-        PUTIL.START_SUPP_PTS  = [   { 'until': 3.0,   'base': 'zero',     'mode': 'instant' },
-                                    { 'until': 1.0,   'base': 'max',      'mode': 'instant' },
-                                    { 'until': 0.0,   'base': 'conn',     'mode': 'linear'  } ]
+    def test_profileMode(self):
+        """ """
 
-        PUTIL.END_SUPP_PTS    = [   { 'until': 5.0,   'base': 'default',  'mode': 'instant' },
-                                    { 'until': 1.0,   'base': 'retract',  'mode': 'smoothstep' },
-                                    { 'until': 0.0,   'base': 'zero',     'mode': 'instant' } ]
+        du.ROBCommQueue.add(du.QEntry())
+        du.ROBCommQueue.add(du.QEntry())
+        du.ROBTelem.Coor = du.Coordinate()
+        pu.START_SUPP_PTS = [
+            {"until": 3.0, "base": "zero", "mode": "instant"},
+            {"until": 1.0, "base": "max", "mode": "instant"},
+            {"until": 0.0, "base": "conn", "mode": "linear"},
+        ]
 
+        pu.END_SUPP_PTS = [
+            {"until": 5.0, "base": "default", "mode": "instant"},
+            {"until": 1.0, "base": "retract", "mode": "smoothstep"},
+            {"until": 0.0, "base": "zero", "mode": "instant"},
+        ]
 
         # START_SUPP_PTS
-        testEntry       = UTIL.QEntry( Coor1= UTIL.Coordinate( x= 10 )
-                                      ,Speed= UTIL.SpeedVector( ts= 1 ) )
-        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 0 )
+        testEntry = du.QEntry(Coor1=du.Coordinate(x=10), Speed=du.SpeedVector(ts=1))
+        self.assertEqual(pu.profile_mode(testEntry, pu.START_SUPP_PTS), 0)
 
-        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 5 )
-        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 0 )
+        du.ROBTelem.Coor = du.Coordinate(x=5)
+        self.assertEqual(pu.profile_mode(testEntry, pu.START_SUPP_PTS), 0)
 
-        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 8 )
-        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 100.0 )
+        du.ROBTelem.Coor = du.Coordinate(x=8)
+        self.assertEqual(pu.profile_mode(testEntry, pu.START_SUPP_PTS), 100.0)
 
-        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 9.5 )
-        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 58.0 )
-        
-        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 10 )
-        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.START_SUPP_PTS ), 16.0 )
+        du.ROBTelem.Coor = du.Coordinate(x=9.5)
+        self.assertEqual(pu.profile_mode(testEntry, pu.START_SUPP_PTS), 58.0)
+
+        du.ROBTelem.Coor = du.Coordinate(x=10)
+        self.assertEqual(pu.profile_mode(testEntry, pu.START_SUPP_PTS), 16.0)
 
         # END_SUPP_PTS
-        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 4 )
-        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.END_SUPP_PTS ), 0.08 )
+        du.ROBTelem.Coor = du.Coordinate(x=4)
+        self.assertEqual(pu.profile_mode(testEntry, pu.END_SUPP_PTS), 0.08)
 
-        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 7 )
-        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.END_SUPP_PTS ), -24.96 )
+        du.ROBTelem.Coor = du.Coordinate(x=7)
+        self.assertEqual(pu.profile_mode(testEntry, pu.END_SUPP_PTS), -24.96)
 
-        UTIL.ROB_telem.Coor = UTIL.Coordinate( x= 10 )
-        self.assertEqual( PUTIL.profileMode( testEntry, PUTIL.END_SUPP_PTS ), 0 )
+        du.ROBTelem.Coor = du.Coordinate(x=10)
+        self.assertEqual(pu.profile_mode(testEntry, pu.END_SUPP_PTS), 0)
 
-
-        UTIL.ROB_commQueue.clear()
-        
-    
+        du.ROBCommQueue.clear()
 
 
-    def test_getBaseSpeed( self ):
-        """  """
-        
-        self.assertEqual( PUTIL.getBaseSpeed('zero',    12), 0    )
-        self.assertEqual( PUTIL.getBaseSpeed('max',     12), 100  )
-        self.assertEqual( PUTIL.getBaseSpeed('min',     12), -100 )
-        self.assertEqual( PUTIL.getBaseSpeed('default', 12), 12   )
-        self.assertEqual( PUTIL.getBaseSpeed('retract', 12), -50   )
-        self.assertEqual( PUTIL.getBaseSpeed('conn',    12), 12   )
+    def test_getBaseSpeed(self):
+        """ """
 
-        UTIL.ROB_commQueue.add( UTIL.QEntry() )
-        UTIL.ROB_commQueue.add( UTIL.QEntry() )
-        self.assertEqual( PUTIL.getBaseSpeed('conn',    12), 16   )
+        self.assertEqual(pu.get_base_speed("zero", 12), 0)
+        self.assertEqual(pu.get_base_speed("max", 12), 100)
+        self.assertEqual(pu.get_base_speed("min", 12), -100)
+        self.assertEqual(pu.get_base_speed("default", 12), 12)
+        self.assertEqual(pu.get_base_speed("retract", 12), -50)
+        self.assertEqual(pu.get_base_speed("conn", 12), 12)
 
-
-
-
+        du.ROBCommQueue.add(du.QEntry())
+        du.ROBCommQueue.add(du.QEntry())
+        self.assertEqual(pu.get_base_speed("conn", 12), 16)
 
 
 ############################################  MAIN  ##################################################
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

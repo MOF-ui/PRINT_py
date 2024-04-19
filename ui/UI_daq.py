@@ -18,207 +18,209 @@ class Ui_DAQWindow(object):
         DAQWindow.setObjectName("DAQWindow")
         DAQWindow.resize(1920, 1080)
         DAQWindow.setMinimumSize(QtCore.QSize(600, 0))
-        DAQWindow.setStyleSheet("QWidget {\n"
-                                "    font-family: \"Bahnschrift\";\n"
-                                "    background: #4c4a48;\n"
-                                "}\n"
-                                "\n"
-                                "\n"
-                                "/* alphabetical from here */\n"
-                                "\n"
-                                "QCheckBox::indicator {\n"
-                                "    top: 2 px;\n"
-                                "    width: 13px;\n"
-                                "    height: 13px;\n"
-                                "    background-color: #f2f4f3;\n"
-                                "    border-radius: 2px;\n"
-                                "}\n"
-                                "\n"
-                                "QCheckBox::indicator:checked {\n"
-                                "    background-color: #ffba00;\n"
-                                "    image: url(:/images/down.png);\n"
-                                "}\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "QComboBox {\n"
-                                "    border-radius: 5px;\n"
-                                "    padding-left: 10px;\n"
-                                "    min-width: 6em;\n"
-                                "    background: #F2F4F3;\n"
-                                "    font-family: \"Bahnschrift\";\n"
-                                "}\n"
-                                "\n"
-                                "QComboBox:on { /* shift the text when the popup opens */\n"
-                                "    border: 2px sold #F2F4F3;\n"
-                                "}\n"
-                                "\n"
-                                "QComboBox::drop-down {\n"
-                                "    width: 25px;\n"
-                                "    background-color: #FFBA00;\n"
-                                "}\n"
-                                "\n"
-                                "QComboBox::down-arrow {\n"
-                                "    border-image: url(:/images/down.png);\n"
-                                "}\n"
-                                "\n"
-                                "QComboBox::drop-down::hover {\n"
-                                "    background-color: #FFC300;\n"
-                                "}\n"
-                                "\n"
-                                "QComboBox::drop-down::pressed {\n"
-                                "    background-color: #88AB75;\n"
-                                "}\n"
-                                "\n"
-                                "QComboBox QAbstractItemView {\n"
-                                "    selection-background-color: #FFBA00;\n"
-                                "}\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "QFrame#BASIC_frame,\n"
-                                "QFrame#MOT_frame,\n"
-                                "QFrame#MORT_frame,\n"
-                                "QFrame#ML_frame,\n"
-                                "QFrame#ROB_frame,\n"
-                                "QFrame#PATH_frame {\n"
-                                "    border-radius: 8px;\n"
-                                "    background: #5d707f;\n"
-                                "}\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "QListView {\n"
-                                "    padding: 2px;\n"
-                                "    background: #F2F4F3;\n"
-                                "    border-radius: 5px;\n"
-                                "}\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "QLabel, QLineEdit {\n"
-                                "    border: 2px solid #F2F4F3;\n"
-                                "    border-radius: 5px;\n"
-                                "    font-size: 14pt;\n"
-                                "    padding: 2px;\n"
-                                "    padding-left: 5px;\n"
-                                "    background-color: #F2F4F3;\n"
-                                "}\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "QTextEdit, QListWidget {\n"
-                                "    border: 0px;\n"
-                                "    border-radius: 5px;\n"
-                                "    font-size: 12pt;\n"
-                                "    padding: 2px;\n"
-                                "    padding-left: 5px;\n"
-                                "    background-color: #F2F4F3;\n"
-                                "}\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "QPushButton {\n"
-                                "    background-color: #FFBA00;\n"
-                                "    border-radius: 5px;\n"
-                                "    font-size: 14pt;\n"
-                                "}\n"
-                                "\n"
-                                "QPushButton:hover {\n"
-                                "    background-color: #FFC300;\n"
-                                "}\n"
-                                "\n"
-                                "QPushButton:pressed {\n"
-                                "    background-color: #88AB75;\n"
-                                "}\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "QSlider {\n"
-                                "    background: #5d707f;\n"
-                                "}\n"
-                                "\n"
-                                "QSlider::handle:horizontal, QSlider::handle:vertical {\n"
-                                "    background-color: #FFBA00;\n"
-                                "}\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "QSpinBox, QDoubleSpinBox {\n"
-                                "    border: 2px solid #F2F4F3;\n"
-                                "    border-radius: 5px;\n"
-                                "    border-width: 3px;\n"
-                                "    border-top-right-radius: 0;\n"
-                                "    border-bottom-right-radius: 0;\n"
-                                "    font-size: 12pt;\n"
-                                "    padding: 2px;\n"
-                                "    padding-left: 5px;\n"
-                                "    padding-right: 5px;\n"
-                                "    background-color: #F2F4F3;\n"
-                                "}\n"
-                                "\n"
-                                "QSpinBox::up-button, QDoubleSpinBox::up-button { \n"
-                                "    subcontrol-origin: padding;\n"
-                                "    subcontrol-position: top right; /* position at the top right corner */\n"
-                                "    width: 30 px;\n"
-                                "}\n"
-                                "\n"
-                                "QSpinBox::down-button, QDoubleSpinBox::down-button { \n"
-                                "    subcontrol-origin: padding;\n"
-                                "    subcontrol-position: bottom right; /* position at the top right corner */\n"
-                                "    width: 30 px;\n"
-                                "    top: 1px;\n"
-                                "}\n"
-                                "\n"
-                                "QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {\n"
-                                "    image: url(:/images/up.png);\n"
-                                "}\n"
-                                "\n"
-                                "QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {\n"
-                                "    image: url(:/images/down.png);;\n"
-                                "}\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "QScrollBar:vertical {  \n"
-                                "    border: None;\n"
-                                "    background:#f2f4f3;\n"
-                                "    width: 10px;\n"
-                                "}\n"
-                                "\n"
-                                "QScrollBar::handle:vertical {\n"
-                                "    background:#ffba00;\n"
-                                "    border-radius: 4px;\n"
-                                "    min-height: 20px;\n"
-                                "}\n"
-                                "\n"
-                                "QScrollBar:horizontal {  \n"
-                                "    background:#f2f4f3;\n"
-                                "    height: 15px;\n"
-                                "}\n"
-                                "\n"
-                                "QScrollBar::handle:horizontal {\n"
-                                "    background:#ffba00;\n"
-                                "    border-radius: 4px;\n"
-                                "    min-width: 20px;\n"
-                                "}\n"
-                                "\n"
-                                "\n"
-                                "\n"
-                                "QTextEdit {\n"
-                                "    border: 2px solid #909cc2\n"
-                                "}\n"
-                                "\n"
-                                "QTextEdit:selected {\n"
-                                "    border-color: #aab9e6\n"
-                                "}")
+        DAQWindow.setStyleSheet(
+            "QWidget {\n"
+            '    font-family: "Bahnschrift";\n'
+            "    background: #4c4a48;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "/* alphabetical from here */\n"
+            "\n"
+            "QCheckBox::indicator {\n"
+            "    top: 2 px;\n"
+            "    width: 13px;\n"
+            "    height: 13px;\n"
+            "    background-color: #f2f4f3;\n"
+            "    border-radius: 2px;\n"
+            "}\n"
+            "\n"
+            "QCheckBox::indicator:checked {\n"
+            "    background-color: #ffba00;\n"
+            "    image: url(:/images/down.png);\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "\n"
+            "QComboBox {\n"
+            "    border-radius: 5px;\n"
+            "    padding-left: 10px;\n"
+            "    min-width: 6em;\n"
+            "    background: #F2F4F3;\n"
+            '    font-family: "Bahnschrift";\n'
+            "}\n"
+            "\n"
+            "QComboBox:on { /* shift the text when the popup opens */\n"
+            "    border: 2px sold #F2F4F3;\n"
+            "}\n"
+            "\n"
+            "QComboBox::drop-down {\n"
+            "    width: 25px;\n"
+            "    background-color: #FFBA00;\n"
+            "}\n"
+            "\n"
+            "QComboBox::down-arrow {\n"
+            "    border-image: url(:/images/down.png);\n"
+            "}\n"
+            "\n"
+            "QComboBox::drop-down::hover {\n"
+            "    background-color: #FFC300;\n"
+            "}\n"
+            "\n"
+            "QComboBox::drop-down::pressed {\n"
+            "    background-color: #88AB75;\n"
+            "}\n"
+            "\n"
+            "QComboBox QAbstractItemView {\n"
+            "    selection-background-color: #FFBA00;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "\n"
+            "QFrame#BASIC_frame,\n"
+            "QFrame#MOT_frame,\n"
+            "QFrame#MORT_frame,\n"
+            "QFrame#ML_frame,\n"
+            "QFrame#ROB_frame,\n"
+            "QFrame#PATH_frame {\n"
+            "    border-radius: 8px;\n"
+            "    background: #5d707f;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "\n"
+            "QListView {\n"
+            "    padding: 2px;\n"
+            "    background: #F2F4F3;\n"
+            "    border-radius: 5px;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "\n"
+            "QLabel, QLineEdit {\n"
+            "    border: 2px solid #F2F4F3;\n"
+            "    border-radius: 5px;\n"
+            "    font-size: 14pt;\n"
+            "    padding: 2px;\n"
+            "    padding-left: 5px;\n"
+            "    background-color: #F2F4F3;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "\n"
+            "QTextEdit, QListWidget {\n"
+            "    border: 0px;\n"
+            "    border-radius: 5px;\n"
+            "    font-size: 12pt;\n"
+            "    padding: 2px;\n"
+            "    padding-left: 5px;\n"
+            "    background-color: #F2F4F3;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "QPushButton {\n"
+            "    background-color: #FFBA00;\n"
+            "    border-radius: 5px;\n"
+            "    font-size: 14pt;\n"
+            "}\n"
+            "\n"
+            "QPushButton:hover {\n"
+            "    background-color: #FFC300;\n"
+            "}\n"
+            "\n"
+            "QPushButton:pressed {\n"
+            "    background-color: #88AB75;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "QSlider {\n"
+            "    background: #5d707f;\n"
+            "}\n"
+            "\n"
+            "QSlider::handle:horizontal, QSlider::handle:vertical {\n"
+            "    background-color: #FFBA00;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "\n"
+            "QSpinBox, QDoubleSpinBox {\n"
+            "    border: 2px solid #F2F4F3;\n"
+            "    border-radius: 5px;\n"
+            "    border-width: 3px;\n"
+            "    border-top-right-radius: 0;\n"
+            "    border-bottom-right-radius: 0;\n"
+            "    font-size: 12pt;\n"
+            "    padding: 2px;\n"
+            "    padding-left: 5px;\n"
+            "    padding-right: 5px;\n"
+            "    background-color: #F2F4F3;\n"
+            "}\n"
+            "\n"
+            "QSpinBox::up-button, QDoubleSpinBox::up-button { \n"
+            "    subcontrol-origin: padding;\n"
+            "    subcontrol-position: top right; /* position at the top right corner */\n"
+            "    width: 30 px;\n"
+            "}\n"
+            "\n"
+            "QSpinBox::down-button, QDoubleSpinBox::down-button { \n"
+            "    subcontrol-origin: padding;\n"
+            "    subcontrol-position: bottom right; /* position at the top right corner */\n"
+            "    width: 30 px;\n"
+            "    top: 1px;\n"
+            "}\n"
+            "\n"
+            "QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {\n"
+            "    image: url(:/images/up.png);\n"
+            "}\n"
+            "\n"
+            "QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {\n"
+            "    image: url(:/images/down.png);;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "\n"
+            "QScrollBar:vertical {  \n"
+            "    border: None;\n"
+            "    background:#f2f4f3;\n"
+            "    width: 10px;\n"
+            "}\n"
+            "\n"
+            "QScrollBar::handle:vertical {\n"
+            "    background:#ffba00;\n"
+            "    border-radius: 4px;\n"
+            "    min-height: 20px;\n"
+            "}\n"
+            "\n"
+            "QScrollBar:horizontal {  \n"
+            "    background:#f2f4f3;\n"
+            "    height: 15px;\n"
+            "}\n"
+            "\n"
+            "QScrollBar::handle:horizontal {\n"
+            "    background:#ffba00;\n"
+            "    border-radius: 4px;\n"
+            "    min-width: 20px;\n"
+            "}\n"
+            "\n"
+            "\n"
+            "\n"
+            "QTextEdit {\n"
+            "    border: 2px solid #909cc2\n"
+            "}\n"
+            "\n"
+            "QTextEdit:selected {\n"
+            "    border-color: #aab9e6\n"
+            "}"
+        )
         self.PATH_frame = QtWidgets.QFrame(DAQWindow)
         self.PATH_frame.setGeometry(QtCore.QRect(50, 30, 1011, 151))
         self.PATH_frame.setStyleSheet("")
@@ -231,11 +233,13 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
         self.PATH_0_frameLabel.setFont(font)
-        self.PATH_0_frameLabel.setStyleSheet(   "border: 0px;\n"
-                                                "font-size: 22pt;\n"
-                                                "padding: 0px;\n"
-                                                "background-color: #5D707F;\n"
-                                                "color: #E1E5EE;")
+        self.PATH_0_frameLabel.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 22pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
         self.PATH_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.PATH_0_frameLabel.setObjectName("PATH_0_frameLabel")
         self.PATH_btt_chgPath = QtWidgets.QPushButton(self.PATH_frame)
@@ -244,25 +248,30 @@ class Ui_DAQWindow(object):
         self.PATH_btt_chgPath.setObjectName("PATH_btt_chgPath")
         self.PATH_disp_path = QtWidgets.QLabel(self.PATH_frame)
         self.PATH_disp_path.setGeometry(QtCore.QRect(110, 80, 791, 41))
-        self.PATH_disp_path.setStyleSheet(      "border-top-right-radius: 0px;\n"
-                                                "border-bottom-right-radius: 0px;")
+        self.PATH_disp_path.setStyleSheet(
+            "border-top-right-radius: 0px;\n" "border-bottom-right-radius: 0px;"
+        )
         self.PATH_disp_path.setObjectName("PATH_disp_path")
         self.PATH_lbl_path = QtWidgets.QLabel(self.PATH_frame)
         self.PATH_lbl_path.setGeometry(QtCore.QRect(36, 90, 71, 31))
-        self.PATH_lbl_path.setStyleSheet(       "border: 0px;\n"
-                                                "background-color: #5D707F;\n"
-                                                "color: #E1E5EE;")
-        self.PATH_lbl_path.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
+        self.PATH_lbl_path.setStyleSheet(
+            "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
+        )
+        self.PATH_lbl_path.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
         self.PATH_lbl_path.setObjectName("PATH_lbl_path")
         self.PATH_disp_datetime = QtWidgets.QLabel(self.PATH_frame)
         self.PATH_disp_datetime.setGeometry(QtCore.QRect(750, 20, 231, 41))
         self.PATH_disp_datetime.setObjectName("PATH_disp_datetime")
         self.PATH_lbl_datetime = QtWidgets.QLabel(self.PATH_frame)
         self.PATH_lbl_datetime.setGeometry(QtCore.QRect(640, 30, 121, 31))
-        self.PATH_lbl_datetime.setStyleSheet(   "border: 0px;\n"
-                                                "background-color: #5D707F;\n"
-                                                "color: #E1E5EE;")
-        self.PATH_lbl_datetime.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
+        self.PATH_lbl_datetime.setStyleSheet(
+            "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
+        )
+        self.PATH_lbl_datetime.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
         self.PATH_lbl_datetime.setObjectName("PATH_lbl_datetime")
         self.PATH_lbl_path.raise_()
         self.PATH_0_frameLabel.raise_()
@@ -282,11 +291,13 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
         self.BASIC_0_frameLabel.setFont(font)
-        self.BASIC_0_frameLabel.setStyleSheet(  "border: 0px;\n"
-                                                "font-size: 22pt;\n"
-                                                "padding: 0px;\n"
-                                                "background-color: #5D707F;\n"
-                                                "color: #E1E5EE;")
+        self.BASIC_0_frameLabel.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 22pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
         self.BASIC_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.BASIC_0_frameLabel.setObjectName("BASIC_0_frameLabel")
         self.BASIC_lbl_delivPumpTemp = QtWidgets.QLabel(self.BASIC_frame)
@@ -295,15 +306,21 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.BASIC_lbl_delivPumpTemp.setFont(font)
-        self.BASIC_lbl_delivPumpTemp.setStyleSheet(     "border: 0px;\n"
-                                                        "font-size: 11pt;\n"
-                                                        "background-color: #5D707F;\n"
-                                                        "color: #E1E5EE;")
-        self.BASIC_lbl_delivPumpTemp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.BASIC_lbl_delivPumpTemp.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.BASIC_lbl_delivPumpTemp.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.BASIC_lbl_delivPumpTemp.setObjectName("BASIC_lbl_delivPumpTemp")
         self.BASIC_disp_delivPumpTemp = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_disp_delivPumpTemp.setGeometry(QtCore.QRect(180, 330, 121, 51))
-        self.BASIC_disp_delivPumpTemp.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.BASIC_disp_delivPumpTemp.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.BASIC_disp_delivPumpTemp.setObjectName("BASIC_disp_delivPumpTemp")
         self.BASIC_lbl_robBaseTemp = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_lbl_robBaseTemp.setGeometry(QtCore.QRect(40, 400, 131, 51))
@@ -311,19 +328,27 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.BASIC_lbl_robBaseTemp.setFont(font)
-        self.BASIC_lbl_robBaseTemp.setStyleSheet(       "border: 0px;\n"
-                                                        "font-size: 11pt;\n"
-                                                        "background-color: #5D707F;\n"
-                                                        "color: #E1E5EE;")
-        self.BASIC_lbl_robBaseTemp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.BASIC_lbl_robBaseTemp.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.BASIC_lbl_robBaseTemp.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.BASIC_lbl_robBaseTemp.setObjectName("BASIC_lbl_robBaseTemp")
         self.BASIC_disp_robBaseTemp = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_disp_robBaseTemp.setGeometry(QtCore.QRect(180, 400, 121, 51))
-        self.BASIC_disp_robBaseTemp.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.BASIC_disp_robBaseTemp.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.BASIC_disp_robBaseTemp.setObjectName("BASIC_disp_robBaseTemp")
         self.BASIC_disp_2kPumpTemp = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_disp_2kPumpTemp.setGeometry(QtCore.QRect(180, 470, 121, 51))
-        self.BASIC_disp_2kPumpTemp.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.BASIC_disp_2kPumpTemp.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.BASIC_disp_2kPumpTemp.setObjectName("BASIC_disp_2kPumpTemp")
         self.BASIC_lbl_2kPumpTemp = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_lbl_2kPumpTemp.setGeometry(QtCore.QRect(40, 470, 131, 51))
@@ -331,39 +356,57 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.BASIC_lbl_2kPumpTemp.setFont(font)
-        self.BASIC_lbl_2kPumpTemp.setStyleSheet("border: 0px;\n"
-                                                "font-size: 11pt;\n"
-                                                "background-color: #5D707F;\n"
-                                                "color: #E1E5EE;")
-        self.BASIC_lbl_2kPumpTemp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.BASIC_lbl_2kPumpTemp.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.BASIC_lbl_2kPumpTemp.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.BASIC_lbl_2kPumpTemp.setObjectName("BASIC_lbl_2kPumpTemp")
         self.BASIC_lbl_ambTemp = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_lbl_ambTemp.setGeometry(QtCore.QRect(40, 120, 131, 51))
-        self.BASIC_lbl_ambTemp.setStyleSheet(   "border: 0px;\n"
-                                                "font-size: 12pt;\n"
-                                                "background-color: #5D707F;\n"
-                                                "color: #E1E5EE;")
-        self.BASIC_lbl_ambTemp.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.BASIC_lbl_ambTemp.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.BASIC_lbl_ambTemp.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.BASIC_lbl_ambTemp.setObjectName("BASIC_lbl_ambTemp")
         self.BASIC_disp_ambTemp = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_disp_ambTemp.setGeometry(QtCore.QRect(180, 120, 121, 51))
-        self.BASIC_disp_ambTemp.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.BASIC_disp_ambTemp.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.BASIC_disp_ambTemp.setObjectName("BASIC_disp_ambTemp")
         self.BASIC_disp_ambHum = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_disp_ambHum.setGeometry(QtCore.QRect(180, 190, 121, 51))
-        self.BASIC_disp_ambHum.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.BASIC_disp_ambHum.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.BASIC_disp_ambHum.setObjectName("BASIC_disp_ambHum")
         self.BASIC_lbl_ambHum = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_lbl_ambHum.setGeometry(QtCore.QRect(40, 190, 131, 51))
-        self.BASIC_lbl_ambHum.setStyleSheet(    "border: 0px;\n"
-                                                "font-size: 12pt;\n"
-                                                "background-color: #5D707F;\n"
-                                                "color: #E1E5EE;")
-        self.BASIC_lbl_ambHum.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.BASIC_lbl_ambHum.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.BASIC_lbl_ambHum.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.BASIC_lbl_ambHum.setObjectName("BASIC_lbl_ambHum")
         self.BASIC_disp_2kPumpPress = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_disp_2kPumpPress.setGeometry(QtCore.QRect(180, 680, 121, 51))
-        self.BASIC_disp_2kPumpPress.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.BASIC_disp_2kPumpPress.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.BASIC_disp_2kPumpPress.setObjectName("BASIC_disp_2kPumpPress")
         self.BASIC_lbl_robBasePress = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_lbl_robBasePress.setGeometry(QtCore.QRect(40, 680, 131, 51))
@@ -371,15 +414,21 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.BASIC_lbl_robBasePress.setFont(font)
-        self.BASIC_lbl_robBasePress.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.BASIC_lbl_robBasePress.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.BASIC_lbl_robBasePress.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.BASIC_lbl_robBasePress.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.BASIC_lbl_robBasePress.setObjectName("BASIC_lbl_robBasePress")
         self.BASIC_disp_delivPumpPress = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_disp_delivPumpPress.setGeometry(QtCore.QRect(180, 610, 121, 51))
-        self.BASIC_disp_delivPumpPress.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.BASIC_disp_delivPumpPress.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.BASIC_disp_delivPumpPress.setObjectName("BASIC_disp_delivPumpPress")
         self.BASIC_lbl_delivPumpPress = QtWidgets.QLabel(self.BASIC_frame)
         self.BASIC_lbl_delivPumpPress.setGeometry(QtCore.QRect(40, 610, 131, 51))
@@ -387,11 +436,15 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.BASIC_lbl_delivPumpPress.setFont(font)
-        self.BASIC_lbl_delivPumpPress.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.BASIC_lbl_delivPumpPress.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.BASIC_lbl_delivPumpPress.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.BASIC_lbl_delivPumpPress.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.BASIC_lbl_delivPumpPress.setObjectName("BASIC_lbl_delivPumpPress")
         self.MOT_frame = QtWidgets.QFrame(DAQWindow)
         self.MOT_frame.setGeometry(QtCore.QRect(430, 210, 411, 791))
@@ -404,140 +457,202 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
         self.MOT_0_frameLabel.setFont(font)
-        self.MOT_0_frameLabel.setStyleSheet("border: 0px;\n"
-"font-size: 22pt;\n"
-"padding: 0px;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
+        self.MOT_0_frameLabel.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 22pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
         self.MOT_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.MOT_0_frameLabel.setObjectName("MOT_0_frameLabel")
         self.MOT_lbl_Freq = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_lbl_Freq.setGeometry(QtCore.QRect(-20, 162, 131, 51))
-        self.MOT_lbl_Freq.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MOT_lbl_Freq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_lbl_Freq.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MOT_lbl_Freq.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_lbl_Freq.setObjectName("MOT_lbl_Freq")
         self.MOT_disp_pump1Freq = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_pump1Freq.setGeometry(QtCore.QRect(120, 160, 121, 51))
-        self.MOT_disp_pump1Freq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_pump1Freq.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_pump1Freq.setObjectName("MOT_disp_pump1Freq")
         self.MOT_disp_pump1Volt = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_pump1Volt.setGeometry(QtCore.QRect(120, 230, 121, 51))
-        self.MOT_disp_pump1Volt.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_pump1Volt.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_pump1Volt.setObjectName("MOT_disp_pump1Volt")
         self.MOT_lbl_Volt = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_lbl_Volt.setGeometry(QtCore.QRect(-20, 232, 131, 51))
-        self.MOT_lbl_Volt.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MOT_lbl_Volt.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_lbl_Volt.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MOT_lbl_Volt.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_lbl_Volt.setObjectName("MOT_lbl_Volt")
         self.MOT_lbl_Amps = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_lbl_Amps.setGeometry(QtCore.QRect(-20, 372, 131, 51))
-        self.MOT_lbl_Amps.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MOT_lbl_Amps.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_lbl_Amps.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MOT_lbl_Amps.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_lbl_Amps.setObjectName("MOT_lbl_Amps")
         self.MOT_lbl_Torq = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_lbl_Torq.setGeometry(QtCore.QRect(-20, 302, 131, 51))
-        self.MOT_lbl_Torq.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MOT_lbl_Torq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_lbl_Torq.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MOT_lbl_Torq.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_lbl_Torq.setObjectName("MOT_lbl_Torq")
         self.MOT_disp_pump1Amps = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_pump1Amps.setGeometry(QtCore.QRect(120, 370, 121, 51))
-        self.MOT_disp_pump1Amps.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_pump1Amps.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_pump1Amps.setObjectName("MOT_disp_pump1Amps")
         self.MOT_disp_pump1Torq = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_pump1Torq.setGeometry(QtCore.QRect(120, 300, 121, 51))
-        self.MOT_disp_pump1Torq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_pump1Torq.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_pump1Torq.setObjectName("MOT_disp_pump1Torq")
         self.MOT_disp_pump2Torq = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_pump2Torq.setGeometry(QtCore.QRect(250, 300, 121, 51))
-        self.MOT_disp_pump2Torq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_pump2Torq.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_pump2Torq.setObjectName("MOT_disp_pump2Torq")
         self.MOT_disp_pump2Amps = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_pump2Amps.setGeometry(QtCore.QRect(250, 370, 121, 51))
-        self.MOT_disp_pump2Amps.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_pump2Amps.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_pump2Amps.setObjectName("MOT_disp_pump2Amps")
         self.MOT_disp_pump2Volt = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_pump2Volt.setGeometry(QtCore.QRect(250, 230, 121, 51))
-        self.MOT_disp_pump2Volt.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_pump2Volt.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_pump2Volt.setObjectName("MOT_disp_pump2Volt")
         self.MOT_disp_pump2Freq = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_pump2Freq.setGeometry(QtCore.QRect(250, 160, 121, 51))
-        self.MOT_disp_pump2Freq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_pump2Freq.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_pump2Freq.setObjectName("MOT_disp_pump2Freq")
         self.MOT_lbl_admPumpAmps = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_lbl_admPumpAmps.setGeometry(QtCore.QRect(110, 532, 131, 51))
-        self.MOT_lbl_admPumpAmps.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MOT_lbl_admPumpAmps.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.MOT_lbl_admPumpAmps.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MOT_lbl_admPumpAmps.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.MOT_lbl_admPumpAmps.setObjectName("MOT_lbl_admPumpAmps")
         self.MOT_disp_admPumpAmps = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_admPumpAmps.setGeometry(QtCore.QRect(250, 530, 121, 51))
-        self.MOT_disp_admPumpAmps.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_admPumpAmps.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_admPumpAmps.setObjectName("MOT_disp_admPumpAmps")
         self.MOT_disp_admPumpFreq = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_admPumpFreq.setGeometry(QtCore.QRect(250, 468, 121, 51))
-        self.MOT_disp_admPumpFreq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_admPumpFreq.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_admPumpFreq.setObjectName("MOT_disp_admPumpFreq")
         self.MOT_lbl_admPumpFreq = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_lbl_admPumpFreq.setGeometry(QtCore.QRect(110, 470, 131, 51))
-        self.MOT_lbl_admPumpFreq.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MOT_lbl_admPumpFreq.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.MOT_lbl_admPumpFreq.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MOT_lbl_admPumpFreq.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.MOT_lbl_admPumpFreq.setObjectName("MOT_lbl_admPumpFreq")
         self.MOT_lbl_pump1 = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_lbl_pump1.setGeometry(QtCore.QRect(120, 100, 121, 51))
-        self.MOT_lbl_pump1.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MOT_lbl_pump1.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignHCenter)
+        self.MOT_lbl_pump1.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MOT_lbl_pump1.setAlignment(QtCore.Qt.AlignBottom | QtCore.Qt.AlignHCenter)
         self.MOT_lbl_pump1.setObjectName("MOT_lbl_pump1")
         self.MOT_lbl_pump2 = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_lbl_pump2.setGeometry(QtCore.QRect(260, 100, 111, 51))
-        self.MOT_lbl_pump2.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MOT_lbl_pump2.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignHCenter)
+        self.MOT_lbl_pump2.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MOT_lbl_pump2.setAlignment(QtCore.Qt.AlignBottom | QtCore.Qt.AlignHCenter)
         self.MOT_lbl_pump2.setObjectName("MOT_lbl_pump2")
         self.MOT_lbl_2kPumpAmps = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_lbl_2kPumpAmps.setGeometry(QtCore.QRect(110, 682, 131, 51))
-        self.MOT_lbl_2kPumpAmps.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MOT_lbl_2kPumpAmps.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.MOT_lbl_2kPumpAmps.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MOT_lbl_2kPumpAmps.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.MOT_lbl_2kPumpAmps.setObjectName("MOT_lbl_2kPumpAmps")
         self.MOT_disp_2kPumpFreq = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_2kPumpFreq.setGeometry(QtCore.QRect(250, 618, 121, 51))
-        self.MOT_disp_2kPumpFreq.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_2kPumpFreq.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_2kPumpFreq.setObjectName("MOT_disp_2kPumpFreq")
         self.MOT_disp_2kPumpAmps = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_disp_2kPumpAmps.setGeometry(QtCore.QRect(250, 680, 121, 51))
-        self.MOT_disp_2kPumpAmps.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MOT_disp_2kPumpAmps.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MOT_disp_2kPumpAmps.setObjectName("MOT_disp_2kPumpAmps")
         self.MOT_lbl_2kPumpFreq = QtWidgets.QLabel(self.MOT_frame)
         self.MOT_lbl_2kPumpFreq.setGeometry(QtCore.QRect(110, 620, 131, 51))
-        self.MOT_lbl_2kPumpFreq.setStyleSheet("border: 0px;\n"
-"font-size: 12pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MOT_lbl_2kPumpFreq.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.MOT_lbl_2kPumpFreq.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MOT_lbl_2kPumpFreq.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.MOT_lbl_2kPumpFreq.setObjectName("MOT_lbl_2kPumpFreq")
         self.ROB_frame = QtWidgets.QFrame(DAQWindow)
         self.ROB_frame.setGeometry(QtCore.QRect(890, 210, 341, 791))
@@ -550,16 +665,20 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
         self.ROB_0_frameLabel.setFont(font)
-        self.ROB_0_frameLabel.setStyleSheet("border: 0px;\n"
-"font-size: 22pt;\n"
-"padding: 0px;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
+        self.ROB_0_frameLabel.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 22pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
         self.ROB_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.ROB_0_frameLabel.setObjectName("ROB_0_frameLabel")
         self.ROB_disp_xPos = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_disp_xPos.setGeometry(QtCore.QRect(130, 320, 171, 51))
-        self.ROB_disp_xPos.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ROB_disp_xPos.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.ROB_disp_xPos.setObjectName("ROB_disp_xPos")
         self.ROB_lbl_xPos = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_lbl_xPos.setGeometry(QtCore.QRect(30, 320, 91, 51))
@@ -567,11 +686,15 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.ROB_lbl_xPos.setFont(font)
-        self.ROB_lbl_xPos.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ROB_lbl_xPos.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ROB_lbl_xPos.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ROB_lbl_xPos.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.ROB_lbl_xPos.setObjectName("ROB_lbl_xPos")
         self.ROB_lbl_yPos = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_lbl_yPos.setGeometry(QtCore.QRect(30, 380, 91, 51))
@@ -579,19 +702,27 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.ROB_lbl_yPos.setFont(font)
-        self.ROB_lbl_yPos.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ROB_lbl_yPos.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ROB_lbl_yPos.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ROB_lbl_yPos.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.ROB_lbl_yPos.setObjectName("ROB_lbl_yPos")
         self.ROB_disp_yPos = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_disp_yPos.setGeometry(QtCore.QRect(130, 380, 171, 51))
-        self.ROB_disp_yPos.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ROB_disp_yPos.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.ROB_disp_yPos.setObjectName("ROB_disp_yPos")
         self.ROB_disp_xOri = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_disp_xOri.setGeometry(QtCore.QRect(130, 500, 171, 51))
-        self.ROB_disp_xOri.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ROB_disp_xOri.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.ROB_disp_xOri.setObjectName("ROB_disp_xOri")
         self.ROB_lbl_zPos = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_lbl_zPos.setGeometry(QtCore.QRect(30, 440, 91, 51))
@@ -599,11 +730,15 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.ROB_lbl_zPos.setFont(font)
-        self.ROB_lbl_zPos.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ROB_lbl_zPos.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ROB_lbl_zPos.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ROB_lbl_zPos.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.ROB_lbl_zPos.setObjectName("ROB_lbl_zPos")
         self.ROB_lbl_xOri = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_lbl_xOri.setGeometry(QtCore.QRect(20, 500, 101, 51))
@@ -611,23 +746,33 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.ROB_lbl_xOri.setFont(font)
-        self.ROB_lbl_xOri.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ROB_lbl_xOri.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ROB_lbl_xOri.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ROB_lbl_xOri.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.ROB_lbl_xOri.setObjectName("ROB_lbl_xOri")
         self.ROB_disp_zPos = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_disp_zPos.setGeometry(QtCore.QRect(130, 440, 171, 51))
-        self.ROB_disp_zPos.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ROB_disp_zPos.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.ROB_disp_zPos.setObjectName("ROB_disp_zPos")
         self.ROB_disp_yOri = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_disp_yOri.setGeometry(QtCore.QRect(130, 560, 171, 51))
-        self.ROB_disp_yOri.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ROB_disp_yOri.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.ROB_disp_yOri.setObjectName("ROB_disp_yOri")
         self.ROB_disp_zOri = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_disp_zOri.setGeometry(QtCore.QRect(130, 620, 171, 51))
-        self.ROB_disp_zOri.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ROB_disp_zOri.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.ROB_disp_zOri.setObjectName("ROB_disp_zOri")
         self.ROB_lbl_yOri = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_lbl_yOri.setGeometry(QtCore.QRect(20, 560, 101, 51))
@@ -635,11 +780,15 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.ROB_lbl_yOri.setFont(font)
-        self.ROB_lbl_yOri.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ROB_lbl_yOri.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ROB_lbl_yOri.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ROB_lbl_yOri.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.ROB_lbl_yOri.setObjectName("ROB_lbl_yOri")
         self.ROB_lbl_zOri = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_lbl_zOri.setGeometry(QtCore.QRect(20, 620, 101, 51))
@@ -647,11 +796,15 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.ROB_lbl_zOri.setFont(font)
-        self.ROB_lbl_zOri.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ROB_lbl_zOri.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ROB_lbl_zOri.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ROB_lbl_zOri.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.ROB_lbl_zOri.setObjectName("ROB_lbl_zOri")
         self.ROB_lbl_extPos = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_lbl_extPos.setGeometry(QtCore.QRect(20, 680, 101, 51))
@@ -659,19 +812,27 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.ROB_lbl_extPos.setFont(font)
-        self.ROB_lbl_extPos.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ROB_lbl_extPos.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ROB_lbl_extPos.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ROB_lbl_extPos.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.ROB_lbl_extPos.setObjectName("ROB_lbl_extPos")
         self.ROB_disp_extPos = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_disp_extPos.setGeometry(QtCore.QRect(130, 680, 171, 51))
-        self.ROB_disp_extPos.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ROB_disp_extPos.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.ROB_disp_extPos.setObjectName("ROB_disp_extPos")
         self.ROB_disp_tcpSpeed = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_disp_tcpSpeed.setGeometry(QtCore.QRect(130, 220, 171, 51))
-        self.ROB_disp_tcpSpeed.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ROB_disp_tcpSpeed.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.ROB_disp_tcpSpeed.setObjectName("ROB_disp_tcpSpeed")
         self.ROB_lbl_id = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_lbl_id.setGeometry(QtCore.QRect(30, 120, 91, 51))
@@ -679,11 +840,15 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.ROB_lbl_id.setFont(font)
-        self.ROB_lbl_id.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ROB_lbl_id.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ROB_lbl_id.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ROB_lbl_id.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.ROB_lbl_id.setObjectName("ROB_lbl_id")
         self.ROB_lbl_tcpSpeed = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_lbl_tcpSpeed.setGeometry(QtCore.QRect(30, 220, 91, 51))
@@ -691,15 +856,21 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.ROB_lbl_tcpSpeed.setFont(font)
-        self.ROB_lbl_tcpSpeed.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.ROB_lbl_tcpSpeed.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.ROB_lbl_tcpSpeed.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ROB_lbl_tcpSpeed.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.ROB_lbl_tcpSpeed.setObjectName("ROB_lbl_tcpSpeed")
         self.ROB_disp_id = QtWidgets.QLabel(self.ROB_frame)
         self.ROB_disp_id.setGeometry(QtCore.QRect(130, 120, 171, 51))
-        self.ROB_disp_id.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.ROB_disp_id.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.ROB_disp_id.setObjectName("ROB_disp_id")
         self.MORT_frame = QtWidgets.QFrame(DAQWindow)
         self.MORT_frame.setGeometry(QtCore.QRect(1280, 210, 351, 791))
@@ -712,16 +883,20 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
         self.MORT_0_frameLabel.setFont(font)
-        self.MORT_0_frameLabel.setStyleSheet("border: 0px;\n"
-"font-size: 22pt;\n"
-"padding: 0px;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
+        self.MORT_0_frameLabel.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 22pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
         self.MORT_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.MORT_0_frameLabel.setObjectName("MORT_0_frameLabel")
         self.MORT_disp_pores = QtWidgets.QLabel(self.MORT_frame)
         self.MORT_disp_pores.setGeometry(QtCore.QRect(140, 120, 171, 51))
-        self.MORT_disp_pores.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MORT_disp_pores.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MORT_disp_pores.setObjectName("MORT_disp_pores")
         self.MORT_lbl_pores = QtWidgets.QLabel(self.MORT_frame)
         self.MORT_lbl_pores.setGeometry(QtCore.QRect(40, 120, 91, 51))
@@ -729,11 +904,15 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.MORT_lbl_pores.setFont(font)
-        self.MORT_lbl_pores.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MORT_lbl_pores.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.MORT_lbl_pores.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MORT_lbl_pores.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.MORT_lbl_pores.setObjectName("MORT_lbl_pores")
         self.MORT_lbl_distFront = QtWidgets.QLabel(self.MORT_frame)
         self.MORT_lbl_distFront.setGeometry(QtCore.QRect(20, 310, 111, 51))
@@ -741,19 +920,27 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.MORT_lbl_distFront.setFont(font)
-        self.MORT_lbl_distFront.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MORT_lbl_distFront.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.MORT_lbl_distFront.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MORT_lbl_distFront.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.MORT_lbl_distFront.setObjectName("MORT_lbl_distFront")
         self.MORT_disp_distFront = QtWidgets.QLabel(self.MORT_frame)
         self.MORT_disp_distFront.setGeometry(QtCore.QRect(140, 310, 171, 51))
-        self.MORT_disp_distFront.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MORT_disp_distFront.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MORT_disp_distFront.setObjectName("MORT_disp_distFront")
         self.MORT_disp_distEnd = QtWidgets.QLabel(self.MORT_frame)
         self.MORT_disp_distEnd.setGeometry(QtCore.QRect(140, 370, 171, 51))
-        self.MORT_disp_distEnd.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.MORT_disp_distEnd.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.MORT_disp_distEnd.setObjectName("MORT_disp_distEnd")
         self.MORT_lbl_distEnd = QtWidgets.QLabel(self.MORT_frame)
         self.MORT_lbl_distEnd.setGeometry(QtCore.QRect(20, 370, 111, 51))
@@ -761,11 +948,15 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
         self.MORT_lbl_distEnd.setFont(font)
-        self.MORT_lbl_distEnd.setStyleSheet("border: 0px;\n"
-"font-size: 11pt;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
-        self.MORT_lbl_distEnd.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+        self.MORT_lbl_distEnd.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.MORT_lbl_distEnd.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
         self.MORT_lbl_distEnd.setObjectName("MORT_lbl_distEnd")
         self.ML_frame = QtWidgets.QFrame(DAQWindow)
         self.ML_frame.setGeometry(QtCore.QRect(1100, 30, 781, 151))
@@ -778,17 +969,20 @@ class Ui_DAQWindow(object):
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
         self.ML_0_frameLabel.setFont(font)
-        self.ML_0_frameLabel.setStyleSheet("border: 0px;\n"
-"font-size: 22pt;\n"
-"padding: 0px;\n"
-"background-color: #5D707F;\n"
-"color: #E1E5EE;")
+        self.ML_0_frameLabel.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 22pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
         self.ML_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.ML_0_frameLabel.setObjectName("ML_0_frameLabel")
         self.ML_indi_state = QtWidgets.QLabel(self.ML_frame)
         self.ML_indi_state.setGeometry(QtCore.QRect(630, 20, 111, 111))
-        self.ML_indi_state.setStyleSheet("border-radius: 55px;\n"
-"background-color: #73ff78;")
+        self.ML_indi_state.setStyleSheet(
+            "border-radius: 55px;\n" "background-color: #73ff78;"
+        )
         self.ML_indi_state.setText("")
         self.ML_indi_state.setObjectName("ML_indi_state")
 
@@ -802,30 +996,37 @@ class Ui_DAQWindow(object):
         self.PATH_btt_chgPath.setText(_translate("DAQWindow", "change"))
         self.PATH_disp_path.setText(_translate("DAQWindow", "no path given"))
         self.PATH_lbl_path.setText(_translate("DAQWindow", "path:"))
-        self.PATH_disp_datetime.setText(_translate("DAQWindow", "2023-07-25    14:55:23"))
+        self.PATH_disp_datetime.setText(
+            _translate("DAQWindow", "2023-07-25    14:55:23")
+        )
         self.PATH_lbl_datetime.setText(_translate("DAQWindow", "datetime:"))
         self.BASIC_0_frameLabel.setText(_translate("DAQWindow", "BASICS"))
-        self.BASIC_lbl_delivPumpTemp.setText(_translate("DAQWindow", "pipe temperature\n"
-"(delivery pump)"))
+        self.BASIC_lbl_delivPumpTemp.setText(
+            _translate("DAQWindow", "pipe temperature\n" "(delivery pump)")
+        )
         self.BASIC_disp_delivPumpTemp.setText(_translate("DAQWindow", "0.0 °C"))
-        self.BASIC_lbl_robBaseTemp.setText(_translate("DAQWindow", "pipe temperature\n"
-"(robot base)"))
+        self.BASIC_lbl_robBaseTemp.setText(
+            _translate("DAQWindow", "pipe temperature\n" "(robot base)")
+        )
         self.BASIC_disp_robBaseTemp.setText(_translate("DAQWindow", "0.0 °C"))
         self.BASIC_disp_2kPumpTemp.setText(_translate("DAQWindow", "0.0 °C"))
-        self.BASIC_lbl_2kPumpTemp.setText(_translate("DAQWindow", "pipe temperature\n"
-"(2K pump)"))
-        self.BASIC_lbl_ambTemp.setText(_translate("DAQWindow", "ambient\n"
-"temperature"))
+        self.BASIC_lbl_2kPumpTemp.setText(
+            _translate("DAQWindow", "pipe temperature\n" "(2K pump)")
+        )
+        self.BASIC_lbl_ambTemp.setText(
+            _translate("DAQWindow", "ambient\n" "temperature")
+        )
         self.BASIC_disp_ambTemp.setText(_translate("DAQWindow", "0.0 °C"))
         self.BASIC_disp_ambHum.setText(_translate("DAQWindow", "0.0 rH"))
-        self.BASIC_lbl_ambHum.setText(_translate("DAQWindow", "ambient\n"
-"humidity"))
+        self.BASIC_lbl_ambHum.setText(_translate("DAQWindow", "ambient\n" "humidity"))
         self.BASIC_disp_2kPumpPress.setText(_translate("DAQWindow", "0.0 °C"))
-        self.BASIC_lbl_robBasePress.setText(_translate("DAQWindow", "pipe pressure\n"
-"(2k pump)"))
+        self.BASIC_lbl_robBasePress.setText(
+            _translate("DAQWindow", "pipe pressure\n" "(2k pump)")
+        )
         self.BASIC_disp_delivPumpPress.setText(_translate("DAQWindow", "0.0 °C"))
-        self.BASIC_lbl_delivPumpPress.setText(_translate("DAQWindow", "pipe pressure\n"
-"(delivery pump)"))
+        self.BASIC_lbl_delivPumpPress.setText(
+            _translate("DAQWindow", "pipe pressure\n" "(delivery pump)")
+        )
         self.MOT_0_frameLabel.setText(_translate("DAQWindow", "MOTORS"))
         self.MOT_lbl_Freq.setText(_translate("DAQWindow", "frequency"))
         self.MOT_disp_pump1Freq.setText(_translate("DAQWindow", "0.0 Hz"))
@@ -839,41 +1040,44 @@ class Ui_DAQWindow(object):
         self.MOT_disp_pump2Amps.setText(_translate("DAQWindow", "0.0 Nm"))
         self.MOT_disp_pump2Volt.setText(_translate("DAQWindow", "0.0 V"))
         self.MOT_disp_pump2Freq.setText(_translate("DAQWindow", "0.0 Hz"))
-        self.MOT_lbl_admPumpAmps.setText(_translate("DAQWindow", "ADMIX PUMP\n"
-"current"))
+        self.MOT_lbl_admPumpAmps.setText(
+            _translate("DAQWindow", "ADMIX PUMP\n" "current")
+        )
         self.MOT_disp_admPumpAmps.setText(_translate("DAQWindow", "0.0 A"))
         self.MOT_disp_admPumpFreq.setText(_translate("DAQWindow", "0.0 Hz"))
-        self.MOT_lbl_admPumpFreq.setText(_translate("DAQWindow", "ADMIX PUMP\n"
-"frequency"))
+        self.MOT_lbl_admPumpFreq.setText(
+            _translate("DAQWindow", "ADMIX PUMP\n" "frequency")
+        )
         self.MOT_lbl_pump1.setText(_translate("DAQWindow", "PUMP1"))
         self.MOT_lbl_pump2.setText(_translate("DAQWindow", "PUMP2"))
-        self.MOT_lbl_2kPumpAmps.setText(_translate("DAQWindow", "2K PUMP\n"
-"current"))
+        self.MOT_lbl_2kPumpAmps.setText(_translate("DAQWindow", "2K PUMP\n" "current"))
         self.MOT_disp_2kPumpFreq.setText(_translate("DAQWindow", "0.0 Hz"))
         self.MOT_disp_2kPumpAmps.setText(_translate("DAQWindow", "0.0 A"))
-        self.MOT_lbl_2kPumpFreq.setText(_translate("DAQWindow", "2K PUMP\n"
-"frequency"))
+        self.MOT_lbl_2kPumpFreq.setText(
+            _translate("DAQWindow", "2K PUMP\n" "frequency")
+        )
         self.ROB_0_frameLabel.setText(_translate("DAQWindow", "ROBOT"))
         self.ROB_disp_xPos.setText(_translate("DAQWindow", "0.0 mm"))
-        self.ROB_lbl_xPos.setText(_translate("DAQWindow", "X position\n"
-"(relative)"))
-        self.ROB_lbl_yPos.setText(_translate("DAQWindow", "Y position\n"
-"(relative)"))
+        self.ROB_lbl_xPos.setText(_translate("DAQWindow", "X position\n" "(relative)"))
+        self.ROB_lbl_yPos.setText(_translate("DAQWindow", "Y position\n" "(relative)"))
         self.ROB_disp_yPos.setText(_translate("DAQWindow", "0.0 mm"))
         self.ROB_disp_xOri.setText(_translate("DAQWindow", "0.0 mm"))
-        self.ROB_lbl_zPos.setText(_translate("DAQWindow", "Z position\n"
-"(relative)"))
-        self.ROB_lbl_xOri.setText(_translate("DAQWindow", "X orientation\n"
-"(relative)"))
+        self.ROB_lbl_zPos.setText(_translate("DAQWindow", "Z position\n" "(relative)"))
+        self.ROB_lbl_xOri.setText(
+            _translate("DAQWindow", "X orientation\n" "(relative)")
+        )
         self.ROB_disp_zPos.setText(_translate("DAQWindow", "0.0 mm"))
         self.ROB_disp_yOri.setText(_translate("DAQWindow", "0.0 mm"))
         self.ROB_disp_zOri.setText(_translate("DAQWindow", "0.0 mm"))
-        self.ROB_lbl_yOri.setText(_translate("DAQWindow", "Y orientation\n"
-"(relative)"))
-        self.ROB_lbl_zOri.setText(_translate("DAQWindow", "Z orientation\n"
-"(relative)"))
-        self.ROB_lbl_extPos.setText(_translate("DAQWindow", "EXT position\n"
-"(relative)"))
+        self.ROB_lbl_yOri.setText(
+            _translate("DAQWindow", "Y orientation\n" "(relative)")
+        )
+        self.ROB_lbl_zOri.setText(
+            _translate("DAQWindow", "Z orientation\n" "(relative)")
+        )
+        self.ROB_lbl_extPos.setText(
+            _translate("DAQWindow", "EXT position\n" "(relative)")
+        )
         self.ROB_disp_extPos.setText(_translate("DAQWindow", "0.0 mm"))
         self.ROB_disp_tcpSpeed.setText(_translate("DAQWindow", "0.0 mm/s"))
         self.ROB_lbl_id.setText(_translate("DAQWindow", "robotor ID"))
@@ -881,12 +1085,13 @@ class Ui_DAQWindow(object):
         self.ROB_disp_id.setText(_translate("DAQWindow", "0"))
         self.MORT_0_frameLabel.setText(_translate("DAQWindow", "MORTAR"))
         self.MORT_disp_pores.setText(_translate("DAQWindow", "n.m."))
-        self.MORT_lbl_pores.setText(_translate("DAQWindow", "porosity\n"
-"analysis"))
-        self.MORT_lbl_distFront.setText(_translate("DAQWindow", "distance\n"
-"(nozzle front)"))
+        self.MORT_lbl_pores.setText(_translate("DAQWindow", "porosity\n" "analysis"))
+        self.MORT_lbl_distFront.setText(
+            _translate("DAQWindow", "distance\n" "(nozzle front)")
+        )
         self.MORT_disp_distFront.setText(_translate("DAQWindow", "n.m."))
         self.MORT_disp_distEnd.setText(_translate("DAQWindow", "n.m."))
-        self.MORT_lbl_distEnd.setText(_translate("DAQWindow", "distance\n"
-"(nozzle end)"))
+        self.MORT_lbl_distEnd.setText(
+            _translate("DAQWindow", "distance\n" "(nozzle end)")
+        )
         self.ML_0_frameLabel.setText(_translate("DAQWindow", "ML STATE"))

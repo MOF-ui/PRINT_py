@@ -8,133 +8,153 @@ import unittest
 import pathlib as pl
 
 # appending the parent directory path
-current_dir = os.path.dirname( os.path.realpath(__file__) )
-parent_dir  = os.path.dirname( current_dir )
-sys.path.append( parent_dir )
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
-import libs.data_utilities    as UTIL
-import libs.threads           as T
-    
-
+import libs.data_utilities as du
+import libs.threads as T
 
 
 ########################################## TEST CLASS ##############################################
 
-class Thread_test( unittest.TestCase ):
-    
-    def test_loadFileWorker( self ):
-        global LFW
-        global gcodeTestpath
-        global rapidTestpath
 
-        self.maxDiff        = 3000    
-        UTIL.SC_currCommId  = 1
-        UTIL.DC_currZero    = UTIL.Coordinate()
-        UTIL.SC_queue.clear()
+class Thread_test(unittest.TestCase):
+
+    def test_loadFileWorker(self):
+        global LFWorker
+        global gcode_test_path
+        global rapid_test_path
+
+        self.maxDiff = 3000
+        du.SC_curr_comm_id = 1
+        du.DCCurrZero = du.Coordinate()
+        du.SCQueue.clear()
 
         # GCode
-        T.LFW_filePath  = gcodeTestpath
-        T.LFW_lineID    = 0
-        LFW.start()
+        T.lfw_file_path = gcode_test_path
+        T.lfw_line_id = 0
+        LFWorker.start(testrun=True)
 
-        self.assertEqual( UTIL.SC_queue.display()
-                         ,[ UTIL.QEntry( id=1, Coor1= UTIL.Coordinate( y= 2000, z= 0 ) ).printShort()
-                           ,UTIL.QEntry( id=2, Coor1= UTIL.Coordinate( y= 2000, z= 1000 ) ).printShort() ] )
+        self.assertEqual(
+            du.SCQueue.display(),
+            [
+                du.QEntry(id=1, Coor1=du.Coordinate(y=2000, z=0)).print_short(),
+                du.QEntry(id=2, Coor1=du.Coordinate(y=2000, z=1000)).print_short(),
+            ],
+        )
 
         # GCode at ID
-        T.LFW_filePath  = gcodeTestpath
-        T.LFW_lineID    = 2
-        LFW.start()
-        
-        self.assertEqual( UTIL.SC_queue.display()
-                         ,[ UTIL.QEntry( id=1, Coor1= UTIL.Coordinate( y= 2000, z= 0 ) ).printShort()
-                           ,UTIL.QEntry( id=2, Coor1= UTIL.Coordinate( y= 2000, z= 0 ) ).printShort()
-                           ,UTIL.QEntry( id=3, Coor1= UTIL.Coordinate( y= 2000, z= 1000 ) ).printShort()
-                           ,UTIL.QEntry( id=4, Coor1= UTIL.Coordinate( y= 2000, z= 1000 ) ).printShort() ] )
+        T.lfw_file_path = gcode_test_path
+        T.lfw_line_id = 2
+        LFWorker.start(testrun=True)
+
+        self.assertEqual(
+            du.SCQueue.display(),
+            [
+                du.QEntry(id=1, Coor1=du.Coordinate(y=2000, z=0)).print_short(),
+                du.QEntry(id=2, Coor1=du.Coordinate(y=2000, z=0)).print_short(),
+                du.QEntry(id=3, Coor1=du.Coordinate(y=2000, z=1000)).print_short(),
+                du.QEntry(id=4, Coor1=du.Coordinate(y=2000, z=1000)).print_short(),
+            ],
+        )
 
         # RAPID
-        UTIL.SC_queue.clear()
-        UTIL.SC_currCommId = 1
+        du.SCQueue.clear()
+        du.SC_curr_comm_id = 1
 
-        T.LFW_filePath  = rapidTestpath
-        T.LFW_lineID    = 0
-        LFW.start()
-        
-        self.assertEqual( UTIL.SC_queue.display()
-                         ,[ UTIL.QEntry( id=1, Coor1= UTIL.Coordinate( y= 2000, z= 0, ext= 11 ) ).printShort()
-                           ,UTIL.QEntry( id=2, Coor1= UTIL.Coordinate( y= 2000, z= 1000, ext= 11 ) ).printShort() ] )
+        T.lfw_file_path = rapid_test_path
+        T.lfw_line_id = 0
+        LFWorker.start(testrun=True)
+
+        self.assertEqual(
+            du.SCQueue.display(),
+            [
+                du.QEntry(id=1, Coor1=du.Coordinate(y=2000, z=0, ext=11)).print_short(),
+                du.QEntry(
+                    id=2, Coor1=du.Coordinate(y=2000, z=1000, ext=11)
+                ).print_short(),
+            ],
+        )
 
         # RAPID at ID
-        T.LFW_filePath  = rapidTestpath
-        T.LFW_lineID    = 2
-        LFW.start()
-        
-        self.assertEqual( UTIL.SC_queue.display()
-                         ,[ UTIL.QEntry( id=1, Coor1= UTIL.Coordinate( y= 2000, z= 0, ext= 11 ) ).printShort()
-                           ,UTIL.QEntry( id=2, Coor1= UTIL.Coordinate( y= 2000, z= 0, ext= 11 ) ).printShort()
-                           ,UTIL.QEntry( id=3, Coor1= UTIL.Coordinate( y= 2000, z= 1000, ext= 11 ) ).printShort()
-                           ,UTIL.QEntry( id=4, Coor1= UTIL.Coordinate( y= 2000, z= 1000, ext= 11 ) ).printShort() ] )
-        
-        UTIL.SC_queue.clear()
-        UTIL.SC_currCommId = 1
-    
+        T.lfw_file_path = rapid_test_path
+        T.lfw_line_id = 2
+        LFWorker.start(testrun=True)
+
+        self.assertEqual(
+            du.SCQueue.display(),
+            [
+                du.QEntry(id=1, Coor1=du.Coordinate(y=2000, z=0, ext=11)).print_short(),
+                du.QEntry(id=2, Coor1=du.Coordinate(y=2000, z=0, ext=11)).print_short(),
+                du.QEntry(
+                    id=3, Coor1=du.Coordinate(y=2000, z=1000, ext=11)
+                ).print_short(),
+                du.QEntry(
+                    id=4, Coor1=du.Coordinate(y=2000, z=1000, ext=11)
+                ).print_short(),
+            ],
+        )
+
+        du.SCQueue.clear()
+        du.SC_curr_comm_id = 1
 
 
-    def test_RoboCommWorker( self ):
-        global RCW
+    def test_RoboCommWorker(self):
+        global RCWorker
 
         # send
-        UTIL.SC_queue.clear()
-        UTIL.ROB_commQueue.clear()
-        UTIL.ROB_sendList.clear()
-        
-        UTIL.SC_queue.add( UTIL.QEntry( id= 1, Coor1= UTIL.Coordinate( y= 1.1 ) ) )
+        du.SCQueue.clear()
+        du.ROBCommQueue.clear()
+        du.ROB_send_list.clear()
 
-        UTIL.ROB_sendList.append( ( UTIL.QEntry(id=3001, mt= 'A'), True ) )
-        RCW.send( testrun= True )
-        self.assertEqual( UTIL.ROB_commQueue.display(), [ UTIL.QEntry(id= 1, mt='A').printShort() ] )
-        self.assertEqual( UTIL.SC_queue.display(), [ UTIL.QEntry( id= 2, Coor1= UTIL.Coordinate( y= 1.1 ) ).printShort() ] )
-        UTIL.ROB_commQueue.clear()
-        UTIL.SC_queue.clear()
+        du.SCQueue.add(du.QEntry(id=1, Coor1=du.Coordinate(y=1.1)))
+
+        du.ROB_send_list.append((du.QEntry(id=3001, mt="A"), True))
+        RCWorker.send(testrun=True)
+        self.assertEqual(
+            du.ROBCommQueue.display(), [du.QEntry(id=1, mt="A").print_short()]
+        )
+        self.assertEqual(
+            du.SCQueue.display(),
+            [du.QEntry(id=2, Coor1=du.Coordinate(y=1.1)).print_short()],
+        )
+        du.ROBCommQueue.clear()
+        du.SCQueue.clear()
 
         # checkRobCommZeroDist
-        UTIL.ROB_commQueue.clear()
-        self.assertIsNone( RCW.checkRobCommZeroDist() )
+        du.ROBCommQueue.clear()
+        self.assertIsNone(RCWorker.check_zero_dist())
 
-        UTIL.ROB_commQueue.add( UTIL.QEntry( Coor1= UTIL.Coordinate( x=1, y= 1, z= 1, ext= 1 ) ) )
-        UTIL.ROB_telem.Coor = UTIL.Coordinate()
-        self.assertEqual( RCW.checkRobCommZeroDist(), 2 )
-
-
-        
-
-
+        du.ROBCommQueue.add(du.QEntry(Coor1=du.Coordinate(x=1, y=1, z=1, ext=1)))
+        du.ROBTelem.Coor = du.Coordinate()
+        self.assertEqual(RCWorker.check_zero_dist(), 2)
 
 
 ########################################## MAIN ##############################################
 
 # create 0_BT_testfiles
-desk    = os.environ[ 'USERPROFILE' ]
-dirpath = desk / pl.Path( 'Desktop/PRINT_py_testrun' )
-dirpath.mkdir( parents=True, exist_ok=True )
+desk = os.environ["USERPROFILE"]
+dir_path = desk / pl.Path("Desktop/PRINT_py_testrun")
+dir_path.mkdir(parents=True, exist_ok=True)
 
-gcodeTestpath = dirpath / pl.Path( '0_UT_testfile.gcode' )
-rapidTestpath = dirpath / pl.Path( '0_UT_testfile.mod' )
-gcodeText     = ';comment\nG1 Y2000\nG1 Z1000'
-rapidText     = '!comment\nMoveJ pHome,v200,fine,tool0;\n\n\
-                    ! start printjob relative to pStart\n\
-                    MoveL Offs(pHome,0.0,2000.0,0.0),[200,50,50,50],z10,tool0 EXT:11;\n\
-                    MoveL Offs(pHome,0.0,2000.0,1000.0),[200,50,50,50],z10,tool0 EXT:11;'
+gcode_test_path = dir_path / pl.Path("0_UT_testfile.gcode")
+rapid_test_path = dir_path / pl.Path("0_UT_testfile.mod")
+gcode_txt = ";comment\nG1 Y2000\nG1 Z1000"
+rapid_txt = "!comment\nMoveJ pHome,v200,fine,tool0;\n\n\
+             ! start printjob relative to pStart\n\
+             MoveL Offs(pHome,0.0,2000.0,0.0),[200,50,50,50],z10,tool0 EXT:11;\n\
+             MoveL Offs(pHome,0.0,2000.0,1000.0),[200,50,50,50],z10,tool0 EXT:11;"
 
-gcodeTestfile = open( gcodeTestpath, 'w' )
-rapidTestfile = open( rapidTestpath, 'w' )
-gcodeTestfile.write( gcodeText )
-rapidTestfile.write( rapidText )
-gcodeTestfile.close()
-rapidTestfile.close()
+gcode_test_file = open(gcode_test_path, "w")
+rapid_test_file = open(rapid_test_path, "w")
+gcode_test_file.write(gcode_txt)
+rapid_test_file.write(rapid_txt)
+gcode_test_file.close()
+rapid_test_file.close()
 
-LFW = T.LoadFileWorker()
-RCW = T.RoboCommWorker()
+LFWorker = T.LoadFileWorker()
+RCWorker = T.RoboCommWorker()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

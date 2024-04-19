@@ -25,7 +25,7 @@ from libs.win_mainframe   import Mainframe
 
 
 # import my own libs
-import libs.data_utilities    as UTIL
+import libs.data_utilities    as du
 
 
 
@@ -55,19 +55,19 @@ mutex = QMutex()
 # only do the following if run as main program
 if __name__ == '__main__':
 
-    from libs.win_dialogs import strdDialog
-    import libs.data_utilities as UTIL
+    from libs.win_dialogs import strd_dialog
+    import libs.data_utilities as du
 
     # import PyQT UIs (converted from .ui to .py)
     from ui.UI_mainframe_v6 import Ui_MainWindow
 
 
 
-    logpath = UTIL.createLogfile()
+    logpath = du.create_logfile()
 
     # overwrite ROB_tcpip for testing, delete later
-    UTIL.ROB_tcp.ip   = 'localhost'
-    UTIL.ROB_tcp.port = 10001
+    du.ROBTcp.ip   = 'localhost'
+    du.ROBTcp.port = 10001
 
     # start the UI and assign to app
     app = 0                             # leave that here so app doesnt include the remnant of a previous QApplication instance
