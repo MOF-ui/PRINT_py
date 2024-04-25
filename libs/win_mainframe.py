@@ -1162,15 +1162,15 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 "border-radius: 15px; background-color: #00aaff;"
             )
 
-        self.TRANS_disp_xStart.setText(str(Start.x - Zero.x))
-        self.TRANS_disp_yStart.setText(str(Start.y - Zero.y))
-        self.TRANS_disp_zStart.setText(str(Start.z - Zero.z))
-        self.TRANS_disp_extStart.setText(str(Start.ext - Zero.ext))
+        self.TRANS_disp_xStart.setText(str(round(Start.x - Zero.x, 2)))
+        self.TRANS_disp_yStart.setText(str(round(Start.y - Zero.y, 2)))
+        self.TRANS_disp_zStart.setText(str(round(Start.z - Zero.z, 2)))
+        self.TRANS_disp_extStart.setText(str(round(Start.ext - Zero.ext, 2)))
 
-        self.TRANS_disp_xEnd.setText(str(End.x - Zero.x))
-        self.TRANS_disp_yEnd.setText(str(End.y - Zero.y))
-        self.TRANS_disp_zEnd.setText(str(End.z - Zero.z))
-        self.TRANS_disp_extEnd.setText(str(End.ext - Zero.ext))
+        self.TRANS_disp_xEnd.setText(str(round(End.x - Zero.x, 2)))
+        self.TRANS_disp_yEnd.setText(str(round(End.y - Zero.y, 2)))
+        self.TRANS_disp_zEnd.setText(str(round(End.z - Zero.z, 2)))
+        self.TRANS_disp_extEnd.setText(str(round(End.ext - Zero.ext, 2)))
 
 
     def label_update_on_send(self, entry):

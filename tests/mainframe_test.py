@@ -595,6 +595,9 @@ class Mainframe_test(unittest.TestCase):
 
     def test_clr_queue(self):
         global test_frame
+        self.maxDiff = 2000
+
+        du.SC_ext_fllw_bhvr = (500, 200)
 
         for i in range(1, 7, 1):
             test_frame.add_gcode_sgl(
@@ -624,6 +627,8 @@ class Mainframe_test(unittest.TestCase):
 
         test_frame.clr_queue(partial=False)
         self.assertEqual(du.SCQueue.display(), ["Queue is empty!"])
+
+        du.SC_ext_fllw_bhvr = du.DEF_SC_EXT_FLLW_BHVR
 
 
     def test_home_command(self):
@@ -944,14 +949,14 @@ class Mainframe_test(unittest.TestCase):
         self.assertEqual(test_frame.SID_disp_progID.text(), "15")
         self.assertEqual(test_frame.SID_disp_robID.text(), "10")
 
-        self.assertEqual(test_frame.TRANS_disp_xStart.text(), "1.0")
-        self.assertEqual(test_frame.TRANS_disp_yStart.text(), "2.0")
-        self.assertEqual(test_frame.TRANS_disp_zStart.text(), "3.0")
-        self.assertEqual(test_frame.TRANS_disp_extStart.text(), "8.8")
-        self.assertEqual(test_frame.TRANS_disp_xEnd.text(), "1.0")
-        self.assertEqual(test_frame.TRANS_disp_yEnd.text(), "2.0")
-        self.assertEqual(test_frame.TRANS_disp_zEnd.text(), "3.0")
-        self.assertEqual(test_frame.TRANS_disp_extEnd.text(), "8.8")
+        self.assertEqual(test_frame.TRANS_disp_xStart.text(), "0.9")
+        self.assertEqual(test_frame.TRANS_disp_yStart.text(), "1.9")
+        self.assertEqual(test_frame.TRANS_disp_zStart.text(), "2.9")
+        self.assertEqual(test_frame.TRANS_disp_extStart.text(), "8.7")
+        self.assertEqual(test_frame.TRANS_disp_xEnd.text(), "0.9")
+        self.assertEqual(test_frame.TRANS_disp_yEnd.text(), "1.9")
+        self.assertEqual(test_frame.TRANS_disp_zEnd.text(), "2.9")
+        self.assertEqual(test_frame.TRANS_disp_extEnd.text(), "8.7")
 
         du.DCCurrZero = du.Coordinate()
         du.ROBTelem = du.RoboTelemetry()
