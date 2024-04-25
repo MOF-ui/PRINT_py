@@ -54,6 +54,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     _testrun = False  # switch for mainframe_test.py
     _first_pos = True  # one-time switch to get robot home position
 
+    _last_comm_id = 0
+    _LastP1Telem = None
+    _LastP2Telem = None
+
     _RoboCommThread = None
     _RoboCommWorker = None
     _PumpCommThread = None
@@ -591,6 +595,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 self.log_entry('SAFE', f"robot disconnected. Last positions were:")
                 self.log_entry('SAFE', f"zero: {du.DCCurrZero}")
                 self.log_entry('SAFE', f"curr: {du.ROBTelem.Coor}")
+                self.log_entry('SAFE', f"rel: {du.ROBTelem.Coor - du.DCCurrZero}")
                 self.log_entry('SAFE', f"last active ID was: {du.ROBTelem.id}")
                 self.log_entry('SAFE', f"-----------------------------------------------")
 
@@ -741,9 +746,17 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.set_zero([1, 2, 3, 4, 5, 6, 8])
             self._first_pos = False
 
-        self.log_entry(
-            "RTel", f"ID {telem.id},   {telem.Coor}   ToolSpeed: {telem.t_speed}"
-        )
+        if telem.id != self._last_comm_id:
+            log_txt = f"ID {telem.id},   {telem.Coor}   ToolSpeed: {telem.t_speed}"
+            
+            if du.PMP1Serial.connected:
+                log_txt += f"   PMP1: {self._LastP1Telem}"
+            if du.PMP2Serial.connected:
+                log_txt += f"   PMP1: {self._LastP2Telem}"
+
+            self.log_entry("RTel", log_txt)
+            self._last_comm_id = telem.id
+
         self.label_update_on_receive(raw_data_string)
         self.Daq.data_update()
 
@@ -814,10 +827,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 self.PUMP_disp_ampsP1.setText(f"{du.STTDataBlock.Pump1.amps} A")
                 self.PUMP_disp_torqP1.setText(f"{du.STTDataBlock.Pump1.torq} Nm")
 
-                self.log_entry(
-                    "PTel",
-                    f"PUMP1, freq: {telem.freq}, volt: {telem.volt}, amps: {telem.amps}, torq: {telem.torq}",
-                )
+                self._LastP1Telem = telem
 
             case "P2":
                 # display & log
@@ -826,10 +836,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 self.PUMP_disp_ampsP2.setText(f"{du.STTDataBlock.Pump2.amps} A")
                 self.PUMP_disp_torqP2.setText(f"{du.STTDataBlock.Pump2.torq} Nm")
 
-                self.log_entry(
-                    "PTel",
-                    f"PUMP2, freq: {telem.freq}, volt: {telem.volt}, amps: {telem.amps}, torq: {telem.torq}",
-                )
+                self._LastP2Telem = telem
 
             case _:
                 self.log_entry(
@@ -986,6 +993,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 self._MixRecvWd.deleteLater()
             case _:
                 pass
+            
+        self.log_entry("WDOG", f"Watchdog {dog} deleted.")
 
 
     #####################################################################################################
@@ -1143,6 +1152,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SID_disp_robID.setText(str(rob_id))
 
         # CURRENT TRANSITION
+        # more practical to just display relative coordinates
         if Start.rx != End.rx or Start.ry != End.ry or Start.rz != End.rz:
             self.TRANS_indi_newOrient.setStyleSheet(
                 "border-radius: 15px; background-color: #4c4a48;"
@@ -1152,14 +1162,15 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 "border-radius: 15px; background-color: #00aaff;"
             )
 
-        self.TRANS_disp_xStart.setText(str(Start.x))
-        self.TRANS_disp_yStart.setText(str(Start.y))
-        self.TRANS_disp_zStart.setText(str(Start.z))
-        self.TRANS_disp_extStart.setText(str(Start.ext))
-        self.TRANS_disp_xEnd.setText(str(End.x))
-        self.TRANS_disp_yEnd.setText(str(End.y))
-        self.TRANS_disp_zEnd.setText(str(End.z))
-        self.TRANS_disp_extEnd.setText(str(End.ext))
+        self.TRANS_disp_xStart.setText(str(Start.x - Zero.x))
+        self.TRANS_disp_yStart.setText(str(Start.y - Zero.y))
+        self.TRANS_disp_zStart.setText(str(Start.z - Zero.z))
+        self.TRANS_disp_extStart.setText(str(Start.ext - Zero.ext))
+
+        self.TRANS_disp_xEnd.setText(str(End.x - Zero.x))
+        self.TRANS_disp_yEnd.setText(str(End.y - Zero.y))
+        self.TRANS_disp_zEnd.setText(str(End.z - Zero.z))
+        self.TRANS_disp_extEnd.setText(str(End.ext - Zero.ext))
 
 
     def label_update_on_send(self, entry):

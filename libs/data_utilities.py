@@ -2056,7 +2056,7 @@ DEF_ROB_COMM_FR = 10
 
 DEF_SC_VOL_PER_M = 0.4  # calculated for 1m of 4cm wide and 1cm high filament
 DEF_SC_MAX_LINES = 400
-DEF_SC_EXT_FLLW_BHVR = (500, 200)
+DEF_SC_EXT_FLLW_BHVR = (5, 2)
 
 DEF_TERM_MAX_LINES = 300
 
