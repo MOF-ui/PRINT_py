@@ -1,48 +1,157 @@
-/* Ethernet Basic Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
+/* 
+following examples from
+    espressif: http_server, ethernet_example
+    OLIMEX: ESP32_PoE_Ethernet_IDFv5.3
+    David Antliff: ds18b20_example
 */
+
 #include <stdio.h>
 #include <string.h>
+#include <nvs_flash.h>
+#include <sys/param.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
 #include "esp_netif.h"
 #include "esp_eth.h"
 #include "esp_event.h"
 #include "esp_log.h"
-#include <ethernet_init.h>
+#include "esp_http_server.h"
+
+#include "driver\gpio.h"
+
 #include "sdkconfig.h"
 
-static const char *TAG = "eth_example";
+static const char *g_TAG = "DAQ_S";
+static bool g_connected = false;
 
-/** Event handler for Ethernet events */
-static void eth_event_handler(void *arg, esp_event_base_t event_base,
-                              int32_t event_id, void *event_data)
+
+/* -------------------------------- WEBSERVER ----------------------------- */
+
+// http GET handler as data request
+static esp_err_t data_request(httpd_req_t *req)
 {
-    uint8_t mac_addr[6] = {0};
-    /* we can get the ethernet driver handle from event data */
+
+    httpd_resp_set_hdr(req, "Allow", "GET");
+
+    // answer with data if available
+    const char* data_str = "not data measured";
+    httpd_resp_send(req, data_str, HTTPD_RESP_USE_STRLEN);
+
+    return ESP_OK;
+}
+
+static const httpd_uri_t data_req = {
+    .uri       = "/data",
+    .method    = HTTP_GET,
+    .handler   = data_request,
+    .user_ctx  = NULL,
+};
+
+// 404 handler
+esp_err_t http_404_handler(httpd_req_t *req, httpd_err_code_t err)
+{
+    httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "no such resource");
+    return ESP_FAIL;
+}
+
+// 405 handler
+esp_err_t http_405_handler(httpd_req_t *req, httpd_err_code_t err)
+{
+    httpd_resp_set_hdr(req, "Allow", "GET");
+    httpd_resp_send_err(req, HTTPD_405_METHOD_NOT_ALLOWED, "only GET methods");
+    return ESP_FAIL;
+}
+
+// start server
+static httpd_handle_t start_daqs(void)
+{
+    httpd_handle_t server = NULL;
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+
+    // start the server on 'quote of the day' port for funsies
+    config.server_port = 17;
+
+    // Start the httpd server
+    ESP_LOGI(g_TAG, "Starting server on port: '%d'", config.server_port);
+    if (httpd_start(&server, &config) == ESP_OK) {
+        
+        // set URIs
+        httpd_register_uri_handler(server, &data_req);
+
+        // set error handlers
+        httpd_register_err_handler(server, HTTPD_404_NOT_FOUND, http_404_handler);
+
+        return server;
+    }
+
+    ESP_LOGI(g_TAG, "Error starting server!");
+    return NULL;
+}
+
+// stop server
+static esp_err_t stop_daqs(httpd_handle_t server)
+{
+    return httpd_stop(server);
+}
+
+
+/* ----------------------------- ETHERNET EVENTS -------------------------- */
+
+static void eth_event_handler(
+        void *arg,
+        esp_event_base_t event_base,
+        int32_t event_id,
+        void *event_data
+    )
+{
     esp_eth_handle_t eth_handle = *(esp_eth_handle_t *)event_data;
+    httpd_handle_t* server = (httpd_handle_t*) arg;
 
     switch (event_id) {
+
     case ETHERNET_EVENT_CONNECTED:
+        g_connected = true;
+
+        uint8_t mac_addr[6] = {0};
         esp_eth_ioctl(eth_handle, ETH_CMD_G_MAC_ADDR, mac_addr);
-        ESP_LOGI(TAG, "Ethernet Link Up");
-        ESP_LOGI(TAG, "Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x",
+
+        ESP_LOGI(g_TAG, "Ethernet Link Up");
+        ESP_LOGI(g_TAG, "Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x",
                  mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+
+        if (*server == NULL) {
+            ESP_LOGI(g_TAG, "Starting webserver");
+            *server = start_daqs();
+        }
+
         break;
+
     case ETHERNET_EVENT_DISCONNECTED:
-        ESP_LOGI(TAG, "Ethernet Link Down");
+        ESP_LOGI(g_TAG, "Ethernet Link Down..");
+
+        if (*server) {
+            ESP_LOGI(g_TAG, "Stopping webserver");
+            if (stop_daqs(*server) == ESP_OK) {
+                *server = NULL;
+            } else {
+                ESP_LOGE(g_TAG, "Failed to stop http server");
+            }
+        }
+
         break;
+
     case ETHERNET_EVENT_START:
-        ESP_LOGI(TAG, "Ethernet Started");
+        ESP_LOGI(g_TAG, "Ethernet Started");
+
         break;
+
     case ETHERNET_EVENT_STOP:
-        ESP_LOGI(TAG, "Ethernet Stopped");
+        ESP_LOGI(g_TAG, "Ethernet Stopped");
+
         break;
+
     default:
         break;
     }
@@ -55,65 +164,92 @@ static void got_ip_event_handler(void *arg, esp_event_base_t event_base,
     ip_event_got_ip_t *event = (ip_event_got_ip_t *) event_data;
     const esp_netif_ip_info_t *ip_info = &event->ip_info;
 
-    ESP_LOGI(TAG, "Ethernet Got IP Address");
-    ESP_LOGI(TAG, "~~~~~~~~~~~");
-    ESP_LOGI(TAG, "ETHIP:" IPSTR, IP2STR(&ip_info->ip));
-    ESP_LOGI(TAG, "ETHMASK:" IPSTR, IP2STR(&ip_info->netmask));
-    ESP_LOGI(TAG, "ETHGW:" IPSTR, IP2STR(&ip_info->gw));
-    ESP_LOGI(TAG, "~~~~~~~~~~~");
+    ESP_LOGI(g_TAG, "Ethernet Got IP Address");
+    ESP_LOGI(g_TAG, "~~~~~~~~~~~");
+    ESP_LOGI(g_TAG, "ETHIP:" IPSTR, IP2STR(&ip_info->ip));
+    ESP_LOGI(g_TAG, "ETHMASK:" IPSTR, IP2STR(&ip_info->netmask));
+    ESP_LOGI(g_TAG, "ETHGW:" IPSTR, IP2STR(&ip_info->gw));
+    ESP_LOGI(g_TAG, "~~~~~~~~~~~");
 }
+
+
+/* ---------------------------------- MAIN ------------------------------- */
 
 void app_main(void)
 {
-    // Initialize Ethernet driver
-    uint8_t eth_port_cnt = 0;
-    esp_eth_handle_t *eth_handles;
-    ESP_ERROR_CHECK(example_eth_init(&eth_handles, &eth_port_cnt));
+    static httpd_handle_t daqs = NULL;
+    ESP_ERROR_CHECK(nvs_flash_init());
+    ESP_LOGI(g_TAG, "                     ");
+    ESP_LOGI(g_TAG, "   DAQS STARTING UP  ");
+    ESP_LOGI(g_TAG, "                     ");
 
-    // Initialize TCP/IP network interface aka the esp-netif (should be called only once in application)
+    // init MAC
+    ESP_LOGI(g_TAG, "init mac..");
+    eth_mac_config_t mac_cfg = ETH_MAC_DEFAULT_CONFIG();
+    eth_esp32_emac_config_t emac_cfg = ETH_ESP32_EMAC_DEFAULT_CONFIG();
+    emac_cfg.smi_mdc_gpio_num = 23;
+    emac_cfg.smi_mdio_gpio_num = 18;
+    // emac_cfg.clock_config.rmii.clock_gpio = 17;
+    esp_eth_mac_t *mac = esp_eth_mac_new_esp32(&emac_cfg, &mac_cfg);
+
+    // turn on PHY on designated pin following espressif/esp-idf issue #12557 (github)
+    ESP_LOGI(g_TAG, "turn on phy via pin..");
+    const gpio_num_t phy_power_pin = 12;
+    gpio_config_t phy_power_conf = {0};
+    phy_power_conf.mode = GPIO_MODE_OUTPUT;
+    phy_power_conf.pin_bit_mask = (1ULL << phy_power_pin);
+    ESP_ERROR_CHECK(gpio_config(&phy_power_conf));
+    ESP_ERROR_CHECK(gpio_set_level(phy_power_pin, 1));
+
+    // init PHY
+    ESP_LOGI(g_TAG, "init phy..");
+    eth_phy_config_t phy_cfg = ETH_PHY_DEFAULT_CONFIG();
+    phy_cfg.reset_gpio_num = -1;
+    phy_cfg.phy_addr = 0;
+    esp_eth_phy_t *phy = esp_eth_phy_new_lan87xx(&phy_cfg);
+
+    // create eth handle
+    ESP_LOGI(g_TAG, "install ethernet..");
+    esp_eth_handle_t eth_handle = NULL;
+    esp_eth_config_t eth_cfg = ETH_DEFAULT_CONFIG(mac, phy);
+    esp_eth_driver_install(&eth_cfg, &eth_handle);
+    ESP_LOGI(g_TAG, "starting network interface..");
+
+    // setup network interface
     ESP_ERROR_CHECK(esp_netif_init());
-    // Create default event loop that running in background
+    esp_netif_config_t netif_cfg = ESP_NETIF_DEFAULT_ETH();
+    esp_netif_t *eth_netif = esp_netif_new(&netif_cfg);
+
+    // start event handling and glue handle to netif
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+    ESP_ERROR_CHECK(
+        esp_netif_attach(eth_netif,esp_eth_new_netif_glue(eth_handle))
+    );
+    ESP_ERROR_CHECK(
+        esp_event_handler_register(
+            ETH_EVENT,
+            ESP_EVENT_ANY_ID,
+            &eth_event_handler,
+            &daqs)
+    );
+    ESP_ERROR_CHECK(
+        esp_event_handler_register(
+            IP_EVENT,
+            IP_EVENT_ETH_GOT_IP,
+            &got_ip_event_handler,
+            &daqs)
+    );
 
-    // Create instance(s) of esp-netif for Ethernet(s)
-    if (eth_port_cnt == 1) {
-        // Use ESP_NETIF_DEFAULT_ETH when just one Ethernet interface is used and you don't need to modify
-        // default esp-netif configuration parameters.
-        esp_netif_config_t cfg = ESP_NETIF_DEFAULT_ETH();
-        esp_netif_t *eth_netif = esp_netif_new(&cfg);
-        // Attach Ethernet driver to TCP/IP stack
-        ESP_ERROR_CHECK(esp_netif_attach(eth_netif, esp_eth_new_netif_glue(eth_handles[0])));
-    } else {
-        // Use ESP_NETIF_INHERENT_DEFAULT_ETH when multiple Ethernet interfaces are used and so you need to modify
-        // esp-netif configuration parameters for each interface (name, priority, etc.).
-        esp_netif_inherent_config_t esp_netif_config = ESP_NETIF_INHERENT_DEFAULT_ETH();
-        esp_netif_config_t cfg_spi = {
-            .base = &esp_netif_config,
-            .stack = ESP_NETIF_NETSTACK_DEFAULT_ETH
-        };
-        char if_key_str[10];
-        char if_desc_str[10];
-        char num_str[3];
-        for (int i = 0; i < eth_port_cnt; i++) {
-            itoa(i, num_str, 10);
-            strcat(strcpy(if_key_str, "ETH_"), num_str);
-            strcat(strcpy(if_desc_str, "eth"), num_str);
-            esp_netif_config.if_key = if_key_str;
-            esp_netif_config.if_desc = if_desc_str;
-            esp_netif_config.route_prio -= i*5;
-            esp_netif_t *eth_netif = esp_netif_new(&cfg_spi);
-
-            // Attach Ethernet driver to TCP/IP stack
-            ESP_ERROR_CHECK(esp_netif_attach(eth_netif, esp_eth_new_netif_glue(eth_handles[i])));
-        }
+    ESP_LOGI(g_TAG, "waiting for network..");
+    while (!g_connected) {
+        TickType_t netw_wait = 3000 / portTICK_PERIOD_MS;
+        vTaskDelay(netw_wait);
     }
 
-    // Register user defined event handers
-    ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &eth_event_handler, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_ETH_GOT_IP, &got_ip_event_handler, NULL));
+    if (!daqs) daqs = start_daqs();
 
-    // Start Ethernet driver state machine
-    for (int i = 0; i < eth_port_cnt; i++) {
-        ESP_ERROR_CHECK(esp_eth_start(eth_handles[i]));
+    while (daqs) {
+        TickType_t loop_delay = 100 / portTICK_PERIOD_MS; 
+        vTaskDelay(loop_delay);
     }
 }
