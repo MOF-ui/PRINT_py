@@ -13,6 +13,7 @@ following examples from
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 
 #include "esp_netif.h"
 #include "esp_eth.h"
@@ -27,28 +28,38 @@ following examples from
 
 #include "sdkconfig.h"
 
-#define GPIO_DS18B20_0       (4)
-#define DS18B20_RESOLUTION   (DS18B20_RESOLUTION_12_BIT)
-#define SAMPLE_PERIOD        (1000)   // milliseconds
-#define BACKLOG_SIZE         (1000)
+#define GPIO_DS18B20_0      4
+#define DS18B20_RESOLUTION  DS18B20_RESOLUTION_12_BIT
+#define SAMPLE_PERIOD       10000   // milliseconds
+#define BACKLOG_SIZE        1000
+#define DAQB_STR_SIZE       20
+
+SemaphoreHandle_t xMutex = NULL;
 
 struct daq_block
 {
     float temp;
-    int t_error_count;
+    bool error;
+    unsigned int upt_s;
 };
 
 static const char *g_TAG = "DAQ_S";
 static bool g_connected = false;
+
 static struct daq_block g_measure_buff[BACKLOG_SIZE];
 static int g_backlog_idx = 0;
+static bool data_lost = false;
 static const struct daq_block g_EMPTY_DAQ_BLOCK = {0};
+
+static TickType_t ticks_last_data_req = 0;
+
 
 
 /* -------------------------------- OWB MAIN ----------------------------- */
 
 void owb_main()
 {
+    // initialize
     const char *OWB_TAG = "OWB_COMM";
     OneWireBus *owb;
     owb_rmt_driver_info rmt_driver_info;
@@ -62,7 +73,7 @@ void owb_main()
     bool found = false;
 
     owb_search_first(owb, &search_state, &found);
-    while(found) 
+    while (found) 
     {
         char rom_code_s[17];
         owb_string_from_rom_code(search_state.rom_code, rom_code_s, sizeof(rom_code_s));
@@ -98,55 +109,61 @@ void owb_main()
 
         // turn of parasitic power
         owb_use_parasitic_power(owb, false);
-
-        int errors_count = 0;
-        long int sample_count = 0;
-        TickType_t last_wake_time = xTaskGetTickCount();
-
+        
+        // start measurement loop
         while(1) 
         {
             float reading = 0;
             DS18B20_ERROR error = {0};
+            bool commError = false;
 
+            // read temp, wait for DS18B20
             ds18b20_convert_all(owb);
             ds18b20_wait_for_conversion(ds18b20_info);
-
             error = ds18b20_read_temp(ds18b20_info, &reading);
+            if (error != DS18B20_OK) commError = true;
 
-            if (error != DS18B20_OK) 
-            {
-                errors_count++;
-            } else {
-                sample_count++;
-            }
-            ESP_LOGI(OWB_TAG, "  %li: T [°C]: %.1f; err_count: %d", sample_count, reading, errors_count);
+            // get mutex
+            xSemaphoreTake( xMutex, portMAX_DELAY );
+
+            TickType_t uptimeTicks = xTaskGetTickCount() - ticks_last_data_req;
+            long unsigned uptime = (long unsigned)(uptimeTicks * portTICK_PERIOD_MS);
+            ESP_LOGI(OWB_TAG, "  %i: T [°C]: %.1f; err: %d; uptime [ms]: %lu", g_backlog_idx, reading, commError, uptime);
 
             // save to the backlog, first check needed to avoid index error
-            if(g_backlog_idx != 0) 
+            if (g_backlog_idx != 0) 
             {
-                if ((reading != g_measure_buff[g_backlog_idx - 1].temp)
-                        || (errors_count != g_measure_buff[g_backlog_idx - 1].t_error_count)) 
+                g_measure_buff[g_backlog_idx].temp = reading;
+                g_measure_buff[g_backlog_idx].error = commError;
+                g_measure_buff[g_backlog_idx].upt_s = (int)(uptime / 1000); // just communicate seconds
+
+                g_backlog_idx++;
+
+                // check if the backlog is full, if so throw of the oldest measurement
+                if (g_backlog_idx >= (BACKLOG_SIZE - 1)) 
                 {
-
-                    g_measure_buff[g_backlog_idx].temp = reading;
-                    g_measure_buff[g_backlog_idx].t_error_count = errors_count;
-
-                    g_backlog_idx++;
-
-                    // check if the backlog is full, if so throw of the oldest measurement
-                    if (g_backlog_idx >= (BACKLOG_SIZE -1)) 
+                    data_lost = true;
+                    for (int idx=1; idx < BACKLOG_SIZE; idx++) 
                     {
-                        for (int idx=1; idx < BACKLOG_SIZE; idx++) 
-                        {
-                            g_measure_buff[idx - 1] = g_measure_buff[idx];
-                        }
-                        g_backlog_idx--;
+                        g_measure_buff[idx - 1] = g_measure_buff[idx];
                     }
+                    g_backlog_idx = BACKLOG_SIZE - 2; // -1 for of-by-zero & -1 since we made 1 space
+                    ESP_LOGE(OWB_TAG, "Backlog full, oldest entry overwritten!");
                 }
+            } 
+            else // first measurement since last request, reset error_counter
+            {
+                g_measure_buff[g_backlog_idx].temp = reading;
+                g_measure_buff[g_backlog_idx].error = commError;
+                g_measure_buff[g_backlog_idx].upt_s = (int)(uptime / 1000);
+                g_backlog_idx++;
             }
 
+            // release mutex
+            xSemaphoreGive( xMutex );
+
             // wait
-            vTaskDelayUntil(&last_wake_time, SAMPLE_PERIOD / portTICK_PERIOD_MS);
+            vTaskDelay(SAMPLE_PERIOD / portTICK_PERIOD_MS);
         }
 
     } else {
@@ -163,8 +180,33 @@ void owb_main()
 
 /* --------------------------------- DAQ2STR ------------------------------ */
 
-static char * daq2str(struct daq_block *) {
+void daq2str(struct daq_block *daqb, char *sz_ret, int buff_len) {  
+    // sz_ret for string-zero (\0 terminated) return 
+    
+    int temp_len = snprintf(NULL, 0, "%.2f", daqb->temp);
+    char *temp = malloc(temp_len + 1); // +1 for string terminator
+    snprintf(temp, temp_len + 1, "%.2f", daqb->temp);
+    
+    int err_len = snprintf(NULL, 0, "%d", daqb->error);
+    char *err = malloc(err_len + 1);
+    snprintf(err, err_len + 1, "%d", daqb->error);
+    
+    int upt_len = snprintf(NULL, 0, "%u", daqb->upt_s);
+    char *upt = malloc(upt_len + 1);
+    snprintf(upt, upt_len + 1, "%u", daqb->upt_s);
+    
+    // build str
+    strlcpy(sz_ret, "T", buff_len);
+    strlcat(sz_ret, temp, buff_len);
+    strlcat(sz_ret, "/E", buff_len);
+    strlcat(sz_ret, err, buff_len);
+    strlcat(sz_ret, "/U", buff_len);
+    strlcat(sz_ret, upt, buff_len);
+    strlcat(sz_ret, ";", buff_len);
 
+    free(temp);
+    free(err);
+    free(upt);
 }
 
 
@@ -187,24 +229,46 @@ static esp_err_t data_request(httpd_req_t *req)
     // set answering header
     httpd_resp_set_hdr(req, "Allow", "GET");
 
+    // get mutex
+    xSemaphoreTake( xMutex, portMAX_DELAY );
+    
     // answer with data if available
-    const char *data_str[BACKLOG_SIZE * sizeof(struct daq_block)] = {0};
+    static char data_str[BACKLOG_SIZE * DAQB_STR_SIZE];
+    
     if(g_backlog_idx == 0) 
     {
-        strcpy(data_str, "no data available");
+        strlcpy(data_str, "no data available", sizeof(data_str));
     }
     else
     {
-        // if avaiable write everything to http str, reset data struct to 0
+    // if avaiable write everything to http str, reset data struct to 0
+
+        if (data_lost) {
+            strlcpy(data_str, "DL=true&", sizeof(data_str));
+        } else {
+            strlcpy(data_str, "DL=false&", sizeof(data_str));
+        }
+
         for (int idx=0; idx < g_backlog_idx; idx++) 
         {
-            strcat(data_str, daq2str(&g_measure_buff[idx]));
+            static char daqb_str[DAQB_STR_SIZE];
+            memset(daqb_str, '\0', sizeof(daqb_str));
+
+            daq2str(&g_measure_buff[idx], daqb_str, DAQB_STR_SIZE);
+            strlcat(data_str, daqb_str, sizeof(data_str));
             g_measure_buff[idx] = g_EMPTY_DAQ_BLOCK;
         }
-        g_backlog_idx = 0;        
+        g_backlog_idx = 0;
+        data_lost = false;
     }
+    ticks_last_data_req = xTaskGetTickCount();
 
+    // release mutex handle
+    xSemaphoreGive( xMutex );
+
+    ESP_LOGI(g_TAG, "returning: %s", data_str);
     httpd_resp_send(req, data_str, HTTPD_RESP_USE_STRLEN);
+
 
     return ESP_OK;
 }
@@ -215,6 +279,13 @@ static const httpd_uri_t data_req = {
     .handler   = data_request,
     .user_ctx  = NULL,
 };
+
+// 400 handler
+esp_err_t http_400_handler(httpd_req_t *req, httpd_err_code_t err)
+{
+    httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "malformed request!");
+    return ESP_FAIL;
+}
 
 // 404 handler
 esp_err_t http_404_handler(httpd_req_t *req, httpd_err_code_t err)
@@ -248,7 +319,9 @@ static httpd_handle_t start_daqs(void)
         httpd_register_uri_handler(server, &data_req);
 
         // set error handlers
+        httpd_register_err_handler(server, HTTPD_400_BAD_REQUEST, http_400_handler);
         httpd_register_err_handler(server, HTTPD_404_NOT_FOUND, http_404_handler);
+        httpd_register_err_handler(server, HTTPD_405_METHOD_NOT_ALLOWED, http_405_handler);
 
         return server;
     }
@@ -289,7 +362,6 @@ static void eth_event_handler(
                  mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
 
         if (*server == NULL) {
-            ESP_LOGI(g_TAG, "Starting webserver");
             *server = start_daqs();
         }
 
@@ -301,7 +373,7 @@ static void eth_event_handler(
         ESP_LOGI(g_TAG, "Ethernet Link Down..");
 
         if (*server) {
-            ESP_LOGI(g_TAG, "Stopping webserver");
+            ESP_LOGI(g_TAG, "stopping http server");
             if (stop_daqs(*server) == ESP_OK) {
                 *server = NULL;
             } else {
@@ -346,11 +418,15 @@ static void got_ip_event_handler(void *arg, esp_event_base_t event_base,
 
 void app_main(void)
 {
+    
     static httpd_handle_t daqs = NULL;
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_LOGI(g_TAG, "                     ");
     ESP_LOGI(g_TAG, "   DAQS STARTING UP  ");
     ESP_LOGI(g_TAG, "                     ");
+
+    // mutual exclusion init
+    xMutex = xSemaphoreCreateMutex();
 
     // init MAC
     ESP_LOGI(g_TAG, "init mac..");
