@@ -12,6 +12,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 import libs.data_utilities as du
+import libs.func_utilities as fu
 
 
 ############################################# TESTS #################################################
@@ -528,25 +529,25 @@ class UTIL_test(unittest.TestCase):
         """checks preCheckGcodeFiles function, should count the number of commands in a file"""
 
         testTxt = ";comment\nG1 X0 Y0 Z0\nG1 X2000 Y0 Z0.0\nG1 X2000 Y1500 Z0"
-        self.assertEqual(du.pre_check_ccode_file(), (0, 0, "empty"))
-        self.assertEqual(du.pre_check_ccode_file(testTxt), (3, 3.5, ""))
+        self.assertEqual(fu.pre_check_ccode_file(), (0, 0, "empty"))
+        self.assertEqual(fu.pre_check_ccode_file(testTxt), (3, 3.5, ""))
 
 
     def test_pre_check_rapid_file_function(self):
         """checks preCheckGcodeFiles function, should count the number of commands in a file"""
 
         testTxt = "!comment\nMoveL [[0.0,0.0,0.0],...,v50,z10,tool0\nMoveL [[2000.0,0.0,0.0],...,v50,z10,tool0\nMoveL [[2000.0,1500.0,0.0],...,v50,z10,tool0"
-        self.assertEqual(du.pre_check_rapid_file(), (0, 0, "empty"))
-        self.assertEqual(du.pre_check_rapid_file(testTxt), (3, 3.5, ""))
+        self.assertEqual(fu.pre_check_rapid_file(), (0, 0, "empty"))
+        self.assertEqual(fu.pre_check_rapid_file(testTxt), (3, 3.5, ""))
 
 
     def test_re_short_function(self):
         """see reShort in libs/PRINT_data_utilities"""
 
-        self.assertEqual(du.re_short("\d+\.\d+", "A12B", "0", "\d+"), ("12", True))
-        self.assertEqual(du.re_short("\d+\.\d+", "A12.3B", "0", "\d+"), ("12.3", True))
-        self.assertEqual(du.re_short("\d+\.\d+", "ABC", "0", "\d+"), ("0", False))
-        self.assertEqual(du.re_short("\d+\.\d+", "A12B", "0"), ("0", False))
+        self.assertEqual(fu.re_short("\d+\.\d+", "A12B", "0", "\d+"), ("12", True))
+        self.assertEqual(fu.re_short("\d+\.\d+", "A12.3B", "0", "\d+"), ("12.3", True))
+        self.assertEqual(fu.re_short("\d+\.\d+", "ABC", "0", "\d+"), ("0", False))
+        self.assertEqual(fu.re_short("\d+\.\d+", "A12B", "0"), ("0", False))
 
 
     def test_gcode_to_qentry_function(self):
@@ -559,7 +560,7 @@ class UTIL_test(unittest.TestCase):
 
         testTxt = "G1 X5.5 Y6 EXT7 F80 TOOL"
         self.assertEqual(
-            du.gcode_to_qentry(
+            fu.gcode_to_qentry(
                 mut_pos=testPos, mut_speed=testSpeed, zone=testZone, txt=testTxt
             ),
             (
@@ -575,7 +576,7 @@ class UTIL_test(unittest.TestCase):
 
         testTxt = "G28 X0 Y0"
         self.assertEqual(
-            du.gcode_to_qentry(
+            fu.gcode_to_qentry(
                 mut_pos=testPos, mut_speed=testSpeed, zone=testZone, txt=testTxt
             ),
             (
@@ -589,7 +590,7 @@ class UTIL_test(unittest.TestCase):
         )
 
         testTxt = "G92 X0 Y0"
-        du.gcode_to_qentry(
+        fu.gcode_to_qentry(
             mut_pos=testPos, mut_speed=testSpeed, zone=testZone, txt=testTxt
         )
         self.assertEqual(du.DCCurrZero, du.Coordinate(1, 1, 4, 4, 4, 4, 4, 4))
@@ -602,7 +603,7 @@ class UTIL_test(unittest.TestCase):
 
         testTxt = "MoveJ [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[0,0,0,0],[0,0,0,0,0,0]],[8,9,10,11],z12,tool0 EXT:13 TOOL"
         self.assertEqual(
-            du.rapid_to_qentry(txt=testTxt),
+            fu.rapid_to_qentry(txt=testTxt),
             (
                 du.QEntry(
                     Coor1=du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 13),
@@ -618,7 +619,7 @@ class UTIL_test(unittest.TestCase):
 
         testTxt = "MoveL Offs(pHome,1.1,2.2,3.3),[8,9,10,11],z12,tool0 EXT:13"
         self.assertEqual(
-            du.rapid_to_qentry(txt=testTxt),
+            fu.rapid_to_qentry(txt=testTxt),
             (
                 du.QEntry(
                     Coor1=du.Coordinate(5.1, 6.2, 7.3, 4, 4, 4, 4, 17),
@@ -635,10 +636,10 @@ class UTIL_test(unittest.TestCase):
         """see showOnTerminal in libs/PRINT_data_utilities"""
 
         du.DEF_TERM_MAX_LINES = 1
-        du.add_to_comm_protocol("1")
+        fu.add_to_comm_protocol("1")
         self.assertEqual(du.TERM_log, ["1"])
 
-        du.add_to_comm_protocol("2")
+        fu.add_to_comm_protocol("2")
         self.assertEqual(du.TERM_log, ["2"])
 
 

@@ -102,14 +102,11 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 
-# import interface for Toshiba frequency modulator by M-TEC
-# from mtec.mtecConnectModbus import mtecConnectModbus
-
-
 # import my own libs and UIs
 from libs.win_dialogs import strd_dialog, conn_dialog
 from libs.win_mainframe import Mainframe
 import libs.data_utilities as du
+import libs.func_utilities as fu
 
 
 
@@ -153,7 +150,7 @@ if not welc_choice:
 #######################################     MAINFRAME     #####################################################
 
 # create logfile and get path
-logpath = du.create_logfile()
+logpath = fu.create_logfile()
 
 
 # start the UI and show the window to user

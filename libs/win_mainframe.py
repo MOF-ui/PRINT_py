@@ -36,6 +36,7 @@ from libs.win_dialogs import strd_dialog, file_dialog
 from libs.pump_utilities import default_mode as PU_def_mode
 import libs.threads as workers
 import libs.data_utilities as du
+import libs.func_utilities as fu
 
 
 
@@ -486,7 +487,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             case "P1":
                 if "COM" in du.PMP1Tcp.port:
-                    du.connect_pump(slot)
+                    fu.connect_pump(slot)
 
                     if du.PMP1Serial.connected:
                         if not self._PumpCommThread.isRunning():
@@ -510,7 +511,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             case "P2":
                 if "COM" in du.PMP1Tcp.port:
-                    du.connect_pump(slot)
+                    fu.connect_pump(slot)
 
                     if du.PMP2Serial.connected:
                         if not self._PumpCommThread.isRunning():
@@ -792,7 +793,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         # keep track of PUMP_speed in case of user overwrite:
         if du.PMP1Serial.connected and du.PMP2Serial.connected:
-            curr_total, p1_ratio = du.calc_pump_ratio(
+            curr_total, p1_ratio = fu.calc_pump_ratio(
                 du.PMP1_speed, du.PMP2_speed
             )
 
@@ -1301,9 +1302,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         # get number of commands and filament length
         if ans.suffix == ".mod":
-            comm_num, filament_length, res = du.pre_check_rapid_file(txt)
+            comm_num, filament_length, res = fu.pre_check_rapid_file(txt)
         else:
-            comm_num, filament_length, res = du.pre_check_ccode_file(txt)
+            comm_num, filament_length, res = fu.pre_check_ccode_file(txt)
 
         if comm_num is None:
             self.IO_disp_filename.setText("COULD NOT READ FILE!")
@@ -1506,7 +1507,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             txt = file_txt
 
         # act according to GCode command
-        entry, command = du.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
+        entry, command = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
 
         if (command != "G1") and (command != "G28") and (command != "G92"):
             if command == ";":
@@ -1564,7 +1565,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         else:
             txt = file_txt
 
-        entry, err = du.rapid_to_qentry(txt)
+        entry, err = fu.rapid_to_qentry(txt)
         if entry == None:
             if not from_file:
                 self.SGLC_entry_rapidSglComm.setText(f"SYNTAX ERROR: {err}\n {txt}")
@@ -1886,7 +1887,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         txt = self.TERM_entry_gcodeInterp.text()
 
         # act according to GCode command
-        Entry, command = du.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
+        Entry, command = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
 
         if command == "G92":
             self.label_update_on_new_zero()
@@ -1917,7 +1918,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.switch_rob_moving()
 
         txt = self.TERM_entry_rapidInterp.text()
-        Entry, err = du.rapid_to_qentry(txt)
+        Entry, err = fu.rapid_to_qentry(txt)
 
         if Entry == None:
             self.TERM_entry_rapidInterp.setText(f"SYNTAX ERROR: {err}\n" + txt)
@@ -2332,7 +2333,7 @@ if __name__ == "__main__":
     # import PyQT UIs (converted from .ui to .py)
     from ui.UI_mainframe_v6 import Ui_MainWindow
 
-    logpath = du.create_logfile()
+    logpath = fu.create_logfile()
 
     # overwrite ROB_tcpip for testing, delete later
     du.ROBTcp.ip = "localhost"

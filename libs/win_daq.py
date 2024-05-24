@@ -16,7 +16,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 # PyQt stuff
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QWidget
 
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
@@ -37,6 +37,7 @@ class DAQWindow(QWidget, Ui_DAQWindow):
 
     Database = None
 
+    _deliv_pump_temp_t = 0
 
     def __init__(self, parent=None):
         super().__init__(parent)

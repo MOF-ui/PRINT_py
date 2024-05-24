@@ -21,6 +21,7 @@ from PyQt5.QtCore import QObject, QTimer, QMutex, pyqtSignal
 
 # import my own libs
 import libs.data_utilities as du
+import libs.func_utilities as fu
 import libs.pump_utilities as pu
 
 
@@ -273,15 +274,15 @@ class RoboCommWorker(QObject):
     def receive(self):
         """receive 36-byte data block, write to ROB vars"""
 
-        Telem, raw_data, state = du.ROBTcp.receive()
+        Telem, raw_data = du.ROBTcp.receive()
 
-        if state == True:
+        if raw_data != None:
             if Telem is not None:
                 Telem = round(Telem, 1)
             self.dataReceived.emit()
 
             Mutex.lock()
-            du.add_to_comm_protocol(
+            fu.add_to_comm_protocol(
                 f"RECV:    ID {Telem.id},   {Telem.Coor}   TCP: {Telem.t_speed}"
             )
 
@@ -344,7 +345,7 @@ class RoboCommWorker(QObject):
             )
 
             Mutex.lock()
-            du.add_to_comm_protocol(
+            fu.add_to_comm_protocol(
                 f"RECV:    error ({Telem}) from TCPIP class ROB_tcpip, data: {raw_data}"
             )
             Mutex.unlock()
@@ -419,7 +420,7 @@ class RoboCommWorker(QObject):
 
                 Mutex.lock()
                 du.ROBCommQueue.append(Comm)
-                du.add_to_comm_protocol(
+                fu.add_to_comm_protocol(
                     f"SEND:    ID: {Comm.id}  MT: {Comm.mt}  PT: {Comm.pt} \t|| COOR_1: {Comm.Coor1}"
                     f"\n\t\t\t|| COOR_2: {Comm.Coor2}"
                     f"\n\t\t\t|| SV:     {Comm.Speed} \t|| SBT: {Comm.sbt}   SC: {Comm.sc}   Z: {Comm.z}"
@@ -460,7 +461,8 @@ class RoboCommWorker(QObject):
 class SensorCommWorker(QObject):
     """cycle through all sensors, collect the data"""
 
-    cycleDone = pyqtSignal(bool)
+    cycleDone = pyqtSignal()
+    logError = pyqtSignal(str, str)
 
 
     def start(self):
@@ -481,6 +483,31 @@ class SensorCommWorker(QObject):
 
     def cycle(self):
         """check every sensor once"""
+
+        temp, t_err, uptime = fu.sensor_data_req()
+        if not isinstance(temp, Exception):
+            data_len = len(temp)
+            if data_len <= 0:
+                self.logError.emit(
+                    'SENS',
+                    f"http request from <IP> successful but data unreadable!"
+                )
+
+            # to-do: write data rescue handler
+            # elif data_len > 1:
+
+            else:
+                Mutex.lock()
+                if t_err:
+                    du.STTDataBlock.deliv_pump_temp = -666.0
+                du.STTDataBlock.deliv_pump_temp = temp[0]
+                Mutex.unlock()
+
+        else:
+            if not isinstance(temp, ValueError):
+                self.logError.emit('SENS', f"request error from <IP>: {temp}")
+                    
+        self.cycleDone.emit()
 
 
 
@@ -560,9 +587,9 @@ class LoadFileWorker(QObject):
             return
 
         # check for unidistance mode
-        um_check = du.re_short("\&\&: \d+.\d+", txt, None, "\&\&: \d+")[0]
+        um_check = fu.re_short("\&\&: \d+.\d+", txt, None, "\&\&: \d+")[0]
         if um_check is not None:
-            um_dist = du.re_short("\d+.\d+", um_check, ValueError, "\d+")[0]
+            um_dist = fu.re_short("\d+.\d+", um_check, ValueError, "\d+")[0]
             um_conv_res = self.add_um_tool(um_dist)
             if um_conv_res is not None:
                 self.convFailed.emit(um_conv_res)
@@ -609,7 +636,7 @@ class LoadFileWorker(QObject):
             Pos = du.DCCurrZero
 
         # act according to GCode command
-        Entry, command = du.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
+        Entry, command = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
 
         if (command != "G1") and (command != "G28"):
             return Entry, command
@@ -626,7 +653,7 @@ class LoadFileWorker(QObject):
     def rapid_conv(self, id, txt):
         """single line conversion from RAPID"""
 
-        Entry, err = du.rapid_to_qentry(txt)
+        Entry, err = fu.rapid_to_qentry(txt)
         if Entry == None:
             return None, err
 
