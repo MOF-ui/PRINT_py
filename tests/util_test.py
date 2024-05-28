@@ -383,48 +383,49 @@ class UTIL_test(unittest.TestCase):
 
     def test_DataBlock_class(self):
         """test DataBlock class, used to sort data for InfluxDB"""
+        self.maxDiff = 2000
 
         # __init__ & __str__
         self.assertEqual(
             str(
                 du.DaqBlock(
-                    1.1,
-                    2.2,
-                    3.3,
-                    4.4,
-                    5.5,
-                    6.6,
-                    7.7,
-                    du.PumpTelemetry(8, 9, 10, 11),
-                    du.PumpTelemetry(12, 13, 14, 15),
-                    16.16,
-                    17.17,
-                    18.18,
-                    19.19,
-                    du.RoboTelemetry(
-                        20.2, 21.21, du.Coordinate(22, 23, 24, 25, 26, 27, 28, 29)
+                    amb_temp = 1.1,
+                    amb_humidity = 2.2,
+                    rb_temp = 3.3,
+                    msp_temp = 4.4,
+                    msp_press = 5.5,
+                    asp_freq = 6.6,
+                    asp_amps = 7.7,
+                    imp_temp = 8.8,
+                    imp_press = 9.9,
+                    imp_freq = 10.1,
+                    imp_amps = 11.11,
+                    Robo = du.RoboTelemetry(
+                        12.12, 13, du.Coordinate(14.14, 15, 16, 17, 18, 19, 20, 21)
                     ),
-                    30.30,
-                    31.31,
-                    32.32,
+                    Pump1 = du.PumpTelemetry(23, 24, 25, 26),
+                    Pump2 = du.PumpTelemetry(27, 28, 29, 30),
+                    phc_aircon = 31.31,
+                    phc_fdist = 32.32,
+                    phc_edist = 33.33,
                 )
             ),
-            f"ambTemp: {1.1}    ambHum: {2.2}    delivPumpTemp: {3.3}    robBaseTemp: {4.4}    "
-            f"kPumpTemp: {5.5}    delivPumpPress: {6.6}    kPumpPress: {7.7}    "
-            f"PUMP1: {du.PumpTelemetry( 8,9,10,11 )}    PUMP2: {du.PumpTelemetry( 12,13,14,15 )}    "
-            f"admPumpFreq: {16.16}    admPumpAmps: {17.17}    kPumpFreq: {18.18}    "
-            f"kPumpAmps: {19.19}    ROB: {du.RoboTelemetry( 20.2, 21.21, du.Coordinate( 22,23,24,25,26,27,28,29 ) )}    "
-            f"porosAnalysis: {30.30}    distanceFront: {31.31}    distanceEnd: {32.32}",
+            f"Amb. temp.: {1.1}    Amb. humid.: {2.2}    RB temp.: {3.3}    MSP temp.: {4.4}    "
+            f"MSP press.: {5.5}    APS freq.: {6.6}    APS amp.: {7.7}    IMP temp.: {8.8}    "
+            f"IMP press.: {9.9}    IMP freq.: {10.10}    IMP amp.: {11.11}    "
+            f"ROB: {du.RoboTelemetry(12.12, 13, du.Coordinate(14.14, 15, 16, 17, 18, 19, 20, 21))}    "
+            f"PUMP1: {du.PumpTelemetry(23, 24, 25, 26)}    PUMP2: {du.PumpTelemetry(27, 28, 29, 30)}    "
+            f"PHC air cont.: {31.31}    PHC front dist.: {32.32}    PHC end dist.: {33.33}",
         )
 
         self.assertEqual(
             str(du.DaqBlock()),
-            f"ambTemp: {0.0}    ambHum: {0.0}    delivPumpTemp: {0.0}    robBaseTemp: {0.0}    "
-            f"kPumpTemp: {0.0}    delivPumpPress: {0.0}    kPumpPress: {0.0}    "
-            f"PUMP1: {du.PumpTelemetry()}    PUMP2: {du.PumpTelemetry()}    "
-            f"admPumpFreq: {0.0}    admPumpAmps: {0.0}    kPumpFreq: {0.0}    "
-            f"kPumpAmps: {0.0}    ROB: {du.RoboTelemetry()}    "
-            f"porosAnalysis: {0.0}    distanceFront: {0.0}    distanceEnd: {0.0}",
+            f"Amb. temp.: {0.0}    Amb. humid.: {0.0}    RB temp.: {0.0}    MSP temp.: {0.0}    "
+            f"MSP press.: {0.0}    APS freq.: {0.0}    APS amp.: {0.0}    IMP temp.: {0.0}    "
+            f"IMP press.: {0.0}    IMP freq.: {0.0}    IMP amp.: {0.0}    "
+            f"ROB: {du.RoboTelemetry()}    PUMP1: {du.PumpTelemetry()}    "
+            f"PUMP2: {du.PumpTelemetry()}    "
+            f"PHC air cont.: {0.0}    PHC front dist.: {0.0}    PHC end dist.: {0.0}",
         )
 
 

@@ -1157,13 +1157,16 @@ class TSData:
 
     def __get__(self, instance, owner) -> float | None:
         age = datetime.now() - self._created_at
-        if age < 60:
+        if age < self.valid_time:
             return self.val
         return None
     
     def __set__(self, instance, value) -> None:
         self.val = value
         self._created_at = datetime.now()
+
+    def __str__(self) -> str:
+        return f"{self.__get__(self, None)}"
 
 
 
@@ -1262,11 +1265,11 @@ class DaqBlock:
     def __str__(self) -> str:
 
         return (
-            f"ambTemp: {self.amb_temp}    ambHum: {self.amb_humidity}    delivPumpTemp: {self.msp_temp}    robBaseTemp: {self.rb_temp}    "
-            f"kPumpTemp: {self.imp_temp}    delivPumpPress: {self.msp_press}    kPumpPress: {self.imp_press}    PUMP1: {self.Pump1}    "
-            f"PUMP2: {self.Pump2}    admPumpFreq: {self.asp_freq}    admPumpAmps: {self.asp_amps}    kPumpFreq: {self.imp_freq}    "
-            f"kPumpAmps: {self.imp_amps}    ROB: {self.Robo}    porosAnalysis: {self.phc_aircon}    "
-            f"distanceFront: {self.phc_fdist}    distanceEnd: {self.phc_edist}"
+            f"Amb. temp.: {self.amb_temp}    Amb. humid.: {self.amb_humidity}    RB temp.: {self.rb_temp}    MSP temp.: {self.msp_temp}    "
+            f"MSP press.: {self.msp_press}    APS freq.: {self.asp_freq}    APS amp.: {self.asp_amps}    IMP temp.: {self.imp_temp}    "
+            f"IMP press.: {self.imp_press}    IMP freq.: {self.imp_freq}    IMP amp.: {self.imp_amps}    "
+            f"ROB: {self.Robo}    PUMP1: {self.Pump1}    PUMP2: {self.Pump2}    PHC air cont.: {self.phc_aircon}    "
+            f"PHC front dist.: {self.phc_fdist}    PHC end dist.: {self.phc_edist}"
         )
 
 
