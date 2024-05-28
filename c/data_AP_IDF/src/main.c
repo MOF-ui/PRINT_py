@@ -181,15 +181,18 @@ void owb_main()
 /* --------------------------------- DAQ2STR ------------------------------ */
 
 void daq2str(struct daq_block *daqb, char *sz_ret, int buff_len) {  
-    // sz_ret for string-zero (\0 terminated) return 
-    
+    // sz_ret for string-zero (\0 terminated) return; save bytes by setting
+    // wrong T measurements to -274 (impossible temperature)
+
+    if (daqb->error == true) daqb->temp = -274.0;
+
     int temp_len = snprintf(NULL, 0, "%.2f", daqb->temp);
     char *temp = malloc(temp_len + 1); // +1 for string terminator
     snprintf(temp, temp_len + 1, "%.2f", daqb->temp);
-    
-    int err_len = snprintf(NULL, 0, "%d", daqb->error);
+     
+    /* int err_len = snprintf(NULL, 0, "%d", daqb->error);
     char *err = malloc(err_len + 1);
-    snprintf(err, err_len + 1, "%d", daqb->error);
+    snprintf(err, err_len + 1, "%d", daqb->error); */
     
     int upt_len = snprintf(NULL, 0, "%u", daqb->upt_s);
     char *upt = malloc(upt_len + 1);
@@ -198,14 +201,14 @@ void daq2str(struct daq_block *daqb, char *sz_ret, int buff_len) {
     // build str
     strlcpy(sz_ret, "T", buff_len);
     strlcat(sz_ret, temp, buff_len);
-    strlcat(sz_ret, "/E", buff_len);
-    strlcat(sz_ret, err, buff_len);
+    /* strlcat(sz_ret, "E", buff_len);
+    strlcat(sz_ret, err, buff_len); */
     strlcat(sz_ret, "/U", buff_len);
     strlcat(sz_ret, upt, buff_len);
     strlcat(sz_ret, ";", buff_len);
 
     free(temp);
-    free(err);
+    // free(err);
     free(upt);
 }
 

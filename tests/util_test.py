@@ -465,9 +465,9 @@ class UTIL_test(unittest.TestCase):
             f"IP: 1.1.1.1   PORT: {2222}   C_TOUT: {0.003}   RW_TOUT: {0.004}   R_BL: {5}   W_BL: {6}",
         )
 
-        testTCPIP._connected = True
+        testTCPIP.connected = True
         self.assertRaises(PermissionError, testTCPIP.set_params, param_dict=None)
-        testTCPIP._connected = False
+        testTCPIP.connected = False
 
         # connect
         ans0, ans1 = testTCPIP.connect()
@@ -484,7 +484,7 @@ class UTIL_test(unittest.TestCase):
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ConnectionError)
 
-        testTCPIP._connected = True
+        testTCPIP.connected = True
         ans0, ans1 = testTCPIP.send([True, True])
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ValueError)
@@ -496,7 +496,7 @@ class UTIL_test(unittest.TestCase):
 
         # close
         testTCPIP.close(end=True)
-        self.assertFalse(testTCPIP._connected)
+        self.assertFalse(testTCPIP.connected)
 
 
     def test_RobConnection_class(self):
@@ -510,7 +510,7 @@ class UTIL_test(unittest.TestCase):
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ConnectionError)
 
-        testRobCon._connected = True
+        testRobCon.connected = True
         ans0, ans1 = testRobCon.send(du.QEntry(id=1))
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ValueError)

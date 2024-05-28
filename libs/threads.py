@@ -110,7 +110,7 @@ class PumpCommWorker(QObject):
             du.PMP2Serial.keepAlive()
 
         # send to mixer
-        if du.MIXTcp._connected:
+        if du.MIXTcp.connected:
             mixer_speed = pump_speed if (du.MIX_act_with_pump) else du.MIX_speed
 
             if mixer_speed != PCW_lastMixerSpeed:
@@ -184,7 +184,7 @@ class PumpCommWorker(QObject):
                     self.dataRecv.emit(Telem, "P2")
 
         # RECEIVE FROM MIXER
-        if du.MIXTcp._connected:
+        if du.MIXTcp.connected:
             res, data = du.MIXTcp.receive()
             if res:
                 self.connActive.emit("MIX")
@@ -192,7 +192,7 @@ class PumpCommWorker(QObject):
                 if data != du.MIX_last_speed:
                     Mutex.lock()
                     du.MIX_last_speed = data
-                    du.STTDataBlock.k_pump_freq = data
+                    du.STTDataBlock.imp_freq = data
                     Mutex.unlock()
 
                     self.dataMixerRecv.emit(data)
@@ -462,6 +462,7 @@ class SensorCommWorker(QObject):
     """cycle through all sensors, collect the data"""
 
     cycleDone = pyqtSignal()
+    dataReceived = pyqtSignal(str)
     logError = pyqtSignal(str, str)
 
 
@@ -484,28 +485,19 @@ class SensorCommWorker(QObject):
     def cycle(self):
         """check every sensor once"""
 
-        temp, t_err, uptime = fu.sensor_data_req()
-        if not isinstance(temp, Exception):
-            data_len = len(temp)
-            if data_len <= 0:
-                self.logError.emit(
-                    'SENS',
-                    f"http request from <IP> successful but data unreadable!"
-                )
+        # MSP
+        res = fu.sensor_data_call(du.SEN_dict['msp'])
+        if isinstance(res['temp'], list):
+            latest_data = res['temp'][0] #(val, uptime)
+            
+            Mutex.lock()
+            du.STTDataBlock.msp_temp = latest_data[0]
+            Mutex.unlock()
 
-            # to-do: write data rescue handler
-            # elif data_len > 1:
-
-            else:
-                Mutex.lock()
-                if t_err:
-                    du.STTDataBlock.deliv_pump_temp = -666.0
-                du.STTDataBlock.deliv_pump_temp = temp[0]
-                Mutex.unlock()
+            self.dataReceived.emit(du.SEN_dict['msp']['ip'])
 
         else:
-            if not isinstance(temp, ValueError):
-                self.logError.emit('SENS', f"request error from <IP>: {temp}")
+            self.logError.emit('SENS', f"request error from {du.SEN_dict['msp']['ip']}: {res['temp']}")
                     
         self.cycleDone.emit()
 

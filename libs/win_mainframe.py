@@ -578,7 +578,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         match slot:
             case "ROB":
-                if not du.ROBTcp._connected:
+                if not du.ROBTcp.connected:
                     return
                 
                 # send stop command to robot; stop threading & watchdog
@@ -633,7 +633,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                     # UTIL.PUMP1_tcpip.close()
 
             case "MIX":
-                if not du.MIXTcp._connected:
+                if not du.MIXTcp.connected:
                     return
 
                 self.kill_watchdog("MIX")
@@ -897,7 +897,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         match dog:
             case "ROB":
-                if du.ROBTcp._connected:
+                if du.ROBTcp.connected:
                     self._RobRecvWd.start()
             case "P1":
                 if du.PMP1Serial.connected:
@@ -906,7 +906,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 if du.PMP2Serial.connected:
                     self._P2RecvWd.start()
             case "MIX":
-                if du.MIXTcp._connected:
+                if du.MIXTcp.connected:
                     self._MixRecvWd.start()
             case _:
                 self.log_entry(
@@ -1956,7 +1956,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             for Entry in du.ROB_send_list:
                 if Entry[0].mt != "S":
-                    LostBuf._queue.append(Entry[0])
+                    LostBuf._queue.append(Entry[0]) # to-do: use class method instead accessing privat attribute
 
             du.SC_curr_comm_id = du.ROBTelem.id
             du.SCQueue = LostBuf + du.SCQueue

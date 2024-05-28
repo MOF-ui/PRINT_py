@@ -432,53 +432,76 @@ def calc_pump_ratio(p1_speed, p2_speed):
     return curr_total, p1_ratio
 
 
-def sensor_data_req(ip=None, raise_dl_flag=False):
-    """http request to data AP, decode
-    accepts: 
-        ip: 
-            str with server address, specify IP & port!
-        get_missed_data:
-            server also sends back data that has been collected before the
-            current measurement but was not yet transmitted (request slower) 
+def sensor_req(ip="", key="", raise_dl_flag=False):
+    """requests and decodes data from sensor
+
+    ATTRIBUTES:
+        ip:
+            server IP
+        key:
+            kind of data to retrieve
+        raise_dl_flag:
+            check if data was lost, if so raise a flag (not supported yet)
     """
 
-    if ip is not None:
+    try:
+        ans = requests.get(f"{ip}/{key}")
+        ans.raise_for_status()
+    except Exception as err:
+        return ValueError(f"request failed: {err}!")
+
+    ans_str = ans.text
+    data_loss_pos = ans_str.find('&')
+    entry_pos = ans_str.find(';')
+    if (data_loss_pos <= -1 or entry_pos <= -1):
+        return ValueError(f"no readable data retrieved: {ans_str}!")
+
+    if raise_dl_flag:
+        data_loss = ans_str[: data_loss_pos-1]
+        if data_loss.find('true') == -1:
+            #to-do: build a flag for data loss
+            pass
+
+    val = []
+    remain_str = ans_str[data_loss_pos+1 :]
+    entry_pos -= data_loss_pos+1
+
+    while entry_pos != -1:
+        next_entry = remain_str[: entry_pos-1]
+        data = next_entry.split('/')
+        datapoint = (float(data[0][1 :]), int(data[2][1 :])) #(val, uptime)
         try:
-            ans = requests.get(ip + "/data")
-            ans.raise_for_status()
-        except Exception as err:
-            return err, None, None
+            val.append(datapoint)
+        except Exception:
+            break
 
-        ans_str = ans.text
-        data_loss_pos = ans_str.find('&')
-        entry_pos = ans_str.find(';')
-        if (data_loss_pos <= -1 or entry_pos <= -1):
-            return ValueError(f"no readable data retrieved: {ans_str}!"), None, None
+        remain_str = ans_str[entry_pos+1 :]
+        entry_pos = remain_str.find(';')
 
-        if raise_dl_flag:
-            data_loss = ans_str[: data_loss_pos-1]
-            if data_loss.find('true') == -1:
-                #to-do: build a flag for data loss
-                pass
-
-        temp = []
-        t_err = []
-        uptime = []
-        remain_str = ans_str[data_loss_pos+1 :]
-        entry_pos -= data_loss_pos+1
-
-        while entry_pos != -1:
-            next_entry = remain_str[: entry_pos-1]
-            data = next_entry.split('/')
-            try:
-                temp.append(float(data[0][1 :]))
-                t_err.append(bool(data[1][1 :]))
-                uptime.append(int(data[2][1 :]))
-            except Exception:
-                break
-
-            remain_str = ans_str[entry_pos+1 :]
-            entry_pos = remain_str.find(';')
+    return val
 
 
-        return temp, t_err, uptime    
+def sensor_data_call(loc=None, raise_dl_flag=False):
+    """http request to data AP, decode
+
+    accepts: 
+        loc: 
+            location dictionary containing "ip" and at least one specified
+            measurement
+        raise_dl_flag:
+            check if data was lost, if so raise a flag (not supported yet)
+    """
+
+    if isinstance(loc, dict):
+        ans_dict = {}
+
+        for key in loc:
+            if key != 'ip':
+                data = sensor_req(loc["ip"], key, raise_dl_flag)
+                ans_dict[key] = data
+        
+        return ans_dict
+    
+    else:
+        raise ValueError(f"{loc} is not an instance of dict")
+    

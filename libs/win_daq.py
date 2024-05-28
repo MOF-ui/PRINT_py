@@ -37,8 +37,6 @@ class DAQWindow(QWidget, Ui_DAQWindow):
 
     Database = None
 
-    _deliv_pump_temp_t = 0
-
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -69,14 +67,14 @@ class DAQWindow(QWidget, Ui_DAQWindow):
 
     def data_update(self):
         self.BASIC_disp_ambTemp.setText(f"{du.STTDataBlock.amb_temp} °C")
-        self.BASIC_disp_ambHum.setText(f"{du.STTDataBlock.amb_hum} rH")
-        self.BASIC_disp_delivPumpTemp.setText(f"{du.STTDataBlock.deliv_pump_temp} °C")
-        self.BASIC_disp_robBaseTemp.setText(f"{du.STTDataBlock.rob_base_temp} °C")
-        self.BASIC_disp_2kPumpTemp.setText(f"{du.STTDataBlock.k_pump_temp} °C")
+        self.BASIC_disp_ambHum.setText(f"{du.STTDataBlock.amb_humidity} rH")
+        self.BASIC_disp_delivPumpTemp.setText(f"{du.STTDataBlock.msp_temp} °C")
+        self.BASIC_disp_robBaseTemp.setText(f"{du.STTDataBlock.rb_temp} °C")
+        self.BASIC_disp_2kPumpTemp.setText(f"{du.STTDataBlock.imp_temp} °C")
         self.BASIC_disp_delivPumpPress.setText(
-            f"{du.STTDataBlock.deliv_pump_press} °C"
+            f"{du.STTDataBlock.msp_press} °C"
         )
-        self.BASIC_disp_2kPumpPress.setText(f"{du.STTDataBlock.k_pump_press} °C")
+        self.BASIC_disp_2kPumpPress.setText(f"{du.STTDataBlock.imp_press} °C")
 
         self.MOT_disp_pump1Freq.setText(f"{du.STTDataBlock.Pump1.freq} Hz")
         self.MOT_disp_pump2Freq.setText(f"{du.STTDataBlock.Pump2.freq} Hz")
@@ -86,10 +84,10 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         self.MOT_disp_pump2Amps.setText(f"{du.STTDataBlock.Pump2.amps} A")
         self.MOT_disp_pump1Torq.setText(f"{du.STTDataBlock.Pump1.torq} Nm")
         self.MOT_disp_pump2Torq.setText(f"{du.STTDataBlock.Pump2.torq} Nm")
-        self.MOT_disp_admPumpFreq.setText(f"{du.STTDataBlock.adm_pump_freq} Hz")
-        self.MOT_disp_admPumpAmps.setText(f"{du.STTDataBlock.adm_pump_amps} A")
-        self.MOT_disp_2kPumpFreq.setText(f"{du.STTDataBlock.k_pump_freq} Hz")
-        self.MOT_disp_2kPumpAmps.setText(f"{du.STTDataBlock.k_pump_amps} A")
+        self.MOT_disp_admPumpFreq.setText(f"{du.STTDataBlock.asp_freq} Hz")
+        self.MOT_disp_admPumpAmps.setText(f"{du.STTDataBlock.asp_amps} A")
+        self.MOT_disp_2kPumpFreq.setText(f"{du.STTDataBlock.imp_freq} Hz")
+        self.MOT_disp_2kPumpAmps.setText(f"{du.STTDataBlock.imp_amps} A")
 
         self.ROB_disp_id.setText(f"{du.STTDataBlock.Robo.id}")
         self.ROB_disp_tcpSpeed.setText(f"{du.STTDataBlock.Robo.t_speed} mm/s")

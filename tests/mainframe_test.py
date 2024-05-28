@@ -1167,10 +1167,10 @@ class Mainframe_test(unittest.TestCase):
         named '_zz_' to be executed by unittest at last"""
         global test_frame
 
-        du.ROBTcp._connected = False
+        du.ROBTcp.connected = False
         du.PMP1Serial.connected = False
         du.PMP2Serial.connected = False
-        du.MIXTcp._connected = False
+        du.MIXTcp.connected = False
         test_frame.close()
 
         du.ROBTcp.close(end=True)

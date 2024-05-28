@@ -13,6 +13,8 @@ import serial
 import socket
 import struct
 
+from datetime import datetime, timedelta
+
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -1132,101 +1134,139 @@ class PumpTelemetry:
         return False
 
 
-
-class DaqBlock:
-    """structure for DAQ
-
+class TSData:
+    """simple descriptor for timestamped data, will take values but only
+    return them if there less old than the valid_time, otherwise returns None
+    
     ATTRIBUTES:
-        amb_temp:
-            ambient temperatur [°C]
-        amb_hum:
-            ambient humidity [%]
-        deliv_pump_temp:
-            temperature behind pump1's moineur pump [°C]
-        rob_base_temp:
-            temperature of the mortar tube at the second coupling [°C]
-        k_pump_temp:
-            temperature behind the 2K pump [°C]
-        deliv_pump_press:
-            pressure behind pump1's moineur pump [bar]
-        k_pump_press:
-            pressure in front of 2K pump [bar]
-        Pump1:
-            PumpTelemetry datablock for pump1
-        Pump2:
-            PumpTelemetry datablock for pump2
-        adm_pump_freq:
-            frequency of the admixture delivery pump
-        adm_pump_amps:
-            current of the admixture delivery pump
-        k_pump_freq:
-            frequency of the 2K pump
-        k_pump_amps:
-            current of the 2K pump
-        Robo:
-            RoboTelemetry datablock
-        poros_analysis:
-            porosity analysis (not specified yet)
-        distance_front:
-            deposition layer height in front of the nozzle
-        distance_end:
-            deposition layer height behind the nozzle
+        val:
+            the value itself
+        created_at:
+            creation or change time timestamp
+        valid_time:
+            user_defined time, the value remains valid
 
     FUNCTIONS:
-        __init__, __str__, __eq__
+        __init__, __get__, __set__
+    """
+
+    def __init__(self, val=0.0) -> None:
+        self.val = float(val)
+        self.valid_time = timedelta(seconds=60)
+        self._created_at = datetime.now()
+
+    def __get__(self, instance, owner) -> float | None:
+        age = datetime.now() - self._created_at
+        if age < 60:
+            return self.val
+        return None
+    
+    def __set__(self, instance, value) -> None:
+        self.val = value
+        self._created_at = datetime.now()
+
+
+
+
+
+class DaqBlock:
+    """structure for DAQ, uses TSData except for Robo & Pumps which have to
+    update periodically in order for the program to run anyways
+
+    ATTRIBUTES:
+        Robo:
+            RoboTelemetry datablock
+        Pump1:
+            PumpTelemetry datablock for pump 1
+        Pump2:
+            PumpTelemetry datablock for pump 2
+        amb_temp:
+            ambient temperature [°C]
+        amb_humidity:
+            ambient humidity [%]
+        rb_temp:
+            RB = robot base; temperature of the mortar tube at the second coupling [°C]
+        msp_temp:
+            MSP = main supply pump; temperature behind pump1's moineur pump [°C]
+        msp_press:
+            MSP = main supply pump; pressure behind pump1's moineur pump [bar]
+        asp_freq:
+            ASP = admixture supply pump; frequency of the admixture delivery pump
+        asp_amps:
+            ASP = admixture supply pump; current of the admixture delivery pump
+        imp_temp:
+            IMP = inline mixing pump; temperature behind the 2K pump [°C]
+        imp_press:
+            IMP = inline mixing pump; pressure in front of 2K pump [bar]
+        imp_freq:
+            IMP = inline mixing pump; frequency of the 2K pump
+        imp_amps:
+            IMP = inline mixing pump; current of the 2K pump
+        phc_aircon:
+            PHC = print head controller; air bubble/content analysis (not specified yet)
+        phc_fdist:
+            PHC = print head controller; deposition layer distance in front of the nozzle
+        phc_edist:
+            PHC = print head controller; deposition layer distance behind the nozzle
+
+    FUNCTIONS:
+        __init__, __str__, __eq__,
+
+        set_valid_time:
+            changes the valid_time of all TSData entries
     """
 
 
     def __init__(
         self,
-        amb_temp=0.0,
-        amb_hum=0.0,
-        deliv_pump_temp=0.0,
-        rob_base_temp=0.0,
-        k_pump_temp=0.0,
-        deliv_pump_press=0.0,
-        k_pump_press=0.0,
+        amb_temp=None,
+        amb_humidity=None,
+        rb_temp=None,
+        msp_temp=None,
+        msp_press=None,
+        asp_freq=None,
+        asp_amps=None,
+        imp_temp=None,
+        imp_press=None,
+        imp_freq=None,
+        imp_amps=None,
+        Robo=None,
         Pump1=None,
         Pump2=None,
-        adm_pump_freq=0.0,
-        adm_pump_amps=0.0,
-        k_pump_freq=0.0,
-        k_pump_amps=0.0,
-        Robo=None,
-        poros_analysis=0.0,
-        distance_front=0.0,
-        distance_end=0.0,
+        phc_aircon=None,
+        phc_fdist=None,
+        phc_edist=None,
     ) -> None:
 
-        self.amb_temp = float(amb_temp)
-        self.amb_hum = float(amb_hum)
-        self.deliv_pump_temp = float(deliv_pump_temp)
-        self.rob_base_temp = float(rob_base_temp)
-        self.k_pump_temp = float(k_pump_temp)
-        self.deliv_pump_press = float(deliv_pump_press)
-        self.k_pump_press = float(k_pump_press)
-        self.adm_pump_freq = float(adm_pump_freq)
-        self.adm_pump_amps = float(adm_pump_amps)
-        self.k_pump_freq = float(k_pump_freq)
-        self.k_pump_amps = float(k_pump_amps)
-        self.poros_analysis = float(poros_analysis)
-        self.distance_front = float(distance_front)
-        self.distance_end = float(distance_end)
+        self.amb_temp = TSData() if (amb_temp is None) else amb_temp
+        self.amb_humidity = TSData() if (amb_humidity is None) else amb_humidity
+        self.rb_temp = TSData() if(rb_temp is None) else rb_temp
+        self.msp_temp = TSData() if (msp_temp is None) else msp_temp
+        self.msp_press = TSData() if (msp_press is None) else msp_press
+        self.asp_freq = TSData() if (asp_freq is None) else asp_freq
+        self.asp_amps = TSData() if (asp_amps is None) else asp_amps
+        self.imp_temp = TSData() if (imp_temp is None) else imp_temp
+        self.imp_press = TSData() if (imp_press is None) else imp_press
+        self.imp_freq = TSData() if (imp_freq is None) else imp_freq
+        self.imp_amps = TSData() if (imp_amps is None) else imp_amps
+        self.phc_aircon = TSData() if (phc_aircon is None) else phc_aircon
+        self.phc_fdist = TSData() if (phc_fdist is None) else phc_fdist
+        self.phc_edist = TSData() if (phc_edist is None) else phc_edist
 
         # handle those beasty mutables
+        self.Robo = RoboTelemetry() if (Robo is None) else Robo
         self.Pump1 = PumpTelemetry() if (Pump1 is None) else Pump1
         self.Pump2 = PumpTelemetry() if (Pump2 is None) else Pump2
-        self.Robo = RoboTelemetry() if (Robo is None) else Robo
 
 
     def __str__(self) -> str:
 
         return (
-            f"ambTemp: {self.amb_temp}    ambHum: {self.amb_hum}    delivPumpTemp: {self.deliv_pump_temp}    robBaseTemp: {self.rob_base_temp}    "
-            f"kPumpTemp: {self.k_pump_temp}    delivPumpPress: {self.deliv_pump_press}    kPumpPress: {self.k_pump_press}    PUMP1: {self.Pump1}    "
-            f"PUMP2: {self.Pump2}    admPumpFreq: {self.adm_pump_freq}    admPumpAmps: {self.adm_pump_amps}    kPumpFreq: {self.k_pump_freq}    "
-            f"kPumpAmps: {self.k_pump_amps}    ROB: {self.Robo}    porosAnalysis: {self.poros_analysis}    "
-            f"distanceFront: {self.distance_front}    distanceEnd: {self.distance_end}"
+            f"ambTemp: {self.amb_temp}    ambHum: {self.amb_humidity}    delivPumpTemp: {self.msp_temp}    robBaseTemp: {self.rb_temp}    "
+            f"kPumpTemp: {self.imp_temp}    delivPumpPress: {self.msp_press}    kPumpPress: {self.imp_press}    PUMP1: {self.Pump1}    "
+            f"PUMP2: {self.Pump2}    admPumpFreq: {self.asp_freq}    admPumpAmps: {self.asp_amps}    kPumpFreq: {self.imp_freq}    "
+            f"kPumpAmps: {self.imp_amps}    ROB: {self.Robo}    porosAnalysis: {self.phc_aircon}    "
+            f"distanceFront: {self.phc_fdist}    distanceEnd: {self.phc_edist}"
         )
 
 
@@ -1235,22 +1275,22 @@ class DaqBlock:
         if isinstance(other, DaqBlock):
             if (
                 self.amb_temp == other.amb_temp
-                and self.amb_hum == other.amb_hum
-                and self.deliv_pump_temp == other.deliv_pump_temp
-                and self.rob_base_temp == other.rob_base_temp
-                and self.k_pump_temp == other.k_pump_temp
-                and self.deliv_pump_press == other.deliv_pump_press
-                and self.k_pump_press == other.k_pump_press
+                and self.amb_humidity == other.amb_humidity
+                and self.msp_temp == other.msp_temp
+                and self.rb_temp == other.rb_temp
+                and self.imp_temp == other.imp_temp
+                and self.msp_press == other.msp_press
+                and self.imp_press == other.imp_press
                 and self.Pump1 == other.Pump1
                 and self.Pump2 == other.Pump2
-                and self.adm_pump_freq == other.adm_pump_freq
-                and self.adm_pump_amps == other.adm_pump_amps
-                and self.k_pump_freq == other.k_pump_freq
-                and self.k_pump_amps == other.k_pump_amps
+                and self.asp_freq == other.asp_freq
+                and self.asp_amps == other.asp_amps
+                and self.imp_freq == other.imp_freq
+                and self.imp_amps == other.imp_amps
                 and self.Robo == other.Robo
-                and self.poros_analysis == other.poros_analysis
-                and self.distance_front == other.distance_front
-                and self.distance_end == other.distance_end
+                and self.phc_aircon == other.phc_aircon
+                and self.phc_fdist == other.phc_fdist
+                and self.phc_edist == other.phc_edist
             ):
                 return True
 
@@ -1268,22 +1308,22 @@ class DaqBlock:
         elif isinstance(other, DaqBlock):
             if (
                 self.amb_temp != other.amb_temp
-                or self.amb_hum != other.amb_hum
-                or self.deliv_pump_temp != other.deliv_pump_temp
-                or self.rob_base_temp != other.rob_base_temp
-                or self.k_pump_temp != other.k_pump_temp
-                or self.deliv_pump_press != other.deliv_pump_press
-                or self.k_pump_press != other.k_pump_press
+                or self.amb_humidity != other.amb_humidity
+                or self.msp_temp != other.msp_temp
+                or self.rb_temp != other.rb_temp
+                or self.imp_temp != other.imp_temp
+                or self.msp_press != other.msp_press
+                or self.imp_press != other.imp_press
                 or self.Pump1 != other.Pump1
                 or self.Pump2 != other.Pump2
-                or self.adm_pump_freq != other.adm_pump_freq
-                or self.adm_pump_amps != other.adm_pump_amps
-                or self.k_pump_freq != other.k_pump_freq
-                or self.k_pump_amps != other.k_pump_amps
+                or self.asp_freq != other.asp_freq
+                or self.asp_amps != other.asp_amps
+                or self.imp_freq != other.imp_freq
+                or self.imp_amps != other.imp_amps
                 or self.Robo != other.Robo
-                or self.poros_analysis != other.poros_analysis
-                or self.distance_front != other.distance_front
-                or self.distance_end != other.distance_end
+                or self.phc_aircon != other.phc_aircon
+                or self.phc_fdist != other.phc_fdist
+                or self.phc_edist != other.phc_edist
             ):
                 return True
 
@@ -1291,6 +1331,22 @@ class DaqBlock:
             raise ValueError(f"{other} is not None or an instance of 'DaqBlock'!")
 
         return False
+    
+
+    def set_valid_time(self, new_valid_time) -> None | ValueError:
+        """ sets valid time (given in seconds) of all TSData objects
+        to new_valid_time
+        """
+        
+        if not isinstance(new_valid_time, int):
+            return ValueError(f"{new_valid_time} is not an instance of int!")
+        
+        for varkey in vars(self):
+            attr = vars(self)[varkey]
+            if isinstance(attr, TSData):
+                attr.valid_time = new_valid_time
+        
+        return None
 
 
 
@@ -1334,7 +1390,7 @@ class TCPIP:
         self.r_bl = int(R_BL)
         self.w_bl = int(W_BL)
 
-        self._connected = False
+        self.connected = False
         self._Socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
@@ -1348,7 +1404,7 @@ class TCPIP:
 
     def set_params(self, param_dict) -> None:
 
-        if self._connected:
+        if self.connected:
             raise PermissionError("params not changeable while connected to server!")
 
         self.ip = str(param_dict["IP"])
@@ -1371,11 +1427,11 @@ class TCPIP:
 
         try:
             self._Socket.connect(server_address)
-            self._connected = True
+            self.connected = True
             self._Socket.settimeout(self.rw_tout)
 
         except Exception as err:
-            self._connected = 0
+            self.connected = 0
             return err, server_address
 
         return True, server_address
@@ -1384,7 +1440,7 @@ class TCPIP:
     def send(self, data=None) -> tuple[bool, int] | tuple[bool, Exception]:
         """send data to server according to class attributes"""
 
-        if not self._connected:
+        if not self.connected:
             return False, ConnectionError(f"no active connection")
         if len(data) != self.w_bl:
             return False, ValueError("wrong message length")
@@ -1419,7 +1475,7 @@ class TCPIP:
         """close TCP connection; restarts the socket, if end isnt set to True"""
 
         self._Socket.close()
-        self._connected = False
+        self.connected = False
         if not end:
             self._Socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -1445,7 +1501,7 @@ class RobConnection(TCPIP):
         message = []
 
         try:
-            if not self._connected:
+            if not self.connected:
                 raise ConnectionError
             if not isinstance(entry, QEntry):
                 raise ValueError(f"{entry} is not an instance of 'QEntry'!")
@@ -1739,9 +1795,22 @@ SC_q_processing = False
 SC_q_prep_end = False
 SC_ext_fllw_bhvr = DEF_SC_EXT_FLLW_BHVR
 
-SEN_pump = "192.168.178.36:17"
-SEN_head = "192.168.178.37:17"
-
+SEN_dict = { # add available datasources here
+    'msp': { # Main Supply Pump
+        'ip': "",
+        'temp': float(0.0),
+        #"pressure": float(0.0)
+    },
+    'asp': { # Admixture Supply Pump
+        None
+    },
+    'imp': { # Inline Mixing Pump
+        None
+    },
+    'phc': { # Print Head Controller
+        None
+    }
+}
 STTDataBlock = DaqBlock()
 
 TERM_log = []
