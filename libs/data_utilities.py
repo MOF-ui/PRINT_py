@@ -1152,17 +1152,16 @@ class TSData:
 
     def __init__(self, val=0.0) -> None:
         self.val = float(val)
-        self.valid_time = timedelta(seconds=60)
         self._created_at = datetime.now()
 
     def __get__(self, instance, owner) -> float | None:
         age = datetime.now() - self._created_at
-        if age < self.valid_time:
+        if age < instance._valid_time:
             return self.val
         return None
-    
+
     def __set__(self, instance, value) -> None:
-        self.val = value
+        self.val = float(value)
         self._created_at = datetime.now()
 
     def __str__(self) -> str:
@@ -1219,42 +1218,59 @@ class DaqBlock:
             changes the valid_time of all TSData entries
     """
 
-
+    amb_temp = TSData()
+    amb_humidity = TSData()
+    rb_temp = TSData()
+    msp_temp = TSData()
+    msp_press = TSData()
+    asp_freq = TSData()
+    asp_amps = TSData()
+    imp_temp = TSData()
+    imp_press = TSData()
+    imp_freq = TSData()
+    imp_amps = TSData()
+    phc_aircon = TSData()
+    phc_fdist = TSData()
+    phc_edist = TSData()
+    
+    _valid_time = timedelta(seconds=60)
+    
+    
     def __init__(
         self,
-        amb_temp=None,
-        amb_humidity=None,
-        rb_temp=None,
-        msp_temp=None,
-        msp_press=None,
-        asp_freq=None,
-        asp_amps=None,
-        imp_temp=None,
-        imp_press=None,
-        imp_freq=None,
-        imp_amps=None,
+        amb_temp=0.0,
+        amb_humidity=0.0,
+        rb_temp=0.0,
+        msp_temp=0.0,
+        msp_press=0.0,
+        asp_freq=0.0,
+        asp_amps=0.0,
+        imp_temp=0.0,
+        imp_press=0.0,
+        imp_freq=0.0,
+        imp_amps=0.0,
         Robo=None,
         Pump1=None,
         Pump2=None,
-        phc_aircon=None,
-        phc_fdist=None,
-        phc_edist=None,
+        phc_aircon=0.0,
+        phc_fdist=0.0,
+        phc_edist=0.0,
     ) -> None:
 
-        self.amb_temp = TSData() if (amb_temp is None) else amb_temp
-        self.amb_humidity = TSData() if (amb_humidity is None) else amb_humidity
-        self.rb_temp = TSData() if(rb_temp is None) else rb_temp
-        self.msp_temp = TSData() if (msp_temp is None) else msp_temp
-        self.msp_press = TSData() if (msp_press is None) else msp_press
-        self.asp_freq = TSData() if (asp_freq is None) else asp_freq
-        self.asp_amps = TSData() if (asp_amps is None) else asp_amps
-        self.imp_temp = TSData() if (imp_temp is None) else imp_temp
-        self.imp_press = TSData() if (imp_press is None) else imp_press
-        self.imp_freq = TSData() if (imp_freq is None) else imp_freq
-        self.imp_amps = TSData() if (imp_amps is None) else imp_amps
-        self.phc_aircon = TSData() if (phc_aircon is None) else phc_aircon
-        self.phc_fdist = TSData() if (phc_fdist is None) else phc_fdist
-        self.phc_edist = TSData() if (phc_edist is None) else phc_edist
+        self.amb_temp = amb_temp
+        self.amb_humidity = amb_humidity
+        self.rb_temp = rb_temp
+        self.msp_temp = msp_temp
+        self.msp_press = msp_press
+        self.asp_freq = asp_freq
+        self.asp_amps = asp_amps
+        self.imp_temp = imp_temp
+        self.imp_press = imp_press
+        self.imp_freq = imp_freq
+        self.imp_amps = imp_amps
+        self.phc_aircon = phc_aircon
+        self.phc_fdist = phc_fdist
+        self.phc_edist = phc_edist
 
         # handle those beasty mutables
         self.Robo = RoboTelemetry() if (Robo is None) else Robo
@@ -1344,11 +1360,7 @@ class DaqBlock:
         if not isinstance(new_valid_time, int):
             return ValueError(f"{new_valid_time} is not an instance of int!")
         
-        for varkey in vars(self):
-            attr = vars(self)[varkey]
-            if isinstance(attr, TSData):
-                attr.valid_time = new_valid_time
-        
+        self._valid_time = timedelta(seconds=new_valid_time)        
         return None
 
 
@@ -1720,6 +1732,12 @@ ADC_fib_pnmtc = DEF_AMC_FIBER_PNMTC
 DCCurrZero = Coordinate()
 DCSpeed = copy.deepcopy(DEF_DC_SPEED)
 DC_rob_moving = False
+
+DB_session = "not set"
+DB_org = "MC3DB"
+DB_token = None
+DB_url = "192.168.178.50:8086"
+DB_log_interval = 10
 
 IO_curr_filepath = None
 IO_fr_to_ts = DEF_IO_FR_TO_TS
