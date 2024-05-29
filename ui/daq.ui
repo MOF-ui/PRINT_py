@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1924</width>
-    <height>1089</height>
+    <width>1932</width>
+    <height>1107</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -288,15 +288,14 @@ color: #E1E5EE;</string>
    <widget class="QLabel" name="PATH_disp_path">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>140</x>
       <y>80</y>
-      <width>791</width>
+      <width>331</width>
       <height>41</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">border-top-right-radius: 0px;
-border-bottom-right-radius: 0px;</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>no path given</string>
@@ -306,9 +305,9 @@ border-bottom-right-radius: 0px;</string>
     <property name="geometry">
      <rect>
       <x>36</x>
-      <y>90</y>
-      <width>71</width>
-      <height>31</height>
+      <y>75</y>
+      <width>101</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -317,7 +316,8 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>path:</string>
+     <string>current
+DB address:</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
@@ -357,12 +357,53 @@ color: #E1E5EE;</string>
      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
     </property>
    </widget>
+   <widget class="QLineEdit" name="PATH_entry_newPath">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>80</y>
+      <width>311</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-top-right-radius: 0px;
+border-bottom-right-radius: 0px;</string>
+    </property>
+    <property name="text">
+     <string>enter new path here</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="PATH_lbl_newPath">
+    <property name="geometry">
+     <rect>
+      <x>488</x>
+      <y>75</y>
+      <width>101</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+    </property>
+    <property name="text">
+     <string>new
+DB address:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+    </property>
+   </widget>
    <zorder>PATH_lbl_path</zorder>
    <zorder>PATH_0_frameLabel</zorder>
-   <zorder>PATH_btt_chgPath</zorder>
    <zorder>PATH_disp_path</zorder>
    <zorder>PATH_lbl_datetime</zorder>
    <zorder>PATH_disp_datetime</zorder>
+   <zorder>PATH_entry_newPath</zorder>
+   <zorder>PATH_btt_chgPath</zorder>
+   <zorder>PATH_lbl_newPath</zorder>
   </widget>
   <widget class="QFrame" name="BASIC_frame">
    <property name="geometry">

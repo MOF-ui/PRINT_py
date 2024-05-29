@@ -120,7 +120,8 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             usr_title="Confirm Dialog"
         )
         commit_dialog.exec()
-        if commit_dialog.result == 1:
+        print(f"DB path change: {commit_dialog.result()}")
+        if commit_dialog.result() == 1:
             du.DB_url = new_url
             self.PATH_disp_path.setText(du.DB_url)
 

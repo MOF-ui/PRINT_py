@@ -9,14 +9,12 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow
 
 
 class Ui_DAQWindow(object):
     def setupUi(self, DAQWindow):
         DAQWindow.setObjectName("DAQWindow")
-        DAQWindow.resize(1920, 1080)
+        DAQWindow.resize(1932, 1107)
         DAQWindow.setMinimumSize(QtCore.QSize(600, 0))
         DAQWindow.setStyleSheet(
             "QWidget {\n"
@@ -222,7 +220,7 @@ class Ui_DAQWindow(object):
             "}"
         )
         self.PATH_frame = QtWidgets.QFrame(DAQWindow)
-        self.PATH_frame.setGeometry(QtCore.QRect(50, 30, 1011, 151))
+        self.PATH_frame.setGeometry(QtCore.QRect(40, 30, 1021, 151))
         self.PATH_frame.setStyleSheet("")
         self.PATH_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.PATH_frame.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -247,13 +245,11 @@ class Ui_DAQWindow(object):
         self.PATH_btt_chgPath.setStyleSheet("padding-left: 6px;")
         self.PATH_btt_chgPath.setObjectName("PATH_btt_chgPath")
         self.PATH_disp_path = QtWidgets.QLabel(self.PATH_frame)
-        self.PATH_disp_path.setGeometry(QtCore.QRect(110, 80, 791, 41))
-        self.PATH_disp_path.setStyleSheet(
-            "border-top-right-radius: 0px;\n" "border-bottom-right-radius: 0px;"
-        )
+        self.PATH_disp_path.setGeometry(QtCore.QRect(140, 80, 331, 41))
+        self.PATH_disp_path.setStyleSheet("")
         self.PATH_disp_path.setObjectName("PATH_disp_path")
         self.PATH_lbl_path = QtWidgets.QLabel(self.PATH_frame)
-        self.PATH_lbl_path.setGeometry(QtCore.QRect(36, 90, 71, 31))
+        self.PATH_lbl_path.setGeometry(QtCore.QRect(36, 75, 101, 51))
         self.PATH_lbl_path.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -273,12 +269,29 @@ class Ui_DAQWindow(object):
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
         self.PATH_lbl_datetime.setObjectName("PATH_lbl_datetime")
+        self.PATH_entry_newPath = QtWidgets.QLineEdit(self.PATH_frame)
+        self.PATH_entry_newPath.setGeometry(QtCore.QRect(590, 80, 311, 41))
+        self.PATH_entry_newPath.setStyleSheet(
+            "border-top-right-radius: 0px;\n" "border-bottom-right-radius: 0px;"
+        )
+        self.PATH_entry_newPath.setObjectName("PATH_entry_newPath")
+        self.PATH_lbl_newPath = QtWidgets.QLabel(self.PATH_frame)
+        self.PATH_lbl_newPath.setGeometry(QtCore.QRect(488, 75, 101, 51))
+        self.PATH_lbl_newPath.setStyleSheet(
+            "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
+        )
+        self.PATH_lbl_newPath.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.PATH_lbl_newPath.setObjectName("PATH_lbl_newPath")
         self.PATH_lbl_path.raise_()
         self.PATH_0_frameLabel.raise_()
-        self.PATH_btt_chgPath.raise_()
         self.PATH_disp_path.raise_()
         self.PATH_lbl_datetime.raise_()
         self.PATH_disp_datetime.raise_()
+        self.PATH_entry_newPath.raise_()
+        self.PATH_btt_chgPath.raise_()
+        self.PATH_lbl_newPath.raise_()
         self.BASIC_frame = QtWidgets.QFrame(DAQWindow)
         self.BASIC_frame.setGeometry(QtCore.QRect(40, 210, 341, 791))
         self.BASIC_frame.setStyleSheet("")
@@ -301,7 +314,7 @@ class Ui_DAQWindow(object):
         self.BASIC_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.BASIC_0_frameLabel.setObjectName("BASIC_0_frameLabel")
         self.BASIC_lbl_delivPumpTemp = QtWidgets.QLabel(self.BASIC_frame)
-        self.BASIC_lbl_delivPumpTemp.setGeometry(QtCore.QRect(40, 330, 131, 51))
+        self.BASIC_lbl_delivPumpTemp.setGeometry(QtCore.QRect(30, 330, 141, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
@@ -323,7 +336,7 @@ class Ui_DAQWindow(object):
         )
         self.BASIC_disp_delivPumpTemp.setObjectName("BASIC_disp_delivPumpTemp")
         self.BASIC_lbl_robBaseTemp = QtWidgets.QLabel(self.BASIC_frame)
-        self.BASIC_lbl_robBaseTemp.setGeometry(QtCore.QRect(40, 400, 131, 51))
+        self.BASIC_lbl_robBaseTemp.setGeometry(QtCore.QRect(30, 400, 141, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
@@ -351,7 +364,7 @@ class Ui_DAQWindow(object):
         )
         self.BASIC_disp_2kPumpTemp.setObjectName("BASIC_disp_2kPumpTemp")
         self.BASIC_lbl_2kPumpTemp = QtWidgets.QLabel(self.BASIC_frame)
-        self.BASIC_lbl_2kPumpTemp.setGeometry(QtCore.QRect(40, 470, 131, 51))
+        self.BASIC_lbl_2kPumpTemp.setGeometry(QtCore.QRect(30, 470, 141, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
@@ -681,16 +694,13 @@ class Ui_DAQWindow(object):
         )
         self.ROB_disp_xPos.setObjectName("ROB_disp_xPos")
         self.ROB_lbl_xPos = QtWidgets.QLabel(self.ROB_frame)
-        self.ROB_lbl_xPos.setGeometry(QtCore.QRect(30, 320, 91, 51))
+        self.ROB_lbl_xPos.setGeometry(QtCore.QRect(30, 321, 91, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
-        font.setPointSize(11)
+        font.setPointSize(14)
         self.ROB_lbl_xPos.setFont(font)
         self.ROB_lbl_xPos.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 11pt;\n"
-            "background-color: #5D707F;\n"
-            "color: #E1E5EE;"
+            "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
         self.ROB_lbl_xPos.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
@@ -700,13 +710,10 @@ class Ui_DAQWindow(object):
         self.ROB_lbl_yPos.setGeometry(QtCore.QRect(30, 380, 91, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
-        font.setPointSize(11)
+        font.setPointSize(14)
         self.ROB_lbl_yPos.setFont(font)
         self.ROB_lbl_yPos.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 11pt;\n"
-            "background-color: #5D707F;\n"
-            "color: #E1E5EE;"
+            "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
         self.ROB_lbl_yPos.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
@@ -728,13 +735,10 @@ class Ui_DAQWindow(object):
         self.ROB_lbl_zPos.setGeometry(QtCore.QRect(30, 440, 91, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
-        font.setPointSize(11)
+        font.setPointSize(14)
         self.ROB_lbl_zPos.setFont(font)
         self.ROB_lbl_zPos.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 11pt;\n"
-            "background-color: #5D707F;\n"
-            "color: #E1E5EE;"
+            "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
         self.ROB_lbl_zPos.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
@@ -744,13 +748,10 @@ class Ui_DAQWindow(object):
         self.ROB_lbl_xOri.setGeometry(QtCore.QRect(20, 500, 101, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
-        font.setPointSize(11)
+        font.setPointSize(14)
         self.ROB_lbl_xOri.setFont(font)
         self.ROB_lbl_xOri.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 11pt;\n"
-            "background-color: #5D707F;\n"
-            "color: #E1E5EE;"
+            "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
         self.ROB_lbl_xOri.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
@@ -778,13 +779,10 @@ class Ui_DAQWindow(object):
         self.ROB_lbl_yOri.setGeometry(QtCore.QRect(20, 560, 101, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
-        font.setPointSize(11)
+        font.setPointSize(14)
         self.ROB_lbl_yOri.setFont(font)
         self.ROB_lbl_yOri.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 11pt;\n"
-            "background-color: #5D707F;\n"
-            "color: #E1E5EE;"
+            "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
         self.ROB_lbl_yOri.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
@@ -794,13 +792,10 @@ class Ui_DAQWindow(object):
         self.ROB_lbl_zOri.setGeometry(QtCore.QRect(20, 620, 101, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
-        font.setPointSize(11)
+        font.setPointSize(14)
         self.ROB_lbl_zOri.setFont(font)
         self.ROB_lbl_zOri.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 11pt;\n"
-            "background-color: #5D707F;\n"
-            "color: #E1E5EE;"
+            "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
         self.ROB_lbl_zOri.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
@@ -810,13 +805,10 @@ class Ui_DAQWindow(object):
         self.ROB_lbl_extPos.setGeometry(QtCore.QRect(20, 680, 101, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
-        font.setPointSize(11)
+        font.setPointSize(14)
         self.ROB_lbl_extPos.setFont(font)
         self.ROB_lbl_extPos.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 11pt;\n"
-            "background-color: #5D707F;\n"
-            "color: #E1E5EE;"
+            "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
         self.ROB_lbl_extPos.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
@@ -835,16 +827,13 @@ class Ui_DAQWindow(object):
         )
         self.ROB_disp_tcpSpeed.setObjectName("ROB_disp_tcpSpeed")
         self.ROB_lbl_id = QtWidgets.QLabel(self.ROB_frame)
-        self.ROB_lbl_id.setGeometry(QtCore.QRect(30, 120, 91, 51))
+        self.ROB_lbl_id.setGeometry(QtCore.QRect(30, 125, 91, 41))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
-        font.setPointSize(11)
+        font.setPointSize(14)
         self.ROB_lbl_id.setFont(font)
         self.ROB_lbl_id.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 11pt;\n"
-            "background-color: #5D707F;\n"
-            "color: #E1E5EE;"
+            "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
         self.ROB_lbl_id.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
@@ -854,11 +843,11 @@ class Ui_DAQWindow(object):
         self.ROB_lbl_tcpSpeed.setGeometry(QtCore.QRect(30, 220, 91, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
-        font.setPointSize(11)
+        font.setPointSize(12)
         self.ROB_lbl_tcpSpeed.setFont(font)
         self.ROB_lbl_tcpSpeed.setStyleSheet(
             "border: 0px;\n"
-            "font-size: 11pt;\n"
+            "font-size: 12pt;\n"
             "background-color: #5D707F;\n"
             "color: #E1E5EE;"
         )
@@ -872,6 +861,42 @@ class Ui_DAQWindow(object):
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.ROB_disp_id.setObjectName("ROB_disp_id")
+        self.ROB_lbl_tcpSpeed_2 = QtWidgets.QLabel(self.ROB_frame)
+        self.ROB_lbl_tcpSpeed_2.setGeometry(QtCore.QRect(150, 290, 151, 31))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(12)
+        self.ROB_lbl_tcpSpeed_2.setFont(font)
+        self.ROB_lbl_tcpSpeed_2.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ROB_lbl_tcpSpeed_2.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
+        self.ROB_lbl_tcpSpeed_2.setObjectName("ROB_lbl_tcpSpeed_2")
+        self.ROB_lbl_tcpSpeed_2.raise_()
+        self.ROB_0_frameLabel.raise_()
+        self.ROB_disp_xPos.raise_()
+        self.ROB_lbl_xPos.raise_()
+        self.ROB_lbl_yPos.raise_()
+        self.ROB_disp_yPos.raise_()
+        self.ROB_disp_xOri.raise_()
+        self.ROB_lbl_zPos.raise_()
+        self.ROB_lbl_xOri.raise_()
+        self.ROB_disp_zPos.raise_()
+        self.ROB_disp_yOri.raise_()
+        self.ROB_disp_zOri.raise_()
+        self.ROB_lbl_yOri.raise_()
+        self.ROB_lbl_zOri.raise_()
+        self.ROB_lbl_extPos.raise_()
+        self.ROB_disp_extPos.raise_()
+        self.ROB_disp_tcpSpeed.raise_()
+        self.ROB_lbl_id.raise_()
+        self.ROB_lbl_tcpSpeed.raise_()
+        self.ROB_disp_id.raise_()
         self.MORT_frame = QtWidgets.QFrame(DAQWindow)
         self.MORT_frame.setGeometry(QtCore.QRect(1280, 210, 351, 791))
         self.MORT_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -995,37 +1020,39 @@ class Ui_DAQWindow(object):
         self.PATH_0_frameLabel.setText(_translate("DAQWindow", "DATABASE"))
         self.PATH_btt_chgPath.setText(_translate("DAQWindow", "change"))
         self.PATH_disp_path.setText(_translate("DAQWindow", "no path given"))
-        self.PATH_lbl_path.setText(_translate("DAQWindow", "path:"))
+        self.PATH_lbl_path.setText(_translate("DAQWindow", "current\n" "DB address:"))
         self.PATH_disp_datetime.setText(
             _translate("DAQWindow", "2023-07-25    14:55:23")
         )
         self.PATH_lbl_datetime.setText(_translate("DAQWindow", "datetime:"))
+        self.PATH_entry_newPath.setText(_translate("DAQWindow", "enter new path here"))
+        self.PATH_lbl_newPath.setText(_translate("DAQWindow", "new\n" "DB address:"))
         self.BASIC_0_frameLabel.setText(_translate("DAQWindow", "BASICS"))
         self.BASIC_lbl_delivPumpTemp.setText(
-            _translate("DAQWindow", "pipe temperature\n" "(delivery pump)")
+            _translate("DAQWindow", "PIPE temperature\n" "(delivery pump)")
         )
         self.BASIC_disp_delivPumpTemp.setText(_translate("DAQWindow", "0.0 °C"))
         self.BASIC_lbl_robBaseTemp.setText(
-            _translate("DAQWindow", "pipe temperature\n" "(robot base)")
+            _translate("DAQWindow", "PIPE temperature\n" "(robot base)")
         )
         self.BASIC_disp_robBaseTemp.setText(_translate("DAQWindow", "0.0 °C"))
         self.BASIC_disp_2kPumpTemp.setText(_translate("DAQWindow", "0.0 °C"))
         self.BASIC_lbl_2kPumpTemp.setText(
-            _translate("DAQWindow", "pipe temperature\n" "(2K pump)")
+            _translate("DAQWindow", "PIPE temperature\n" "(2K pump)")
         )
         self.BASIC_lbl_ambTemp.setText(
-            _translate("DAQWindow", "ambient\n" "temperature")
+            _translate("DAQWindow", "AMBIENT\n" "temperature")
         )
         self.BASIC_disp_ambTemp.setText(_translate("DAQWindow", "0.0 °C"))
         self.BASIC_disp_ambHum.setText(_translate("DAQWindow", "0.0 rH"))
-        self.BASIC_lbl_ambHum.setText(_translate("DAQWindow", "ambient\n" "humidity"))
+        self.BASIC_lbl_ambHum.setText(_translate("DAQWindow", "AMBIENT\n" "humidity"))
         self.BASIC_disp_2kPumpPress.setText(_translate("DAQWindow", "0.0 °C"))
         self.BASIC_lbl_robBasePress.setText(
-            _translate("DAQWindow", "pipe pressure\n" "(2k pump)")
+            _translate("DAQWindow", "PIPE pressure\n" "(2k pump)")
         )
         self.BASIC_disp_delivPumpPress.setText(_translate("DAQWindow", "0.0 °C"))
         self.BASIC_lbl_delivPumpPress.setText(
-            _translate("DAQWindow", "pipe pressure\n" "(delivery pump)")
+            _translate("DAQWindow", "PIPE pressure\n" "(delivery pump)")
         )
         self.MOT_0_frameLabel.setText(_translate("DAQWindow", "MOTORS"))
         self.MOT_lbl_Freq.setText(_translate("DAQWindow", "frequency"))
@@ -1058,31 +1085,24 @@ class Ui_DAQWindow(object):
         )
         self.ROB_0_frameLabel.setText(_translate("DAQWindow", "ROBOT"))
         self.ROB_disp_xPos.setText(_translate("DAQWindow", "0.0 mm"))
-        self.ROB_lbl_xPos.setText(_translate("DAQWindow", "X position\n" "(relative)"))
-        self.ROB_lbl_yPos.setText(_translate("DAQWindow", "Y position\n" "(relative)"))
+        self.ROB_lbl_xPos.setText(_translate("DAQWindow", "X"))
+        self.ROB_lbl_yPos.setText(_translate("DAQWindow", "Y"))
         self.ROB_disp_yPos.setText(_translate("DAQWindow", "0.0 mm"))
         self.ROB_disp_xOri.setText(_translate("DAQWindow", "0.0 mm"))
-        self.ROB_lbl_zPos.setText(_translate("DAQWindow", "Z position\n" "(relative)"))
-        self.ROB_lbl_xOri.setText(
-            _translate("DAQWindow", "X orientation\n" "(relative)")
-        )
+        self.ROB_lbl_zPos.setText(_translate("DAQWindow", "Z"))
+        self.ROB_lbl_xOri.setText(_translate("DAQWindow", "RX"))
         self.ROB_disp_zPos.setText(_translate("DAQWindow", "0.0 mm"))
         self.ROB_disp_yOri.setText(_translate("DAQWindow", "0.0 mm"))
         self.ROB_disp_zOri.setText(_translate("DAQWindow", "0.0 mm"))
-        self.ROB_lbl_yOri.setText(
-            _translate("DAQWindow", "Y orientation\n" "(relative)")
-        )
-        self.ROB_lbl_zOri.setText(
-            _translate("DAQWindow", "Z orientation\n" "(relative)")
-        )
-        self.ROB_lbl_extPos.setText(
-            _translate("DAQWindow", "EXT position\n" "(relative)")
-        )
+        self.ROB_lbl_yOri.setText(_translate("DAQWindow", "RY"))
+        self.ROB_lbl_zOri.setText(_translate("DAQWindow", "RZ"))
+        self.ROB_lbl_extPos.setText(_translate("DAQWindow", "EXT"))
         self.ROB_disp_extPos.setText(_translate("DAQWindow", "0.0 mm"))
         self.ROB_disp_tcpSpeed.setText(_translate("DAQWindow", "0.0 mm/s"))
-        self.ROB_lbl_id.setText(_translate("DAQWindow", "robotor ID"))
+        self.ROB_lbl_id.setText(_translate("DAQWindow", "ID"))
         self.ROB_lbl_tcpSpeed.setText(_translate("DAQWindow", "TCP speed"))
         self.ROB_disp_id.setText(_translate("DAQWindow", "0"))
+        self.ROB_lbl_tcpSpeed_2.setText(_translate("DAQWindow", "relative positions"))
         self.MORT_0_frameLabel.setText(_translate("DAQWindow", "MORTAR"))
         self.MORT_disp_pores.setText(_translate("DAQWindow", "n.m."))
         self.MORT_lbl_pores.setText(_translate("DAQWindow", "porosity\n" "analysis"))
