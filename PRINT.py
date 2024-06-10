@@ -128,6 +128,7 @@ cs_pump2 = connection_setup[3]
 cs_conn_def = (connection_setup[4], connection_setup[5])
 
 if not cs_result:
+    print(f"User choose to abort setup! Exiting..")
     exit()
 else:
     du.ROBTcp.set_params(cs_robot)
@@ -144,6 +145,7 @@ welc_text = (
 
 welc_choice = strd_dialog(welc_text, "Welcome to PRINT_py", standalone=True)
 if not welc_choice:
+    print(f"User choose to abort setup! Exiting..")
     exit()
 
 
@@ -152,12 +154,20 @@ if not welc_choice:
 # create logfile and get path
 logpath = fu.create_logfile()
 
+print(
+    f"PRINT_py started.\n"
+    f"Writing log at {logpath}.\n"
+    f"Got command line arguments: {sys.argv}"
+)
+
+arg1 = sys.argv[0]
+test_arg = True if (arg1 == 'test') else False
 
 # start the UI and show the window to user
 app = 0  # leave that here so app doesnt include the remnant of a previous QApplication instance
 win = 0
 app = QApplication(sys.argv)
-win = Mainframe(lpath=logpath, conn_def=cs_conn_def)
+win = Mainframe(lpath=logpath, conn_def=cs_conn_def, testrun=test_arg)
 win.show()
 app.exec()
 # sys.exit(app.exec())

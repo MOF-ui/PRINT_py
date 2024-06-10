@@ -530,7 +530,7 @@ class UTIL_test(unittest.TestCase):
         """checks preCheckGcodeFiles function, should count the number of commands in a file"""
 
         testTxt = ";comment\nG1 X0 Y0 Z0\nG1 X2000 Y0 Z0.0\nG1 X2000 Y1500 Z0"
-        self.assertEqual(fu.pre_check_ccode_file(), (0, 0, "empty"))
+        self.assertEqual(fu.pre_check_ccode_file(''), (0, 0, "empty"))
         self.assertEqual(fu.pre_check_ccode_file(testTxt), (3, 3.5, ""))
 
 
@@ -538,17 +538,17 @@ class UTIL_test(unittest.TestCase):
         """checks preCheckGcodeFiles function, should count the number of commands in a file"""
 
         testTxt = "!comment\nMoveL [[0.0,0.0,0.0],...,v50,z10,tool0\nMoveL [[2000.0,0.0,0.0],...,v50,z10,tool0\nMoveL [[2000.0,1500.0,0.0],...,v50,z10,tool0"
-        self.assertEqual(fu.pre_check_rapid_file(), (0, 0, "empty"))
+        self.assertEqual(fu.pre_check_rapid_file(''), (0, 0, "empty"))
         self.assertEqual(fu.pre_check_rapid_file(testTxt), (3, 3.5, ""))
 
 
     def test_re_short_function(self):
         """see reShort in libs/PRINT_data_utilities"""
 
-        self.assertEqual(fu.re_short("\d+\.\d+", "A12B", "0", "\d+"), ("12", True))
-        self.assertEqual(fu.re_short("\d+\.\d+", "A12.3B", "0", "\d+"), ("12.3", True))
-        self.assertEqual(fu.re_short("\d+\.\d+", "ABC", "0", "\d+"), ("0", False))
-        self.assertEqual(fu.re_short("\d+\.\d+", "A12B", "0"), ("0", False))
+        self.assertEqual(fu.re_short("\d+\.\d+", "A12B", "0", "\d+"), "12")
+        self.assertEqual(fu.re_short("\d+\.\d+", "A12.3B", "0", "\d+"), "12.3")
+        self.assertEqual(fu.re_short("\d+\.\d+", "ABC", "0", "\d+"), "0")
+        self.assertEqual(fu.re_short("\d+\.\d+", "A12B", "0"), "0")
 
 
     def test_gcode_to_qentry_function(self):

@@ -605,7 +605,7 @@ class Queue:
             increments all QEntry.ID to handle DC commands send before the queue
         add:
             adds a new QEntry to queue, checks if QEntry.ID makes sense, places QEntry in queue according to the ID given
-        add_list:
+        add_queue:
             adds another queue, hopefully less time-consuming than a for loop with self.add
         append:
             other than '.add' this simply appends an entry indifferently to its ID
@@ -623,7 +623,7 @@ class Queue:
         if not isinstance(other, Queue):
             raise ValueError(f"{other} is not an instance of 'Queue'!")
         
-        return self._queue + other._queue
+        return Queue(self._queue + other._queue)
 
 
     def __init__(self, queue=None) -> None:
@@ -832,7 +832,7 @@ class Queue:
         return None
 
 
-    def add_list(self, list) -> None | Exception:
+    def add_queue(self, list) -> None | Exception:
         """adds another queue, hopefully less time-consuming than a for loop with self.add"""
 
         new_list = copy.deepcopy(list)
@@ -1210,12 +1210,11 @@ class DaqBlock:
             PHC = print head controller; deposition layer distance in front of the nozzle
         phc_edist:
             PHC = print head controller; deposition layer distance behind the nozzle
+        valid time:
+            changes the valid_time of all TSData entries (property attribute)
 
     FUNCTIONS:
         __init__, __str__, __eq__,
-
-        set_valid_time:
-            changes the valid_time of all TSData entries
     """
 
     amb_temp = TSData()
@@ -1233,30 +1232,30 @@ class DaqBlock:
     phc_fdist = TSData()
     phc_edist = TSData()
     
-    _valid_time = timedelta(seconds=60)
-    
     
     def __init__(
-        self,
-        amb_temp=0.0,
-        amb_humidity=0.0,
-        rb_temp=0.0,
-        msp_temp=0.0,
-        msp_press=0.0,
-        asp_freq=0.0,
-        asp_amps=0.0,
-        imp_temp=0.0,
-        imp_press=0.0,
-        imp_freq=0.0,
-        imp_amps=0.0,
-        Robo=None,
-        Pump1=None,
-        Pump2=None,
-        phc_aircon=0.0,
-        phc_fdist=0.0,
-        phc_edist=0.0,
+            self,
+            amb_temp=0.0,
+            amb_humidity=0.0,
+            rb_temp=0.0,
+            msp_temp=0.0,
+            msp_press=0.0,
+            asp_freq=0.0,
+            asp_amps=0.0,
+            imp_temp=0.0,
+            imp_press=0.0,
+            imp_freq=0.0,
+            imp_amps=0.0,
+            Robo=None,
+            Pump1=None,
+            Pump2=None,
+            phc_aircon=0.0,
+            phc_fdist=0.0,
+            phc_edist=0.0,
     ) -> None:
+        global DEF_STT_VALID_TIME
 
+        self.valid_time = DEF_STT_VALID_TIME
         self.amb_temp = amb_temp
         self.amb_humidity = amb_humidity
         self.rb_temp = rb_temp
@@ -1351,17 +1350,16 @@ class DaqBlock:
 
         return False
     
-
-    def set_valid_time(self, new_valid_time) -> None | ValueError:
-        """ sets valid time (given in seconds) of all TSData objects
-        to new_valid_time
-        """
-        
+    @property
+    def valid_time(self):
+        return self._valid_time
+    
+    @valid_time.setter
+    def valid_time(self, new_valid_time):
         if not isinstance(new_valid_time, int):
-            return ValueError(f"{new_valid_time} is not an instance of int!")
+            raise ValueError(f"{new_valid_time} is not an instance of int!")
         
-        self._valid_time = timedelta(seconds=new_valid_time)        
-        return None
+        self._valid_time = timedelta(seconds=new_valid_time) 
 
 
 
@@ -1714,6 +1712,8 @@ DEF_SC_VOL_PER_M = 0.4  # calculated for 1m of 4cm wide and 1cm high filament
 DEF_SC_MAX_LINES = 400
 DEF_SC_EXT_FLLW_BHVR = (5, 2)
 
+DEF_STT_VALID_TIME = 60 # seconds
+
 DEF_TERM_MAX_LINES = 300
 
 DEF_TOOL_FIB_STPS = 10
@@ -1818,9 +1818,10 @@ SC_ext_fllw_bhvr = DEF_SC_EXT_FLLW_BHVR
 
 SEN_dict = { # add available datasources here
     'msp': { # Main Supply Pump
-        'ip': "",
-        'temp': float(0.0),
-        #"pressure": float(0.0)
+        'ip': "192.168.178.36:17",
+        'err': False,
+        'temp': True,
+        'pressure': False,
     },
     'asp': { # Admixture Supply Pump
         None

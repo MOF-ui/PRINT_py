@@ -28,14 +28,18 @@ import libs.data_utilities as du
 #                                    FUNCTIONS
 #############################################################################################
 
-def pre_check_ccode_file(txt=""):
+def pre_check_ccode_file(txt:str) -> tuple[int, float, str] | tuple[None, None, Exception]:
     """extracts the number of GCode commands and the filament length from
     text, ignores Z movement for now, slicing only in x-y-plane yet
+
+    accepts:
+        txt:
+            whole file txt as single string
     """
 
     try:
         if txt == "":
-            return 0, 0, "empty"
+            return 0, 0.0, "empty"
 
         rows = txt.split("\n")
         x = 0.0
@@ -49,13 +53,13 @@ def pre_check_ccode_file(txt=""):
                 comm_num += 1
 
             x_new = float(
-                    re_short("X\d+[,.]\d+", row, "X" + str(x), "X\d+")[0][1:]
+                    re_short("X\d+[,.]\d+", row, "X" + str(x), "X\d+")[1:]
                 )
             y_new = float(
-                    re_short("Y\d+[,.]\d+", row, "Y" + str(y), "Y\d+")[0][1:]
+                    re_short("Y\d+[,.]\d+", row, "Y" + str(y), "Y\d+")[1:]
                 )
             z_new = float(
-                    re_short("Z\d+[,.]\d+", row, "Z" + str(z), "Z\d+")[0][1:]
+                    re_short("Z\d+[,.]\d+", row, "Z" + str(z), "Z\d+")[1:]
                 )
 
             # do the Pythagoras for me, baby
@@ -77,14 +81,18 @@ def pre_check_ccode_file(txt=""):
     return comm_num, filament_length, ""
 
 
-def pre_check_rapid_file(txt=""):
+def pre_check_rapid_file(txt:str) -> tuple[int, float, str] | tuple[None, None, Exception]:
     """extracts the number of GCode commands and the filament length from
     text, does not handle Offs commands yet
+
+    accepts:
+        txt:
+            whole file txt as single string
     """
 
     try:
         if txt == "":
-            return 0, 0, "empty"
+            return 0, 0.0, 'empty'
 
         rows = txt.split("\n")
         x = 0.0
@@ -118,34 +126,63 @@ def pre_check_rapid_file(txt=""):
     except Exception as e:
         return None, None, e
 
-    return comm_num, filament_length, ""
+    return comm_num, filament_length, ''
 
 
-def re_short(regex, txt, default, fallback_regex=""):
-    """tries 2 regular expressions on expressions like 'X1.23 Y4.56',
-    returns first match without the leading letter (e.g. '1.23' for '\d+[.,]\d+'),
-    returns default value and 'False' if no match occurs"""
+def re_short(regex:str, txt:str, default, fallback_regex=""):
+    """tries 2 regular expressions on expressions to match the txt,
+    returns first match found, returns default if no match occurs
+    
+    accepts:
+        regex:
+            regular expression to be matched (using re lib)
+        txt:
+            string to be searched
+        default:
+            default return value if nothing is found, can be any type
+        fallback_regex:
+            second RE to try if regex doesnt match
+    """
 
+    ans = default
     try:
         ans = re.findall(regex, txt)[0]
 
     except IndexError:
-        if fallback_regex == "":
-            return default, False
+        if fallback_regex != "":
+            try:
+                ans = re.findall(fallback_regex, txt)[0]
+            except IndexError:
+                pass
 
-        try:
-            ans = re.findall(fallback_regex, txt)[0]
-        except IndexError:
-            return default, False
-
-    return ans, True
+    return ans
 
 
-def gcode_to_qentry(mut_pos, mut_speed, zone, txt=""):
+def gcode_to_qentry(
+        mut_pos:du.Coordinate,
+        mut_speed:du.SpeedVector,
+        zone:int,
+        txt:str
+    ) -> (
+        tuple[du.QEntry, str]
+        | tuple[None, None]
+    ):
     """converts a single line of GCode G1 command to a QEntry, can be used in
     loops for multiline code, "pos" should be the pos before this command is
     executed (before its EXECUTED, not before its added to SC_queue) as its
     the fallback option if no new X, Y, Z or EXT posistion is passed
+
+    accepts:
+        mut_pos: 
+            postion immediately prior to planned command execution,
+            is deepcopied inside function to avoid mutuable behavior
+        mut_speed:
+            speed to be used in this movement,
+            is deepcopied inside function to avoid mutuable behavior
+        zone:
+            RAPID-like accuracy zone for the movement
+        txt: 
+            GCode line to be converted
     """
 
     # handle mutuables here
@@ -158,7 +195,7 @@ def gcode_to_qentry(mut_pos, mut_speed, zone, txt=""):
             raise ValueError(f"{pos} is not an instance of QEntry!")
         if not isinstance(speed, du.SpeedVector):
             raise ValueError(f"{speed} is not an instance of SpeedVector!")
-        command = re_short("G\d+", txt, 0, "^;")[0]
+        command = re_short("G\d+", txt, 0, "^;")
 
     except IndexError:
         return None, None
@@ -170,8 +207,8 @@ def gcode_to_qentry(mut_pos, mut_speed, zone, txt=""):
             entry = du.QEntry(id=0, Coor1=pos, Speed=speed, z=zone)
 
             # set position and speed
-            x, res = re_short("X\d+[,.]\d+", txt, pos.x, "X\d+")
-            if res:
+            x = re_short("X\d+[,.]\d+", txt, pos.x, "X\d+")
+            if x != pos.x:
                 entry.Coor1.x = float(x[1:].replace(",", "."))
                 entry.Coor1.x += zero.x
 
@@ -186,23 +223,40 @@ def gcode_to_qentry(mut_pos, mut_speed, zone, txt=""):
                 else:
                     entry.Coor1.ext = zero.ext
 
-            y, res = re_short("Y\d+[,.]\d+", txt, pos.y, "Y\d+")
-            if res:
+            y = re_short("Y\d+[,.]\d+", txt, pos.y, "Y\d+")
+            if y != pos.y:
                 entry.Coor1.y = float(y[1:].replace(",", "."))
                 entry.Coor1.y += zero.y
 
-            z, res = re_short("Z\d+[,.]\d+", txt, pos.z, "Z\d+")
-            if res:
+            z = re_short("Z\d+[,.]\d+", txt, pos.z, "Z\d+")
+            if z != pos.z:
                 entry.Coor1.z = float(z[1:].replace(",", "."))
                 entry.Coor1.z += zero.z
 
-            fr, res = re_short("F\d+[,.]\d+", txt, speed.ts, "F\d+")
-            if res:
+            # set tool angulation
+            rx = re_short("XR\d+[,.]\d+", txt, pos.rx, "XR\d+")
+            if rx != pos.rx:
+                entry.Coor1.rx = float(rx[1:].replace(",","."))
+                entry.Coor1.rx += zero.rx #to-do: check if running out of 0-359 crashes the robot
+                
+            ry = re_short("XR\d+[,.]\d+", txt, pos.ry, "XR\d+")
+            if ry != pos.ry:
+                entry.Coor1.ry = float(ry[1:].replace(",","."))
+                entry.Coor1.ry += zero.ry
+                
+            rz = re_short("XR\d+[,.]\d+", txt, pos.rz, "XR\d+")
+            if rz != pos.rz:
+                entry.Coor1.rz = float(rz[1:].replace(",","."))
+                entry.Coor1.rz += zero.rz
+
+            # set speed and external axis
+            fr = re_short("F\d+[,.]\d+", txt, speed.ts, "F\d+")
+            if fr != speed.ts:
                 fr = float(fr[1:].replace(",", "."))
                 entry.Speed.ts = int(fr * du.IO_fr_to_ts)
 
-            ext, res = re_short("EXT\d+[,.]\d+", txt, pos.ext, "EXT\d+")
-            if res:
+            ext = re_short("EXT\d+[,.]\d+", txt, pos.ext, "EXT\d+")
+            if ext != pos.ext:
                 entry.Coor1.ext = float(ext[3:].replace(",", "."))
                 entry.Coor1.ext += zero.ext
 
@@ -281,17 +335,25 @@ def gcode_to_qentry(mut_pos, mut_speed, zone, txt=""):
     return entry, command
 
 
-def rapid_to_qentry(txt=""):
+def rapid_to_qentry(
+        txt:str
+    ) -> (
+        tuple[du.QEntry, None]
+        | tuple[Exception, None]
+    ): # to-do
     """converts a single line of MoveL, MoveJ, MoveC or Move* Offs command 
     (no Reltool) to a QEntry (relative to DC_curr_zero for 'Offs'), can be
-    used in loops for multiline code, returns entry and any Exceptions
+    used in loops for multiline code, returns entry or any Exceptions
+
+    accepts:
+        txt: RAPID-like command line specifying movement
     """
 
     entry = du.QEntry(id=0)
     try:
         entry.mt = re.findall("Move[J,L,C]", txt, 0)[0][4]
 
-        ext, res = re_short("EXT:\d+\.\d+", txt, "error", "EXT:\d+")
+        ext = re_short("EXT:\d+\.\d+", txt, None, "EXT:\d+")
         ext = float(ext[4:])
 
         if "Offs" in txt:
@@ -336,7 +398,7 @@ def rapid_to_qentry(txt=""):
         entry.Speed.acr = int(res_speed[2])
         entry.Speed.dcr = int(res_speed[3])
 
-        zone, res = re_short("z\d+", txt, 10)
+        zone = re_short("z\d+", txt, 10)
         entry.z = int(zone[1:])
 
         entry.Coor1 = round(entry.Coor1, 2)
@@ -361,7 +423,7 @@ def rapid_to_qentry(txt=""):
     return entry, None
 
 
-def create_logfile():
+def create_logfile() -> Path | None:
     """defines and creates a logfile (and folder if necessary), which carries
     its creation datetime in the title
     """
@@ -387,8 +449,12 @@ def create_logfile():
     return logpath
 
 
-def add_to_comm_protocol(txt):
-    """puts entries in terminal list an keep its length below TERM_maxLen"""
+def add_to_comm_protocol(txt:str) -> None:
+    """puts entries in terminal list an keep its length below TERM_maxLen
+    
+    accepts:
+        txt: str to appear as terminal entry
+    """
 
     du.TERM_log.append(txt)
 
@@ -396,10 +462,13 @@ def add_to_comm_protocol(txt):
         du.TERM_log.__delitem__(0)
 
 
-def connect_pump(p_num):
-    """creates the defalt serial connection if needed, connects required pump.
+def connect_pump(p_num:int):
+    """creates the default serial connection if needed, connects required pump.
     necessary to do this via default bus, as multiple connections to on COM
     port are forbitten by pyserial
+
+    accepts:
+        p_num: number of pump to be connected
     """
 
     if PMP_serial_def_bus is None:
@@ -422,8 +491,16 @@ def connect_pump(p_num):
             raise ValueError(f"wrong pNum given: {p_num}")
 
 
-def calc_pump_ratio(p1_speed, p2_speed):
-    """keep track if pumpRatio changes"""
+def calc_pump_ratio(p1_speed:int, p2_speed:int) -> tuple[float, float]:
+    """keep track if pumpRatio changes, returns total volume flow and 
+    pump ratio as floats for 2 pump speeds
+
+    accepts:
+        p1_speed:
+            speed of pump 1 expressed as 0-100
+        p2_speed:
+            speed of pump 2 expressed as 0-100
+    """
 
     curr_total = p1_speed + p2_speed
     p1_ratio = (p1_speed / curr_total) if (curr_total != 0) else 0.5
@@ -432,8 +509,17 @@ def calc_pump_ratio(p1_speed, p2_speed):
     return curr_total, p1_ratio
 
 
-def sensor_req(ip="", key="", raise_dl_flag=False):
-    """requests and decodes data from sensor
+def sensor_req(
+        ip:str,
+        key:str,
+        raise_dl_flag=False
+    ) -> (
+        list
+        | None
+        | Exception
+    ):
+    """requests and decodes data from sensor, returns ValueError if request
+    fails, returns None if there is no new data available on the data server
 
     ATTRIBUTES:
         ip:
@@ -445,12 +531,15 @@ def sensor_req(ip="", key="", raise_dl_flag=False):
     """
 
     try:
-        ans = requests.get(f"{ip}/{key}")
+        ans = requests.get(f"http://{ip}/{key}")
         ans.raise_for_status()
     except Exception as err:
         return ValueError(f"request failed: {err}!")
 
     ans_str = ans.text
+    if 'no data available' in ans_str:
+        return None
+    
     data_loss_pos = ans_str.find('&')
     entry_pos = ans_str.find(';')
     if (data_loss_pos <= -1 or entry_pos <= -1):
@@ -467,41 +556,72 @@ def sensor_req(ip="", key="", raise_dl_flag=False):
     entry_pos -= data_loss_pos+1
 
     while entry_pos != -1:
-        next_entry = remain_str[: entry_pos-1]
+        next_entry = remain_str[: entry_pos]
         data = next_entry.split('/')
-        datapoint = (float(data[0][1 :]), int(data[2][1 :])) #(val, uptime)
+        datapoint = (float(data[0][1 :]), int(data[1][1 :])) #(val, uptime)
         try:
             val.append(datapoint)
         except Exception:
             break
 
-        remain_str = ans_str[entry_pos+1 :]
+        remain_str = remain_str[entry_pos+1 :]
         entry_pos = remain_str.find(';')
 
     return val
 
 
-def sensor_data_call(loc=None, raise_dl_flag=False):
-    """http request to data AP, decode
+def store_sensor_data(data:tuple, key:str, sub_key:str) -> None:
+    """Stores data according to key and sub_key, mutual exclusion needs to
+    be called beforehand, as values are stored in global variables.
+    No data is stored, if the corresponding uptime exceeds the data 
 
     accepts: 
-        loc: 
-            location dictionary containing "ip" and at least one specified
-            measurement
-        raise_dl_flag:
-            check if data was lost, if so raise a flag (not supported yet)
+        data:
+            data to be stored, expected as a tuple: (value, uptime)
+        key:
+            superior key in du.SEN_dict, specifying sensor location
+        sub_key:
+            inferior key in du.SEN_dict, specifying parameter type
     """
 
-    if isinstance(loc, dict):
-        ans_dict = {}
+    val, uptime = data
 
-        for key in loc:
-            if key != 'ip':
-                data = sensor_req(loc["ip"], key, raise_dl_flag)
-                ans_dict[key] = data
+    if uptime > du.STTDataBlock.valid_time:
+        return None
+    match key:
+        case 'amb':
+            match sub_key:
+                case 'temp': du.STTDataBlock.amb_temp = val
+                case 'humid': du.STTDataBlock.amb_humidity = val
+                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
+        case 'asp': 
+            match sub_key:
+                case 'freq': du.STTDataBlock.asp_freq = val
+                case 'amps': du.STTDataBlock.asp_amps = val
+                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
+        case 'rb':
+            match sub_key:
+                case 'temp': du.STTDataBlock.rb_temp = val
+                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
+        case 'msp': 
+            match sub_key:
+                case 'temp': du.STTDataBlock.msp_temp = val
+                case 'press': du.STTDataBlock.msp_press = val
+                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
+        case 'imp':
+            match sub_key:
+                case 'temp': du.STTDataBlock.imp_temp = val
+                case 'press': du.STTDataBlock.imp_press = val
+                case 'freq': du.STTDataBlock.imp_freq = val
+                case 'amps': du.STTDataBlock.imp_amps = val
+                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
+        case 'phc':
+            match sub_key:
+                case 'aircon': du.STTDataBlock.imp_temp = val
+                case 'fdist': du.STTDataBlock.imp_press = val
+                case 'edist': du.STTDataBlock.imp_freq = val
+                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
+        case _:
+            raise KeyError(f"no storage reserved for {key} in du.STTDataBlock!")
         
-        return ans_dict
-    
-    else:
-        raise ValueError(f"{loc} is not an instance of dict")
-    
+    return None

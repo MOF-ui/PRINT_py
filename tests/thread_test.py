@@ -34,7 +34,7 @@ class Thread_test(unittest.TestCase):
         # GCode
         T.lfw_file_path = gcode_test_path
         T.lfw_line_id = 0
-        LFWorker.start(testrun=True)
+        LFWorker.run(testrun=True)
 
         self.assertEqual(
             du.SCQueue.display(),
@@ -47,7 +47,7 @@ class Thread_test(unittest.TestCase):
         # GCode at ID
         T.lfw_file_path = gcode_test_path
         T.lfw_line_id = 2
-        LFWorker.start(testrun=True)
+        LFWorker.run(testrun=True)
 
         self.assertEqual(
             du.SCQueue.display(),
@@ -65,7 +65,7 @@ class Thread_test(unittest.TestCase):
 
         T.lfw_file_path = rapid_test_path
         T.lfw_line_id = 0
-        LFWorker.start(testrun=True)
+        LFWorker.run(testrun=True)
 
         self.assertEqual(
             du.SCQueue.display(),
@@ -80,7 +80,7 @@ class Thread_test(unittest.TestCase):
         # RAPID at ID
         T.lfw_file_path = rapid_test_path
         T.lfw_line_id = 2
-        LFWorker.start(testrun=True)
+        LFWorker.run(testrun=True)
 
         self.assertEqual(
             du.SCQueue.display(),

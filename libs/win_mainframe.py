@@ -40,14 +40,14 @@ import libs.func_utilities as fu
 
 
 
-####################################### MAINFRAME CLASS  #####################################################
+####################### MAINFRAME CLASS  #####################################
 
 class Mainframe(QMainWindow, Ui_MainWindow):
     """main UI of PRINT_py (further details pending)"""
 
-    #####################################################################################################
-    #                                        ATTRIBUTES                                                 #
-    #####################################################################################################
+    ##########################################################################
+    #                                ATTRIBUTES                              #
+    ##########################################################################
 
     logpath = ""  # reference for logEntry, set by __init__
     Daq = None  # reference for DAQ main window, instance is loaded in __init__
@@ -65,6 +65,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     _PumpCommWorker = None
     _LoadFileThread = None
     _LoadFileWorker = None
+    _SensorArrThread = None
+    _SensorArrWorker = None
     
     _RobRecvWd = None
     _P1RecvWd = None
@@ -72,11 +74,17 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     _MixRecvWd = None
 
 
-    #####################################################################################################
-    #                                           SETUP                                                   #
-    #####################################################################################################
+    #########################################################################
+    #                                  SETUP                                #
+    #########################################################################
 
-    def __init__(self, lpath=None, conn_def=(False, False), testrun=False, parent=None):
+    def __init__(
+            self,
+            lpath=None,
+            conn_def=(False, False),
+            testrun=False,
+            parent=None
+        ):
         """setup main and daq UI, start subsystems & threads"""
 
         super().__init__(parent)
@@ -149,6 +157,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         # DAQ SETUP
         self.Daq = daq_window()
+        self.Daq.logEntry.connect(self.log_entry)
+
         self._DaqTimer = QTimer()
         self._DaqTimer.setInterval(1000)
         self._DaqTimer.timeout.connect(self.Daq.time_update)
@@ -193,6 +203,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if conn_def[1]:
             self.log_entry("GNRL", "connect to pump2...")
             self.connect_tcp("P2")
+
+        # SENSOR ARRAY START-UP
+        self._SensorArrThread.start()
+        self.log_entry("GNRL", "started sensor array.")
 
         # FINISH SETUP
         self.log_entry("GNRL", "setup finished.")
@@ -459,12 +473,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             widget.blockSignals(False)
 
 
-    #####################################################################################################
-    #                                        CONNECTIONS                                                #
-    #####################################################################################################
+    ##########################################################################
+    #                             CONNECTIONS                                #
+    ##########################################################################
 
     def connect_tcp(self, slot=""):
-        """slot-wise connection management, mostly to shrink code length, maybe more functionality later"""
+        """slot-wise connection management, mostly to shrink code length,
+        maybe more functionality later
+        """
 
         css = "border-radius: 25px; background-color: #00aaff;"
 
@@ -646,9 +662,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 pass
 
 
-    #####################################################################################################
-    #                                          THREADS                                                  #
-    #####################################################################################################
+    ##########################################################################
+    #                               THREADS                                  #
+    ##########################################################################
 
     def connect_threads(self):
         """load all threads from PRINT_threads and set signal-slot-connections"""
@@ -666,13 +682,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self._RoboCommWorker.dataUpdated.connect(self.robo_recv)
         self._RoboCommWorker.endProcessing.connect(self.stop_SCTRL_queue)
         self._RoboCommWorker.endDcMoving.connect(lambda: self.switch_rob_moving(end=True))
-        self._RoboCommWorker.logError.connect(self.log_entry)
+        self._RoboCommWorker.logEntry.connect(self.log_entry)
         self._RoboCommWorker.sendElem.connect(self.robo_send)
         self._RoboCommWorker.queueEmtpy.connect(
             lambda: self.stop_SCTRL_queue(prep_end=True)
         )
 
-        # THREAD FOR COMMUNICATION WITH PUMPS
+        # THREAD FOR COMMUNICATION WITH PUMPS & INLINE MIXER
         self._PumpCommThread = QThread()
         self._PumpCommWorker = workers.PumpCommWorker()
 
@@ -680,22 +696,33 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self._PumpCommThread.started.connect(self._PumpCommWorker.run)
         self._PumpCommThread.finished.connect(self._PumpCommWorker.stop)
         self._PumpCommThread.finished.connect(self._PumpCommWorker.deleteLater)
-        self._PumpCommWorker.logError.connect(self.log_entry)
+        self._PumpCommWorker.logEntry.connect(self.log_entry)
         self._PumpCommWorker.dataSend.connect(self.pump_send)
         self._PumpCommWorker.dataMixerSend.connect(self.mixer_send)
         self._PumpCommWorker.dataRecv.connect(self.pump_recv)
         self._PumpCommWorker.dataMixerRecv.connect(self.mixer_recv)
         self._PumpCommWorker.connActive.connect(self.reset_watchdog)
 
-        # THREAD FOR COMMUNICATION WITH INLINE MIXER
+        # THREAD FOR FILE LOADING
         self._LoadFileThread = QThread()
         self._LoadFileWorker = workers.LoadFileWorker()
 
         self._LoadFileWorker.moveToThread(self._LoadFileThread)
-        self._LoadFileThread.started.connect(self._LoadFileWorker.start)
+        self._LoadFileThread.started.connect(self._LoadFileWorker.run)
         self._LoadFileThread.destroyed.connect(self._LoadFileWorker.deleteLater)
         self._LoadFileWorker.convFailed.connect(self.load_file_failed)
         self._LoadFileWorker.convFinished.connect(self.load_file_finished)
+
+        # THREAD FOR COMMUNICATION WITH SENSOR ARRAY
+        self._SensorArrThread = QThread()
+        self._SensorArrWorker = workers.SensorCommWorker()
+
+        self._SensorArrWorker.moveToThread(self._SensorArrThread)
+        self._SensorArrThread.started.connect(self._SensorArrWorker.run)
+        self._SensorArrThread.finished.connect(self._SensorArrWorker.stop)
+        self._SensorArrThread.destroyed.connect(self._SensorArrWorker.deleteLater)
+        self._SensorArrWorker.dataReceived.connect(self.Daq.data_update)
+        self._SensorArrWorker.logEntry.connect(self.log_entry)
 
 
     def robo_send(self, command, msg, num_send, dc, no_error):
@@ -862,9 +889,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.log_entry("MTel", f"current speed at {mixerSpeed}%")
 
 
-    #####################################################################################################
-    #                                          WATCHDOGS                                                #
-    #####################################################################################################
+    ##########################################################################
+    #                               WATCHDOGS                                #
+    ##########################################################################
 
     def set_watchdog(self, dog=""):
         """set Watchdog, check data updates from robot and pump occure at least every 10 sec"""
@@ -998,9 +1025,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.log_entry("WDOG", f"Watchdog {dog} deleted.")
 
 
-    #####################################################################################################
-    #                                          SETTINGS                                                 #
-    #####################################################################################################
+    ##########################################################################
+    #                                SETTINGS                                #
+    ##########################################################################
 
     def update_comm_forerun(self):
         """reset the robots internal buffer length"""
@@ -1073,9 +1100,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         )
 
 
-    #####################################################################################################
-    #                                        LOG FUNCTION                                               #
-    #####################################################################################################
+    ##########################################################################
+    #                              LOG FUNCTION                              #
+    ##########################################################################
 
     def log_entry(self, source="[    ]", text=""):
         """set one-liner for log entries, safes A LOT of repetitive code"""
@@ -1102,9 +1129,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         logfile.close()
 
 
-    #####################################################################################################
-    #                                        QLABEL UPDATES                                             #
-    #####################################################################################################
+    ##########################################################################
+    #                            QLABEL UPDATES                              #
+    ##########################################################################
 
     def label_update_on_receive(self, data_string):
         """update all QLabels in the UI that may change with newly received data from robot"""
@@ -1276,9 +1303,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.ZERO_float_ext.setValue(du.DCCurrZero.ext)
 
 
-    #####################################################################################################
-    #                                            FILE IO                                                #
-    #####################################################################################################
+    ##########################################################################
+    #                               FILE IO                                  #
+    ##########################################################################
 
     def open_file(self, testrun=False, testpath=None):
         """prompts the user with a file dialog and estimates printing parameters in given file"""
@@ -1418,9 +1445,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self._LoadFileThread.exit()
 
 
-    #####################################################################################################
-    #                                         COMMAND QUEUE                                             #
-    #####################################################################################################
+    ##########################################################################
+    #                             COMMAND QUEUE                              #
+    ##########################################################################
 
     def reset_SC_id(self):
         """synchronize SC and ROB ID with this, if program falls out of sync with the robot, should
@@ -1711,9 +1738,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         return True
 
 
-    #####################################################################################################
-    #                                          DC COMMANDS                                              #
-    #####################################################################################################
+    ##########################################################################
+    #                               DC COMMANDS                              #
+    ##########################################################################
 
     def values_to_DC_spinbox(self):
         """button function to help the user adjust a postion via numeric control, copys the current position
@@ -1768,7 +1795,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         read_mt = self.DC_drpd_moveType.currentText()
         mt = "L" if (read_mt == "LINEAR") else "J"
 
-        command = du.QEntry(
+        Command = du.QEntry(
             id=du.SC_curr_comm_id,
             mt=mt,
             Coor1=copy.deepcopy(du.DCCurrZero),
@@ -1777,7 +1804,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         )
 
         self.log_entry("DCom", "sending DC home command...")
-        return self.send_command(command, dc=True)
+        return self.send_command(Command, dc=True)
 
 
     def send_DC_command(self, axis="0", dir="+"):
@@ -1820,7 +1847,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         read_mt = self.DC_drpd_moveType.currentText()
         mt = "L" if (read_mt == "LINEAR") else "J"
 
-        command = du.QEntry(
+        Command = du.QEntry(
             id=du.SC_curr_comm_id,
             mt=mt,
             Coor1=NewPos,
@@ -1828,8 +1855,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             z=0,
         )
 
-        self.log_entry("DCom", f"sending DC command: ({command})")
-        return self.send_command(command, dc=True)
+        self.log_entry("DCom", f"sending DC command: ({Command})")
+        return self.send_command(Command, dc=True)
 
 
     def send_NC_command(self, axis=None):
@@ -1860,7 +1887,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         read_mt = self.DC_drpd_moveType.currentText()
         mt = "L" if (read_mt == "LINEAR") else "J"
 
-        command = du.QEntry(
+        Command = du.QEntry(
             id=du.SC_curr_comm_id,
             mt=mt,
             Coor1=NewPos,
@@ -1869,7 +1896,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         )
 
         self.log_entry("DCom", f"sending NC command: ({NewPos})")
-        return self.send_command(command, dc=True)
+        return self.send_command(Command, dc=True)
 
 
     def send_gcode_command(self):
@@ -1939,8 +1966,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if self._testrun:
             return self.send_command(Command, dc=True)
         fs_warning = strd_dialog(
-            f"WARNING!\n\nRobot will stop after current movement!"
-            f"OK to delete buffered commands on robot;"
+            f"WARNING!\n\nRobot will stop after current movement! "
+            f"OK to delete buffered commands on robot, "
             f"Cancel to continue queue processing.",
             "FORCED STOP COMMIT",
         )
@@ -1956,7 +1983,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             for Entry in du.ROB_send_list:
                 if Entry[0].mt != "S":
-                    LostBuf._queue.append(Entry[0]) # to-do: use class method instead accessing privat attribute
+                    LostBuf.append(Entry[0])
 
             du.SC_curr_comm_id = du.ROBTelem.id
             du.SCQueue = LostBuf + du.SCQueue
@@ -1995,9 +2022,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             return Command
 
 
-    #####################################################################################################
-    #                                         SEND COMMANDS                                             #
-    #####################################################################################################
+    ##########################################################################
+    #                              SEND COMMANDS                             #
+    ##########################################################################
 
     def send_command(self, command, dc=False):
         """passing new commands to RoboCommWorker"""
@@ -2058,9 +2085,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.log_entry("ZERO", f"current zero position updated: ({du.DCCurrZero})")
 
 
-    #####################################################################################################
-    #                                         PUMP CONTROL                                              #
-    #####################################################################################################
+    ##########################################################################
+    #                              PUMP CONTROL                              #
+    ##########################################################################
 
     def pump_set_speed(self, type=""):
         """handle user inputs regarding pump frequency"""
@@ -2133,9 +2160,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         usr_info.exec()
 
 
-    #####################################################################################################
-    #                                        MIXER CONTROL                                              #
-    #####################################################################################################
+    ##########################################################################
+    #                              MIXER CONTROL                             #
+    ##########################################################################
 
     def mixer_set_speed(self, type=""):
         """handle user inputs for 2K mixer"""
@@ -2153,9 +2180,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         Mutex.unlock()
 
 
-    #####################################################################################################
-    #                                        AMCON CONTROL                                              #
-    #####################################################################################################
+    ##########################################################################
+    #                              AMCON CONTROL                             #
+    ##########################################################################
 
     def amcon_script_overwrite(self):
         """override entire/partial SC queue with custom Amcon settings"""
@@ -2283,9 +2310,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         return self.send_command(Command, dc=True)
 
 
-    #####################################################################################################
-    #                                           CLOSE UI                                                #
-    #####################################################################################################
+    ##########################################################################
+    #                              CLOSE UI                                  #
+    ##########################################################################
 
     def closeEvent(self, event):
         """exit all threads and connections clean(ish)"""
@@ -2298,6 +2325,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if self._PumpCommThread.isRunning():
             self._PumpCommThread.quit()
             self._PumpCommThread.wait()
+        
+        # stop sensor array
+        if self._SensorArrThread.isRunning():
+            self._SensorArrThread.quit()
+            self._SensorArrThread.wait()
 
         # disconnect everything
         self.disconnect_tcp("ROB", internal_call=True)
@@ -2319,7 +2351,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 
-####################################################   MAIN  ####################################################
+##################################   MAIN  ###################################
 
 # mutual exclusion object, used to manage global data exchange
 Mutex = QMutex()

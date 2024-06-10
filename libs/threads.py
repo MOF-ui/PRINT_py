@@ -38,7 +38,7 @@ class PumpCommWorker(QObject):
     dataMixerRecv = pyqtSignal(int)
     dataSend = pyqtSignal(int, str, int, str)
     dataMixerSend = pyqtSignal(int, bool, int)
-    logError = pyqtSignal(str, str)
+    logEntry = pyqtSignal(str, str)
 
 
     def run(self):
@@ -119,7 +119,7 @@ class PumpCommWorker(QObject):
                     PCW_lastMixerSpeed = mixer_speed
                     self.dataMixerSend.emit(mixer_speed, res, data_len)
                 else:
-                    self.logError.emit(
+                    self.logEntry.emit(
                         "CONN", f"MIXER - sending data failed ({data_len})"
                     )
 
@@ -135,7 +135,7 @@ class PumpCommWorker(QObject):
             torq = du.PMP1Serial.torque
 
             if None in [freq, volt, amps, torq]:
-                self.logError.emit(
+                self.logEntry.emit(
                     "PTel", "Pump1 telemetry package broken or not received..."
                 )
 
@@ -163,7 +163,7 @@ class PumpCommWorker(QObject):
             torq = du.PMP2Serial.torque
 
             if None in [freq, volt, amps, torq]:
-                self.logError.emit(
+                self.logEntry.emit(
                     "PTel", "Pump2 telemetry package broken or not received..."
                 )
 
@@ -198,7 +198,7 @@ class PumpCommWorker(QObject):
                     self.dataMixerRecv.emit(data)
 
             else:
-                self.logError.emit("MTel", f"MIXER - receiving data failed ({data})")
+                self.logEntry.emit("MTel", f"MIXER - receiving data failed ({data})")
 
 
 
@@ -212,7 +212,7 @@ class RoboCommWorker(QObject):
     dataUpdated = pyqtSignal(str, du.RoboTelemetry)
     endDcMoving = pyqtSignal()
     endProcessing = pyqtSignal()
-    logError = pyqtSignal(str, str)
+    logEntry = pyqtSignal(str, str)
     queueEmtpy = pyqtSignal()
     sendElem = pyqtSignal(du.QEntry, object, int, bool, bool)
 
@@ -340,7 +340,7 @@ class RoboCommWorker(QObject):
                         self.endDcMoving.emit()
 
         elif Telem is not None:
-            self.logError.emit(
+            self.logEntry.emit(
                 "RTel", f"error ({Telem}) from TCPIP class ROB_tcpip, data: {raw_data}"
             )
 
@@ -463,14 +463,15 @@ class SensorCommWorker(QObject):
 
     cycleDone = pyqtSignal()
     dataReceived = pyqtSignal(str)
-    logError = pyqtSignal(str, str)
+    logEntry = pyqtSignal(str, str)
 
+    _conn_error = False
 
-    def start(self):
+    def run(self):
         """start cycling through the sensors"""
 
         self.CycleTimer = QTimer()
-        self.CycleTimer.setInterval(200)
+        self.CycleTimer.setInterval(1000)
         self.CycleTimer.timeout.connect(self.cycle)
         self.CycleTimer.start()
 
@@ -485,20 +486,37 @@ class SensorCommWorker(QObject):
     def cycle(self):
         """check every sensor once"""
 
-        # MSP
-        res = fu.sensor_data_call(du.SEN_dict['msp'])
-        if isinstance(res['temp'], list):
-            latest_data = res['temp'][0] #(val, uptime)
-            
-            Mutex.lock()
-            du.STTDataBlock.msp_temp = latest_data[0]
-            Mutex.unlock()
+        def loc_request(loc:dict, key:str):
+            for sub_key in loc:
+                if sub_key == 'ip' or sub_key == 'err': 
+                    continue
 
-            self.dataReceived.emit(du.SEN_dict['msp']['ip'])
-
-        else:
-            self.logError.emit('SENS', f"request error from {du.SEN_dict['msp']['ip']}: {res['temp']}")
+                if loc[sub_key]:
+                    data = fu.sensor_req(loc["ip"], sub_key)
                     
+                    if isinstance(data, list): # to-do: write handling for legacy data
+                        self.dataReceived.emit(loc['ip'])
+                        latest_data = data[0] # extracts tuple from list: (val, uptime)
+                        loc['err'] = False
+
+                        Mutex.lock()
+                        fu.store_sensor_data(sub_key, key)
+                        Mutex.unlock()
+
+                    elif data is not None:
+                        if loc['err'] == False: # log recurring error from one location only once
+                            loc['err'] = True
+                            self.logEntry.emit(
+                                'SENS',
+                                f"request error from {loc['ip']}: {data}"
+                            )
+            
+            return None
+
+        # MSP
+        for key in du.SEN_dict:
+            loc_request(du.SEN_dict[key], key)
+
         self.cycleDone.emit()
 
 
@@ -512,7 +530,7 @@ class LoadFileWorker(QObject):
     _CommList = du.Queue()
 
 
-    def start(self, testrun=False):
+    def run(self, testrun=False):
         """get data, start conversion loop"""
 
         global lfw_file_path
@@ -579,9 +597,9 @@ class LoadFileWorker(QObject):
             return
 
         # check for unidistance mode
-        um_check = fu.re_short("\&\&: \d+.\d+", txt, None, "\&\&: \d+")[0]
+        um_check = fu.re_short("\&\&: \d+.\d+", txt, None, "\&\&: \d+")
         if um_check is not None:
-            um_dist = fu.re_short("\d+.\d+", um_check, ValueError, "\d+")[0]
+            um_dist = fu.re_short("\d+.\d+", um_check, ValueError, "\d+")
             um_conv_res = self.add_um_tool(um_dist)
             if um_conv_res is not None:
                 self.convFailed.emit(um_conv_res)
@@ -609,7 +627,7 @@ class LoadFileWorker(QObject):
             # set the last entry to pMode=end
             self._CommList[len(self._CommList) - 1].p_mode = "end"
 
-        du.SCQueue.add_list(self._CommList)
+        du.SCQueue.add_queue(self._CommList)
         self.convFinished.emit(line_id, start_id, skips)
         lfw_running = False
 

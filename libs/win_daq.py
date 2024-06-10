@@ -16,7 +16,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 # PyQt stuff
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QWidget
 
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
@@ -37,8 +37,11 @@ from libs.win_dialogs import strd_dialog
 class DAQWindow(QWidget, Ui_DAQWindow):
     """setup DAQ window"""
 
+    logEntry = pyqtSignal(str, str)
+    
     _Database = None
     _db_bucket = None
+    _influx_error = False
 
 
     def __init__(self, parent=None):
@@ -120,10 +123,22 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             usr_title="Confirm Dialog"
         )
         commit_dialog.exec()
-        print(f"DB path change: {commit_dialog.result()}")
+
         if commit_dialog.result() == 1:
             du.DB_url = new_url
+
+            #restart DB client with new url
+            self._Database.close()
+            self._Database = influxdb_client.InfluxDBClient(
+                    url=du.DB_url,
+                    token=du.DB_token,
+                    org=du.DB_org
+                )
+            self.db_connection = self._Database.write_api(write_options=SYNCHRONOUS)
+
+            # display
             self.PATH_disp_path.setText(du.DB_url)
+            self.logEntry.emit('DAQW', f"user set DB path to {du.DB_url}")
 
 
     def toInflux(self):
@@ -167,7 +182,23 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             .field("ROB RZ", du.STTDataBlock.Robo.Coor.rz)\
             .field("ROB EXT", du.STTDataBlock.Robo.Coor.ext)
         
-        self.db_connection.write(bucket=self._db_bucket, org=du.DB_org, record=DBEntry)
+        res = self.db_connection.write(
+            bucket=self._db_bucket,
+            org=du.DB_org,
+            record=DBEntry
+        )
+
+        if res is None:
+            if self._influx_error == False:
+                self._influx_error = True
+                self.logEntry.emit(
+                    'DAQW',
+                    f"error writing to DB at {self._Database.url}: {res}")
+                self.logEntry.emit('DAWQ', 'trying to reconnect..')
+                
+        elif self._influx_error:
+            self._influx_error = False
+            self.logEntry.emit('DAQW','DB reconnected!')
 
 
 
