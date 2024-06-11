@@ -79,15 +79,15 @@ class PUTIL_test(unittest.TestCase):
         du.ROBCommQueue.add(du.QEntry())
         du.ROBTelem.Coor = du.Coordinate()
         pu.START_SUPP_PTS = [
-            {"until": 3.0, "base": "zero", "mode": "instant"},
-            {"until": 1.0, "base": "max", "mode": "instant"},
-            {"until": 0.0, "base": "conn", "mode": "linear"},
+            {'until': 5.0, 'base': 'zero', 'mode': 'instant'},
+            {'until': 1.0, 'base': 'max', 'mode': 'instant'},
+            {'until': 0.0, 'base': 'conn', 'mode': 'linear'},
         ]
 
         pu.END_SUPP_PTS = [
-            {"until": 5.0, "base": "default", "mode": "instant"},
-            {"until": 1.0, "base": "retract", "mode": "smoothstep"},
-            {"until": 0.0, "base": "zero", "mode": "instant"},
+            {'until': 5.0, 'base': 'default', 'mode': 'instant'},
+            {'until': 1.0, 'base': 'retract', 'mode': 'smoothstep'},
+            {'until': 0.0, 'base': 'zero', 'mode': 'instant'},
         ]
 
         # START_SUPP_PTS

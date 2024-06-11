@@ -1,9 +1,10 @@
-# I modified this library to use it in a QThread, original by Paul Richter from m-tec.com,
-# see https://github.com/m-tec-com/m-tecConnectModbus (2023-06-27)
+# I modified this library to use it in a QThread, original by Paul Richter 
+# from m-tec.com, see https://github.com/m-tec-com/m-tecConnectModbus
+# (2023-06-27)
 
 
 
-####################################################   IMPORTS   ####################################################
+############################     IMPORTS     ################################
 
 import serial
 import math
@@ -11,7 +12,7 @@ import time
 
 
 
-####################################################    CLASS     ####################################################
+############################     CLASSES     ################################
 
 class MtecMod:
     def __init__(self, serial_bus_def=None, inverter_id="01") -> None:
@@ -57,7 +58,7 @@ class MtecMod:
         self.temp_sendReady = False
 
 
-    ####################################################   SEND COMs   ####################################################
+###########################     SEND COMs     ###############################
 
     def sendCommand(self, parameter, value):
         return self.sendHexCommand(
@@ -98,7 +99,7 @@ class MtecMod:
         self.waitForResponse()
 
 
-    ####################################################   RECEIVE   ####################################################
+############################     RECEIVE     ################################
 
     def waitForResponse(self):
         command = ""
@@ -170,7 +171,7 @@ class MtecMod:
         return True
 
 
-    #################################################  INTERNAL FUNCTIONs  #################################################
+########################     COM PREPARATION     ############################
 
     def int2hex(self, value, length):
         s = hex(value)[2:]
@@ -195,8 +196,8 @@ class MtecMod:
 
         return self.int2hex((crc % 256) * 256 + math.floor(crc / 256), 4)
 
-    #################################################  EASY TO USE FUNCTIONS  #################################################
 
+########################     EASY TO USE FUNC     ############################
 
     def start(self):
         return self.sendHexCommand(self.settings_inverter_id + "06FA00C400")
@@ -233,7 +234,7 @@ class MtecMod:
         return ans
 
 
-    ###################################################    PROPERTIES    ###################################################
+###########################     PROPERTIES     ###############################
 
     @property
     def speed(self):

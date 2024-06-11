@@ -1,9 +1,12 @@
-#   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
-#   (https://creativecommons.org/licenses/by-sa/4.0/). Feel free to use, modify or distribute this code as
-#   far as you like, so long as you make anything based on it publicly avialable under the same license.
+#   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0
+#   International (CC BY-SA 4.0).
+#   (https://creativecommons.org/licenses/by-sa/4.0/)
+#   Feel free to use, modify or distribute this code as far as you like, so
+#   long as you make anything based on it publicly avialable under the same
+#   license.
 
 
-#######################################     IMPORTS      #####################################################
+############################     IMPORTS      ################################
 
 # python standard libraries
 import os
@@ -32,10 +35,10 @@ from libs.win_dialogs import strd_dialog
 
 
 
-#######################################   DAQ CLASS   #####################################################
+###########################     DAQ CLASS      ###############################
 
 class DAQWindow(QWidget, Ui_DAQWindow):
-    """setup DAQ window"""
+    """setup and run Data AcQuisition (DAQ) window"""
 
     logEntry = pyqtSignal(str, str)
     
@@ -44,12 +47,15 @@ class DAQWindow(QWidget, Ui_DAQWindow):
     _influx_error = False
 
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None) -> None:
         super().__init__(parent)
 
         self.setupUi(self)
         self.setWindowTitle("---   PRINT_py  -  DAQ window  ---")
-        self.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowMinimizeButtonHint)
+        self.setWindowFlags(
+            Qt.WindowMaximizeButtonHint
+            | Qt.WindowMinimizeButtonHint
+        )
         self.time_update()
 
         self.PATH_btt_chgPath.pressed.connect(self.new_path)
@@ -61,20 +67,22 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             )
         daq_starttime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         self._db_bucket = daq_starttime + "__" + du.DB_session 
-        self.db_connection = self._Database.write_api(write_options=SYNCHRONOUS)
+        self.db_connection = self._Database.write_api(
+            write_options=SYNCHRONOUS
+        )
 
         # set up default displays
         self.PATH_disp_path.setText(du.DB_url)
 
 
-    def time_update(self):
+    def time_update(self) -> None:
         """clock update, signal from mainframe"""
 
         self.PATH_disp_datetime.setText(
             f"{datetime.now().strftime('%Y-%m-%d    %H:%M:%S')}"
         )
 
-    def data_update(self):
+    def data_update(self) -> None:
         """data label update, signal from robo_recv"""
 
         self.BASIC_disp_ambTemp.setText(f"{du.STTDataBlock.amb_temp} °C")
@@ -113,13 +121,16 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         self.ROB_disp_extPos.setText(f"{du.STTDataBlock.Robo.Coor.ext}  mm")
 
 
-    def new_path(self):
+    def new_path(self) -> None:
         """write new path to du.DB_url"""
         
         # no Mutex as DB_url is only read in other functions
         new_url = self.PATH_entry_newPath.text()
         commit_dialog = strd_dialog(
-            usr_text="Resetting the DB URL could result in data loss!\nAre you sure?",
+            usr_text=(
+                f"Resetting the DB URL could result in data loss!\n"
+                f"Are you sure you want to do this?"
+            ),
             usr_title="Confirm Dialog"
         )
         commit_dialog.exec()
@@ -134,14 +145,16 @@ class DAQWindow(QWidget, Ui_DAQWindow):
                     token=du.DB_token,
                     org=du.DB_org
                 )
-            self.db_connection = self._Database.write_api(write_options=SYNCHRONOUS)
+            self.db_connection = self._Database.write_api(
+                write_options=SYNCHRONOUS
+            )
 
             # display
             self.PATH_disp_path.setText(du.DB_url)
             self.logEntry.emit('DAQW', f"user set DB path to {du.DB_url}")
 
 
-    def toInflux(self):
+    def toInflux(self) -> None:
         """build & send an DB entry, name the measurement after current time,
         all DaqBlock entries will return None if their valid_time has passed,
         signal from (robo_recv or sensor_cycle?) 
@@ -188,7 +201,7 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             record=DBEntry
         )
 
-        if res is None:
+        if res is None: # to-do: errors dont appear in log, yet
             if self._influx_error == False:
                 self._influx_error = True
                 self.logEntry.emit(
@@ -202,13 +215,16 @@ class DAQWindow(QWidget, Ui_DAQWindow):
 
 
 
-#######################################   STRD DIALOG    #####################################################
+########################     DAQ WIN DIALOG      ############################
 
-def daq_window(standalone=False):
-    """shows a dialog window, text and title can be set, returns the users choice"""
+def daq_window(standalone=False) -> DAQWindow:
+    """shows a dialog window, text and title can be set, returns the users
+    choice
+    """
 
     if standalone:
-        # leave that here so app doesnt include the remnant of a previous QApplication instance
+        # leave that here so app doesnt include the remnant of a previous 
+        # QApplication instance
         daq_app = 0
         daq_app = QApplication(sys.argv)
 

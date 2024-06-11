@@ -427,9 +427,10 @@ class Mainframe_test(unittest.TestCase):
         test_frame.ADC_btt_knife.setChecked(True)
         test_frame.ADC_btt_fiberPnmtc.setChecked(True)
 
-        command = test_frame.adc_user_change()[1]
+        test_frame.adc_user_change()
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
-            command,
+            command[0],
             du.QEntry(
                 id=1,
                 z=0,
@@ -636,9 +637,10 @@ class Mainframe_test(unittest.TestCase):
 
         du.DCCurrZero = du.Coordinate(x=1, y=2.2, z=3, rx=4, ry=5, rz=6, q=7, ext=8)
         test_frame.DC_drpd_moveType.setCurrentText("LINEAR")
-        command = test_frame.home_command()[1]
+        test_frame.home_command()
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
-            command,
+            command[0],
             du.QEntry(
                 id=1,
                 z=0,
@@ -647,13 +649,14 @@ class Mainframe_test(unittest.TestCase):
         )
         self.assertTrue(du.DC_rob_moving)
 
-        test_frame.robo_send(command, True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True, True)
         du.DC_rob_moving = False
 
         test_frame.DC_drpd_moveType.setCurrentText("JOINT")
-        command = test_frame.home_command()[1]
+        test_frame.home_command()
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
-            command,
+            command[0],
             du.QEntry(
                 id=2,
                 z=0,
@@ -970,30 +973,38 @@ class Mainframe_test(unittest.TestCase):
         test_frame.DC_sld_stepWidth.setValue(1)
         test_frame.DC_drpd_moveType.setCurrentText("LINEAR")
 
-        command = test_frame.send_DC_command(axis="X", dir="+")[1]
-        self.assertEqual(command, du.QEntry(id=1, z=0, Coor1=du.Coordinate(x=1)))
+        test_frame.send_DC_command(axis="X", dir="+")
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        self.assertEqual(
+            command[0],
+            du.QEntry(id=1, z=0, Coor1=du.Coordinate(x=1))
+        )
 
         du.DC_rob_moving = False
-        test_frame.robo_send(command, True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True, True)
         test_frame.DC_sld_stepWidth.setValue(2)
         test_frame.DC_drpd_moveType.setCurrentText("JOINT")
 
-        command = test_frame.send_DC_command(axis="Y", dir="-")[1]
+        test_frame.send_DC_command(axis="Y", dir="-")
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
-            command, du.QEntry(id=2, mt="J", z=0, Coor1=du.Coordinate(y=-10))
+            command[0],
+            du.QEntry(id=2, mt="J", z=0, Coor1=du.Coordinate(y=-10))
         )
 
         du.DC_rob_moving = False
-        test_frame.robo_send(command, True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True, True)
         test_frame.DC_sld_stepWidth.setValue(3)
 
-        command = test_frame.send_DC_command(axis="Z", dir="+")[1]
+        test_frame.send_DC_command(axis="Z", dir="+")
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
-            command, du.QEntry(id=3, mt="J", z=0, Coor1=du.Coordinate(z=100))
+            command[0],
+            du.QEntry(id=3, mt="J", z=0, Coor1=du.Coordinate(z=100))
         )
 
         du.DC_rob_moving = False
-        test_frame.robo_send(command, True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True, True)
         self.assertRaises(ValueError, test_frame.send_DC_command, axis="A", dir="+")
 
         du.DC_rob_moving = False
@@ -1028,9 +1039,10 @@ class Mainframe_test(unittest.TestCase):
         du.ROBTelem.Coor = du.Coordinate(1, 1, 1, 1, 1, 1, 1, 1)
         du.DCCurrZero = du.Coordinate(y=1)
 
-        command = test_frame.send_gcode_command()[1]
+        test_frame.send_gcode_command()
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
-            command,
+            command[0],
             du.QEntry(
                 id=1,
                 Coor1=du.Coordinate(x=1, y=3.2, z=1, rx=1, ry=1, rz=1, q=1, ext=1),
@@ -1039,14 +1051,15 @@ class Mainframe_test(unittest.TestCase):
         )
 
         du.DC_rob_moving = False
-        test_frame.robo_send(command, True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True, True)
         test_frame.TERM_entry_gcodeInterp.setText("G1 X1 Z3")
         du.ROBTelem.Coor = du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
         du.DCCurrZero = du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
 
-        command = test_frame.send_gcode_command()[1]
+        test_frame.send_gcode_command()
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
-            command,
+            command[0],
             du.QEntry(
                 id=2, Coor1=du.Coordinate(2.1, 2.2, 6.3, 4.4, 5.5, 6.6, 7.7, 8.8)
             ),
@@ -1070,19 +1083,22 @@ class Mainframe_test(unittest.TestCase):
         test_frame.NC_float_ext.setValue(7)
         test_frame.DC_drpd_moveType.setCurrentText("LINEAR")
 
-        command = test_frame.send_NC_command([1, 2, 3])[1]
+        test_frame.send_NC_command([1, 2, 3])
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
-            command, du.QEntry(id=1, z=0, Coor1=du.Coordinate(x=1, y=2.2, z=3))
+            command[0],
+            du.QEntry(id=1, z=0, Coor1=du.Coordinate(x=1, y=2.2, z=3))
         )
 
         du.DC_rob_moving = False
-        test_frame.robo_send(command, True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True, True)
         du.ROBTelem.Coor = du.Coordinate(1, 1, 1, 1, 1, 1, 0, 1)
         test_frame.DC_drpd_moveType.setCurrentText("JOINT")
 
-        command = test_frame.send_NC_command([4, 5, 6, 8])[1]
+        test_frame.send_NC_command([4, 5, 6, 8])
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
-            command,
+            command[0],
             du.QEntry(
                 id=2,
                 mt="J",
@@ -1103,8 +1119,10 @@ class Mainframe_test(unittest.TestCase):
         test_frame.TERM_entry_rapidInterp.setText(
             "MoveL [[1.0,2.0,3.0],[4.0,5.0,6.0,7.0]],[200,50,50,50],z50,tool0  EXT:600  TOOL"
         )
+        test_frame.send_rapid_command()
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
-            test_frame.send_rapid_command()[1],
+            command[0],
             du.QEntry(
                 id=1,
                 pt="Q",
@@ -1146,14 +1164,16 @@ class Mainframe_test(unittest.TestCase):
     def test_system_stop_commands(self):
         global test_frame
 
-        command = test_frame.forced_stop_command()[1]
-        self.assertEqual(command, du.QEntry(id=1, mt="S"))
+        test_frame.forced_stop_command()
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        self.assertEqual(command[0], du.QEntry(id=1, mt="S"))
 
-        test_frame.robo_send(command, True, 1, True, True)
-        command = test_frame.robot_stop_command()[1]
-        self.assertEqual(command, du.QEntry(id=1, mt="E"))
+        test_frame.robo_send(command[0], True, 1, True, True)
+        test_frame.robot_stop_command()
+        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        self.assertEqual(command[0], du.QEntry(id=1, mt="E"))
 
-        test_frame.robo_send(command, True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True, True)
         test_frame.robot_stop_command(directly=False)
 
         self.assertEqual(du.SCQueue.display(), [du.QEntry(id=3, mt="E").print_short()])
@@ -1212,7 +1232,7 @@ rapid_test_file.close()
 app = 0
 win = 0
 app = QApplication(sys.argv)
-test_frame = mf.Mainframe(lpath=logpath, conn_def=(False, False), testrun=True)
+test_frame = mf.Mainframe(lpath=logpath, p_conn=(False, False), testrun=True)
 rapid_test_file.close()
 
 # grouping

@@ -1,9 +1,12 @@
-#   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
-#   (https://creativecommons.org/licenses/by-sa/4.0/). Feel free to use, modify or distribute this code as
-#   far as you like, so long as you make anything based on it publicly avialable under the same license.
+#   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0
+#   International (CC BY-SA 4.0).
+#   (https://creativecommons.org/licenses/by-sa/4.0/)
+#   Feel free to use, modify or distribute this code as far as you like, so
+#   long as you make anything based on it publicly avialable under the same
+#   license.
 
 
-#######################################     IMPORTS      #####################################################
+############################     IMPORTS      ################################
 
 import re
 import os
@@ -24,9 +27,8 @@ sys.path.append(parent_dir)
 from mtec.mtec_mod import MtecMod
 
 
-##############################################################################
-#                                  CLASSES                                   #
-##############################################################################
+
+############################     CLASSES      ################################
 
 class Coordinate:
     """standard 7-axis coordinate block (8 attributes, as quaterion
@@ -46,7 +48,17 @@ class Coordinate:
         __init__, __str__, __add__, __sub__, __round__, __eq__, __ne__
     """
 
-    def __init__(self, x=0.0, y=0.0, z=0.0, rx=0.0, ry=0.0, rz=0.0, q=0.0, ext=0.0) -> None:
+    def __init__(
+            self,
+            x=0.0,
+            y=0.0,
+            z=0.0,
+            rx=0.0,
+            ry=0.0,
+            rz=0.0,
+            q=0.0,
+            ext=0.0
+    ) -> None:
 
         self.x = float(x)
         self.y = float(y)
@@ -161,7 +173,9 @@ class Coordinate:
                 return True
 
         elif other is not None:
-            raise ValueError(f"{other} is not None or an instance of 'Coordinate'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'Coordinate'!"
+            )
 
         return False
 
@@ -185,7 +199,9 @@ class Coordinate:
                 return True
 
         else:
-            raise ValueError(f"{other} is not None or an instance of 'Coordinate'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'Coordinate'!"
+            )
 
         return False
 
@@ -219,7 +235,10 @@ class SpeedVector:
 
     def __str__(self) -> str:
 
-        return f"TS: {self.ts}   OS: {self.ors}   ACR: {self.acr}   DCR: {self.dcr}"
+        return (
+            f"TS: {self.ts}   OS: {self.ors}   "
+            f"ACR: {self.acr}   DCR: {self.dcr}"
+        )
 
 
     def __mul__(self, other) -> 'SpeedVector':
@@ -253,7 +272,9 @@ class SpeedVector:
                 return True
 
         elif other is not None:
-            raise ValueError(f"{other} is not None or an instance of 'SpeedVector'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'SpeedVector'!"
+            )
 
         return False
 
@@ -273,7 +294,9 @@ class SpeedVector:
                 return True
 
         else:
-            raise ValueError(f"{other} is not None or an instance of 'SpeedVector'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'SpeedVector'!"
+            )
 
         return False
 
@@ -345,7 +368,7 @@ class ToolCommand:
 
         self.pan_id = int(pan_id)  # pivoting value
         self.pan_steps = int(pan_steps)
-        self.fib_deliv_id = int(fib_deliv_id)  # fiber value (calculated with V-option)
+        self.fib_deliv_id = int(fib_deliv_id)  # fiber value
         self.fib_deliv_steps = int(fib_deliv_steps)
         self.mor_pump_id = int(mor_pump_id)  # mortar pump
         self.mor_pump_steps = int(mor_pump_steps)
@@ -399,7 +422,9 @@ class ToolCommand:
                 return True
 
         elif other is not None:
-            raise ValueError(f"{other} is not None or an instance of 'ToolCommand'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'ToolCommand'!"
+            )
 
         return False
 
@@ -431,7 +456,9 @@ class ToolCommand:
                 return True
 
         else:
-            raise ValueError(f"{other} is not None or an instance of 'ToolCommand'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'ToolCommand'!"
+            )
 
         return False
 
@@ -539,7 +566,9 @@ class QEntry:
                 return True
 
         elif other is not None:
-            raise ValueError(f"{other} is not None or an instance of 'QEntry'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'QEntry'!"
+            )
 
         return False
 
@@ -566,7 +595,9 @@ class QEntry:
                 return True
 
         else:
-            raise ValueError(f"{other} is not None or an instance of 'QEntry'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'QEntry'!"
+            )
 
         return False
 
@@ -587,10 +618,12 @@ class Queue:
 
     ATTRIBUTES:
         queue:
-            a list of QEntry elements, careful: list index does not match QEntry.id
+            a list of QEntry elements, careful: list index does not match
+            QEntry.id
 
     FUNCTIONS:
-        __add__, __init__, __iter__, __getitem__, __len__, __next__, __str__, __eq__
+        __add__, __init__, __iter__, __getitem__, __len__, __next__,
+        __str__, __eq__
 
         last_entry:
             returns last entry
@@ -602,15 +635,20 @@ class Queue:
         display:
             returns queue as a str list (uses __str__ of QEntry)
         increment:
-            increments all QEntry.ID to handle DC commands send before the queue
+            increments all QEntry.ID to handle DC commands send before
+            the queue
         add:
-            adds a new QEntry to queue, checks if QEntry.ID makes sense, places QEntry in queue according to the ID given
+            adds a new QEntry to queue, checks if QEntry.ID makes sense,
+            places QEntry in queue according to the ID given
         add_queue:
-            adds another queue, hopefully less time-consuming than a for loop with self.add
+            adds another queue, hopefully less time-consuming than a for loop
+            with self.add
         append:
-            other than '.add' this simply appends an entry indifferently to its ID
+            other than '.add' this simply appends an entry indifferently to
+            its ID
         clear:
-            deletes single or multiple QEntry from queue, adjusts following ID accordingly
+            deletes single or multiple QEntry from queue, adjusts following
+            ID accordingly
         pop_first_item:
             returns and deletes the QEntry at index 0
     """
@@ -711,11 +749,15 @@ class Queue:
             return False
 
         else:
-            raise ValueError(f"{other} is not None or an instance of 'Queue'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'Queue'!"
+            )
 
 
     def last_entry(self) -> QEntry | None:
-        """returns last item in queue (surprise!), returns None if queue is empty"""
+        """returns last item in queue (surprise!), returns None if queue
+        is empty
+        """
 
         if len(self._queue) == 0:
             return None
@@ -723,7 +765,9 @@ class Queue:
 
 
     def id_pos(self, id) -> int | None:
-        """return queue entry index(!) at given ID, not the entry itself, returns None if no such entry"""
+        """return queue entry index(!) at given ID, not the entry itself,
+        returns None if no such entry
+        """
 
         length = len(self._queue)
         i = 0
@@ -744,7 +788,9 @@ class Queue:
 
 
     def entry_before_id(self, id) -> QEntry:
-        """return queue entry before (index - 1) a specific ID, raises AttributeError if no such entry"""
+        """return queue entry before (index - 1) a specific ID, raises
+        AttributeError if no such entry
+        """
 
         length = len(self._queue)
         i = 0
@@ -772,7 +818,9 @@ class Queue:
 
             for x in self._queue:
                 if not isinstance(x, QEntry):
-                    raise ValueError(f"could not print entry '{x}', it's not 'QEntry' type!")
+                    raise ValueError(
+                        f"could not print entry '{x}', it's not 'QEntry' type!"
+                    )
                 ans.append(x.print_short())
 
             return ans
@@ -780,15 +828,19 @@ class Queue:
 
 
     def increment(self) -> None:
-        """increments all QEntry.ID to handle DC commands send before the queue"""
+        """increments all QEntry.ID to handle DC commands send before the
+        queue
+        """
 
         for i in self._queue:
             i.id += 1
 
 
     def add(self, entry, thread_call=False) -> None | Exception:
-        """adds a new QEntry to queue, checks if QEntry.ID makes sense, places QEntry in queue according to the ID given
-        threadCall option allows the first ID to be 0"""
+        """adds a new QEntry to queue, checks if QEntry.ID makes sense, places
+        QEntry in queue according to the ID given, threadCall option allows
+        the first ID to be 0
+        """
 
         new_entry = copy.deepcopy(entry)
         last_item = len(self._queue) - 1
@@ -833,7 +885,9 @@ class Queue:
 
 
     def add_queue(self, list) -> None | Exception:
-        """adds another queue, hopefully less time-consuming than a for loop with self.add"""
+        """adds another queue, hopefully less time-consuming than a for loop
+        with self.add
+        """
 
         new_list = copy.deepcopy(list)
         if not isinstance(new_list, Queue):
@@ -890,22 +944,26 @@ class Queue:
 
 
     def append(self, entry) -> None:
-        """other than '.add' this simply appends an entry indifferently to its ID"""
+        """other than '.add' this simply appends an entry indifferently
+        to its ID
+        """
 
         new_entry = copy.deepcopy(entry)
         self._queue.append(new_entry)
         return None
 
 
-    def clear(self, all=True, id="") -> list[QEntry] | Exception | None:
-        """deletes single or multiple QEntry from queue, adjusts following ID accordingly"""
+    def clear(self, all=True, id="") -> None:
+        """deletes single or multiple QEntry from queue, adjusts following
+        ID accordingly
+        """
 
         if all:
             self._queue = []
-            return self._queue
+            return
 
         if len(self._queue) == 0:
-            return None
+            return
 
         ids = re.findall("\d+", id)
         id_num = len(ids)
@@ -917,7 +975,7 @@ class Queue:
                 id1 = int(ids[0])
 
                 if id1 < first_id or id1 > last_id:
-                    return ValueError
+                    return
 
                 i = 0
                 for entry in self._queue:
@@ -941,7 +999,7 @@ class Queue:
                     or id2 > last_id
                     or id.find("..") == -1
                 ):
-                    return ValueError
+                    return
 
                 id_dist = id2 - id1 + 1
                 i = 0
@@ -962,9 +1020,7 @@ class Queue:
                     i += 1
 
             case _:
-                return ValueError
-
-        return self._queue
+                return
 
 
     def pop_first_item(self) -> QEntry | Exception:
@@ -981,7 +1037,8 @@ class Queue:
 
 
 class RoboTelemetry:
-    """class used to store the standard 36 byte telemetry data comming from the robot
+    """class used to store the standard 36 byte telemetry data comming from
+    the robot
 
     ATTRIBUTES:
         t_speed:
@@ -1008,8 +1065,10 @@ class RoboTelemetry:
     def __str__(self) -> str:
 
         return (
-            f"ID: {self.id}   X: {self.Coor.x}   Y: {self.Coor.y}   Z: {self.Coor.z}   Rx: {self.Coor.rx}   Ry: {self.Coor.ry}   Rz: {self.Coor.rz}   "
-            f"EXT:   {self.Coor.ext}   TOOL_SPEED: {self.t_speed}"
+            f"ID: {self.id}   X: {self.Coor.x}   Y: {self.Coor.y}   "
+            f"Z: {self.Coor.z}   Rx: {self.Coor.rx}   Ry: {self.Coor.ry}   "
+            f"Rz: {self.Coor.rz}   EXT:   {self.Coor.ext}   "
+            f"TOOL_SPEED: {self.t_speed}"
         )
 
 
@@ -1031,7 +1090,9 @@ class RoboTelemetry:
                 return True
 
         elif other is not None:
-            raise ValueError(f"{other} is not None or an instance of 'RoboTelemetry'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'RoboTelemetry'!"
+            )
 
         return False
 
@@ -1050,7 +1111,9 @@ class RoboTelemetry:
                 return True
 
         else:
-            raise ValueError(f"{other} is not None or an instance of 'RoboTelemetry'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'RoboTelemetry'!"
+            )
 
         return False
 
@@ -1063,7 +1126,7 @@ class PumpTelemetry:
         freq:
             motor frequency (currently only given as 0 - 100%)
         volt:
-            voltage at motor coil (I thought in V, but the values seem to high)
+            voltage at motor coil (presumably V, but the values seem to high)
         amps:
             current in motor coil (unit unknown, as for volt)
         torq:
@@ -1084,7 +1147,10 @@ class PumpTelemetry:
 
     def __str__(self) -> str:
 
-        return f"FREQ: {self.freq}   VOLT: {self.volt}   AMPS: {self.amps}   TORQ: {self.torq}"
+        return (
+            f"FREQ: {self.freq}   VOLT: {self.volt}   "
+            f"AMPS: {self.amps}   TORQ: {self.torq}"
+        )
 
 
     def __round__(self, digits) -> 'PumpTelemetry':
@@ -1109,7 +1175,9 @@ class PumpTelemetry:
                 return True
 
         elif other is not None:
-            raise ValueError(f"{other} is not None or an instance 'PumpTelemetry'!")
+            raise ValueError(
+                f"{other} is not None or an instance 'PumpTelemetry'!"
+            )
 
         return False
 
@@ -1129,7 +1197,9 @@ class PumpTelemetry:
                 return True
 
         else:
-            raise ValueError(f"{other} is not None or an instance 'PumpTelemetry'!")
+            raise ValueError(
+                f"{other} is not None or an instance 'PumpTelemetry'!"
+            )
 
         return False
 
@@ -1187,15 +1257,19 @@ class DaqBlock:
         amb_humidity:
             ambient humidity [%]
         rb_temp:
-            RB = robot base; temperature of the mortar tube at the second coupling [°C]
+            RB = robot base; temperature of the mortar tube at the second
+            coupling [°C]
         msp_temp:
-            MSP = main supply pump; temperature behind pump1's moineur pump [°C]
+            MSP = main supply pump; temperature behind pump1's moineur
+            pump [°C]
         msp_press:
             MSP = main supply pump; pressure behind pump1's moineur pump [bar]
         asp_freq:
-            ASP = admixture supply pump; frequency of the admixture delivery pump
+            ASP = admixture supply pump; frequency of the admixture delivery
+            pump
         asp_amps:
-            ASP = admixture supply pump; current of the admixture delivery pump
+            ASP = admixture supply pump; current of the admixture delivery
+            pump
         imp_temp:
             IMP = inline mixing pump; temperature behind the 2K pump [°C]
         imp_press:
@@ -1205,11 +1279,14 @@ class DaqBlock:
         imp_amps:
             IMP = inline mixing pump; current of the 2K pump
         phc_aircon:
-            PHC = print head controller; air bubble/content analysis (not specified yet)
+            PHC = print head controller; air bubble/content analysis
+            (not specified yet)
         phc_fdist:
-            PHC = print head controller; deposition layer distance in front of the nozzle
+            PHC = print head controller; deposition layer distance in front
+            of the nozzle
         phc_edist:
-            PHC = print head controller; deposition layer distance behind the nozzle
+            PHC = print head controller; deposition layer distance behind
+            the nozzle
         valid time:
             changes the valid_time of all TSData entries (property attribute)
 
@@ -1280,11 +1357,16 @@ class DaqBlock:
     def __str__(self) -> str:
 
         return (
-            f"Amb. temp.: {self.amb_temp}    Amb. humid.: {self.amb_humidity}    RB temp.: {self.rb_temp}    MSP temp.: {self.msp_temp}    "
-            f"MSP press.: {self.msp_press}    APS freq.: {self.asp_freq}    APS amp.: {self.asp_amps}    IMP temp.: {self.imp_temp}    "
-            f"IMP press.: {self.imp_press}    IMP freq.: {self.imp_freq}    IMP amp.: {self.imp_amps}    "
-            f"ROB: {self.Robo}    PUMP1: {self.Pump1}    PUMP2: {self.Pump2}    PHC air cont.: {self.phc_aircon}    "
-            f"PHC front dist.: {self.phc_fdist}    PHC end dist.: {self.phc_edist}"
+            f"Amb. temp.: {self.amb_temp}    Amb. humid.: {self.amb_humidity}"
+            f"    RB temp.: {self.rb_temp}    MSP temp.: {self.msp_temp}    "
+            f"MSP press.: {self.msp_press}    APS freq.: {self.asp_freq}    "
+            f"APS amp.: {self.asp_amps}    IMP temp.: {self.imp_temp}    "
+            f"IMP press.: {self.imp_press}    IMP freq.: {self.imp_freq}    "
+            f"IMP amp.: {self.imp_amps}    ROB: {self.Robo}    "
+            f"PUMP1: {self.Pump1}    PUMP2: {self.Pump2}    "
+            f"PHC air cont.: {self.phc_aircon}    "
+            f"PHC front dist.: {self.phc_fdist}    "
+            f"PHC end dist.: {self.phc_edist}"
         )
 
 
@@ -1313,7 +1395,9 @@ class DaqBlock:
                 return True
 
         elif other is not None:
-            raise ValueError(f"{other} is not None or an instance of 'DaqBlock'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'DaqBlock'!"
+            )
 
         return False
 
@@ -1346,7 +1430,9 @@ class DaqBlock:
                 return True
 
         else:
-            raise ValueError(f"{other} is not None or an instance of 'DaqBlock'!")
+            raise ValueError(
+                f"{other} is not None or an instance of 'DaqBlock'!"
+            )
 
         return False
     
@@ -1364,7 +1450,8 @@ class DaqBlock:
 
 
 class TCPIP:
-    """setup class for TCP/IP connection, provides all functions concerning the connection
+    """setup class for TCP/IP connection, provides all functions concerning
+    the connection
 
     ATTRIBUTES:
         IP:
@@ -1384,7 +1471,8 @@ class TCPIP:
         __init__, __str__
 
         connect:
-            tries to connect to the IP and PORT given, returns errors if not possible
+            tries to connect to the IP and PORT given, returns errors if
+            not possible
         send:
             send data to server according to class attributes
         receive:
@@ -1394,7 +1482,15 @@ class TCPIP:
     """
 
 
-    def __init__(self, ip="", PORT=0, C_TOUT=1.0, RW_TOUT=1, R_BL=0, W_BL=0) -> None:
+    def __init__(
+            self,
+            ip="",
+            PORT=0,
+            C_TOUT=1.0,
+            RW_TOUT=1,
+            R_BL=0,
+            W_BL=0
+    ) -> None:
 
         self.ip = str(ip)
         self.port = str(PORT)
@@ -1410,7 +1506,8 @@ class TCPIP:
     def __str__(self) -> str:
 
         return (
-            f"IP: {self.ip}   PORT: {self.port}   C_TOUT: {self.c_tout}   RW_TOUT: {self.rw_tout}   "
+            f"IP: {self.ip}   PORT: {self.port}   "
+            f"C_TOUT: {self.c_tout}   RW_TOUT: {self.rw_tout}   "
             f"R_BL: {self.r_bl}   W_BL: {self.w_bl}"
         )
 
@@ -1418,7 +1515,9 @@ class TCPIP:
     def set_params(self, param_dict) -> None:
 
         if self.connected:
-            raise PermissionError("params not changeable while connected to server!")
+            raise PermissionError(
+                "params not changeable while connected to server!"
+            )
 
         self.ip = str(param_dict["IP"])
         self.port = str(param_dict["PORT"])
@@ -1428,8 +1527,10 @@ class TCPIP:
         self.w_bl = int(param_dict["W_BL"])
 
 
-    def connect(self) -> tuple[bool, tuple[str, int]] | tuple[Exception, tuple[str, int]]:
-        """tries to connect to the IP and PORT given, returns errors if not possible"""
+    def connect(self) -> tuple[str, int] | Exception:
+        """tries to connect to the IP and PORT given, returns errors if
+        not possible
+        """
 
         try:
             server_address = (self.ip, int(self.port))
@@ -1445,12 +1546,12 @@ class TCPIP:
 
         except Exception as err:
             self.connected = 0
-            return err, server_address
+            return err
 
-        return True, server_address
+        return server_address
 
 
-    def send(self, data=None) -> tuple[bool, int] | tuple[bool, Exception]:
+    def send(self, data=None) -> tuple[bool, int | Exception]:
         """send data to server according to class attributes"""
 
         if not self.connected:
@@ -1466,7 +1567,7 @@ class TCPIP:
         return True, len(data)
 
 
-    def receive(self) -> tuple[bool, bytes] | tuple[bool, Exception]:
+    def receive(self) -> tuple[bool, bytes | Exception]:
         """receive according to class attributes"""
 
         data = ""
@@ -1485,7 +1586,8 @@ class TCPIP:
 
 
     def close(self, end=False) -> None:
-        """close TCP connection; restarts the socket, if end isnt set to True"""
+        """close TCP connection; restarts the socket, if end isnt set to True
+        """
 
         self._Socket.close()
         self.connected = False
@@ -1495,21 +1597,25 @@ class TCPIP:
 
 
 class RobConnection(TCPIP):
-    """sets robot specific send/receive operations, inherits from TCPIP class, overwrites send & receive functions
+    """sets robot specific send/receive operations, inherits from TCPIP class,
+    overwrites send & receive functions
 
     ATTRIBUTES:
         inherited from TCPIP class
 
     FUNCTIONS:
         send:
-            sends a QEntry object to server, packing according to robots protocol
+            sends a QEntry object to server, packing according to robots
+            protocol
         receive:
-            receives and unpacks data from robot, returns it as RobTelemetry object
+            receives and unpacks data from robot, returns it as RobTelemetry
+            object
     """
 
 
-    def send(self, entry) -> tuple[bool, int] | tuple[bool, Exception]:
-        """sends QEntry object to robot, packing according to robots protocol"""
+    def send(self, entry) -> tuple[bool, int | Exception]:
+        """sends QEntry object to robot, packing according to robots protocol
+        """
 
         message = []
 
@@ -1577,10 +1683,10 @@ class RobConnection(TCPIP):
         return True, len(message)
 
 
-    def receive(self) -> tuple[RoboTelemetry, bytes] | tuple[None, None]:
+    def receive(self) -> tuple[RoboTelemetry | Exception, bytes]:
         """receives and unpacks data from robot"""
 
-        data = []
+        data = b''
         Telem = RoboTelemetry()
 
         try:
@@ -1591,7 +1697,7 @@ class RobConnection(TCPIP):
                 raise ValueError
 
         except Exception as err:
-            return None, None
+            return err, data
 
         Telem.t_speed = struct.unpack("<f", data[0:4])[0]
         Telem.id = struct.unpack("<i", data[4:8])[0]
@@ -1640,14 +1746,12 @@ class RobConnection(TCPIP):
 #         return True, len(message)
 
 
-#############################################################################################
-#                                    GLOBALS
-#############################################################################################
 
-###################################### global constants #####################################
-# defaut connection settings (the byte length for writing to the robot wont be user setable
-# for safety reasons, it can only be changed here, but only if you know what your doing!)
+#########################     GLOBALS CONST     #############################
 
+# defaut connection settings (the byte length for writing to the robot
+# wont be user setable for safety reasons, it can only be changed here, but 
+# only if you know what your doing!)
 DEF_TCP_MIXER = {
     "IP": "193.0.0.1",
     "PORT": "3000",
@@ -1693,7 +1797,7 @@ DEF_AMC_FIBER_PNMTC = False
 
 DEF_DC_SPEED = SpeedVector()
 
-DEF_IO_ZONE = 10
+DEF_IO_ZONE = 10 # [mm]
 DEF_IO_FR_TO_TS = 0.1
 
 DEF_ICQ_MAX_LINES = 200
@@ -1701,18 +1805,18 @@ DEF_ICQ_MAX_LINES = 200
 DEF_PRIN_SPEED = SpeedVector()
 
 DEF_PUMP_LPS = 0.5
-DEF_PUMP_RETR_SPEED = -50
+DEF_PUMP_RETR_SPEED = -50.0 # [%]
 DEF_PUMP_OUTP_RATIO = 1.0
 DEF_PUMP_CLASS1 = 75.0
 DEF_PUMP_CLASS2 = 50.0
 
 DEF_ROB_COMM_FR = 10
 
-DEF_SC_VOL_PER_M = 0.4  # calculated for 1m of 4cm wide and 1cm high filament
+DEF_SC_VOL_PER_M = 0.4  # [L/m] calculated for 1m of 4cm x 1cm high filament
 DEF_SC_MAX_LINES = 400
-DEF_SC_EXT_FLLW_BHVR = (5, 2)
+DEF_SC_EXT_FLLW_BHVR = (5, 2) # [mm]
 
-DEF_STT_VALID_TIME = 60 # seconds
+DEF_STT_VALID_TIME = 60 # [seconds]
 
 DEF_TERM_MAX_LINES = 300
 
@@ -1720,7 +1824,7 @@ DEF_TOOL_FIB_STPS = 10
 DEF_TOOL_FIB_RATIO = 1.0
 
 
-###################################### global variables ######################################
+##########################     GLOBALS VARS     ##############################
 
 ADC_panning = DEF_AMC_PANNING
 ADC_fib_deliv = DEF_AMC_FIB_DELIV
@@ -1816,23 +1920,48 @@ SC_q_processing = False
 SC_q_prep_end = False
 SC_ext_fllw_bhvr = DEF_SC_EXT_FLLW_BHVR
 
+SEN_timeout = 0.5
 SEN_dict = { # add available datasources here
+    'amb': { # AMBient
+        'ip': "192.168.178.36:17",
+        'err': False,
+        'temp': False,
+        'humid': False,
+    },
+    'asp': { # Admixture Supply Pump
+        'ip': "",
+        'err': False,
+        'freq': False,
+        'amps': False,
+    },
+    'rb': { # Robot Base
+        'ip': "",
+        'err': False,
+        'temp': False,
+    },
     'msp': { # Main Supply Pump
         'ip': "192.168.178.36:17",
         'err': False,
         'temp': True,
         'pressure': False,
     },
-    'asp': { # Admixture Supply Pump
-        None
-    },
     'imp': { # Inline Mixing Pump
-        None
+        'ip': "",
+        'err': False,
+        'temp': False,
+        'pressure': False,
+        'freq': False,
+        'amps': False
     },
     'phc': { # Print Head Controller
-        None
+        'ip': "",
+        'err': False,
+        'aircon': False,
+        'fdist': False,
+        'edist': False
     }
 }
+
 STTDataBlock = DaqBlock()
 
 TERM_log = []

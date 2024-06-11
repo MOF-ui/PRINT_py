@@ -262,15 +262,24 @@ class UTIL_test(unittest.TestCase):
             ],
         )
 
+        curr_disp = testQueue.display()
         # clear
-        self.assertEqual(testQueue.clear(all=False, id=""), ValueError)
-        self.assertEqual(testQueue.clear(all=False, id="3..4.5"), ValueError)
-        self.assertEqual(testQueue.clear(all=False, id="8"), ValueError)
-        self.assertEqual(testQueue.clear(all=False, id="1"), ValueError)
-        self.assertEqual(testQueue.clear(all=False, id="1..3"), ValueError)
-        self.assertEqual(testQueue.clear(all=False, id="5..8"), ValueError)
-        self.assertEqual(testQueue.clear(all=False, id="5..3"), ValueError)
-        self.assertEqual(testQueue.clear(all=False, id="3,,5"), ValueError)
+        testQueue.clear(all=False, id="")
+        self.assertEqual(testQueue.display(), curr_disp)
+        testQueue.clear(all=False, id="3..4.5")
+        self.assertEqual(testQueue.display(), curr_disp)
+        testQueue.clear(all=False, id="8")
+        self.assertEqual(testQueue.display(), curr_disp)
+        testQueue.clear(all=False, id="1")
+        self.assertEqual(testQueue.display(), curr_disp)
+        testQueue.clear(all=False, id="1..3")
+        self.assertEqual(testQueue.display(), curr_disp)
+        testQueue.clear(all=False, id="5..8")
+        self.assertEqual(testQueue.display(), curr_disp)
+        testQueue.clear(all=False, id="5..3")
+        self.assertEqual(testQueue.display(), curr_disp)
+        testQueue.clear(all=False, id="3,,5")
+        self.assertEqual(testQueue.display(), curr_disp)
 
         testQueue.clear(all=False, id="4")
         self.assertEqual(
@@ -471,11 +480,8 @@ class UTIL_test(unittest.TestCase):
         testTCPIP.connected = False
 
         # connect
-        ans0, ans1 = testTCPIP.connect()
-        ans11, ans12 = ans1
+        ans0 = testTCPIP.connect()
         self.assertIsInstance(ans0, TimeoutError)
-        self.assertEqual(ans11, "1.1.1.1")
-        self.assertEqual(ans12, 2222)
 
         testTCPIP.port = "ABC"
         self.assertRaises(ConnectionError, testTCPIP.connect)
@@ -613,8 +619,7 @@ class UTIL_test(unittest.TestCase):
                     Speed=du.SpeedVector(10, 11, 8, 9),
                     z=12,
                     Tool=du.ToolCommand(fib_deliv_steps=10, pnmtc_fiber_yn=True),
-                ),
-                None,
+                )
             ),
         )
 
@@ -627,8 +632,7 @@ class UTIL_test(unittest.TestCase):
                     pt="E",
                     Speed=du.SpeedVector(10, 11, 8, 9),
                     z=12,
-                ),
-                None,
+                )
             ),
         )
 

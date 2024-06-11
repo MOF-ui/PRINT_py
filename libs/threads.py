@@ -1,9 +1,12 @@
-#   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
-#   (https://creativecommons.org/licenses/by-sa/4.0/). Feel free to use, modify or distribute this code as
-#   far as you like, so long as you make anything based on it publicly avialable under the same license.
+#   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0
+#   International (CC BY-SA 4.0).
+#   (https://creativecommons.org/licenses/by-sa/4.0/)
+#   Feel free to use, modify or distribute this code as far as you like, so
+#   long as you make anything based on it publicly avialable under the same
+#   license.
 
 
-####################################################   IMPORTS  ####################################################
+############################     IMPORTS      ################################
 
 # python standard libraries
 import os
@@ -26,7 +29,7 @@ import libs.pump_utilities as pu
 
 
 
-####################################################   WORKER   ####################################################
+##########################     PUMP WORKER      ##############################
 
 class PumpCommWorker(QObject):
     """manages data updates and keepalive commands to pump"""
@@ -41,7 +44,7 @@ class PumpCommWorker(QObject):
     logEntry = pyqtSignal(str, str)
 
 
-    def run(self):
+    def run(self) -> None:
         """start timer with standard operation on timeout,
         connect to pump via M-Tec Interface"""
 
@@ -52,17 +55,19 @@ class PumpCommWorker(QObject):
         self.LoopTimer.start()
 
 
-    def stop(self):
+    def stop(self) -> None:
         """stop loop"""
 
         self.LoopTimer.stop()
         self.LoopTimer.deleteLater()
 
 
-    def send(self):
-        """send pump speed to pump, uses modified setter in mtec's script (changed to function),
-        which recognizes a value change and returns the machines answer and the original command string,
-        uses user-set pump speed if no script is running"""
+    def send(self) -> None:
+        """send pump speed to pump, uses modified setter in mtec's script 
+        (changed to function), which recognizes a value change and returns
+        the machines answer and the original command string, uses user-set
+        pump speed if no script is running
+        """
         global PCW_lastMixerSpeed
 
         # SEND TO PUMPS
@@ -76,7 +81,8 @@ class PumpCommWorker(QObject):
         else:
             pump1_speed = pump2_speed = pump_speed
 
-        # look for user overwrite, no mutex, as changing global PUMP_userSpeed would not harm the process
+        # look for user overwrite, no mutex, as changing 
+        # global PUMP_userSpeed would not harm the process
         if du.PMP1_user_speed != -999:
             pump1_speed = du.PMP1_user_speed
             du.PMP1_user_speed = -999
@@ -124,8 +130,10 @@ class PumpCommWorker(QObject):
                     )
 
 
-    def receive(self):
-        """request data updates for frequency, voltage, current and torque from pump, pass to mainframe"""
+    def receive(self) -> None:
+        """request data updates for frequency, voltage, current and torque
+        from pump, pass to mainframe
+        """
 
         # RECEIVE FROM PUMPS, first P1:
         if du.PMP1Serial.connected:
@@ -144,7 +152,8 @@ class PumpCommWorker(QObject):
                 Telem = round(Telem, 3)
                 self.connActive.emit("P1")
 
-                # telemetry contains no info about the rotation direction, interpret according to settings
+                # telemetry contains no info about the rotation direction,
+                # interpret according to settings
                 if du.PMP1_speed < 0:
                     Telem.freq *= -1
 
@@ -172,7 +181,8 @@ class PumpCommWorker(QObject):
                 Telem = round(Telem, 3)
                 self.connActive.emit("P2")
 
-                # telemetry contains no info about the rotation direction, interpret according to settings
+                # telemetry contains no info about the rotation direction,
+                # interpret according to settings
                 if du.PMP2_speed < 0:
                     Telem.freq *= -1
 
@@ -186,7 +196,7 @@ class PumpCommWorker(QObject):
         # RECEIVE FROM MIXER
         if du.MIXTcp.connected:
             res, data = du.MIXTcp.receive()
-            if res:
+            if not isinstance(res, Exception):
                 self.connActive.emit("MIX")
 
                 if data != du.MIX_last_speed:
@@ -198,14 +208,21 @@ class PumpCommWorker(QObject):
                     self.dataMixerRecv.emit(data)
 
             else:
-                self.logEntry.emit("MTel", f"MIXER - receiving data failed ({data})")
+                self.logEntry.emit(
+                    "MTel",
+                    f"MIXER - receiving data failed ({data})"
+                )
 
 
+
+##########################     ROBO WORKER      ##############################
 
 class RoboCommWorker(QObject):
-    """a worker object that check every 50 ms if the Robot queue has empty slots (according to ROBO_comm_forerun),
-    emits signal to send data if so, beforehand
-    checks the TCPIP connection every 50 ms and writes the result to global vars"""
+    """a worker object that check every 50 ms if the Robot queue has empty 
+    slots (according to ROBO_comm_forerun), emits signal to send data if so,
+    beforehand checks the TCPIP connection every 50 ms and writes the result
+    to global vars
+    """
 
     commLost = pyqtSignal(int)
     dataReceived = pyqtSignal()
@@ -219,7 +236,7 @@ class RoboCommWorker(QObject):
     transmitting = False
 
 
-    def run(self):
+    def run(self) -> None:
         """start timer, receive and send on timeout"""
 
         self.StatusCheckTimer = QTimer()
@@ -237,7 +254,7 @@ class RoboCommWorker(QObject):
         self.CheckTimer.timeout.connect(self.check_queue)
 
 
-    def stop(self):
+    def stop(self) -> None:
         """stop loop"""
 
         self.CommTimer.stop()
@@ -250,9 +267,10 @@ class RoboCommWorker(QObject):
         self.StatusCheckTimer.deleteLater()
 
 
-    def check_new_status(self):
-        """change connection status if requested, request via permanent check of global variable as I'm unwilling
-        to program a custom QThread class with the according slot and also havent figured out another way yet
+    def check_new_status(self) -> None:
+        """change connection status if requested, request via permanent check
+        of global variable as I'm unwilling to program a custom QThread class
+        with the according slot and also havent figured out another way yet
         """
         global rcw_new_status
 
@@ -271,22 +289,23 @@ class RoboCommWorker(QObject):
                 self.commLost.emit(len(du.ROB_send_list))
 
 
-    def receive(self):
+    def receive(self) -> None:
         """receive 36-byte data block, write to ROB vars"""
 
         Telem, raw_data = du.ROBTcp.receive()
 
-        if raw_data != None:
-            if Telem is not None:
-                Telem = round(Telem, 1)
+        if not isinstance(Telem, Exception):
+            Telem = round(Telem, 1)
             self.dataReceived.emit()
 
             Mutex.lock()
             fu.add_to_comm_protocol(
-                f"RECV:    ID {Telem.id},   {Telem.Coor}   TCP: {Telem.t_speed}"
+                f"RECV:    ID {Telem.id},   {Telem.Coor}   "
+                f"TCP: {Telem.t_speed}"
             )
 
-            # check for ID overflow, reduce SC_queue IDs & get rid off ROB_commQueue entries with IDs at ~3000
+            # check for ID overflow, reduce SC_queue IDs & get rid off
+            # ROB_commQueue entries with IDs at ~3000
             if Telem.id < du.ROBLastTelem.id:
                 for x in du.SCQueue:
                     x.id -= 3000
@@ -313,7 +332,8 @@ class RoboCommWorker(QObject):
             # refresh data only if new
             if Telem != du.ROBLastTelem:
 
-                # check if robot is processing a new command (length check to skip in first loop)
+                # check if robot is processing a new command
+                # (length check to skip in first loop)
                 if (Telem.id != du.ROBLastTelem.id) and (len(du.ROBCommQueue) > 0):
                     du.ROBMovStartP = du.ROBMovEndP
                     du.ROBMovEndP = copy.deepcopy(du.ROBCommQueue[0].Coor1)
@@ -339,34 +359,40 @@ class RoboCommWorker(QObject):
                     if check_dist < 1:
                         self.endDcMoving.emit()
 
-        elif Telem is not None:
+        else:
             self.logEntry.emit(
-                "RTel", f"error ({Telem}) from TCPIP class ROB_tcpip, data: {raw_data}"
+                "RTel",
+                f"error ({Telem}) from TCPIP class ROB_tcpip, data: {raw_data}"
             )
 
             Mutex.lock()
             fu.add_to_comm_protocol(
-                f"RECV:    error ({Telem}) from TCPIP class ROB_tcpip, data: {raw_data}"
+                f"RECV:    error ({Telem}) from TCPIP class ROB_tcpip, "
+                f"data: {raw_data}"
             )
             Mutex.unlock()
 
 
-    def check_queue(self):
-        """add queue element to sendList if qProcessing and robot queue has space"""
+    def check_queue(self) -> None:
+        """add queue element to sendList if qProcessing and robot queue has
+        space
+        """
 
         len_sc = len(du.SCQueue)
         len_rob = len(du.ROBCommQueue)
         rob_id = du.ROBTelem.id
 
-        # if qProcessing is ending, define end as being in 1mm range of the last robtarget
+        # if qProcessing is ending, define end as being in 1mm range of
+        # the last robtarget
         if du.SC_q_prep_end:
             check_dist = self.check_zero_dist()
             if check_dist is not None:
                 if check_dist < 1:
                     self.endProcessing.emit()
 
-        # if qProcessing is active and not ending, pop first queue item if robot is nearer than ROB_commFr
-        # if no entries in SC_queue left, end qProcessing (immediately if ROB_commQueue is empty as well)
+        # if qProcessing is active and not ending, pop first queue item if
+        # robot is nearer than ROB_commFr; if no entries in SC_queue left,
+        # end qProcessing (immediately if ROB_commQueue is empty as well)
         elif du.SC_q_processing:
 
             if len_sc > 0:
@@ -388,7 +414,7 @@ class RoboCommWorker(QObject):
                     self.queueEmtpy.emit()
 
 
-    def send(self, testrun=False):
+    def send(self, testrun=False) -> None:
         """send sendList entries if not empty"""
 
         num_to_send = len(du.ROB_send_list)
@@ -421,9 +447,11 @@ class RoboCommWorker(QObject):
                 Mutex.lock()
                 du.ROBCommQueue.append(Comm)
                 fu.add_to_comm_protocol(
-                    f"SEND:    ID: {Comm.id}  MT: {Comm.mt}  PT: {Comm.pt} \t|| COOR_1: {Comm.Coor1}"
+                    f"SEND:    ID: {Comm.id}  MT: {Comm.mt}  PT: {Comm.pt} "
+                    f"\t|| COOR_1: {Comm.Coor1}"
                     f"\n\t\t\t|| COOR_2: {Comm.Coor2}"
-                    f"\n\t\t\t|| SV:     {Comm.Speed} \t|| SBT: {Comm.sbt}   SC: {Comm.sc}   Z: {Comm.z}"
+                    f"\n\t\t\t|| SV:     {Comm.Speed} \t|| SBT: {Comm.sbt}   "
+                    f"SC: {Comm.sc}   Z: {Comm.z}"
                     f"\n\t\t\t|| TOOL:   {Comm.Tool}"
                 )
                 if direct_ctrl:
@@ -441,9 +469,10 @@ class RoboCommWorker(QObject):
             # else: self.sendElem.emit(command, msg, msgLen, directCtrl, False)
 
 
-    def check_zero_dist(self):
-        """calculates distance between next entry in ROB_commQueue and current position;
-        calculates 4 dimensional only to account for external axis movement (0,0,0,1) 
+    def check_zero_dist(self) -> float | None:
+        """calculates distance between next entry in ROB_commQueue and current
+        position; calculates 4 dimensional only to account for external axis
+        movement (0,0,0,1) 
         """
 
         if len(du.ROBCommQueue) == 1:
@@ -458,6 +487,8 @@ class RoboCommWorker(QObject):
 
 
 
+#########################     SENSOR WORKER      #############################
+
 class SensorCommWorker(QObject):
     """cycle through all sensors, collect the data"""
 
@@ -467,7 +498,7 @@ class SensorCommWorker(QObject):
 
     _conn_error = False
 
-    def run(self):
+    def run(self) -> None:
         """start cycling through the sensors"""
 
         self.CycleTimer = QTimer()
@@ -476,50 +507,64 @@ class SensorCommWorker(QObject):
         self.CycleTimer.start()
 
 
-    def stop(self):
+    def stop(self) -> None:
         """stop cycling"""
 
         self.CycleTimer.stop()
         self.CycleTimer.deleteLater()
 
 
-    def cycle(self):
+    def cycle(self) -> None:
         """check every sensor once"""
 
-        def loc_request(loc:dict, key:str):
+        def loc_request(loc:dict, key:str) -> None:
+            """runs sub-cycle for single location, sends data to
+            fu.store_sensor_data while its at it
+            """
+
             for sub_key in loc:
                 if sub_key == 'ip' or sub_key == 'err': 
                     continue
-
-                if loc[sub_key]:
+                
+                if loc[sub_key]: # only check true-marked sensors
                     data = fu.sensor_req(loc["ip"], sub_key)
                     
-                    if isinstance(data, list): # to-do: write handling for legacy data
+                    if isinstance(data, list):
+                        # to-do: write handling for legacy data
                         self.dataReceived.emit(loc['ip'])
-                        latest_data = data[0] # extracts tuple from list: (val, uptime)
+                        # extract tuple from list: (val, uptime)
+                        # newest entry is at the end of the list
+                        latest_data = data[len(data) - 1]
                         loc['err'] = False
 
                         Mutex.lock()
-                        fu.store_sensor_data(sub_key, key)
+                        fu.store_sensor_data(latest_data, key, sub_key)
                         Mutex.unlock()
 
                     elif data is not None:
-                        if loc['err'] == False: # log recurring error from one location only once
+                        # log recurring error from one location only once
+                        if loc['err'] == False:
                             loc['err'] = True
                             self.logEntry.emit(
                                 'SENS',
                                 f"request error from {loc['ip']}: {data}"
                             )
+                            self.logEntry.emit(
+                                'SENS',
+                                f"trying to reconnect to {loc['ip']}.."
+                            )
             
             return None
 
-        # MSP
+        # main cycle
         for key in du.SEN_dict:
             loc_request(du.SEN_dict[key], key)
 
         self.cycleDone.emit()
 
 
+
+###########################     LF WORKER      ###############################
 
 class LoadFileWorker(QObject):
     """worker converts .gcode or .mod into QEntries, outsourced to worker as
@@ -530,7 +575,7 @@ class LoadFileWorker(QObject):
     _CommList = du.Queue()
 
 
-    def run(self, testrun=False):
+    def run(self, testrun=False) -> None:
         """get data, start conversion loop"""
 
         global lfw_file_path
@@ -565,14 +610,14 @@ class LoadFileWorker(QObject):
             for row in rows:
                 Entry, command = self.gcode_conv(id=line_id, txt=row)
 
-                if (command == "G92") or (command == ";") or (command is None):
-                    skips += 1
-                elif (command == "G1") or (command == "G28"):
-                    line_id += 1
-                elif command == ValueError:
+                if isinstance(Entry, Exception):
                     self.convFailed.emit(f"VALUE ERROR: {command}")
                     lfw_running = False
                     return
+                if (command == "G92") or (command == ";") or (command == ''):
+                    skips += 1
+                elif (command == "G1") or (command == "G28"):
+                    line_id += 1
                 else:
                     self.convFailed.emit(f"{command}!, ABORTED")
                     lfw_running = False
@@ -580,10 +625,10 @@ class LoadFileWorker(QObject):
 
         else:
             for row in rows:
-                Entry, err = self.rapid_conv(id=line_id, txt=row)
+                Entry = self.rapid_conv(id=line_id, txt=row)
 
-                if err == ValueError:
-                    self.convFailed.emit(f"VALUE ERROR: {command}")
+                if isinstance(Entry, Exception):
+                    self.convFailed.emit(f"ERROR: {Entry}")
                     lfw_running = False
                     return
                 elif Entry is None:
@@ -597,14 +642,14 @@ class LoadFileWorker(QObject):
             return
 
         # check for unidistance mode
-        um_check = fu.re_short("\&\&: \d+.\d+", txt, None, "\&\&: \d+")
-        if um_check is not None:
-            um_dist = fu.re_short("\d+.\d+", um_check, ValueError, "\d+")
-            um_conv_res = self.add_um_tool(um_dist)
-            if um_conv_res is not None:
-                self.convFailed.emit(um_conv_res)
-                lfw_running = False
-                return
+        # um_check = fu.re_short("\&\&: \d+.\d+", txt, None, "\&\&: \d+")
+        # if um_check is not None:
+        #     um_dist = fu.re_short("\d+.\d+", um_check, ValueError, "\d+")
+        #     um_conv_res = self.add_um_tool(um_dist)
+        #     if um_conv_res is not None:
+        #         self.convFailed.emit(um_conv_res)
+        #         lfw_running = False
+        #         return
 
         # automatic pump control
         if lfw_p_ctrl:
@@ -612,7 +657,8 @@ class LoadFileWorker(QObject):
             for Entry in self._CommList:
                 Entry.p_mode = "default"
 
-            # add a 3mm long startvector with a speed of 3mm/s (so 3s of approach), with pMode=start
+            # add a 3mm long startvector with a speed of 3mm/s
+            # (so 3s of approach), with pMode=start
             StartVector = copy.deepcopy(self._CommList[0])
             StartVector.id = start_id
             StartVector.Coor1.x += lfw_pre_run_time
@@ -632,7 +678,13 @@ class LoadFileWorker(QObject):
         lfw_running = False
 
 
-    def gcode_conv(self, id, txt):
+    def gcode_conv(
+            self,
+            id:int,
+            txt:str
+    ) -> (
+        tuple[du.QEntry | None | ValueError, str]
+    ):
         """single line conversion from GCode"""
 
         # get text and position BEFORE PLANNED COMMAND EXECUTION
@@ -655,51 +707,51 @@ class LoadFileWorker(QObject):
         res = self._CommList.add(Entry, thread_call=True)
 
         if res == ValueError:
-            return None, ValueError
+            return ValueError, ''
 
         return Entry, command
 
 
-    def rapid_conv(self, id, txt):
+    def rapid_conv(self, id:int, txt:str) -> du.QEntry | None | Exception:
         """single line conversion from RAPID"""
 
-        Entry, err = fu.rapid_to_qentry(txt)
-        if Entry == None:
-            return None, err
+        Entry = fu.rapid_to_qentry(txt)
+        if isinstance(Entry, Exception) or Entry is None:
+            return Entry
 
         Entry.id = id
         res = self._CommList.add(Entry, thread_call=True)
 
         if res == ValueError:
-            return None, ValueError
+            return ValueError
 
-        return Entry, None
-
-
-    def add_um_tool(self, umd):
-        """check if the data makes send, add the tooldata to entries"""
-
-        try:
-            um_dist = float(umd)
-        except Exception:
-            return f"UM-Mode failed reading {umd}"
-
-        if um_dist < 0.0 or um_dist > 2000.0:
-            return f"UM-Distance <0 or >2000"
-
-        for Entry in self._CommList:
-            travel_time = um_dist / Entry.Speed.ts
-            if (um_dist % Entry.Speed.ts) != 0:
-                return f"UM-Mode failed setting {travel_time} to int."
-
-            Entry.sc = "T"
-            Entry.sbt = int(travel_time)
-            Entry.Tool.time_time = int(travel_time)
-        return None
+        return Entry
 
 
+    # def add_um_tool(self, umd:float):
+    #     """check if the data makes send, add the tooldata to entries"""
 
-####################################################   MAIN  ####################################################
+    #     try:
+    #         um_dist = float(umd)
+    #     except Exception:
+    #         return f"UM-Mode failed reading {umd}"
+
+    #     if um_dist < 0.0 or um_dist > 2000.0:
+    #         return f"UM-Distance <0 or >2000"
+
+    #     for Entry in self._CommList:
+    #         travel_time = um_dist / Entry.Speed.ts
+    #         if (um_dist % Entry.Speed.ts) != 0:
+    #             return f"UM-Mode failed setting {travel_time} to int."
+
+    #         Entry.sc = "T"
+    #         Entry.sbt = int(travel_time)
+    #         Entry.Tool.time_time = int(travel_time)
+    #     return None
+
+
+
+##############################     MAIN      #################################
 
 Mutex = QMutex()
 

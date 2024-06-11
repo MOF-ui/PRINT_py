@@ -1,4 +1,13 @@
-################################################  IMPORTS  ###############################################
+
+#   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0
+#   International (CC BY-SA 4.0).
+#   (https://creativecommons.org/licenses/by-sa/4.0/)
+#   Feel free to use, modify or distribute this code as far as you like, so
+#   long as you make anything based on it publicly avialable under the same
+#   license.
+
+
+############################     IMPORTS      ################################
 
 import os
 import re
@@ -10,10 +19,10 @@ from threading import Thread
 from time import sleep
 
 
-################################################  THREADS  ###############################################
+############################     THREADS      ################################
 
 
-def stt_update():
+def stt_update() -> None:
     global id
     global x1
     global y1
@@ -31,7 +40,18 @@ def stt_update():
         id_ans = id - id_offs
         try:
             conn.sendall(
-                struct.pack("<fifffffff", 99.0, id_ans, x1, y1, z1, rx, ry, rz, ext)
+                struct.pack(
+                    "<fifffffff",
+                    99.0,
+                    id_ans,
+                    x1,
+                    y1,
+                    z1,
+                    rx,
+                    ry,
+                    rz,
+                    ext
+                )
             )
         except OSError:
             print("OSError in stt_update, last package lost..")
@@ -73,7 +93,7 @@ def usr_input():
                 print(f"Invalid number for ID offset: {num}\ncommand:")
 
 
-################################################  MAIN  ###############################################
+#############################     MAIN      #################################
 
 HOST = "localhost"
 PORT = 10001
@@ -176,10 +196,12 @@ while toggle:
                     f"Ext2: {ext2}"
                     f"\nACR: {acr} DCR: {dcr} TS: {ts} OS: {ors} "
                     f"T: {t} SC: {sc} Z: {z}"
-                    f"\nM1_ID: {m1_id} M1_ST: {m1_steps} M2_ID: {m2_id} M2_ST: {m2_steps} "
-                    f"M3_ID: {m3_id} M3_ST: {m3_steps} PC_ID: {pnmtcClamp_id} PC_YN: {pnmtcClamp_yn} "
-                    f"K_ID: {knife_id} K_YN: {knife_yn} M4_ID: {m4_id} M4_ST: {m4_steps} "
-                    f"PF_ID: {pnmtcFiber_id} PF_YN: {pnmtcFiber_yn} T_ID: {time_id} T_T: {time_time}"
+                    f"\nM1_ID: {m1_id} M1_ST: {m1_steps} M2_ID: {m2_id} "
+                    f"M2_ST: {m2_steps} M3_ID: {m3_id} M3_ST: {m3_steps} "
+                    f"PC_ID: {pnmtcClamp_id} PC_YN: {pnmtcClamp_yn} "
+                    f"K_ID: {knife_id} K_YN: {knife_yn} M4_ID: {m4_id} "
+                    f"M4_ST: {m4_steps} PF_ID: {pnmtcFiber_id} "
+                    f"PF_YN: {pnmtcFiber_yn} T_ID: {time_id} T_T: {time_time}"
                 )
 
     a = input("Connection closed...  Wait for reconnect? Y/N\n")

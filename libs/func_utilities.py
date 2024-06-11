@@ -1,9 +1,12 @@
-#   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
-#   (https://creativecommons.org/licenses/by-sa/4.0/). Feel free to use, modify or distribute this code as
-#   far as you like, so long as you make anything based on it publicly avialable under the same license.
+#   This work is licensed under Creativ Commons Attribution-ShareAlike 4.0
+#   International (CC BY-SA 4.0).
+#   (https://creativecommons.org/licenses/by-sa/4.0/)
+#   Feel free to use, modify or distribute this code as far as you like, so
+#   long as you make anything based on it publicly avialable under the same
+#   license.
 
 
-#######################################     IMPORTS      #####################################################
+############################     IMPORTS      ################################
 
 import re
 import os
@@ -24,11 +27,13 @@ sys.path.append(parent_dir)
 import libs.data_utilities as du
 
 
-#############################################################################################
-#                                    FUNCTIONS
-#############################################################################################
+###########################     FUNCTIONS      ###############################
 
-def pre_check_ccode_file(txt:str) -> tuple[int, float, str] | tuple[None, None, Exception]:
+def pre_check_ccode_file(
+        txt:str
+) -> (
+        tuple[int | Exception, float, str]
+):
     """extracts the number of GCode commands and the filament length from
     text, ignores Z movement for now, slicing only in x-y-plane yet
 
@@ -38,10 +43,10 @@ def pre_check_ccode_file(txt:str) -> tuple[int, float, str] | tuple[None, None, 
     """
 
     try:
-        if txt == "":
-            return 0, 0.0, "empty"
+        if txt == '':
+            return 0, 0.0, 'empty'
 
-        rows = txt.split("\n")
+        rows = txt.split('\n')
         x = 0.0
         y = 0.0
         z = 0.0
@@ -75,13 +80,17 @@ def pre_check_ccode_file(txt:str) -> tuple[int, float, str] | tuple[None, None, 
         filament_length /= 1000
         filament_length = round(filament_length, 2)
 
-    except Exception as e:
-        return None, None, e
+    except Exception as err:
+        return err, 0.0, ''
 
-    return comm_num, filament_length, ""
+    return comm_num, filament_length, ''
 
 
-def pre_check_rapid_file(txt:str) -> tuple[int, float, str] | tuple[None, None, Exception]:
+def pre_check_rapid_file(
+        txt:str
+) -> (
+        tuple[int | Exception, float, str]
+):
     """extracts the number of GCode commands and the filament length from
     text, does not handle Offs commands yet
 
@@ -123,8 +132,8 @@ def pre_check_rapid_file(txt:str) -> tuple[int, float, str] | tuple[None, None, 
         filament_length /= 1000
         filament_length = round(filament_length, 2)
 
-    except Exception as e:
-        return None, None, e
+    except Exception as err:
+        return err, 0.0, ''
 
     return comm_num, filament_length, ''
 
@@ -164,8 +173,7 @@ def gcode_to_qentry(
         zone:int,
         txt:str
     ) -> (
-        tuple[du.QEntry, str]
-        | tuple[None, None]
+        tuple[du.QEntry|None, str]
     ):
     """converts a single line of GCode G1 command to a QEntry, can be used in
     loops for multiline code, "pos" should be the pos before this command is
@@ -190,15 +198,14 @@ def gcode_to_qentry(
     speed = copy.deepcopy(mut_speed)
     zero = copy.deepcopy(du.DCCurrZero)
 
-    try:
-        if not isinstance(pos, du.Coordinate):
-            raise ValueError(f"{pos} is not an instance of QEntry!")
-        if not isinstance(speed, du.SpeedVector):
-            raise ValueError(f"{speed} is not an instance of SpeedVector!")
-        command = re_short("G\d+", txt, 0, "^;")
-
-    except IndexError:
-        return None, None
+    if not isinstance(pos, du.Coordinate):
+        raise ValueError(f"{pos} is not an instance of QEntry!")
+    if not isinstance(speed, du.SpeedVector):
+        raise ValueError(f"{speed} is not an instance of SpeedVector!")
+    
+    command = re_short("G\d+", txt, None, "^;")
+    if command is None:
+        return None, ''
 
     # act according to GCode command
     match command:
@@ -276,7 +283,7 @@ def gcode_to_qentry(
                 if p_class:
                     entry.p_mode = p_class[0]
                 else:
-                    return None, None
+                    return None, ''
 
             # set tool settings
             if "TOOL" in txt:
@@ -313,7 +320,7 @@ def gcode_to_qentry(
                 if p_class:
                     entry.p_mode = p_class[0]
                 else:
-                    return None, None
+                    return None, ''
 
         case "G92":
             if "X0" in txt:
@@ -330,30 +337,35 @@ def gcode_to_qentry(
             return None, command
 
         case _:
-            return None, None
+            return None, ''
 
     return entry, command
 
 
-def rapid_to_qentry(
-        txt:str
-    ) -> (
-        tuple[du.QEntry, None]
-        | tuple[Exception, None]
-    ): # to-do
+def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception: # to-do
     """converts a single line of MoveL, MoveJ, MoveC or Move* Offs command 
     (no Reltool) to a QEntry (relative to DC_curr_zero for 'Offs'), can be
-    used in loops for multiline code, returns entry or any Exceptions
+    used in loops for multiline code, returns entry or any Exceptions, 
+    return None if no movement-type keyword is found
 
     accepts:
         txt: RAPID-like command line specifying movement
     """
 
     entry = du.QEntry(id=0)
+
+    # if no movement-type command is given, return None
     try:
         entry.mt = re.findall("Move[J,L,C]", txt, 0)[0][4]
-
-        ext = re_short("EXT:\d+\.\d+", txt, None, "EXT:\d+")
+    except IndexError:
+        return None
+    
+    ext = re_short("EXT:\d+\.\d+", txt, None, "EXT:\d+")
+    if ext is None:
+        return None # to-do: add missing value handler
+    
+    # otherwise try to decode
+    try:
         ext = float(ext[4:])
 
         if "Offs" in txt:
@@ -414,13 +426,18 @@ def rapid_to_qentry(
         if pump:
             pump = pump[0]
 
-        if "start" in pump or "end" in pump or "default" in pump or "None" in pump:
+        if (
+                "start" in pump 
+                or "end" in pump 
+                or "default" in pump 
+                or "None" in pump
+        ):
             entry.p_mode = pump
 
-    except Exception as e:
-        return None, e
+    except Exception as err:
+        return err
 
-    return entry, None
+    return entry
 
 
 def create_logfile() -> Path | None:
@@ -462,7 +479,7 @@ def add_to_comm_protocol(txt:str) -> None:
         du.TERM_log.__delitem__(0)
 
 
-def connect_pump(p_num:int):
+def connect_pump(p_num:int) -> None:
     """creates the default serial connection if needed, connects required pump.
     necessary to do this via default bus, as multiple connections to on COM
     port are forbitten by pyserial
@@ -489,6 +506,8 @@ def connect_pump(p_num:int):
             du.PMP2Serial.connect()
         case _:
             raise ValueError(f"wrong pNum given: {p_num}")
+    
+    return None
 
 
 def calc_pump_ratio(p1_speed:int, p2_speed:int) -> tuple[float, float]:
@@ -531,7 +550,7 @@ def sensor_req(
     """
 
     try:
-        ans = requests.get(f"http://{ip}/{key}")
+        ans = requests.get(f"http://{ip}/{key}", timeout=du.SEN_timeout)
         ans.raise_for_status()
     except Exception as err:
         return ValueError(f"request failed: {err}!")
@@ -573,7 +592,8 @@ def sensor_req(
 def store_sensor_data(data:tuple, key:str, sub_key:str) -> None:
     """Stores data according to key and sub_key, mutual exclusion needs to
     be called beforehand, as values are stored in global variables.
-    No data is stored, if the corresponding uptime exceeds the data 
+    No data is stored, if the corresponding uptime exceeds the datas
+    valid_time.
 
     accepts: 
         data:
@@ -586,7 +606,7 @@ def store_sensor_data(data:tuple, key:str, sub_key:str) -> None:
 
     val, uptime = data
 
-    if uptime > du.STTDataBlock.valid_time:
+    if uptime > du.STTDataBlock.valid_time.seconds:
         return None
     match key:
         case 'amb':
