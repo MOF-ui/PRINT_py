@@ -42,6 +42,7 @@ import libs.func_utilities as fu
 
 test_arg = False
 arg_len = len(sys.argv)
+arg1 = ''
 
 if arg_len == 2:
     arg1 = sys.argv[1]
@@ -54,7 +55,7 @@ if arg_len == 2:
         case _: 
             raise KeyError(f"{arg1} is not a valid argument for PRINT.py!")
 
-elif arg_len < 2:
+elif arg_len > 2:
     raise KeyError(f"PRINT.py got too many arguments!")
 
 

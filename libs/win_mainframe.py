@@ -53,7 +53,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     ##########################################################################
 
     logpath = ""  # reference for logEntry, set by __init__
-    Daq = None  # reference for DAQ main window, instance is loaded in __init__
 
     _testrun = False  # switch for mainframe_test.py
     _first_pos = True  # one-time switch to get robot home position
@@ -167,11 +166,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # DAQ SETUP
         self.Daq = daq_window()
         self.Daq.logEntry.connect(self.log_entry)
-
-        self._DaqTimer = QTimer()
-        self._DaqTimer.setInterval(1000)
-        self._DaqTimer.timeout.connect(self.Daq.time_update)
-        self._DaqTimer.start()
 
         if not testrun:
             self.Daq.show()
@@ -766,10 +760,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def robo_send(
             self,
             command:du.QEntry,
-            msg:object,
-            num_send:int,
-            dc:bool,
-            no_error:bool
+            no_error:bool,
+            num_send:int | Exception,
+            dc:bool
     ) -> None:
         """handle UI update after new command was send"""
 
@@ -790,21 +783,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.label_update_on_send(command)
             write_buffer = command.print_short()
 
-        elif num_send == ValueError:
-            write_buffer = "ValueError"
-        elif num_send == RuntimeError:
-            write_buffer = "RuntimeError"
-        elif num_send == OSError:
-            write_buffer = "OSError"
         else:
-            write_buffer = "unspecified error"
-
-        if not no_error:
             self.log_entry(
                 "CONN",
                 (
-                    f"TCPIP class 'ROB_tcpip' encountered {write_buffer} "
-                    f"in sendCommand: {num_send}"
+                    f"TCPIP class 'ROB_tcpip' encountered {num_send} "
+                    f"in sendCommand!"
                 ),
             )
         self.TCP_ROB_disp_writeBuffer.setText(write_buffer)
@@ -815,7 +799,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """write robots telemetry to log & user displays, resetting globals
         position variables is done by RobCommWorker"""
 
-        # set the fist given position to zero as this is usually the standard position for Rob2, take current ID
+        # set the fist given position to zero as this is usually the standard
+        # position for Rob2, take current ID
         if self._first_pos:
             du.ROBMovStartP = copy.deepcopy(du.ROBTelem.Coor)
             du.ROBMovEndP = copy.deepcopy(du.ROBTelem.Coor)
@@ -1722,7 +1707,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if Entry is None:
             if not from_file:
                 self.SGLC_entry_rapidSglComm.setText(
-                    f"ERROR: no detectable move-type in:\n {txt}"
+                    f"ERROR: no detectable move-type "
+                    f"or missing 'EXT:' in:\n {txt}"
                 )
             return Entry
         
@@ -2509,7 +2495,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         # bye
         self.log_entry("GNRL", "exiting GUI.")
-        self._DaqTimer.stop()
         self.Daq.close()
         event.accept()
 

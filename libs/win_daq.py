@@ -19,7 +19,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 # PyQt stuff
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QTimer
 from PyQt5.QtWidgets import QApplication, QWidget
 
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
@@ -43,6 +43,7 @@ class DAQWindow(QWidget, Ui_DAQWindow):
     logEntry = pyqtSignal(str, str)
     
     _Database = None
+    _db_active = True
     _db_bucket = None
     _influx_error = False
 
@@ -50,20 +51,37 @@ class DAQWindow(QWidget, Ui_DAQWindow):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
 
+        # UI setup
         self.setupUi(self)
         self.setWindowTitle("---   PRINT_py  -  DAQ window  ---")
         self.setWindowFlags(
             Qt.WindowMaximizeButtonHint
             | Qt.WindowMinimizeButtonHint
         )
-        self.time_update()
 
+        # timer setup
+        self.time_update()
+        self._ClockTimer = QTimer()
+        self._ClockTimer.setInterval(1000)
+        self._ClockTimer.timeout.connect(self.time_update)
+        self._ClockTimer.start()
+
+        self._DBTimer = QTimer()
+        self._DBTimer.setInterval(1000 * du.DB_log_interval) #[s] -> [ms]
+        self._DBTimer.timeout.connect(self.to_influx_db)
+        self._DBTimer.start()
+
+        # connect signals
+        self.ADD_btt_add.pressed.connect(self.to_influx_db)
+        self.ADD_btt_dbPause.pressed.connect(self.db_on_off)
         self.PATH_btt_chgPath.pressed.connect(self.new_path)
 
+        # database setup
         self._Database = influxdb_client.InfluxDBClient(
                 url=du.DB_url,
                 token=du.DB_token,
-                org=du.DB_org
+                org=du.DB_org,
+                timeout=500
             )
         daq_starttime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         self._db_bucket = daq_starttime + "__" + du.DB_session 
@@ -71,7 +89,7 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             write_options=SYNCHRONOUS
         )
 
-        # set up default displays
+        # default display setup
         self.PATH_disp_path.setText(du.DB_url)
 
 
@@ -152,14 +170,45 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             # display
             self.PATH_disp_path.setText(du.DB_url)
             self.logEntry.emit('DAQW', f"user set DB path to {du.DB_url}")
+    
+
+    def db_on_off(self, error_indi=False) -> None:
+        """ user/internal call to switch db entry on/off """
+
+        if error_indi:
+            btt_txt = 'start\nDB entries'
+            btt_style = 'background-color: #a28230;'
+            indi_stlye = "border-radius: 35px;\nbackground-color: #ffda1e;"
+            self._db_active = False
+        
+        elif self._db_active:
+            self._DBTimer.stop()
+            btt_txt = 'start\nDB entries'
+            btt_style = 'background-color: #a28230;'
+            indi_stlye = "border-radius: 35px;\nbackground-color: #4c4a48;"
+            self._db_active = False
+            self.logEntry.emit('DAQW', 'stop posting DB entries')
+
+        else:
+            self._DBTimer.start()
+            btt_txt = 'pause\nDB entries'
+            btt_style = 'background-color: #FFBA00;'
+            indi_stlye = "border-radius: 35px;\nbackground-color: #73ff78;"
+            self._db_active = True
+            self.logEntry.emit('DAQW', 'contiuned to post DB entries')
+        
+        self.ADD_btt_dbPause.setText(btt_txt)
+        self.ADD_btt_dbPause.setStyleSheet(btt_style)
+        self.ADD_indi_state.setStyleSheet(indi_stlye)
 
 
-    def toInflux(self) -> None:
+    def to_influx_db(self) -> None:
         """build & send an DB entry, name the measurement after current time,
         all DaqBlock entries will return None if their valid_time has passed,
         signal from (robo_recv or sensor_cycle?) 
         """
 
+        # upload to TCP Influx server
         now = datetime.now().strftime('%Y-%m-%d    %H:%M:%S')
         DBEntry = influxdb_client\
             .Point(now)\
@@ -195,29 +244,43 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             .field("ROB RZ", du.STTDataBlock.Robo.Coor.rz)\
             .field("ROB EXT", du.STTDataBlock.Robo.Coor.ext)
         
-        res = self.db_connection.write(
-            bucket=self._db_bucket,
-            org=du.DB_org,
-            record=DBEntry
-        )
-
-        if res is None: # to-do: errors dont appear in log, yet
+        try: #to-do: write a non-blocking entry post routine, this one waits for 500ms timeout
+            self.db_connection.write(
+                bucket=self._db_bucket,
+                org=du.DB_org,
+                record=DBEntry
+            )
+        except Exception as err:
+            self.db_connection.flush()
+            self.db_on_off(error_indi=True)
+            
             if self._influx_error == False:
                 self._influx_error = True
                 self.logEntry.emit(
                     'DAQW',
-                    f"error writing to DB at {self._Database.url}: {res}")
+                    f"error writing to DB at {self._Database.url}: {err}")
                 self.logEntry.emit('DAWQ', 'trying to reconnect..')
+            return
                 
-        elif self._influx_error:
+        if self._influx_error:
             self._influx_error = False
             self.logEntry.emit('DAQW','DB reconnected!')
+            if not self._db_active:
+                self.db_on_off()
+
+
+    def closeEvent(self, event) -> None:
+        """exit timer"""
+
+        self._ClockTimer.stop()
+        self._DBTimer.stop()
+        event.accept()
 
 
 
 ########################     DAQ WIN DIALOG      ############################
 
-def daq_window(standalone=False) -> DAQWindow:
+def daq_window(standalone=False) -> 'DAQWindow':
     """shows a dialog window, text and title can be set, returns the users
     choice
     """

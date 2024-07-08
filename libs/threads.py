@@ -82,7 +82,7 @@ class PumpCommWorker(QObject):
             pump1_speed = pump2_speed = pump_speed
 
         # look for user overwrite, no mutex, as changing 
-        # global PUMP_userSpeed would not harm the process
+        # global PUMP_user_speed would not harm the process
         if du.PMP1_user_speed != -999:
             pump1_speed = du.PMP1_user_speed
             du.PMP1_user_speed = -999
@@ -231,7 +231,9 @@ class RoboCommWorker(QObject):
     endProcessing = pyqtSignal()
     logEntry = pyqtSignal(str, str)
     queueEmtpy = pyqtSignal()
-    sendElem = pyqtSignal(du.QEntry, object, int, bool, bool)
+    # sendElem contains object as third parameter,
+    # however this will be either int or Exception type
+    sendElem = pyqtSignal(du.QEntry, bool, object, bool)
 
     transmitting = False
 
@@ -460,12 +462,12 @@ class RoboCommWorker(QObject):
 
             else:
                 print(f" Message Error: {msg_len}")
-                self.sendElem.emit(Comm, res, msg_len, direct_ctrl, False)
+                self.sendElem.emit(Comm, res, msg_len, direct_ctrl)
 
             if num_to_send == 0:
                 if not testrun:
                     print(" Block send ")
-                self.sendElem.emit(Comm, res, num_send, direct_ctrl, True)
+                self.sendElem.emit(Comm, res, num_send, direct_ctrl)
             # else: self.sendElem.emit(command, msg, msgLen, directCtrl, False)
 
 
@@ -652,22 +654,20 @@ class LoadFileWorker(QObject):
         #         return
 
         # automatic pump control
-        if lfw_p_ctrl:
+        if lfw_p_ctrl and (len(self._CommList) > 0):
+
             # set all entries to pmode=default
             for Entry in self._CommList:
                 Entry.p_mode = "default"
 
-            # add a 3mm long startvector with a speed of 3mm/s
-            # (so 3s of approach), with pMode=start
+            # add a startvector with a speed of 1mm/s with pMode=start
+            # (so X seconds of approach if length is X mm (lfw_pre_run_time))
             StartVector = copy.deepcopy(self._CommList[0])
             StartVector.id = start_id
             StartVector.Coor1.x += lfw_pre_run_time
             StartVector.Coor1.y += lfw_pre_run_time
-            StartVector.p_mode = "zero"
-            StartVector.Speed = du.SpeedVector(acr=50, dcr=50, ts=200, ors=100)
-
-            self._CommList[0].Speed = du.SpeedVector(acr=1, dcr=1, ts=1, ors=1)
-            self._CommList[0].p_mode = "start"
+            StartVector.p_mode = "start"
+            StartVector.Speed = du.SpeedVector(acr=1, dcr=1, ts=1, ors=1)
             self._CommList.add(StartVector, thread_call=True)
 
             # set the last entry to pMode=end
@@ -763,4 +763,4 @@ lfw_file_path = None
 lfw_line_id = 0
 lfw_p_ctrl = False
 lfw_running = False
-lfw_pre_run_time = 5
+lfw_pre_run_time = 10

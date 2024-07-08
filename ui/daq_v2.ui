@@ -79,7 +79,7 @@ QComboBox QAbstractItemView {
 
 
 
-
+QFrame#ADD_frame,
 QFrame#BASIC_frame,
 QFrame#MOT_frame,
 QFrame#MORT_frame,
@@ -304,10 +304,10 @@ color: #E1E5EE;</string>
    <widget class="QLabel" name="PATH_lbl_path">
     <property name="geometry">
      <rect>
-      <x>36</x>
-      <y>75</y>
-      <width>101</width>
-      <height>51</height>
+      <x>16</x>
+      <y>65</y>
+      <width>121</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -377,10 +377,10 @@ border-bottom-right-radius: 0px;</string>
    <widget class="QLabel" name="PATH_lbl_newPath">
     <property name="geometry">
      <rect>
-      <x>488</x>
-      <y>75</y>
-      <width>101</width>
-      <height>51</height>
+      <x>468</x>
+      <y>65</y>
+      <width>121</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -398,12 +398,12 @@ DB address:</string>
    </widget>
    <zorder>PATH_lbl_path</zorder>
    <zorder>PATH_0_frameLabel</zorder>
-   <zorder>PATH_disp_path</zorder>
    <zorder>PATH_lbl_datetime</zorder>
    <zorder>PATH_disp_datetime</zorder>
    <zorder>PATH_entry_newPath</zorder>
    <zorder>PATH_btt_chgPath</zorder>
    <zorder>PATH_lbl_newPath</zorder>
+   <zorder>PATH_disp_path</zorder>
   </widget>
   <widget class="QFrame" name="BASIC_frame">
    <property name="geometry">
@@ -1933,10 +1933,99 @@ color: #E1E5EE;</string>
     </property>
     <property name="styleSheet">
      <string notr="true">border-radius: 55px;
-background-color: #73ff78;</string>
+background-color: #4c4a48;</string>
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="ADD_frame">
+   <property name="geometry">
+    <rect>
+     <x>1680</x>
+     <y>210</y>
+     <width>201</width>
+     <height>791</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="ADD_0_frameLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>161</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Bahnschrift</family>
+      <pointsize>22</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: 0px;
+font-size: 22pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+    </property>
+    <property name="text">
+     <string>ADD</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ADD_btt_add">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>230</y>
+      <width>161</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>add data point</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="ADD_indi_state">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>130</y>
+      <width>71</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 35px;
+background-color: #4c4a48;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ADD_btt_dbPause">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>290</y>
+      <width>161</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>pause
+DB entries</string>
     </property>
    </widget>
   </widget>

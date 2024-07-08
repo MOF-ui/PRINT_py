@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\daq_v2.ui'
+# Form implementation generated from reading ui file '.\daq.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_DAQWindow(object):
     def setupUi(self, DAQWindow):
         DAQWindow.setObjectName("DAQWindow")
-        DAQWindow.resize(1932, 1107)
+        DAQWindow.resize(1924, 1089)
         DAQWindow.setMinimumSize(QtCore.QSize(600, 0))
         DAQWindow.setStyleSheet(
             "QWidget {\n"
@@ -76,7 +76,7 @@ class Ui_DAQWindow(object):
             "\n"
             "\n"
             "\n"
-            "\n"
+            "QFrame#ADD_frame,\n"
             "QFrame#BASIC_frame,\n"
             "QFrame#MOT_frame,\n"
             "QFrame#MORT_frame,\n"
@@ -249,7 +249,7 @@ class Ui_DAQWindow(object):
         self.PATH_disp_path.setStyleSheet("")
         self.PATH_disp_path.setObjectName("PATH_disp_path")
         self.PATH_lbl_path = QtWidgets.QLabel(self.PATH_frame)
-        self.PATH_lbl_path.setGeometry(QtCore.QRect(36, 75, 101, 51))
+        self.PATH_lbl_path.setGeometry(QtCore.QRect(16, 65, 121, 61))
         self.PATH_lbl_path.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -276,7 +276,7 @@ class Ui_DAQWindow(object):
         )
         self.PATH_entry_newPath.setObjectName("PATH_entry_newPath")
         self.PATH_lbl_newPath = QtWidgets.QLabel(self.PATH_frame)
-        self.PATH_lbl_newPath.setGeometry(QtCore.QRect(488, 75, 101, 51))
+        self.PATH_lbl_newPath.setGeometry(QtCore.QRect(468, 65, 121, 61))
         self.PATH_lbl_newPath.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -286,12 +286,12 @@ class Ui_DAQWindow(object):
         self.PATH_lbl_newPath.setObjectName("PATH_lbl_newPath")
         self.PATH_lbl_path.raise_()
         self.PATH_0_frameLabel.raise_()
-        self.PATH_disp_path.raise_()
         self.PATH_lbl_datetime.raise_()
         self.PATH_disp_datetime.raise_()
         self.PATH_entry_newPath.raise_()
         self.PATH_btt_chgPath.raise_()
         self.PATH_lbl_newPath.raise_()
+        self.PATH_disp_path.raise_()
         self.BASIC_frame = QtWidgets.QFrame(DAQWindow)
         self.BASIC_frame.setGeometry(QtCore.QRect(40, 210, 341, 791))
         self.BASIC_frame.setStyleSheet("")
@@ -1006,10 +1006,43 @@ class Ui_DAQWindow(object):
         self.ML_indi_state = QtWidgets.QLabel(self.ML_frame)
         self.ML_indi_state.setGeometry(QtCore.QRect(630, 20, 111, 111))
         self.ML_indi_state.setStyleSheet(
-            "border-radius: 55px;\n" "background-color: #73ff78;"
+            "border-radius: 55px;\n" "background-color: #4c4a48;"
         )
         self.ML_indi_state.setText("")
         self.ML_indi_state.setObjectName("ML_indi_state")
+        self.ADD_frame = QtWidgets.QFrame(DAQWindow)
+        self.ADD_frame.setGeometry(QtCore.QRect(1680, 210, 201, 791))
+        self.ADD_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.ADD_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.ADD_frame.setObjectName("ADD_frame")
+        self.ADD_0_frameLabel = QtWidgets.QLabel(self.ADD_frame)
+        self.ADD_0_frameLabel.setGeometry(QtCore.QRect(20, 10, 161, 51))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(22)
+        self.ADD_0_frameLabel.setFont(font)
+        self.ADD_0_frameLabel.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 22pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ADD_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.ADD_0_frameLabel.setObjectName("ADD_0_frameLabel")
+        self.ADD_btt_add = QtWidgets.QPushButton(self.ADD_frame)
+        self.ADD_btt_add.setGeometry(QtCore.QRect(20, 230, 161, 51))
+        self.ADD_btt_add.setObjectName("ADD_btt_add")
+        self.ADD_indi_state = QtWidgets.QLabel(self.ADD_frame)
+        self.ADD_indi_state.setGeometry(QtCore.QRect(70, 130, 71, 71))
+        self.ADD_indi_state.setStyleSheet(
+            "border-radius: 35px;\n" "background-color: #4c4a48;"
+        )
+        self.ADD_indi_state.setText("")
+        self.ADD_indi_state.setObjectName("ADD_indi_state")
+        self.ADD_btt_dbPause = QtWidgets.QPushButton(self.ADD_frame)
+        self.ADD_btt_dbPause.setGeometry(QtCore.QRect(20, 290, 161, 61))
+        self.ADD_btt_dbPause.setObjectName("ADD_btt_dbPause")
 
         self.retranslateUi(DAQWindow)
         QtCore.QMetaObject.connectSlotsByName(DAQWindow)
@@ -1115,3 +1148,6 @@ class Ui_DAQWindow(object):
             _translate("DAQWindow", "distance\n" "(nozzle end)")
         )
         self.ML_0_frameLabel.setText(_translate("DAQWindow", "ML STATE"))
+        self.ADD_0_frameLabel.setText(_translate("DAQWindow", "ADD"))
+        self.ADD_btt_add.setText(_translate("DAQWindow", "add data point"))
+        self.ADD_btt_dbPause.setText(_translate("DAQWindow", "pause\n" "DB entries"))
