@@ -488,16 +488,16 @@ def connect_pump(p_num:int) -> None:
         p_num: number of pump to be connected
     """
 
-    if PMP_serial_def_bus is None:
-        PMP_serial_def_bus=du.serial.Serial(
+    if du.PMP_serial_def_bus is None:
+        du.PMP_serial_def_bus=du.serial.Serial(
             baudrate=du.DEF_SERIAL_PUMP["BR"],
             parity=du.DEF_SERIAL_PUMP["P"],
             stopbits=du.DEF_SERIAL_PUMP["SB"],
             bytesize=du.DEF_SERIAL_PUMP["BS"],
             port=du.DEF_SERIAL_PUMP["PORT"],
         )
-        du.PMP1Serial.serial_default = PMP_serial_def_bus
-        du.PMP2Serial.serial_default = PMP_serial_def_bus
+        du.PMP1Serial.serial_default = du.PMP_serial_def_bus
+        du.PMP2Serial.serial_default = du.PMP_serial_def_bus
 
     match p_num:
         case "P1":

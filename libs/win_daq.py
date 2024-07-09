@@ -195,7 +195,7 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             btt_style = 'background-color: #FFBA00;'
             indi_stlye = "border-radius: 35px;\nbackground-color: #73ff78;"
             self._db_active = True
-            self.logEntry.emit('DAQW', 'contiuned to post DB entries')
+            self.logEntry.emit('DAQW', 'continuing to post DB entries')
         
         self.ADD_btt_dbPause.setText(btt_txt)
         self.ADD_btt_dbPause.setStyleSheet(btt_style)
