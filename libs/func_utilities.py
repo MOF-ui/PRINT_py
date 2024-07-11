@@ -507,6 +507,8 @@ def connect_pump(p_num:int) -> None:
         case _:
             raise ValueError(f"wrong pNum given: {p_num}")
     
+    # TO-DO: Check if connection was really established, or grab info from error messages
+    
     return None
 
 

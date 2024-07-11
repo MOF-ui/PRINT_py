@@ -145,6 +145,7 @@ class PumpCommWorker(QObject):
             if None in [freq, volt, amps, torq]:
                 self.logEntry.emit(
                     "PTel", "Pump1 telemetry package broken or not received..."
+                # TO-DO: catch error; or disconnect immediatly to prevent GUI crash in next loops
                 )
 
             else:
