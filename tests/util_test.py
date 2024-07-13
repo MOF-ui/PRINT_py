@@ -536,8 +536,8 @@ class UTIL_test(unittest.TestCase):
         """checks preCheckGcodeFiles function, should count the number of commands in a file"""
 
         testTxt = ";comment\nG1 X0 Y0 Z0\nG1 X2000 Y0 Z0.0\nG1 X2000 Y1500 Z0"
-        self.assertEqual(fu.pre_check_ccode_file(''), (0, 0, "empty"))
-        self.assertEqual(fu.pre_check_ccode_file(testTxt), (3, 3.5, ""))
+        self.assertEqual(fu.pre_check_gcode_file(''), (0, 0, "empty"))
+        self.assertEqual(fu.pre_check_gcode_file(testTxt), (3, 3.5, ""))
 
 
     def test_pre_check_rapid_file_function(self):

@@ -41,6 +41,9 @@ import libs.threads as workers
 import libs.data_utilities as du
 import libs.func_utilities as fu
 
+# import interface for Toshiba frequency modulator by M-TEC
+from mtec.mtec_mod import MtecMod
+
 
 
 ####################### MAINFRAME CLASS  #####################################
@@ -61,13 +64,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     _LastP1Telem = None
     _LastP2Telem = None
 
-    _RoboCommThread = None
+    _RoboCommThread = QThread()
+    _PumpCommThread = QThread()
+    _LoadFileThread = QThread()
+    _SensorArrThread = QThread()
     _RoboCommWorker = None
-    _PumpCommThread = None
     _PumpCommWorker = None
-    _LoadFileThread = None
     _LoadFileWorker = None
-    _SensorArrThread = None
     _SensorArrWorker = None
     
     _RobRecvWd = None
@@ -93,45 +96,15 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         # UI SETUP
         self.setupUi(self)
-        self.setWindowTitle("---   PRINT_py  -  Main Window  ---")
+        self.setWindowTitle('---   PRINT_py  -  Main Window  ---')
         self.setWindowFlags(
             Qt.WindowMaximizeButtonHint
             | Qt.WindowMinimizeButtonHint
             | Qt.WindowCloseButtonHint
         )
+
+        self.group_gui_elems()
         self._testrun = testrun
-
-        # GROUP UI ELEMENTS
-        self.ADC_group = self.ADC_frame.findChildren(
-            (QtWidgets.QPushButton, QtWidgets.QSpinBox)
-        )
-
-        self.ASC_group = self.ASC_frame.findChildren(
-            (QtWidgets.QPushButton, QtWidgets.QSpinBox)
-        )
-
-        self.DC_group = (
-            self.DC_btt_xPlus,
-            self.DC_btt_xMinus,
-            self.DC_btt_yPlus,
-            self.DC_btt_yMinus,
-            self.DC_btt_zPlus,
-            self.DC_btt_zMinus,
-            self.DC_btt_extPlus,
-            self.DC_btt_extMinus,
-            self.DC_btt_home,
-            self.DC_lbl_x,
-            self.DC_lbl_y,
-            self.DC_lbl_z,
-            self.DC_lbl_ext,
-        )
-
-        self.NC_group = (
-            self.NC_btt_xyzSend,
-            self.NC_btt_xyzExtSend,
-            self.NC_btt_orientSend,
-        )
-        self.TERM_group = self.TERM_btt_gcodeInterp, self.TERM_btt_rapidInterp
 
         # LOGFILE SETUP
         if lpath is None:
@@ -139,68 +112,49 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 f"No path for logfile!\n\n"
                 f"Press OK to continue anyways or Cancel to exit the program."
             )
-            log_warning = strd_dialog(
-                log_txt,
-                "LOGFILE ERROR",
-            )
+            log_warning = strd_dialog(log_txt, 'LOGFILE ERROR')
             log_warning.exec()
 
             if log_warning.result() == 0:
                 # suicide after the actual .exec is finished,
                 # exit without chrash
-                self.log_entry(
-                    "GNRL",
-                    "no logpath given, user choose to exit, exit after setup..."
-                )
+                print('no logpath given, user choose to exit after setup...')
                 QTimer.singleShot(0, self.close)
             else:
-                self.log_entry(
-                    "GNRL",
-                    "no logpath given, user chose to continue without..."
-                )
-
+                print('no logpath given, user chose to continue without...')
         else:
             self.logpath = lpath
-            self.log_entry("GNRL", "main GUI running.")
+            self.log_entry('GNRL', 'main GUI running.')
 
         # DAQ SETUP
         self.Daq = daq_window()
         self.Daq.logEntry.connect(self.log_entry)
-
         if not testrun:
             self.Daq.show()
-        self.log_entry("GNRL", "DAQ GUI running.")
+        self.log_entry('GNRL', 'DAQ GUI running.')
 
         # LOAD THREADS, SIGNALS & DEFAULT SETTINGS
-        self.log_entry("GNRL", "init threading...")
-        self.connect_threads()
-
-        self.log_entry("GNRL", "connecting signals...")
+        self.log_entry('GNRL', 'connecting signals...')
         self.connect_main_signals()
         self.connect_short_signals()
 
-        self.log_entry("GNRL", "load default settings...")
+        self.log_entry('GNRL', 'load default settings...')
         self.load_defaults(setup=True)
+
+        self.log_entry('GNRL', 'init threading...')
+        self.connect_threads('OTHER')
 
         # TESTRUN OPTION
         if testrun:
-            self.log_entry("TEST", "testrun, skipping robot connection...")
-            self.log_entry("GNRL", "setup finished.")
-            self.log_entry("newline")
+            self.log_entry('TEST', 'testrun, skipping robot connection...')
+            self.log_entry('GNRL', 'setup finished.')
+            self.log_entry('newline')
             return
 
-        # ROBOT CONNECTION SETUP
-        self.log_entry("GNRL", "connect to Robot...")
-        res = self.connect_tcp("ROB")
+        # CONNECTIONS SETUP
+        self.log_entry('GNRL', "connect to Robot...")
+        self.connect_tcp('ROB')
 
-        # if connection fails, suicide after the actual .exec is finished,
-        # exit without chrash
-        if res == False:
-            self.log_entry("GNRL", "failed, exiting...")
-            QTimer.singleShot(0, self.close)
-            return
-
-        # PUMP CONNECTIONS SETUP
         if p_conn[0]:
             self.log_entry("GNRL", "connect to pump1...")
             self.connect_tcp("P1")
@@ -221,10 +175,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """create signal-slot-links for UI buttons"""
 
         # AMCON CONTROL
-        self.ADC_btt_resetAll.pressed.connect(
-            lambda: self.load_ADC_defaults(send_changes=True)
-        )
-
+        self.ADC_btt_resetAll.pressed.connect(lambda: self.load_ADC_defaults(send_changes=True))
         self.ADC_num_panning.valueChanged.connect(self.adc_user_change)
         self.ADC_num_fibDeliv.valueChanged.connect(self.adc_user_change)
         self.ADC_btt_clamp.released.connect(self.adc_user_change)
@@ -244,32 +195,32 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.DC_btt_extMinus.pressed.connect(lambda: self.send_DC_command("EXT", "-"))
         self.DC_btt_xyzZero.pressed.connect(lambda: self.set_zero([1, 2, 3]))
         self.DC_btt_extZero.pressed.connect(lambda: self.set_zero([8]))
-
         self.DC_btt_home.pressed.connect(self.home_command)
 
         # FILE IO
         self.IO_btt_newFile.pressed.connect(self.open_file)
         self.IO_btt_loadFile.pressed.connect(self.load_file)
-
         self.IO_btt_addByID.pressed.connect(lambda: self.load_file(lf_atID=True))
         self.IO_btt_xyzextZero.pressed.connect(lambda: self.set_zero([1, 2, 3, 8]))
         self.IO_btt_orientZero.pressed.connect(lambda: self.set_zero([4, 5, 6]))
 
         # NUMERIC CONTROL
         self.NC_btt_getValues.pressed.connect(self.values_to_DC_spinbox)
-
         self.NC_btt_xyzSend.pressed.connect(lambda: self.send_NC_command([1, 2, 3]))
         self.NC_btt_xyzExtSend.pressed.connect(lambda: self.send_NC_command([1, 2, 3, 8]))
         self.NC_btt_orientSend.pressed.connect(lambda: self.send_NC_command([4, 5, 6]))
         self.NC_btt_orientZero.pressed.connect(lambda: self.set_zero([4, 5, 6]))
 
         # PUMP CONTROL
-        self.SCTRL_num_liveAd_pump1.valueChanged.connect(
-            lambda: self.pump_set_speed("c1")
+        self.PUMP_sld_outputRatio.sliderMoved.connect(
+            lambda: self.mutex_setattr(
+                du,
+                'PMP_output_ratio',
+                1 - (self.PUMP_sld_outputRatio.value() / 100.0)
+            )
         )
-        self.SCTRL_num_liveAd_pump2.valueChanged.connect(
-            lambda: self.pump_set_speed("c2")
-        )
+        self.SCTRL_num_liveAd_pump1.valueChanged.connect(lambda: self.pump_set_speed("c1"))
+        self.SCTRL_num_liveAd_pump2.valueChanged.connect(lambda: self.pump_set_speed("c2"))
         self.PUMP_btt_setSpeedP1.pressed.connect(lambda: self.pump_set_speed("s1"))
         self.PUMP_btt_setSpeedP2.pressed.connect(lambda: self.pump_set_speed("s2"))
         self.PUMP_btt_plus1.pressed.connect(lambda: self.pump_set_speed("1"))
@@ -281,20 +232,23 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.PUMP_btt_stop.pressed.connect(lambda: self.pump_set_speed("0"))
         self.PUMP_btt_reverse.pressed.connect(lambda: self.pump_set_speed("r"))
         self.PUMP_btt_ccToDefault.pressed.connect(lambda: self.pump_set_speed("def"))
-
         self.PUMP_btt_setSpeed.pressed.connect(self.pump_set_speed)
         self.PUMP_btt_scToDefault.pressed.connect(self.pump_script_overwrite)
         self.PUMP_btt_pinchValve.pressed.connect(self.pinch_valve_toggle)
-        self.PUMP_sld_outputRatio.sliderMoved.connect(self.update_output_ratio)
 
         # SCRIPT CONTROL
+        self.SCTRL_num_liveAd_robot.valueChanged.connect(
+            lambda: self.mutex_setattr(
+                du,
+                'ROB_live_ad',
+                self.SCTRL_num_liveAd_robot.value() / 100.0
+            )
+        )
+        self.SCTRL_btt_holdQProcessing.pressed.connect(lambda: self.stop_SCTRL_queue(prep_end=True))
+        self.SCTRL_chk_autoScroll.stateChanged.connect(lambda: self.SCTRL_arr_queue.scrollToBottom())
+        self.ICQ_chk_autoScroll.stateChanged.connect(lambda: self.ICQ_arr_terminal.scrollToBottom())
         self.SCTRL_btt_forcedStop.pressed.connect(self.forced_stop_command)
         self.SCTRL_btt_startQProcessing.pressed.connect(self.start_SCTRL_queue)
-        self.SCTRL_num_liveAd_robot.valueChanged.connect(self.update_rob_live_ad)
-
-        self.SCTRL_btt_holdQProcessing.pressed.connect(
-            lambda: self.stop_SCTRL_queue(prep_end=True)
-        )
         self.SCTRL_btt_addSIB1_atFront.pressed.connect(lambda: self.add_SIB(1))
         self.SCTRL_btt_addSIB2_atFront.pressed.connect(lambda: self.add_SIB(2))
         self.SCTRL_btt_addSIB3_atFront.pressed.connect(lambda: self.add_SIB(3))
@@ -303,38 +257,39 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_btt_addSIB3_atEnd.pressed.connect(lambda: self.add_SIB(3, at_end=True))
         self.SCTRL_btt_clrQ.pressed.connect(lambda: self.clr_queue(partial=False))
         self.SCTRL_btt_clrByID.pressed.connect(lambda: self.clr_queue(partial=True))
-        self.SCTRL_chk_autoScroll.stateChanged.connect(
-            lambda: self.SCTRL_arr_queue.scrollToBottom()
-        )
-        self.ICQ_chk_autoScroll.stateChanged.connect(
-            lambda: self.ICQ_arr_terminal.scrollToBottom()
-        )
 
         # SETTINGS
+        self.TCP_num_commForerun.valueChanged.connect(
+            lambda: self.mutex_setattr(
+                du,
+                'ROB_comm_fr',
+                self.TCP_num_commForerun.value()
+            )
+        )
         self.SET_btt_apply.pressed.connect(self.apply_settings)
         self.SET_btt_default.pressed.connect(self.load_defaults)
         self.SET_TE_btt_apply.pressed.connect(self.apply_TE_settings)
         self.SET_TE_btt_default.pressed.connect(self.load_TE_defaults)
         self.SID_btt_robToProgID.pressed.connect(self.reset_SC_id)
-        self.TCP_num_commForerun.valueChanged.connect(self.update_comm_forerun)
 
         # SINGLE COMMAND
-        self.SGLC_btt_gcodeSglComm.pressed.connect(self.add_gcode_sgl)
-        self.SGLC_btt_rapidSglComm.pressed.connect(self.add_rapid_sgl)
-
-        self.SGLC_btt_sendFirstQComm.pressed.connect(
-            lambda: self.send_command(du.SCQueue.pop_first_item())
-        )
         self.SGLC_btt_gcodeSglComm_addByID.pressed.connect(
             lambda: self.add_gcode_sgl(
-                at_id=True, id=self.SGLC_num_gcodeSglComm_addByID.value()
+                at_id=True,
+                id=self.SGLC_num_gcodeSglComm_addByID.value()
             )
         )
         self.SGLC_btt_rapidSglComm_addByID.pressed.connect(
             lambda: self.add_rapid_sgl(
-                at_id=True, id=self.SGLC_num_rapidSglComm_addByID.value()
+                at_id=True,
+                id=self.SGLC_num_rapidSglComm_addByID.value()
             )
         )
+        self.SGLC_btt_sendFirstQComm.pressed.connect(
+            lambda: self.send_command(du.SCQueue.pop_first_item())
+        )
+        self.SGLC_btt_gcodeSglComm.pressed.connect(self.add_gcode_sgl)
+        self.SGLC_btt_rapidSglComm.pressed.connect(self.add_rapid_sgl)
 
         # CONNECTIONS
         self.TCP_ROB_btt_reconn.pressed.connect(lambda: self.connect_tcp("ROB"))
@@ -383,9 +338,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # SCRIPT CONTROL
         self._ctrl_S.activated.connect(self.start_SCTRL_queue)
         self._ctrl_A.activated.connect(lambda: self.stop_SCTRL_queue(prep_end=True))
-        self._ctrl_F.activated.connect(
-            lambda: self.send_command(du.SCQueue.pop_first_item())
-        )
+        self._ctrl_F.activated.connect(lambda: self.send_command(du.SCQueue.pop_first_item()))
         self._ctrl_Raute.activated.connect(lambda: self.clr_queue(partial=False))
         self._ctrl_Q.activated.connect(self.forced_stop_command)
         self._ctrl_alt_I.activated.connect(self.reset_SC_id)
@@ -410,6 +363,83 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # PUMP CONTROL
         self._ctrl_E.activated.connect(lambda: self.pump_set_speed("0"))
         self._ctrl_R.activated.connect(lambda: self.pump_set_speed("-1"))
+    
+
+    def group_gui_elems(self) -> None:
+        """build groups for enable/disable actions"""
+
+        self.ADC_group = self.ADC_frame.findChildren(
+            (QtWidgets.QPushButton, QtWidgets.QSpinBox)
+        )
+
+        self.ASC_group = self.ASC_frame.findChildren(
+            (QtWidgets.QPushButton, QtWidgets.QSpinBox)
+        )
+
+        self.DC_group = [
+            self.DC_btt_xPlus,
+            self.DC_btt_xMinus,
+            self.DC_btt_yPlus,
+            self.DC_btt_yMinus,
+            self.DC_btt_zPlus,
+            self.DC_btt_zMinus,
+            self.DC_btt_extPlus,
+            self.DC_btt_extMinus,
+            self.DC_btt_home,
+            self.DC_lbl_x,
+            self.DC_lbl_y,
+            self.DC_lbl_z,
+            self.DC_lbl_ext,
+        ]
+
+        self.NC_group = [
+            self.NC_btt_xyzSend,
+            self.NC_btt_xyzExtSend,
+            self.NC_btt_orientSend,
+        ]
+
+        self.PMP1_group = [
+            self.PUMP_num_setSpeedP1,
+            self.PUMP_btt_setSpeedP1,
+            self.PUMP_disp_freqP1,
+            self.PUMP_disp_voltP1,
+            self.PUMP_disp_ampsP1,
+            self.PUMP_disp_torqP1,
+        ]
+        for elem in self.PMP1_group:
+            elem.setEnabled(False)
+
+        self.PMP2_group = [
+            self.PUMP_num_setSpeedP2,
+            self.PUMP_btt_setSpeedP2,
+            self.PUMP_disp_freqP2,
+            self.PUMP_disp_voltP2,
+            self.PUMP_disp_ampsP2,
+            self.PUMP_disp_torqP2,
+        ]
+        for elem in self.PMP2_group:
+            elem.setEnabled(False)
+
+        self.ROB_group = [
+            self.SGLC_btt_sendFirstQComm,
+            self.SCTRL_btt_startQProcessing,
+            self.SCTRL_btt_holdQProcessing,
+            self.SCTRL_btt_forcedStop,
+            self.TERM_btt_gcodeInterp,
+            self.TERM_btt_rapidInterp,
+            self.ADC_btt_clamp,
+            self.ADC_btt_knifePos,
+            self.ADC_btt_knife,
+            self.ADC_btt_fiberPnmtc,
+            self.ADC_num_panning,
+            self.ADC_num_fibDeliv,
+        ]
+        self.ROB_group += self.DC_group
+        self.ROB_group += self.NC_group
+        for elem in self.ROB_group:
+            elem.setEnabled(False)
+
+        self.TERM_group = self.TERM_btt_gcodeInterp, self.TERM_btt_rapidInterp
 
 
     def load_defaults(self, setup=False) -> None:
@@ -481,214 +511,189 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                             CONNECTIONS                                #
     ##########################################################################
 
-    def connect_tcp(self, slot="") -> bool:
+    def connect_tcp(self, slot='') -> bool:
         """slot-wise connection management, mostly to shrink code length,
         maybe more functionality later
         """
 
         css = "border-radius: 25px; background-color: #00aaff;"
+        
+        def rob_connect() -> bool:
+            res  = du.ROBTcp.connect()
+
+            if isinstance(res, tuple):
+                # if successful, start threading and watchdog
+                if not self._RoboCommThread.isRunning():
+                    # restart if necessary; if so reconnect threads
+                    self.connect_threads(slot)
+                    self._RoboCommThread.start()
+
+                self.set_watchdog(slot)
+                self.log_entry(
+                    'CONN',
+                    f"connected to {du.ROBTcp.ip} at {du.ROBTcp.port}."
+                )
+                self.TCP_ROB_indi_connected.setStyleSheet(css)
+                for elem in self.ROB_group:
+                    elem.setEnabled(True)
+                return True
+            
+            elif res == TimeoutError:
+                log_txt = f"timeout connecting {du.ROBTcp.ip}:{du.ROBTcp.port}."
+            elif res == ConnectionRefusedError:
+                log_txt = f"{du.ROBTcp.ip}:{du.ROBTcp.port} refused connection."
+            else:
+                log_txt = f"failed to connect {du.ROBTcp.ip}:{du.ROBTcp.port}!"
+            
+            self.log_entry('CONN', log_txt)
+            return False
+            
+        def pmp_connect(
+                serial:MtecMod,
+                port:str,
+                p_num:str,
+                indi,
+                elem_group:list
+        ) -> bool:
+            if 'COM' in port:
+                fu.connect_pump(p_num)
+
+                if serial.connected:
+                    if not self._PumpCommThread.isRunning():
+                        # restart if necessary; if so reconnect threads
+                        self.connect_threads('PMP')
+                        self._PumpCommThread.start()
+                    
+                    self.log_entry(
+                        'CONN',
+                        f"connected to {p_num} as inverter "
+                        f"{serial.settings_inverter_id} at {port}"
+                    )
+                    self.set_watchdog(p_num)
+                    indi.setStyleSheet(css)
+                    for elem in elem_group:
+                        elem.setEnabled(True)
+                    return True
+            
+                else:
+                    self.log_entry('CONN', f"connection to {p_num} failed!")
+                    return False
+            
+            else:
+                raise ConnectionError("TCP not supported, yet")
 
         match slot:
-            case "ROB":
-                res  = du.ROBTcp.connect()
+            case 'ROB':
+                return rob_connect()
+            
+            case 'P1':
+                return pmp_connect(
+                    du.PMP1Serial,
+                    du.PMP1Tcp.port,
+                    slot,
+                    self.TCP_PUMP1_indi_connected,
+                    self.PMP1_group
+                )
 
-                if isinstance(res, tuple):
-                    # if successful, start threading and watchdog
-                    if not self._RoboCommThread.isRunning():
-                        self._RoboCommThread.start()
+            case 'P2':
+                return pmp_connect(
+                    du.PMP2Serial,
+                    du.PMP2Tcp.port,
+                    slot,
+                    self.TCP_PUMP2_indi_connected,
+                    self.PMP2_group
+                )
 
-                    workers.rcw_new_status = True
-                    self.set_watchdog("ROB")
-                    self.log_entry(
-                        "CONN",
-                        f"connected to {res[0]} at {res[1]}."
-                    )
-                    self.TCP_ROB_indi_connected.setStyleSheet(css)
-                    return True
-
-            case "P1":
-                if "COM" in du.PMP1Tcp.port:
-                    fu.connect_pump(slot)
-
-                    if du.PMP1Serial.connected:
-                        if not self._PumpCommThread.isRunning():
-                            self._PumpCommThread.start()
-
-                        self.log_entry(
-                            "CONN",
-                            (
-                                f"connected to Pump1 as inverter "
-                                f"{du.PMP1Serial.settings_inverter_id} at "
-                                f"{du.PMP1Tcp.port}."
-                            ),
-                        )
-                        self.set_watchdog("P1")
-                        self.TCP_PUMP1_indi_connected.setStyleSheet(css)
-                        return True
-
-                    else:
-                        self.log_entry("CONN", "connection to Pump1 failed!")
-                        return False
-
-                else:
-                    raise ConnectionError("TCP not supported, yet")
-                    # res,conn = UTIL.PUMP1_tcpip.connect()
-
-            case "P2":
-                if "COM" in du.PMP1Tcp.port:
-                    fu.connect_pump(slot)
-
-                    if du.PMP2Serial.connected:
-                        if not self._PumpCommThread.isRunning():
-                            self._PumpCommThread.start()
-
-                        self.log_entry(
-                            "CONN",
-                            (
-                                f"connected to Pump1 as inverter "
-                                f"{du.PMP1Serial.settings_inverter_id} at "
-                                f"{du.PMP1Tcp.port}."
-                            ),
-                        )
-                        self.set_watchdog("P2")
-                        self.TCP_PUMP2_indi_connected.setStyleSheet(css)
-                        return True
-
-                    else:
-                        self.log_entry("CONN", "connecting to Pump2 failed!")
-                        return False
-
-                else:
-                    raise ConnectionError("TCP not supported, yet")
-                    # res,conn = UTIL.PUMP1_tcpip.connect()
-
-            case "MIX":
-                res = du.MIXTcp.connect()
-
-                if isinstance(res, tuple):
-                    if not self._PumpCommThread.isRunning():
-                        self._PumpCommThread.start()
-
-                    self.log_entry(
-                        "CONN",
-                        f"connected to {res[0]} at {res[1]}."
-                    )
-                    self.set_watchdog("MIX")
-                    self.TCP_MIXER_indi_connected.setStyleSheet(css)
-                    return True
+            case 'MIX':
+                pass #to-do
 
             case _:
                 return False
 
-        if res == TimeoutError:
-            self.log_entry(
-                "CONN",
-                f"timed out while trying to connect {res[0]} at {res[1]} ."
-            )
-
-        elif res == ConnectionRefusedError:
-            self.log_entry(
-                "CONN",
-                f"server {res[0]} at {res[1]} refused the connection."
-            )
-
-        else:
-            self.log_entry(
-                "CONN",
-                f"connection to {res[0]} at {res[1]} failed ({res})!"
-            )
-
         return False
 
 
-    def disconnect_tcp(self, slot="", internal_call=False) -> None:
+    def disconnect_tcp(self, slot='', internal_call=False) -> None:
         """disconnect works, reconnect crashes the app, problem probably lies
         here should also send E command to robot on disconnect
         """
 
-        log_text = (
-            "internal call to disconnect" 
-            if (internal_call) 
-            else "user disconnected"
-        )
         css = "border-radius: 25px; background-color: #4c4a48;"
+        if internal_call:
+            log_txt = "internal call to disconnect" 
+        else:
+            log_txt = "user disconnected"
+            
+        def safe_positions():
+            self.log_entry('SAFE', f"Last robot positions:")
+            self.log_entry('SAFE', f"zero: {du.DCCurrZero}")
+            self.log_entry('SAFE', f"curr: {du.ROBTelem.Coor}")
+            self.log_entry('SAFE', f"rel: {du.ROBTelem.Coor - du.DCCurrZero}")
+            self.log_entry('SAFE', f"last active ID was: {du.ROBTelem.id}")
+
+        def p_disconnect(
+                serial:MtecMod,
+                port:str,
+                p_num:str,
+                indi,
+                elem_group:list
+        ) -> None:
+            if not serial.connected:
+                return
+            
+            if 'COM' in port:
+                self.kill_watchdog(p_num)
+                serial.disconnect()
+                self.log_entry('CONN', f"{log_txt} {p_num}.")
+                indi.setStyleSheet(css)
+            else:
+                raise ConnectionError(
+                    "TCP not supported, unable to disconnect"
+                )
+        
+            for elem in elem_group:
+                elem.setEnabled(False)
 
         match slot:
-            case "ROB":
+            case 'ROB':
                 if not du.ROBTcp.connected:
                     return
                 
                 # send stop command to robot; stop threading & watchdog
                 du.ROBTcp.send(du.QEntry(id=1, mt="E"))
-                self._RoboCommThread.quit()
-                workers.rcw_new_status = False
                 self.kill_watchdog("ROB")
+                self._RoboCommThread.quit()
                 du.ROBTcp.close()
 
-                self.log_entry("CONN", f"{log_text} robot.")
                 self.TCP_ROB_indi_connected.setStyleSheet(css)
+                for elem in self.ROB_group:
+                    elem.setEnabled(False)
 
-                # safe positions and IDs:
-                self.log_entry(
-                    'SAFE',
-                    f"robot disconnected. Last positions were:"
-                )
-                self.log_entry('SAFE', f"zero: {du.DCCurrZero}")
-                self.log_entry('SAFE', f"curr: {du.ROBTelem.Coor}")
-                self.log_entry(
-                    'SAFE',
-                    f"rel: {du.ROBTelem.Coor - du.DCCurrZero}"
-                )
-                self.log_entry(
-                    'SAFE',
-                    f"last active ID was: {du.ROBTelem.id}"
-                )
-
+                # safe data & wait for Thread:
+                self.log_entry("CONN", f"{log_txt} robot.")
+                safe_positions()
                 self._RoboCommThread.wait()
 
-            case "P1":
-                if not du.PMP1Serial.connected:
-                    return
+            case 'P1':
+                p_disconnect(
+                    du.PMP1Serial,
+                    du.PMP1Tcp.port,
+                    slot,
+                    self.TCP_PUMP1_indi_connected,
+                    self.PMP1_group
+                )
 
-                if "COM" in du.PMP1Tcp.port:
-                    self.kill_watchdog("P1")
-                    du.PMP1Serial.disconnect()
+            case 'P2':
+                p_disconnect(
+                    du.PMP2Serial,
+                    du.PMP2Tcp.port,
+                    slot,
+                    self.TCP_PUMP2_indi_connected,
+                    self.PMP2_group
+                )
 
-                    self.log_entry("CONN", f"{log_text} pump 1.")
-                    self.TCP_PUMP1_indi_connected.setStyleSheet(css)
-
-                else:
-                    raise ConnectionError(
-                        "TCP not supported, unable to disconnect"
-                    )
-                    # UTIL.PUMP1_tcpip.close()
-
-            case "P2":
-                if not du.PMP2Serial.connected:
-                    return
-
-                if "COM" in du.PMP2Tcp.port:
-                    self.kill_watchdog("P2")
-                    du.PMP2Serial.disconnect()
-
-                    self.log_entry("CONN", f"{log_text} pump 2.")
-                    self.TCP_PUMP2_indi_connected.setStyleSheet(css)
-
-                else:
-                    raise ConnectionError(
-                        "TCP not supported, unable to disconnect"
-                    )
-                    # UTIL.PUMP1_tcpip.close()
-
-            case "MIX":
-                if not du.MIXTcp.connected:
-                    return
-
-                self.kill_watchdog("MIX")
-                du.MIXTcp.close()
-
-                self.log_entry("CONN", f"{log_text} mixer.")
-                self.TCP_MIXER_indi_connected.setStyleSheet(css)
+            case 'MIX':
+                pass #to-do
 
             case _:
                 pass
@@ -698,63 +703,81 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                               THREADS                                  #
     ##########################################################################
 
-    def connect_threads(self) -> None:
-        """load all threads from PRINT_threads and set signal-slot-connections"""
+    def connect_threads(self, slot='') -> None:
+        """load threads from PRINT_threads and set signal-slot-connections,
+        this needs to be done for all thread during __init__, but you can call
+        individual connectors via 'slot' as one needs to reconnect all signals
+        if the Thread is restarted (after TCP/COM reconnects)
+        """
 
-        # THREAD FOR COMMUNICATION WITH ROBOT
-        self._RoboCommThread = QThread()
-        self._RoboCommWorker = workers.RoboCommWorker()
+        def rob_thread_connector():
+            # thread for communication with robotic arms
+            self.log_entry('THRT', 'initializing RoboComm thread..')
+            self._RoboCommWorker = workers.RoboCommWorker()
+            self._RoboCommWorker.moveToThread(self._RoboCommThread)
+            self._RoboCommThread.started.connect(self._RoboCommWorker.run)
+            self._RoboCommThread.finished.connect(self._RoboCommWorker.stop)
+            self._RoboCommThread.finished.connect(self._RoboCommWorker.deleteLater)
+            self._RoboCommWorker.logEntry.connect(self.log_entry)
+            self._RoboCommWorker.sendElem.connect(self.robo_send)
+            self._RoboCommWorker.dataUpdated.connect(self.robo_recv)
+            self._RoboCommWorker.endProcessing.connect(self.stop_SCTRL_queue)
+            self._RoboCommWorker.dataReceived.connect(lambda: self.reset_watchdog("ROB"))
+            self._RoboCommWorker.dataReceived.connect(self.label_update_on_terminal_change)
+            self._RoboCommWorker.endDcMoving.connect(lambda: self.switch_rob_moving(end=True))
+            self._RoboCommWorker.queueEmtpy.connect(lambda: self.stop_SCTRL_queue(prep_end=True))
+        
+        def pmp_thread_connector():
+            # thread for communication with pumps & inline mixer
+            self.log_entry('THRT', 'initializing PumpComm thread..')
+            self._PumpCommWorker = workers.PumpCommWorker()
+            self._PumpCommWorker.moveToThread(self._PumpCommThread)
+            self._PumpCommThread.started.connect(self._PumpCommWorker.run)
+            self._PumpCommThread.finished.connect(self._PumpCommWorker.stop)
+            self._PumpCommThread.finished.connect(self._PumpCommWorker.deleteLater)
+            self._PumpCommWorker.logEntry.connect(self.log_entry)
+            self._PumpCommWorker.dataSend.connect(self.pump_send)
+            self._PumpCommWorker.dataRecv.connect(self.pump_recv)
+            self._PumpCommWorker.connLost.connect(self.disconnect_tcp)
+            self._PumpCommWorker.dataMixerSend.connect(self.mixer_send)
+            self._PumpCommWorker.dataMixerRecv.connect(self.mixer_recv)
+            self._PumpCommWorker.connActive.connect(self.reset_watchdog)
+        
+        def other_threads_connector():
+            # thread for file loading
+            self.log_entry('THRT', 'initializing LoadFile thread..')
+            self._LoadFileWorker = workers.LoadFileWorker()
+            self._LoadFileWorker.moveToThread(self._LoadFileThread)
+            self._LoadFileThread.started.connect(self._LoadFileWorker.run)
+            self._LoadFileThread.destroyed.connect(self._LoadFileWorker.deleteLater)
+            self._LoadFileWorker.convFailed.connect(self.load_file_failed)
+            self._LoadFileWorker.convFinished.connect(self.load_file_finished)
 
-        self._RoboCommWorker.moveToThread(self._RoboCommThread)
-        self._RoboCommThread.started.connect(self._RoboCommWorker.run)
-        self._RoboCommThread.finished.connect(self._RoboCommWorker.stop)
-        self._RoboCommThread.finished.connect(self._RoboCommWorker.deleteLater)
-        self._RoboCommWorker.dataReceived.connect(self.label_update_on_terminal_change)
-        self._RoboCommWorker.dataReceived.connect(lambda: self.reset_watchdog("ROB"))
-        self._RoboCommWorker.dataUpdated.connect(self.robo_recv)
-        self._RoboCommWorker.endProcessing.connect(self.stop_SCTRL_queue)
-        self._RoboCommWorker.endDcMoving.connect(lambda: self.switch_rob_moving(end=True))
-        self._RoboCommWorker.logEntry.connect(self.log_entry)
-        self._RoboCommWorker.sendElem.connect(self.robo_send)
-        self._RoboCommWorker.queueEmtpy.connect(
-            lambda: self.stop_SCTRL_queue(prep_end=True)
-        )
+            # thread for communication with sensor array
+            self.log_entry('THRT', 'initializing SensorComm thread..')
+            self._SensorArrWorker = workers.SensorCommWorker()
+            self._SensorArrWorker.moveToThread(self._SensorArrThread)
+            self._SensorArrThread.started.connect(self._SensorArrWorker.run)
+            self._SensorArrThread.finished.connect(self._SensorArrWorker.stop)
+            self._SensorArrThread.destroyed.connect(self._SensorArrWorker.deleteLater)
+            self._SensorArrWorker.dataReceived.connect(self.Daq.data_update)
+            self._SensorArrWorker.logEntry.connect(self.log_entry)
 
-        # THREAD FOR COMMUNICATION WITH PUMPS & INLINE MIXER
-        self._PumpCommThread = QThread()
-        self._PumpCommWorker = workers.PumpCommWorker()
+        # the actual function input is processed here
+        match slot:
+            case 'ROB':
+                rob_thread_connector()
+            case 'PMP':
+                pmp_thread_connector()
+            case 'OTHER':
+                other_threads_connector()
+            case 'ALL':
+                rob_thread_connector()
+                pmp_thread_connector()
+                other_threads_connector()
+            case _:
+                raise KeyError(f"Thread to activate not specified: ({slot})")
 
-        self._PumpCommWorker.moveToThread(self._PumpCommThread)
-        self._PumpCommThread.started.connect(self._PumpCommWorker.run)
-        self._PumpCommThread.finished.connect(self._PumpCommWorker.stop)
-        self._PumpCommThread.finished.connect(self._PumpCommWorker.deleteLater)
-        self._PumpCommWorker.logEntry.connect(self.log_entry)
-        self._PumpCommWorker.dataSend.connect(self.pump_send)
-        self._PumpCommWorker.dataMixerSend.connect(self.mixer_send)
-        self._PumpCommWorker.dataRecv.connect(self.pump_recv)
-        self._PumpCommWorker.dataMixerRecv.connect(self.mixer_recv)
-        self._PumpCommWorker.connActive.connect(self.reset_watchdog)
-
-        # THREAD FOR FILE LOADING
-        self._LoadFileThread = QThread()
-        self._LoadFileWorker = workers.LoadFileWorker()
-
-        self._LoadFileWorker.moveToThread(self._LoadFileThread)
-        self._LoadFileThread.started.connect(self._LoadFileWorker.run)
-        self._LoadFileThread.destroyed.connect(self._LoadFileWorker.deleteLater)
-        self._LoadFileWorker.convFailed.connect(self.load_file_failed)
-        self._LoadFileWorker.convFinished.connect(self.load_file_finished)
-
-        # THREAD FOR COMMUNICATION WITH SENSOR ARRAY
-        self._SensorArrThread = QThread()
-        self._SensorArrWorker = workers.SensorCommWorker()
-
-        self._SensorArrWorker.moveToThread(self._SensorArrThread)
-        self._SensorArrThread.started.connect(self._SensorArrWorker.run)
-        self._SensorArrThread.finished.connect(self._SensorArrWorker.stop)
-        self._SensorArrThread.destroyed.connect(self._SensorArrWorker.deleteLater)
-        self._SensorArrWorker.dataReceived.connect(self.Daq.data_update)
-        self._SensorArrWorker.logEntry.connect(self.log_entry)
 
 
     def robo_send(
@@ -774,12 +797,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 du.SC_curr_comm_id -= 3000
                 Mutex.unlock()
 
-            if dc:
-                log_text = f"{num_send} DC command(s) send"
-            else:
-                log_text = f"{num_send} SC command(s) send"
+            log_txt = "DC" if dc else 'SC'
+            log_txt = f"{num_send} {log_txt} command(s) send"
 
-            self.log_entry("ROBO", log_text)
+            self.log_entry("ROBO", log_txt)
             self.label_update_on_send(command)
             write_buffer = command.print_short()
 
@@ -833,31 +854,32 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         PumpCommWorker, calc ratios and volume flow
         """
 
+        def p_send(displays:list, speed:int, p_num:int) -> None:
+            displays[0].setText(str(command))
+            displays[1].setText(str(len(command)))
+            displays[2].setText(str(ans))
+
+            self.log_entry(
+                f"PMP{p_num}", f"speed set to {speed}, command: {command}"
+            )
+
         match source:
-            case "P1":
-                self.TCP_PUMP1_disp_writeBuffer.setText(str(command))
-                self.TCP_PUMP1_disp_bytesWritten.setText(str(len(command)))
-                self.TCP_PUMP1_disp_readBuffer.setText(str(ans))
+            case 'P1':
+                displays = [self.TCP_PUMP1_disp_writeBuffer,
+                            self.TCP_PUMP1_disp_bytesWritten,
+                            self.TCP_PUMP1_disp_readBuffer]
+                p_send(displays, du.PMP1_speed, 1)
 
-                self.log_entry(
-                    "PMP1", f"speed set to {du.PMP1_speed}, command: {command}"
-                )
-
-            case "P2":
-                self.TCP_PUMP2_disp_writeBuffer.setText(str(command))
-                self.TCP_PUMP2_disp_bytesWritten.setText(str(len(command)))
-                self.TCP_PUMP2_disp_readBuffer.setText(str(ans))
-
-                self.log_entry(
-                    "PMP2", f"speed set to {du.PMP2_speed}, command: {command}"
-                )
+            case 'P2':
+                displays = [self.TCP_PUMP1_disp_writeBuffer,
+                            self.TCP_PUMP1_disp_bytesWritten,
+                            self.TCP_PUMP1_disp_readBuffer]
+                p_send(displays, du.PMP2_speed, 2)
 
             case _:
-                self.log_entry(
-                    "CONN", "ERROR! Pump dataSend signal from unspecified source."
+                raise KeyError(
+                    f"Pump signal from unspecified source ({source})!"
                 )
-                print("ERROR! Pump data_send signal from unspecified source.")
-                return
 
         # keep track of PUMP_speed in case of user overwrite:
         if du.PMP1Serial.connected and du.PMP2Serial.connected:
@@ -870,13 +892,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             du.PMP_output_ratio = p1_ratio
             Mutex.unlock()
 
-        elif source == "P1":
+        else:
             curr_total = new_speed
-            p1_ratio = 1.0
-
-        elif source == "P2":
-            curr_total = new_speed
-            p1_ratio = 0.0
+            p1_ratio = 1.0 if (source == 'P1') else 0.0
 
         sld = int((1 - p1_ratio) * 100)
         self.PUMP_disp_currSpeed.setText(f"{round(curr_total, 2)}%")
@@ -888,31 +906,34 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def pump_recv(self, telem:du.PumpTelemetry, source:str)  -> None:
         """display pump telemetry, global vars are set by PumpCommWorker"""
 
+        def p_recv(display:list, stt_data:du.PumpTelemetry, dump:str) -> None:
+            # display & log
+            display[0].setText(f"{stt_data.freq}%")
+            display[1].setText(f"{stt_data.volt} V")
+            display[2].setText(f"{stt_data.amps} A")            
+            display[3].setText(f"{stt_data.torq} Nm")
+
+            setattr(self, dump, telem)
+
         match source:
-            case "P1":
-                # display & log
-                self.PUMP_disp_freqP1.setText(f"{du.STTDataBlock.Pump1.freq}%")
-                self.PUMP_disp_voltP1.setText(f"{du.STTDataBlock.Pump1.volt} V")
-                self.PUMP_disp_ampsP1.setText(f"{du.STTDataBlock.Pump1.amps} A")
-                self.PUMP_disp_torqP1.setText(f"{du.STTDataBlock.Pump1.torq} Nm")
+            case 'P1':
+                displays = [self.PUMP_disp_freqP1,
+                            self.PUMP_disp_voltP1,
+                            self.PUMP_disp_ampsP1,
+                            self.PUMP_disp_torqP1]
+                p_recv(displays, du.STTDataBlock.Pump1, '_LastP1Telem')
 
-                self._LastP1Telem = telem
-
-            case "P2":
-                # display & log
-                self.PUMP_disp_freqP2.setText(f"{du.STTDataBlock.Pump2.freq}%")
-                self.PUMP_disp_voltP2.setText(f"{du.STTDataBlock.Pump2.volt} V")
-                self.PUMP_disp_ampsP2.setText(f"{du.STTDataBlock.Pump2.amps} A")
-                self.PUMP_disp_torqP2.setText(f"{du.STTDataBlock.Pump2.torq} Nm")
-
-                self._LastP2Telem = telem
+            case 'P2':
+                displays = [self.PUMP_disp_freqP2,
+                            self.PUMP_disp_voltP2,
+                            self.PUMP_disp_ampsP2,
+                            self.PUMP_disp_torqP2]
+                p_recv(displays, du.STTDataBlock.Pump2, '_LastP2Telem')
 
             case _:
-                self.log_entry(
-                    "CONN", "ERROR! Received PumpTelemetry from unspecified source."
+                raise KeyError(
+                    f"Received Pump Telem from unspecified source ({source})!"
                 )
-                print("ERROR! Received PumpTelemetry from unspecified source.")
-                return
 
 
     def mixer_send(self, mixer_speed:int, res:bool, data_len:bool) -> None:
@@ -936,8 +957,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
     def set_watchdog(self, dog:str) -> None:
         """set Watchdog, check data updates from robot and pump occure at
-        least every 10 sec
-        """
+        least every 10 sec"""
 
         watchdog = QTimer()
         watchdog.setSingleShot(True)
@@ -945,24 +965,22 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         watchdog.timeout.connect(lambda: self.watchdog_bite(dog))
 
         match dog:
-            case "ROB":
+            case 'ROB':
                 self._RobRecvWd = watchdog
                 self._RobRecvWd.start()
-            case "P1":
+            case 'P1':
                 self._P1RecvWd = watchdog
                 self._P1RecvWd.start()
-            case "P2":
+            case 'P2':
                 self._P2RecvWd = watchdog
                 self._P2RecvWd.start()
-            case "MIX":
+            case 'MIX':
                 self._MixRecvWd = watchdog
                 self._MixRecvWd.start()
             case _:
-                raise ValueError(
-                    "Watchdog setting failed, invalid dog number given"
-                )
-
+                raise ValueError(f"{dog} is invalad as a watchdog!")
         self.log_entry("WDOG", f"Watchdog {dog} started.")
+
 
     def reset_watchdog(self, dog:str) -> None:
         """reset the Watchdog on every newly received data block, check
@@ -970,57 +988,53 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         """
 
         match dog:
-            case "ROB":
+            case 'ROB':
                 if du.ROBTcp.connected:
                     self._RobRecvWd.start()
-            case "P1":
+            case 'P1':
                 if du.PMP1Serial.connected:
                     self._P1RecvWd.start()
-            case "P2":
+            case 'P2':
                 if du.PMP2Serial.connected:
                     self._P2RecvWd.start()
-            case "MIX":
+            case 'MIX':
                 if du.MIXTcp.connected:
                     self._MixRecvWd.start()
             case _:
-                self.log_entry(
-                    "WDOG", "Watchdog reset failed, invalid dog number given"
-                )
+                self.log_entry('WDOG', f"no such WD: {dog}, reset failed!")
+
 
     def watchdog_bite(self, dog:str) -> None:
-        """close the UI on any biting WD, log info"""
+        """infrom user on any biting WD, log info"""
 
         cancel_operation = False
         match dog:
-            case "ROB":
+            case 'ROB':
                 result = "Robot offline"
                 if du.SC_q_processing:
                     cancel_operation = True
 
-            case "P1":
+            case 'P1':
                 result = "Pump 1 offline"
                 if du.SC_q_processing:
                     cancel_operation = True
 
-            case "P2":
+            case 'P2':
                 result = "Pump 2 offline"
                 if du.SC_q_processing:
                     cancel_operation = True
 
-            case "MIX":
+            case 'MIX':
                 result = "Mixer offline"
 
             case _:
                 result = "Internal error"
                 return
 
-        self.kill_watchdog(dog)
-        self.disconnect_tcp(slot=dog, internal_call=True)
-
         # stop critical operations, build user text
         if cancel_operation:
             self.log_entry(
-                "WDOG",
+                'WDOG',
                 (
                     f"Watchdog {dog} has bitten! Stopping script control & "
                     f"forwarding forced-stop to robot!"
@@ -1036,7 +1050,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             )
 
         else:
-            self.log_entry("WDOG", f"Watchdog {dog} has bitten!")
+            self.log_entry('WDOG', f"Watchdog {dog} has bitten!")
             wd_text = (
                 (
                     f"Watchdog {dog} has bitten!\n\n{result}.\nPress OK to "
@@ -1044,64 +1058,54 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 )
             )
 
+        # disconnect, also stops watchdog
+        self.disconnect_tcp(slot=dog, internal_call=True)
+
         # ask user to close application
         watchdog_warning = strd_dialog(wd_text, "WATCHDOG ALARM")
         watchdog_warning.exec()
 
         if watchdog_warning.result():
-            self.log_entry("WDOG", f"User chose to return to main screen.")
+            self.log_entry('WDOG', f"User chose to return to main screen.")
 
         else:
-            self.log_entry("WDOG", f"User chose to close PRINT_py, exiting...")
+            self.log_entry('WDOG', f"User chose to close PRINT_py, exiting...")
             self.close()
+
 
     def kill_watchdog(self, dog:str) -> None:
         """put them to sleep (dont do this to real dogs)"""
 
         match dog:
-            case "ROB":
+            case 'ROB':
                 self._RobRecvWd.stop()
                 self._RobRecvWd.deleteLater()
-            case "P1":
+            case 'P1':
                 self._P1RecvWd.stop()
                 self._P1RecvWd.deleteLater()
-            case "P2":
+            case 'P2':
                 self._P2RecvWd.stop()
                 self._P2RecvWd.deleteLater()
-            case "MIX":
+            case 'MIX':
                 self._MixRecvWd.stop()
                 self._MixRecvWd.deleteLater()
             case _:
                 pass
             
-        self.log_entry("WDOG", f"Watchdog {dog} deleted.")
+        self.log_entry('WDOG', f"Watchdog {dog} deleted.")
 
 
     ##########################################################################
     #                                SETTINGS                                #
     ##########################################################################
 
-    def update_comm_forerun(self) -> None:
-        """reset the robots internal buffer length"""
+    def mutex_setattr(self, obj, attr, val) -> None:
+        """reduce the Mutex lock/unlock game to a single line,
+        but makes refactoring a little more tedious
+        """
 
         Mutex.lock()
-        du.ROB_comm_fr = self.TCP_num_commForerun.value()
-        Mutex.unlock()
-
-
-    def update_rob_live_ad(self) -> None:
-        """new factor for QEntry.Speed.ts, applied before sending"""
-
-        Mutex.lock()
-        du.ROB_live_ad = self.SCTRL_num_liveAd_robot.value() / 100.0
-        Mutex.unlock()
-
-
-    def update_output_ratio(self) -> None:
-        """new factor for QEntry.Speed.ts, applied before sending"""
-
-        Mutex.lock()
-        du.PMP_output_ratio = 1 - (self.PUMP_sld_outputRatio.value() / 100.0)
+        setattr(obj, attr, val)
         Mutex.unlock()
 
 
@@ -1123,7 +1127,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         Mutex.unlock()
 
         self.log_entry(
-            "SETS",
+            'SETS',
             f"General settings updated -- VolPerMM: {du.SC_vol_per_m}"
             f", FR2TS: {du.IO_fr_to_ts}, IOZ: {du.IO_zone}"
             f", PrinTS: {du.PRINSpeed.ts}, PrinOS: {du.PRINSpeed.ors}"
@@ -1147,7 +1151,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         Mutex.unlock()
 
         self.log_entry(
-            "SETS",
+            'SETS',
             f"TE settings updated -- FB_inter: {du.SC_ext_fllw_bhvr[0]}, "
             f"FB_skip: {du.SC_ext_fllw_bhvr[1]}, "
             f"PmpRS: {du.PMP_retract_speed}, "
@@ -1163,20 +1167,19 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def log_entry(self, source="[    ]", text="") -> None:
         """set one-liner for log entries, safes A LOT of repetitive code"""
 
-        text = text.replace("\n", "")
-        text = text.replace("\t", "")
-
-        if self.logpath == "":
+        if self.logpath == '':
             return None
+        text = text.replace('\n', '')
+        text = text.replace('\t', '')
 
-        if source == "newline":
-            text = "\n"
+        if source == 'newline':
+            text = '\n'
         else:
             time = datetime.now().strftime("%Y-%m-%d_%H%M%S")
             text = f"{time}    [{source}]:        {text}\n"
 
         try:
-            logfile = open(self.logpath, "a")
+            logfile = open(self.logpath, 'a')
         except FileExistsError:
             pass
 
@@ -1200,7 +1203,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         com_id = du.SC_curr_comm_id
         Start = du.ROBMovStartP
         End = du.ROBMovEndP
-
         try:
             prog_id = du.SCQueue[0].id
         except AttributeError:
@@ -1252,7 +1254,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.TRANS_disp_yStart.setText(str(round(Start.y - Zero.y, 2)))
         self.TRANS_disp_zStart.setText(str(round(Start.z - Zero.z, 2)))
         self.TRANS_disp_extStart.setText(str(round(Start.ext - Zero.ext, 2)))
-
         self.TRANS_disp_xEnd.setText(str(round(End.x - Zero.x, 2)))
         self.TRANS_disp_yEnd.setText(str(round(End.y - Zero.y, 2)))
         self.TRANS_disp_zEnd.setText(str(round(End.z - Zero.z, 2)))
@@ -1267,15 +1268,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.label_update_on_terminal_change()
         self.SCTRL_disp_elemInQ.setText(str(len(du.SCQueue)))
 
-        if not isinstance(entry, du.QEntry):
-            return
-
         try:
             rob_id = du.ROBTelem.id if (du.ROBTelem.id != -1) else 0
             self.SCTRL_disp_buffComms.setText(
                 str(du.SCQueue[0].id - rob_id - 1)
             )
-
         except AttributeError:
             pass
 
@@ -1401,7 +1398,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if file_path.suffix == ".mod":
             comm_num, filament_length, res = fu.pre_check_rapid_file(txt)
         else:
-            comm_num, filament_length, res = fu.pre_check_ccode_file(txt)
+            comm_num, filament_length, res = fu.pre_check_gcode_file(txt)
 
         if isinstance(comm_num, Exception):
             self.IO_disp_filename.setText("COULD NOT READ FILE!")
@@ -1428,7 +1425,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             "F-IO",
             (
                 f"Opened new file at {file_path}:   {comm_num} commands,   "
-                f"{filament_length}mm filament, {filament_vol}L"
+                f"{filament_length}m filament, {filament_vol}L"
             ),
         )
         du.IO_curr_filepath = file_path
@@ -1446,8 +1443,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         p_ctrl = self.IO_chk_autoPCtrl.isChecked()
         fpath = du.IO_curr_filepath
 
-        if (fpath is None) or not (
-            fpath.suffix == ".gcode" or fpath.suffix == ".mod"
+        if fpath is None or not (
+                fpath.suffix == ".gcode" or fpath.suffix == ".mod"
         ):
             self.IO_lbl_loadFile.setText("... no valid file, not executed")
             return
@@ -1543,10 +1540,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         theoretically
         """
 
-        Mutex.lock()
-        du.SC_curr_comm_id = du.ROBTelem.id + 1
-        Mutex.unlock()
-
+        self.mutex_setattr(du, 'SC_curr_comm_id', du.ROBTelem.id + 1)
         self.label_update_on_receive(
             data_string=self.TCP_ROB_disp_readBuffer.text()
         )
@@ -1639,7 +1633,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # act according to GCode command
         Entry, command = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
 
-        if (command != "G1") and (command != "G28") and (command != "G92"):
+        if command != "G1" and command != "G28" and command != "G92":
             if command == ";":
                 pan_txt = f"leading semicolon interpreted as comment:\n{txt}"
 
@@ -1747,18 +1741,16 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         return Entry
 
 
-    def add_SIB(self, number:int, at_end=False) -> bool:
+    def add_SIB(self, num:int, at_end=False) -> bool:
         """add standard instruction block (SIB) to queue"""
 
-        match number:
-            case 1:
-                txt = self.SIB_entry_sib1.toPlainText()
-            case 2:
-                txt = self.SIB_entry_sib2.toPlainText()
-            case 3:
-                txt = self.SIB_entry_sib3.toPlainText()
-            case _:
-                return False
+        num -= 1
+        sib_entry = [
+            self.SIB_entry_sib1,
+            self.SIB_entry_sib2,
+            self.SIB_entry_sib3,
+        ]
+        txt = sib_entry[num].toPlainText()
 
         if (len(du.SCQueue) == 0) or not at_end:
             try:
@@ -1771,7 +1763,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         if line_id < 1: line_id = 1
         line_id_start = line_id
-        rows = txt.split("\n")
+        rows = txt.split('\n')
 
         # interpret rows as either RAPID or GCode, row-wise, handling the
         # entry is unnessecary as its added to queue by the addRapidSgl /
@@ -1783,21 +1775,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 )
 
                 if not isinstance(Entry, du.QEntry):
-                    match number:
-                        case 1:
-                            self.SIB_entry_sib1.setText(
-                                f"COMMAND ERROR, ABORTED\n {txt}"
-                            )
-                        case 2:
-                            self.SIB_entry_sib2.setText(
-                                f"COMMAND ERROR, ABORTED\n {txt}"
-                            )
-                        case 3:
-                            self.SIB_entry_sib3.setText(
-                                f"COMMAND ERROR, ABORTED\n {txt}"
-                            )
+                    sib_entry[num].setText(f"COMMAND ERROR, ABORTED\n {txt}")
                     self.log_entry(
-                        f"SIB{number}",
+                        f"SIB{num + 1}",
                         (
                             f"ERROR: SIB command import aborted ({Entry})! "
                             f"false entry: {txt}"
@@ -1815,21 +1795,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 if (command == "G1") or (command == "G28"):
                     line_id += 1
                 else:
-                    match number:
-                        case 1:
-                            self.SIB_entry_sib1.setText(
-                                f"COMMAND ERROR, ABORTED\n {txt}"
-                            )
-                        case 2:
-                            self.SIB_entry_sib2.setText(
-                                f"COMMAND ERROR, ABORTED\n {txt}"
-                            )
-                        case 3:
-                            self.SIB_entry_sib3.setText(
-                                f"COMMAND ERROR, ABORTED\n {txt}"
-                            )
+                    sib_entry[num].setText(f"COMMAND ERROR, ABORTED\n {txt}")
                     self.log_entry(
-                        f"SIB{number}",
+                        f"SIB{num + 1}",
                         (
                             f"ERROR: SIB command import aborted ({command})! "
                             f"false entry: {txt}"
@@ -1842,7 +1810,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             log_txt += " at end of queue"
         else:
             log_txt += " in front of queue"
-        self.log_entry(f"SIB{number}", log_txt)
+        self.log_entry(f"SIB{num + 1}", log_txt)
         return True
     
 
@@ -1949,23 +1917,14 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.switch_rob_moving()
 
         step_width = self.DC_sld_stepWidth.value()
-        match step_width:
-            case 1:
-                pass
-            case 2:
-                step_width = 10
-            case 3:
-                step_width = 100
-            case _:
-                raise ValueError(f"step_width of {step_width} is not valid!")
+        step_width = int(10 ** (step_width - 1)) # 1->1, 2->10, 3->100
 
-        if dir != "+" and dir != "-":
+        if dir != '+' and dir != '-':
             raise ValueError
-        if dir == "-":
+        if dir == '-':
             step_width = -step_width
 
         NewPos = copy.deepcopy(du.ROBTelem.Coor)
-
         match axis:
             case "X":
                 NewPos.x += step_width
@@ -1980,7 +1939,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         read_mt = self.DC_drpd_moveType.currentText()
         mt = "L" if (read_mt == "LINEAR") else "J"
-
         Command = du.QEntry(
             id=du.SC_curr_comm_id,
             mt=mt,
@@ -2022,7 +1980,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         read_mt = self.DC_drpd_moveType.currentText()
         mt = "L" if (read_mt == "LINEAR") else "J"
-
         Command = du.QEntry(
             id=du.SC_curr_comm_id,
             mt=mt,
@@ -2056,7 +2013,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if command == "G92":
             self.label_update_on_new_zero()
 
-        elif (command != "G1") and (command != "G28"):
+        elif command != "G1" and command != "G28":
             if command == ";":
                 pan_txt = f"leading semicolon interpreted as comment:\n{txt}"
             elif Entry is None:
@@ -2218,9 +2175,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             if 8 in axis:
                 NewZero.ext = CurrPos.ext
 
-            Mutex.lock()
-            du.DCCurrZero = NewZero
-            Mutex.unlock()
+            self.mutex_setattr(du, 'DCCurrZero', NewZero)
 
         self.label_update_on_new_zero()
         self.log_entry(
@@ -2322,9 +2277,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             case _:
                 speed = self.MIX_num_setSpeed.value()
 
-        Mutex.lock()
-        du.MIX_speed = speed
-        Mutex.unlock()
+        self.mutex_setattr(du, 'MIX_speed', speed)
 
 
     ##########################################################################

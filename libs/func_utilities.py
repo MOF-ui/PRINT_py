@@ -29,7 +29,7 @@ import libs.data_utilities as du
 
 ###########################     FUNCTIONS      ###############################
 
-def pre_check_ccode_file(
+def pre_check_gcode_file(
         txt:str
 ) -> (
         tuple[int | Exception, float, str]

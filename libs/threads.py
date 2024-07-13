@@ -37,6 +37,7 @@ class PumpCommWorker(QObject):
     # naming conventions in PyQT are different,
     # for the signals I will stick with mixedCase
     connActive = pyqtSignal(str)
+    connLost = pyqtSignal(str, bool)
     dataRecv = pyqtSignal(du.PumpTelemetry, str)
     dataMixerRecv = pyqtSignal(int)
     dataSend = pyqtSignal(int, str, int, str)
@@ -53,6 +54,8 @@ class PumpCommWorker(QObject):
         self.LoopTimer.timeout.connect(self.send)
         self.LoopTimer.timeout.connect(self.receive)
         self.LoopTimer.start()
+
+        self.logEntry.emit('THRT','PumpComm thread running.')
 
 
     def stop(self) -> None:
@@ -83,39 +86,38 @@ class PumpCommWorker(QObject):
 
         # look for user overwrite, no mutex, as changing 
         # global PUMP_user_speed would not harm the process
-        if du.PMP1_user_speed != -999:
-            pump1_speed = du.PMP1_user_speed
-            du.PMP1_user_speed = -999
-        if du.PMP2_user_speed != -999:
-            pump2_speed = du.PMP2_user_speed
-            du.PMP2_user_speed = -999
-
+        for du_user_speed, calc_speed in [
+                ('PMP1_user_speed', 'pump1_speed'),
+                ('PMP2_user_speed', 'pump2_speed'),
+        ]:
+            user_speed = getattr(du, du_user_speed)
+            if user_speed != -999:
+                locals()[calc_speed] = user_speed
+                setattr(du, setattr, -999)
+        
         # send to P1 and P2 & keepAlive both
-        if du.PMP1Serial.connected and (pump1_speed is not None):
-            res = du.PMP1Serial.set_speed(int(pump1_speed * du.PMP1_live_ad))
+        for serial, speed, live_ad, speed_global, p_num in [
+                (du.PMP1Serial, pump1_speed, 'PMP1_live_ad', 'PMP1_speed', 'P1'),
+                (du.PMP2Serial, pump2_speed, 'PMP2_live_ad', 'PMP2_speed', 'P2'),
+        ]:
+            if serial.connected and speed is not None:
+                res = serial.set_speed(int(speed * getattr(du, live_ad)))
+                if res is None:
+                    self.connLost.emit(p_num, True)
+                    self.logEntry.emit(
+                        'PMP ',
+                        f"Error on send, Connection to {p_num} lost!"
+                    )
+                else:
+                    Mutex.lock()
+                    setattr(du, speed_global, speed)
+                    Mutex.unlock()
+                    print(f"{p_num}: {speed}")
+                    self.dataSend.emit(speed, res[0], res[1], p_num)
 
-            if res is not None:
-                Mutex.lock()
-                du.PMP1_speed = pump1_speed
-                Mutex.unlock()
-                print(f"P1: {pump1_speed}")
-                self.dataSend.emit(pump1_speed, res[0], res[1], "P1")
+                serial.keepAlive()
 
-            du.PMP1Serial.keepAlive()
-
-        if du.PMP2Serial.connected and (pump2_speed is not None):
-            res = du.PMP2Serial.set_speed(int(pump2_speed * du.PMP2_live_ad))
-
-            if res is not None:
-                Mutex.lock()
-                du.PMP2_speed = pump2_speed
-                Mutex.unlock()
-                print(f"P2: {pump2_speed}")
-                self.dataSend.emit(pump2_speed, res[0], res[1], "P2")
-
-            du.PMP2Serial.keepAlive()
-
-        # send to mixer
+        # SEND TO MIXER
         if du.MIXTcp.connected:
             mixer_speed = pump_speed if (du.MIX_act_with_pump) else du.MIX_speed
 
@@ -135,64 +137,40 @@ class PumpCommWorker(QObject):
         from pump, pass to mainframe
         """
 
-        # RECEIVE FROM PUMPS, first P1:
-        if du.PMP1Serial.connected:
-            freq = du.PMP1Serial.frequency
-            volt = du.PMP1Serial.voltage
-            amps = du.PMP1Serial.current
-            torq = du.PMP1Serial.torque
+        # RECEIVE FROM PUMPS:
+        for serial, last_telem, speed_global, stt_attr, p_num in [
+                (du.PMP1Serial, 'PMP1LastTelem', 'PMP1_speed', 'Pump1', 'P1'),
+                (du.PMP2Serial, 'PMP2LastTelem', 'PMP2_speed', 'Pump2', 'P2'),
+        ]:
+            if serial.connected:
+                freq = serial.frequency
+                volt = serial.voltage
+                amps = serial.current
+                torq = serial.torque
 
-            if None in [freq, volt, amps, torq]:
-                self.logEntry.emit(
-                    "PTel", "Pump1 telemetry package broken or not received..."
-                # TO-DO: catch error; or disconnect immediatly to prevent GUI crash in next loops
-                )
+                if None in [freq, volt, amps, torq]:
+                    self.connLost.emit(p_num, True)
+                    self.logEntry.emit(
+                        'PTel',
+                        f"{p_num} telemetry package broken or not received, "
+                        f"connection lost!"
+                    )
+                else:
+                    Telem = du.PumpTelemetry(freq, volt, amps, torq)
+                    Telem = round(Telem, 3)
+                    self.connActive.emit(p_num)
 
-            else:
-                Telem = du.PumpTelemetry(freq, volt, amps, torq)
-                Telem = round(Telem, 3)
-                self.connActive.emit("P1")
+                    # telemetry contains no info about the rotation direction,
+                    # interpret according to settings
+                    if getattr(du, speed_global) < 0:
+                        Telem.freq *= -1
 
-                # telemetry contains no info about the rotation direction,
-                # interpret according to settings
-                if du.PMP1_speed < 0:
-                    Telem.freq *= -1
-
-                if Telem != du.PMP1LastTelem:
-                    Mutex.lock()
-                    du.PMP1LastTelem = Telem
-                    du.STTDataBlock.Pump1 = Telem
-                    Mutex.unlock()
-                    self.dataRecv.emit(Telem, "P1")
-
-        # P2
-        if du.PMP2Serial.connected:
-            freq = du.PMP2Serial.frequency
-            volt = du.PMP2Serial.voltage
-            amps = du.PMP2Serial.current
-            torq = du.PMP2Serial.torque
-
-            if None in [freq, volt, amps, torq]:
-                self.logEntry.emit(
-                    "PTel", "Pump2 telemetry package broken or not received..."
-                )
-
-            else:
-                Telem = du.PumpTelemetry(freq, volt, amps, torq)
-                Telem = round(Telem, 3)
-                self.connActive.emit("P2")
-
-                # telemetry contains no info about the rotation direction,
-                # interpret according to settings
-                if du.PMP2_speed < 0:
-                    Telem.freq *= -1
-
-                if Telem != du.PMP2LastTelem:
-                    Mutex.lock()
-                    du.PMP2LastTelem = Telem
-                    du.STTDataBlock.Pump2 = Telem
-                    Mutex.unlock()
-                    self.dataRecv.emit(Telem, "P2")
+                    if Telem != getattr(du, last_telem):
+                        Mutex.lock()
+                        setattr(du, last_telem, Telem)
+                        setattr(du.STTDataBlock, stt_attr, Telem)
+                        Mutex.unlock()
+                        self.dataRecv.emit(Telem, p_num)
 
         # RECEIVE FROM MIXER
         if du.MIXTcp.connected:
@@ -225,7 +203,6 @@ class RoboCommWorker(QObject):
     to global vars
     """
 
-    commLost = pyqtSignal(int)
     dataReceived = pyqtSignal()
     dataUpdated = pyqtSignal(str, du.RoboTelemetry)
     endDcMoving = pyqtSignal()
@@ -236,25 +213,22 @@ class RoboCommWorker(QObject):
     # however this will be either int or Exception type
     sendElem = pyqtSignal(du.QEntry, bool, object, bool)
 
-    transmitting = False
-
 
     def run(self) -> None:
         """start timer, receive and send on timeout"""
-
-        self.StatusCheckTimer = QTimer()
-        self.StatusCheckTimer.setInterval(10)
-        self.StatusCheckTimer.timeout.connect(self.check_new_status)
-        self.StatusCheckTimer.start()
 
         self.CommTimer = QTimer()
         self.CommTimer.setInterval(10)
         self.CommTimer.timeout.connect(self.receive)
         self.CommTimer.timeout.connect(self.send)
+        self.CommTimer.start()
 
         self.CheckTimer = QTimer()
         self.CheckTimer.setInterval(200)
         self.CheckTimer.timeout.connect(self.check_queue)
+        self.CheckTimer.start()
+
+        self.logEntry.emit('THRT','RoboComm thread running.')
 
 
     def stop(self) -> None:
@@ -266,37 +240,11 @@ class RoboCommWorker(QObject):
         self.CheckTimer.stop()
         self.CheckTimer.deleteLater()
 
-        self.StatusCheckTimer.stop()
-        self.StatusCheckTimer.deleteLater()
-
-
-    def check_new_status(self) -> None:
-        """change connection status if requested, request via permanent check
-        of global variable as I'm unwilling to program a custom QThread class
-        with the according slot and also havent figured out another way yet
-        """
-        global rcw_new_status
-
-        if rcw_new_status == self.transmitting:
-            return
-
-        if rcw_new_status:
-            self.CommTimer.start()
-            self.CheckTimer.start()
-            self.transmitting = True
-        else:
-            self.CommTimer.stop()
-            self.CheckTimer.stop()
-            self.transmitting = False
-            if len(du.ROB_send_list) != 0:
-                self.commLost.emit(len(du.ROB_send_list))
-
 
     def receive(self) -> None:
         """receive 36-byte data block, write to ROB vars"""
 
         Telem, raw_data = du.ROBTcp.receive()
-
         if not isinstance(Telem, Exception):
             Telem = round(Telem, 1)
             self.dataReceived.emit()
@@ -307,25 +255,18 @@ class RoboCommWorker(QObject):
                 f"TCP: {Telem.t_speed}"
             )
 
-            # check for ID overflow, reduce SC_queue IDs & get rid off
-            # ROB_commQueue entries with IDs at ~3000
+            # check for ID overflow, reduce SC_queue IDs 
             if Telem.id < du.ROBLastTelem.id:
                 for x in du.SCQueue:
                     x.id -= 3000
-
+                # and clear ROBCommQueue entries with IDs near 3000
                 try:
-                    id = du.ROBCommQueue[0].id
-                    while id <= 3000:
+                    while du.ROBCommQueue[0].id > Telem.id:
                         du.ROBCommQueue.pop_first_item()
-                        try:
-                            id = du.ROBCommQueue[0].id
-                        except Exception:
-                            break
-
-                except AttributeError:
+                except Exception:
                     pass
 
-            # delete all finished command from ROB_commQueue
+            # delete all finished commands from ROB_commQueue
             try:
                 while du.ROBCommQueue[0].id < Telem.id:
                     du.ROBCommQueue.pop_first_item()
@@ -334,7 +275,6 @@ class RoboCommWorker(QObject):
 
             # refresh data only if new
             if Telem != du.ROBLastTelem:
-
                 # check if robot is processing a new command
                 # (length check to skip in first loop)
                 if (Telem.id != du.ROBLastTelem.id) and (len(du.ROBCommQueue) > 0):
@@ -346,13 +286,13 @@ class RoboCommWorker(QObject):
                 du.ROBLastTelem = copy.deepcopy(Telem)
 
                 # prep database entry
-                Zero = copy.deepcopy(du.DCCurrZero)
-                du.STTDataBlock.Robo = copy.deepcopy(Telem)
-                du.STTDataBlock.Robo.Coor -= Zero
+                STTEntry = copy.deepcopy(Telem)
+                STTEntry.Coor -= du.DCCurrZero
+                du.STTDataBlock.Robo = copy.deepcopy(STTEntry) 
                 self.dataUpdated.emit(str(raw_data), Telem)
-
+                
+                # print
                 print(f"RECV:    {Telem}")
-
             Mutex.unlock()
 
             # reset robMoving indicator if near end, skip if queue is processed
@@ -362,17 +302,12 @@ class RoboCommWorker(QObject):
                     if check_dist < 1:
                         self.endDcMoving.emit()
 
+        # inform user if error occured in websocket connection
         else:
-            self.logEntry.emit(
-                "RTel",
-                f"error ({Telem}) from TCPIP class ROB_tcpip, data: {raw_data}"
-            )
-
+            err_txt = f"ERROR from ROBTcp ({Telem}), raw data: {raw_data}"
+            self.logEntry.emit('RTel', err_txt)
             Mutex.lock()
-            fu.add_to_comm_protocol(
-                f"RECV:    error ({Telem}) from TCPIP class ROB_tcpip, "
-                f"data: {raw_data}"
-            )
+            fu.add_to_comm_protocol(f"RECV:    {err_txt}")
             Mutex.unlock()
 
 
@@ -397,15 +332,12 @@ class RoboCommWorker(QObject):
         # robot is nearer than ROB_commFr; if no entries in SC_queue left,
         # end qProcessing (immediately if ROB_commQueue is empty as well)
         elif du.SC_q_processing:
-
             if len_sc > 0:
                 Mutex.lock()
-
                 try:
                     while (rob_id + du.ROB_comm_fr) >= du.SCQueue[0].id:
                         comm_tuple = (du.SCQueue.pop_first_item(), False)
                         du.ROB_send_list.append(comm_tuple)
-
                 except AttributeError:
                     pass
                 Mutex.unlock()
@@ -418,58 +350,59 @@ class RoboCommWorker(QObject):
 
 
     def send(self, testrun=False) -> None:
-        """send sendList entries if not empty"""
+        """iterate over ROB_send_list entries and send one by one,
+        check if sending was successful each time
+        """
 
         num_to_send = len(du.ROB_send_list)
         num_send = 0
-        while num_to_send > 0:
 
+        # send commands until send_list is empty
+        while num_to_send > 0:
             comm_tuple = du.ROB_send_list.pop(0)
             num_to_send = len(du.ROB_send_list)
-            command = comm_tuple[0]
+            Command = comm_tuple[0]
             direct_ctrl = comm_tuple[1]
 
-            if not isinstance(command, du.QEntry): 
+            # check for type, ID overflow & live adjustments to tcp speed
+            if not isinstance(Command, du.QEntry):
+                err = ValueError(f"{Command} is not an instance of QEntry!")
+                self.sendElem.emit(Command, False, err, direct_ctrl)
+                print(f"send error: {err}")
                 break
-            else:
-                Comm = command
+            Command.Speed.ts = int(Command.Speed.ts * du.ROB_live_ad)
+            while Command.id > 3000:
+                Command.id -= 3000
 
-            while Comm.id > 3000:
-                Comm.id -= 3000
-
-            Comm.Speed.ts = int(Comm.Speed.ts * du.ROB_live_ad)
-
-            if not testrun:
-                res, msg_len = du.ROBTcp.send(Comm)
-            else:
+            # if testrun, skip actually sending the message
+            if testrun:
                 res, msg_len = True, 159
+            else:
+                res, msg_len = du.ROBTcp.send(Command)
 
+            # see if sending was successful
             if res:
-                num_send += 1
-
                 Mutex.lock()
-                du.ROBCommQueue.append(Comm)
+                num_send += 1
+                du.ROBCommQueue.append(Command)
                 fu.add_to_comm_protocol(
-                    f"SEND:    ID: {Comm.id}  MT: {Comm.mt}  PT: {Comm.pt} "
-                    f"\t|| COOR_1: {Comm.Coor1}"
-                    f"\n\t\t\t|| COOR_2: {Comm.Coor2}"
-                    f"\n\t\t\t|| SV:     {Comm.Speed} \t|| SBT: {Comm.sbt}   "
-                    f"SC: {Comm.sc}   Z: {Comm.z}"
-                    f"\n\t\t\t|| TOOL:   {Comm.Tool}"
+                    f"SEND:    ID: {Command.id}  MT: {Command.mt}  PT: {Command.pt} "
+                    f"\t|| COOR_1: {Command.Coor1}"
+                    f"\n\t\t\t|| COOR_2: {Command.Coor2}"
+                    f"\n\t\t\t|| SV:     {Command.Speed} \t|| SBT: {Command.sbt}   "
+                    f"SC: {Command.sc}   Z: {Command.z}"
+                    f"\n\t\t\t|| TOOL:   {Command.Tool}"
                 )
                 if direct_ctrl:
                     du.SCQueue.increment()
                 Mutex.unlock()
-
             else:
                 print(f" Message Error: {msg_len}")
-                self.sendElem.emit(Comm, res, msg_len, direct_ctrl)
-
+                self.sendElem.emit(Command, False, msg_len, direct_ctrl)
+        
+            # inform mainframe if command block was send successfully 
             if num_to_send == 0:
-                if not testrun:
-                    print(" Block send ")
-                self.sendElem.emit(Comm, res, num_send, direct_ctrl)
-            # else: self.sendElem.emit(command, msg, msgLen, directCtrl, False)
+                self.sendElem.emit(Command, res, num_send, direct_ctrl)
 
 
     def check_zero_dist(self) -> float | None:
@@ -508,6 +441,8 @@ class SensorCommWorker(QObject):
         self.CycleTimer.setInterval(1000)
         self.CycleTimer.timeout.connect(self.cycle)
         self.CycleTimer.start()
+
+        self.logEntry.emit('THRT','SensorComm thread running.')
 
 
     def stop(self) -> None:
@@ -755,9 +690,6 @@ class LoadFileWorker(QObject):
 ##############################     MAIN      #################################
 
 Mutex = QMutex()
-
-# RoboCommWorker:
-rcw_new_status = False
 
 # LoadFileWorker:
 lfw_file_path = None

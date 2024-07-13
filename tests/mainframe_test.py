@@ -210,7 +210,7 @@ class Mainframe_test(unittest.TestCase):
             f"MoveJ Offs(pHome,7.0,8.0,9.0),[110,120,130,140],z15,tool0 EXT:160"
         )
 
-        test_frame.add_SIB(number=1, at_end=False)
+        test_frame.add_SIB(num=1, at_end=False)
         self.assertEqual(
             du.SCQueue.display(),
             [
@@ -228,7 +228,7 @@ class Mainframe_test(unittest.TestCase):
         )
 
         du.DCCurrZero = du.Coordinate(x=1)
-        test_frame.add_SIB(number=2, at_end=True)
+        test_frame.add_SIB(num=2, at_end=True)
         self.assertEqual(
             du.SCQueue.display(),
             [
@@ -262,7 +262,7 @@ class Mainframe_test(unittest.TestCase):
         )
 
         du.DCCurrZero = du.Coordinate(x=1)
-        test_frame.add_SIB(number=3, at_end=False)
+        test_frame.add_SIB(num=3, at_end=False)
         self.assertEqual(
             du.SCQueue.display(),
             [
