@@ -22,34 +22,35 @@ of, though. You can write me issues, I'll see to them, if I find the time.
 ## File structure
 
 > [!NOTE]
-> **gh (Grashopper)**
-> grasshopper scripts used to extract control points as list or
-> GCode from one or multiple Rhino3D curve objects either controlled
+>
+> #### gh
+>
+> (Grashopper) grasshopper scripts used to extract control points as list
+> or GCode from one or multiple Rhino3D curve objects either controlled
 > by minimum control points per degree of curviture (with or without
 > alternating curve seams) or with unidistance mode
-
->[!NOTE]
->#### libs (libraries)
 >
->actual software libraries for PRINT_py, libs with the "win" prefix
->control the GUIs, TCP and COM interfaces are scripted in
->threads.py
-
-#### mtec (modified from m-tec-com)
- 
-Modbus interface for mtec P20 & P50
-
-#### simCom (virtual robot)
-
-used for simplified integration tests
-
-#### test (not up-to-date)
-
-unittests für most libs
-
-### ui (GUIs)
-
-Qt designer files and pyuic5 outputs
+> #### libs
+>
+> (libraries) actual software libraries for PRINT_py, libs with the "win" prefix
+> control the GUIs, TCP and COM interfaces are scripted in
+> threads.py
+>
+> #### mtec 
+>
+> Modbus interface for mtec P20 & P50 (original by m-tec-com)
+>
+> #### simCom
+>
+> (simulated communication) virtual robot used for simplified integration tests
+> 
+> #### test
+>
+> unittests für most libs (:warning: not up-to-date)
+>
+> ### ui
+>
+> (user interfaces) Qt designer files and pyuic5 outputs
 
 ## Scope
 
@@ -81,10 +82,11 @@ conversion unit. Both pumps are connected via Modbus, sharing the same bus
 and therefore the same COM port. Modbus adresses are '01' & '02'. There is 
 no testing environment for the pumps, yet.
 
-## Robot command syntax 
+## Robot communication syntax 
 
-| size | type | description |
-| [byte] |  |  |
+#### Command
+
+| size [byte] | type | description |
 | ---- | ---- | ----------- |
 | 4 | INT | **ID**: |
 |   |     | command ID for robot to keep track |
@@ -97,13 +99,13 @@ no testing environment for the pumps, yet.
 |   |      | `Q` (rotation as quaternion) |
 |   |      | `A` (pass 6 axis values) |
 | 4 | FLOAT | **X** or **A1**: |
-|   |       | `X` = position in global coordinate [mm]|
-|   |       | `A` = axis 1 position [deg] |
+|   |       | **X** = position in global coordinate [mm]|
+|   |       | **A** = axis 1 position [deg] |
 | 4 | FLOAT | **Y** or **A2** |
 | 4 | FLOAT | **Z** or **A3** |
 | 4 | FLOAT | **Q1**, **Rx** or **A4** |
-|   |       | `Q1` = quaternion 1. dimension [-] |
-|   |       | `Rx` = rotation around `X` [deg] |
+|   |       | **Q1** = quaternion 1. dimension [-] |
+|   |       | **Rx** = rotation around `X` [deg] |
 | 4 | FLOAT | **Q2**, **Ry** or **A5** |
 | 4 | FLOAT | **Q3**, **Rz** or **A6** |
 | 4 | FLOAT | **Q4** or **0** |
@@ -127,42 +129,55 @@ no testing environment for the pumps, yet.
 | 4 | INT | **OS**: |
 |   |     | orientation speed [deg s<sup>-1</sup>s] |
 | 4 | INT | **SBT**: |
-|   |     | speed by time (if **SC** = T) [ms] |
+|   |     | speed by time (if **SC** = `T`) [ms] |
 | 1 | CHAR | **SC** |
 |   |      | `V` = velocity dependent |
 |   |      | `T` = time-dependent |
 | 4 | INT | **Z** |
-| 4 | INT | zone (destination accuracy) |
+|   |     | zone (destination accuracy) |
 | 4 | INT | **PAN_ID** |
 | 4 | INT | **PAN_STEPS** |
-| 4 | INT | ID, motor 2 |
-| 4 | INT | steps, motor 2 |
-| 4 | INT | ID, motor 3 |
-| 4 | INT | steps, motor 3 |
-| 4 | INT | ID, pnmtc clamp |
-| 4 | INT | Y/N, pnmtc clamp |
-| 4 | INT | ID, knife |
-| 4 | INT | Y/N, knife |
-| 4 | INT | ID, motor 4 |
-| 4 | INT | steps, motor 4 |
-| 4 | INT | ID, fiber |
-| 4 | INT | steps, fiber |
-| 4 | INT | ID, time |
-| 4 | INT | time [ms], time |
+|   |     | tool panning step-motor [-] |
+| 4 | INT | **FIB_DELIV_ID** |
+| 4 | INT | **FIB_DELIV_STEPS** |
+|   |     | fiber delivery step-motor [-] |
+| 4 | INT | **MOR_PUMP_ID** |
+| 4 | INT | **MOR_PUMP_STEPS** |
+|   |     | *not in use* |
+| 4 | INT | **PNMTC_CLAMP_ID** |
+| 4 | INT | **PNMTC_CLAMP_YN** |
+|   |     | pneumatic clamp on/off [0/1] |
+| 4 | INT | **KNIFE_POS_ID** |
+| 4 | INT | **KNIFE_POS_YN** |
+|   |     | knife in cutting pos on/off [0/1] |
+| 4 | INT | **KNIFE_ID** |
+| 4 | INT | **KNIFE_YN** |
+|   |     | rotary knife on/off [0/1] |
+| 4 | INT | **PNMTC_FIBER_ID** |
+| 4 | INT | **PNMTC_FIBER_YN** |
+|   |     | pneumatic fiber delivery system on/off [0/1] |
+| 4 | INT | **TIME_ID** |
+| 4 | INT | **TIME_TIME** |
+|   |     | time [ms] |
 
+#### Position update
 
-POSITION BLOCK
-4 byte, FLOAT - tool center point velocity
-1 byte, INT -   current command ID processing
-4 byte, FLOAT - X
-4 byte, FLOAT - Y
-4 byte, FLOAT - Z
-4 byte, FLOAT - Rx
-4 byte, FLOAT - Ry
-4 byte, FLOAT - Rz
-4 byte, FLOAT - EXT
+| size [byte] | type | description |
+| ---- | ---- | ----------- |
+| 4 | FLOAT | **TCP_SPEED** |
+|   |       | tool center point velocity [mm s<sup>-1</sup>] |
+| 1 | INT | **ID** |
+|   |     | current command ID being processed |
+| 4 | FLOAT | **X**: |
+|   |       | current position on global x-axis [mm] |
+| 4 | FLOAT | **Y** |
+| 4 | FLOAT | **Z** |
+| 4 | FLOAT | **Rx** |
+| 4 | FLOAT | **Ry** |
+| 4 | FLOAT | **Rz** |
+| 4 | FLOAT | **EXT** |
 
-more detail documentation may follows in future commits...
+more detailed documentation may follows in future commits...
 
 
 Shield: [![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
