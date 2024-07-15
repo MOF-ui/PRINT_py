@@ -66,9 +66,12 @@ device in the future:
 
 # Usage
 
-start with 'py .\PRINT.py'
+start with `py .\PRINT.py`
+
 you can also start a testing environment with:
-        - start a virtual robot with 'py .\simCom\test_server.py'
+
+        - start a virtual robot with `py .\simCom\test_server.py`
+
         - start PRINT_py in local mode with 'py .\PRINT.py local'
 
 Pumps currently connected via COM port using a USB001Z-3 USB-to-Serial
@@ -78,8 +81,12 @@ no testing environment for the pumps, yet.
 
 ## Robot command syntax 
 
+| size | type | description |
+| ---- | ---- | ----------- |
+| 4 byte | INT | **ID**[^1] |
+[^1]: command ID for robot to keep track
 
-4 byte (INT):  **ID**[^1]
+
 1 byte (CHAR): **move type**      
 1 byte (CHAR): **pos type**    
 4 byte, FLOAT - X or A1             (X = X position in global coordinate
@@ -126,7 +133,6 @@ no testing environment for the pumps, yet.
 4 byte, INT -   ID, time
 4 byte, INT -   time [ms], time
 
-[^1]: command ID for robot to keep track
 [^2]: use: L (linear movement), J (joint movement), C (circular movement)
 [^3]: use: E (rotation in Euler angles), Q (rotation as quaternion), A (pass 6 axis values)
 
