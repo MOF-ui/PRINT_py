@@ -21,18 +21,19 @@ of, though. You can write me issues, I'll see to them, if I find the time.
 
 ## File structure
 
-#### gh (Grashopper)
+> [!NOTE]
+> **gh (Grashopper)**
+> grasshopper scripts used to extract control points as list or
+> GCode from one or multiple Rhino3D curve objects either controlled
+> by minimum control points per degree of curviture (with or without
+> alternating curve seams) or with unidistance mode
 
-grasshopper scripts used to extract control points as list or
-GCode from one or multiple Rhino3D curve objects either controlled
-by minimum control points per degree of curviture (with or without
-alternating curve seams) or with unidistance mode
-
-#### libs (libraries)
-
-actual software libraries for PRINT_py, libs with the "win" prefix
-control the GUIs, TCP and COM interfaces are scripted in
-threads.py
+>[!NOTE]
+>#### libs (libraries)
+>
+>actual software libraries for PRINT_py, libs with the "win" prefix
+>control the GUIs, TCP and COM interfaces are scripted in
+>threads.py
 
 #### mtec (modified from m-tec-com)
  
@@ -70,8 +71,10 @@ start with `py .\PRINT.py`
 
 > [!TIP]
 > you can also start a testing environment with:
+>
 > start a virtual robot with `py .\simCom\test_server.py`
-> start PRINT_py in local mode with 'py .\PRINT.py local'
+>
+> start PRINT_py in local mode with `py .\PRINT.py local`
 
 Pumps are currently connected via COM port using a USB001Z-3 USB-to-Serial
 conversion unit. Both pumps are connected via Modbus, sharing the same bus
@@ -85,22 +88,29 @@ no testing environment for the pumps, yet.
 | ---- | ---- | ----------- |
 | 4 | INT | **ID**: |
 |   |     | command ID for robot to keep track |
-| 1 | CHAR | **move type**: |
-|   |      | `L` (linear movement), `J` (joint movement), `C` (circular movement) |
-| 1 | CHAR | **pos type**: |
-|   |      | `E` (rotation in Euler angles), `Q` (rotation as quaternion), `A` (pass 6 axis values) |
+| 1 | CHAR | **MT** (move type): |
+|   |      | `L` (linear movement) |
+|   |      | `J` (joint movement) |
+|   |      | `C` (circular movement) |
+| 1 | CHAR | **PT** (position type): |
+|   |      | `E` (rotation in Euler angles) |
+|   |      | `Q` (rotation as quaternion) |
+|   |      | `A` (pass 6 axis values) |
 | 4 | FLOAT | **X** or **A1**: |
-|   |       | `X` = position in global coordinate [mm], `A` = axis 1 position [deg] |
+|   |       | `X` = position in global coordinate [mm]|
+|   |       | `A` = axis 1 position [deg] |
 | 4 | FLOAT | **Y** or **A2** |
 | 4 | FLOAT | **Z** or **A3** |
 | 4 | FLOAT | **Q1**, **Rx** or **A4** |
-|   |       | `Q1` = quaternion 1. dimension [-], `Rx` = rotation around `X` [deg] |
+|   |       | `Q1` = quaternion 1. dimension [-] |
+|   |       | `Rx` = rotation around `X` [deg] |
 | 4 | FLOAT | **Q2**, **Ry** or **A5** |
 | 4 | FLOAT | **Q3**, **Rz** or **A6** |
 | 4 | FLOAT | **Q4** or **0** |
-| 4 | FLOAT | **EXT**: postion of external axis [mm] |
+| 4 | FLOAT | **EXT**: |
+|   |       | postion of external axis [mm] |
 | 4 | FLOAT | (2) **X** or **A1** |
-|   |       | second block of coordinates for C-type movement |
+|   |       | second coordinate block for C-type movement |
 | 4 | FLOAT | (2) **Y** or **A2** |
 | 4 | FLOAT | (2) **Z** or **A3** |
 | 4 | FLOAT | (2) **Q1**, Rx or **A4** |
@@ -108,15 +118,23 @@ no testing environment for the pumps, yet.
 | 4 | FLOAT | (2) **Q3**, Rz or **A6** |
 | 4 | FLOAT | (2) **Q4** or **0** |
 | 4 | FLOAT | (2) **EXT** |
-| 4 | INT | **ACR**: acceleration ramp [mm s<sup>-2</sup>] |
-| 4 | INT | **DCR**: deceleration ramp [mm s<sup>-2</sup>] |
-| 4 | INT | **TS**: transition speed [mm s<sup>-1</sup>] |
-| 4 | INT | **OS**: orientation speed [deg/s] |
-| 4 | INT | **T**: time                (for time-dependent movement) |
-| 1 | CHAR | speed calculation   (V = velocity dependent, T = time-dependent) |
-| 4 | INT | zone |
-| 4 | INT | ID, motor 1         (all tool specific data from here) |
-| 4 | INT | steps, motor 1 |
+| 4 | INT | **ACR**: |
+|   |     | acceleration ramp [mm s<sup>-2</sup>] |
+| 4 | INT | **DCR**: |
+|   |     | deceleration ramp [mm s<sup>-2</sup>] |
+| 4 | INT | **TS**: |
+|   |     | transition speed [mm s<sup>-1</sup>] |
+| 4 | INT | **OS**: |
+|   |     | orientation speed [deg s<sup>-1</sup>s] |
+| 4 | INT | **SBT**: |
+|   |     | speed by time (if **SC** = T) [ms] |
+| 1 | CHAR | **SC** |
+|   |      | `V` = velocity dependent |
+|   |      | `T` = time-dependent |
+| 4 | INT | **Z** |
+| 4 | INT | zone (destination accuracy) |
+| 4 | INT | **PAN_ID** |
+| 4 | INT | **PAN_STEPS** |
 | 4 | INT | ID, motor 2 |
 | 4 | INT | steps, motor 2 |
 | 4 | INT | ID, motor 3 |
@@ -131,9 +149,6 @@ no testing environment for the pumps, yet.
 | 4 | INT | steps, fiber |
 | 4 | INT | ID, time |
 | 4 | INT | time [ms], time |
-
-[^2]: 
-[^3]: use: E (rotation in Euler angles), Q (rotation as quaternion), A (pass 6 axis values)
 
 
 POSITION BLOCK
