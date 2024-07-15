@@ -83,57 +83,50 @@ no testing environment for the pumps, yet.
 
 | size | type | description |
 | ---- | ---- | ----------- |
-| 4 byte | INT | **ID**[^1] |
-[^1]: command ID for robot to keep track
+| 4 byte | INT | **ID**: command ID for robot to keep track |
+| 1 byte | CHAR | **move type**: `L` (linear movement), `J` (joint movement), `C` (circular movement) |
+| 1 byte | CHAR | **pos type**: `E` (rotation in Euler angles), `Q` (rotation as quaternion), `A` (pass 6 axis values) |
+| 4 byte | FLOAT | **X** or **A1**: `X` = position in global coordinate [mm], `A` = axis 1 position [deg] |
+| 4 byte | FLOAT | Y or A2 |
+| 4 byte | FLOAT | Z or A3 |
+| 4 byte | FLOAT | Q1, Rx or A4        (Q = quaternion value, Rx = rotation around X in degrees)
+| 4 byte | FLOAT | Q2, Ry or A5 |
+| 4 byte | FLOAT | Q3, Rz or A6 |
+| 4 byte | FLOAT | Q4 or 0 |
+| 4 byte | FLOAT | EXT:                (EXT = postion of external axis in mm) |
+| 4 byte | FLOAT | (2) X or A1         (second block of coordinates for C-type movement)
+| 4 byte | FLOAT | (2) Y or A2 |
+| 4 byte | FLOAT | (2) Z or A3 |
+| 4 byte | FLOAT | (2) Q1, Rx or A4 |
+| 4 byte | FLOAT | (2) Q2, Ry or A5 |
+| 4 byte | FLOAT | (2) Q3, Rz or A6 |
+| 4 byte | FLOAT | (2) Q4 or 0 |
+| 4 byte | FLOAT | (2) EXT |
+| 4 byte | INT |   acceleration ramp |
+| 4 byte | INT |   deceleration ramp |
+| 4 byte | INT |   transition speed |
+| 4 byte | INT |   orientation speed |
+| 4 byte | INT |   time                (for time-dependent movement) |
+| 1 byte | CHAR |  speed calculation   (V = velocity dependent, T = time-dependent) |
+| 4 byte | INT |   zone |
+| 4 byte | INT |   ID, motor 1         (all tool specific data from here) |
+| 4 byte | INT |   steps, motor 1 |
+| 4 byte | INT |   ID, motor 2 |
+| 4 byte | INT |   steps, motor 2 |
+| 4 byte | INT |   ID, motor 3 |
+| 4 byte | INT |   steps, motor 3 |
+| 4 byte | INT |   ID, pnmtc clamp |
+| 4 byte | INT |   Y/N, pnmtc clamp |
+| 4 byte | INT |   ID, knife |
+| 4 byte | INT |   Y/N, knife |
+| 4 byte | INT |   ID, motor 4 |
+| 4 byte | INT |   steps, motor 4 |
+| 4 byte | INT |   ID, fiber |
+| 4 byte | INT |   steps, fiber |
+| 4 byte | INT |   ID, time |
+| 4 byte | INT |   time [ms], time |
 
-
-1 byte (CHAR): **move type**      
-1 byte (CHAR): **pos type**    
-4 byte, FLOAT - X or A1             (X = X position in global coordinate
-                                        system in mm, A = axis position)
-4 byte, FLOAT - Y or A2
-4 byte, FLOAT - Z or A3
-4 byte, FLOAT - Q1, Rx or A4        (Q = quaternion value,
-                                        Rx = rotation around X in degrees)
-4 byte, FLOAT - Q2, Ry or A5
-4 byte, FLOAT - Q3, Rz or A6
-4 byte, FLOAT - Q4 or 0
-4 byte, FLOAT - EXT:                (EXT = postion of external axis in mm)
-4 byte, FLOAT - (2) X or A1         (second block of coordinates for
-                                        C-type movement)
-4 byte, FLOAT - (2) Y or A2
-4 byte, FLOAT - (2) Z or A3
-4 byte, FLOAT - (2) Q1, Rx or A4
-4 byte, FLOAT - (2) Q2, Ry or A5
-4 byte, FLOAT - (2) Q3, Rz or A6
-4 byte, FLOAT - (2) Q4 or 0
-4 byte, FLOAT - (2) EXT
-4 byte, INT -   acceleration ramp
-4 byte, INT -   deceleration ramp
-4 byte, INT -   transition speed
-4 byte, INT -   orientation speed
-4 byte; INT -   time                (for time-dependent movement)
-1 byte, CHAR -  speed calculation   (V = velocity dependent,
-                                        T = time-dependent)
-4 byte, INT -   zone
-4 byte, INT -   ID, motor 1         (all tool specific data from here)
-4 byte, INT -   steps, motor 1
-4 byte, INT -   ID, motor 2
-4 byte, INT -   steps, motor 2
-4 byte, INT -   ID, motor 3
-4 byte, INT -   steps, motor 3
-4 byte, INT -   ID, pnmtc clamp
-4 byte, INT -   Y/N, pnmtc clamp
-4 byte, INT -   ID, knife
-4 byte, INT -   Y/N, knife
-4 byte, INT -   ID, motor 4
-4 byte, INT -   steps, motor 4
-4 byte, INT -   ID, fiber
-4 byte, INT -   steps, fiber
-4 byte, INT -   ID, time
-4 byte, INT -   time [ms], time
-
-[^2]: use: L (linear movement), J (joint movement), C (circular movement)
+[^2]: 
 [^3]: use: E (rotation in Euler angles), Q (rotation as quaternion), A (pass 6 axis values)
 
 
