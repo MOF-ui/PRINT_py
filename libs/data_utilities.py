@@ -485,7 +485,7 @@ class QEntry:
         Speed:
             speed vector for given movement
         sbt:
-            time to calculate speed by
+            (speed by time) time to calculate speed by
         sc:
             speed command, set movement speed by movement time (SBT) or speed
             vector (SV), (T = time, V = vector)

@@ -53,19 +53,17 @@ def pre_check_gcode_file(
         comm_num = 0
         filament_length = 0.0
 
+        x_regex = ['X\d+[,.]\d+', 'X\d+', 'X-\d+[,.]\d+', 'X-\d+']
+        y_regex = ['Y\d+[,.]\d+', 'Y\d+', 'Y-\d+[,.]\d+', 'Y-\d+']
+        z_regex = ['Z\d+[,.]\d+', 'Z\d+', 'Z-\d+[,.]\d+', 'Z-\d+']
+
         for row in rows:
-            if len(re.findall("G\d+", row)) > 0:
+            if len(re.findall('G\d+', row)) > 0:
                 comm_num += 1
 
-            x_new = float(
-                    re_short("X\d+[,.]\d+", row, "X" + str(x), "X\d+")[1:]
-                )
-            y_new = float(
-                    re_short("Y\d+[,.]\d+", row, "Y" + str(y), "Y\d+")[1:]
-                )
-            z_new = float(
-                    re_short("Z\d+[,.]\d+", row, "Z" + str(z), "Z\d+")[1:]
-                )
+            x_new = float(re_short(x_regex, row, 'X' + str(x))[1:])
+            y_new = float(re_short(y_regex, row, 'Y' + str(y))[1:])
+            z_new = float(re_short(z_regex, row, 'Z' + str(z))[1:])
 
             # do the Pythagoras for me, baby
             filament_length += m.sqrt(
@@ -115,9 +113,9 @@ def pre_check_rapid_file(
             # and 'MoveJ Offs(pHome [...]'
             if ("Move" in row) and (" p" not in row):
                 comm_num += 1
-                x_new = float(re.findall("\d+\.\d+", row)[0])
-                y_new = float(re.findall("\d+\.\d+", row)[1])
-                z_new = float(re.findall("\d+\.\d+", row)[2])
+                x_new = float(re.findall('\d+\.\d+', row)[0])
+                y_new = float(re.findall('\d+\.\d+', row)[1])
+                z_new = float(re.findall('\d+\.\d+', row)[2])
 
                 # do the Pythagoras for me, baby
                 filament_length += m.sqrt(
@@ -138,9 +136,11 @@ def pre_check_rapid_file(
     return comm_num, filament_length, ''
 
 
-def re_short(regex:str, txt:str, default, fallback_regex=""):
-    """tries 2 regular expressions on expressions to match the txt,
-    returns first match found, returns default if no match occurs
+def re_short(regex:list, txt:str, default, find_coor=''):
+    """tries all given regular expressions to match the txt,
+    returns first match found, returns default if no match occurs;
+    sure you could game it out with regex, but this way is less
+    brain-hurty
     
     accepts:
         regex:
@@ -153,16 +153,26 @@ def re_short(regex:str, txt:str, default, fallback_regex=""):
             second RE to try if regex doesnt match
     """
 
-    ans = default
-    try:
-        ans = re.findall(regex, txt)[0]
+    # if only used to find GCode coordinates like 'X1.2', use this shortcut:
+    # regular expression for e.g. 'X1', 'X2.2' or 'X-3,3' with find_coor='X':
+    #   'X-?': 
+    #       matches 'X' and 'X-'
+    #   '\d+': 
+    #       matches any amount of consecutive decimal numbers
+    #   '[,.]?[\d+]?': 
+    #       matches any amount of fractional digits, indifferent to ',' or '.'
+    if find_coor != '':
+        regex = [find_coor + '-?\d+[,.]?[\d+]?']
+    
+    if not isinstance(regex, list):
+        raise ValueError
 
-    except IndexError:
-        if fallback_regex != "":
-            try:
-                ans = re.findall(fallback_regex, txt)[0]
-            except IndexError:
-                pass
+    ans = default
+    for curr_regex in regex:
+        try:
+            ans = re.findall(curr_regex, txt)[0]
+        except IndexError:
+            continue
 
     return ans
 
@@ -203,18 +213,18 @@ def gcode_to_qentry(
     if not isinstance(speed, du.SpeedVector):
         raise ValueError(f"{speed} is not an instance of SpeedVector!")
     
-    command = re_short("G\d+", txt, None, "^;")
+    command = re_short(['G\d+', '^;'], txt, None)
     if command is None:
         return None, ''
 
     # act according to GCode command
     match command:
 
-        case "G1":
+        case 'G1':
             entry = du.QEntry(id=0, Coor1=pos, Speed=speed, z=zone)
 
             # set position and speed
-            x = re_short("X\d+[,.]\d+", txt, pos.x, "X\d+")
+            x = re_short(None, txt, pos.x, find_coor='X')
             if x != pos.x:
                 entry.Coor1.x = float(x[1:].replace(",", "."))
                 entry.Coor1.x += zero.x
@@ -230,39 +240,39 @@ def gcode_to_qentry(
                 else:
                     entry.Coor1.ext = zero.ext
 
-            y = re_short("Y\d+[,.]\d+", txt, pos.y, "Y\d+")
+            y = re_short(None, txt, pos.y, find_coor='Y')
             if y != pos.y:
                 entry.Coor1.y = float(y[1:].replace(",", "."))
                 entry.Coor1.y += zero.y
 
-            z = re_short("Z\d+[,.]\d+", txt, pos.z, "Z\d+")
+            z = re_short(None, txt, pos.z, find_coor='Z')
             if z != pos.z:
                 entry.Coor1.z = float(z[1:].replace(",", "."))
                 entry.Coor1.z += zero.z
 
             # set tool angulation
-            rx = re_short("XR\d+[,.]\d+", txt, pos.rx, "XR\d+")
+            rx = re_short(None, txt, pos.rx, find_coor='XR')
             if rx != pos.rx:
                 entry.Coor1.rx = float(rx[1:].replace(",","."))
                 entry.Coor1.rx += zero.rx #to-do: check if running out of 0-359 crashes the robot
                 
-            ry = re_short("XR\d+[,.]\d+", txt, pos.ry, "XR\d+")
+            ry = re_short(None, txt, pos.ry, find_coor='YR')
             if ry != pos.ry:
                 entry.Coor1.ry = float(ry[1:].replace(",","."))
                 entry.Coor1.ry += zero.ry
                 
-            rz = re_short("XR\d+[,.]\d+", txt, pos.rz, "XR\d+")
+            rz = re_short(None, txt, pos.rz, find_coor='ZR')
             if rz != pos.rz:
                 entry.Coor1.rz = float(rz[1:].replace(",","."))
                 entry.Coor1.rz += zero.rz
 
             # set speed and external axis
-            fr = re_short("F\d+[,.]\d+", txt, speed.ts, "F\d+")
+            fr = re_short(['F\d+[,.]\d+', 'F\d+'], txt, speed.ts)
             if fr != speed.ts:
                 fr = float(fr[1:].replace(",", "."))
                 entry.Speed.ts = int(fr * du.IO_fr_to_ts)
 
-            ext = re_short("EXT\d+[,.]\d+", txt, pos.ext, "EXT\d+")
+            ext = re_short(None, txt, pos.ext, find_coor='EXT')
             if ext != pos.ext:
                 entry.Coor1.ext = float(ext[3:].replace(",", "."))
                 entry.Coor1.ext += zero.ext
@@ -270,7 +280,7 @@ def gcode_to_qentry(
             entry.Coor1 = round(entry.Coor1, 2)
 
             # set pump settings
-            pump = re.findall("P_([a-zA-Z]+)", txt)
+            pump = re.findall('P_([a-zA-Z]+)', txt)
             if pump:
                 pump = pump[0]
 
@@ -360,7 +370,7 @@ def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception: # to-do
     except IndexError:
         return None
     
-    ext = re_short("EXT:\d+\.\d+", txt, None, "EXT:\d+")
+    ext = re_short(None, txt, None, find_coor='EXT')
     if ext is None:
         return None # to-do: add missing value handler
     
@@ -410,7 +420,7 @@ def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception: # to-do
         entry.Speed.acr = int(res_speed[2])
         entry.Speed.dcr = int(res_speed[3])
 
-        zone = re_short("z\d+", txt, 10)
+        zone = re_short(['z\d+'], txt, du.IO_zone)
         entry.z = int(zone[1:])
 
         entry.Coor1 = round(entry.Coor1, 2)

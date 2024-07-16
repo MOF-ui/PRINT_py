@@ -7,10 +7,6 @@
 
 # General
 
-PyQT5-based python-ui to remote-control an ABB robot arm, mortar pumps,
-admixture pumps and DAQ devices in order to 3D print conrete/mortar
-on a large scale
-
 Hi! First of all: be careful with this program. Keep in mind, that it 
 controls a very large robot arm that can easily cause a lot of damage. 
 Also, I am not a programmer (nor is english my first language for that
@@ -78,9 +74,9 @@ start with `py .\PRINT.py`
 > start PRINT_py in local mode with `py .\PRINT.py local`
 
 Pumps are currently connected via COM port using a USB001Z-3 USB-to-Serial
-conversion unit. Both pumps are connected via Modbus, sharing the same bus
-and therefore the same COM port. Modbus adresses are '01' & '02'. There is 
-no testing environment for the pumps, yet.
+conversion unit. Both pumps are connected to this converter via Modbus, sharing
+the same bus and therefore the same COM port. Modbus adresses are '01' & '02'. 
+There is no testing environment for the pumps, yet.
 
 ## Robot communication syntax 
 
@@ -103,21 +99,21 @@ no testing environment for the pumps, yet.
 |   |       | **A** = axis 1 position [deg] |
 | 4 | FLOAT | **Y** or **A2** |
 | 4 | FLOAT | **Z** or **A3** |
-| 4 | FLOAT | **Q1**, **Rx** or **A4** |
+| 4 | FLOAT | **Q1**, **Rx** or **A4**: |
 |   |       | **Q1** = quaternion 1. dimension [-] |
-|   |       | **Rx** = rotation around `X` [deg] |
+|   |       | **Rx** = rotation around **X** [deg] |
 | 4 | FLOAT | **Q2**, **Ry** or **A5** |
 | 4 | FLOAT | **Q3**, **Rz** or **A6** |
 | 4 | FLOAT | **Q4** or **0** |
 | 4 | FLOAT | **EXT**: |
 |   |       | postion of external axis [mm] |
-| 4 | FLOAT | (2) **X** or **A1** |
-|   |       | second coordinate block for C-type movement |
+| 4 | FLOAT | (2) **X** or **A1**: |
+|   |       | (2) = second coordinate block for C-type movement |
 | 4 | FLOAT | (2) **Y** or **A2** |
 | 4 | FLOAT | (2) **Z** or **A3** |
-| 4 | FLOAT | (2) **Q1**, Rx or **A4** |
-| 4 | FLOAT | (2) **Q2**, Ry or **A5** |
-| 4 | FLOAT | (2) **Q3**, Rz or **A6** |
+| 4 | FLOAT | (2) **Q1**, **Rx** or **A4** |
+| 4 | FLOAT | (2) **Q2**, **Ry** or **A5** |
+| 4 | FLOAT | (2) **Q3**, **Rz** or **A6** |
 | 4 | FLOAT | (2) **Q4** or **0** |
 | 4 | FLOAT | (2) **EXT** |
 | 4 | INT | **ACR**: |
@@ -127,46 +123,46 @@ no testing environment for the pumps, yet.
 | 4 | INT | **TS**: |
 |   |     | transition speed [mm s<sup>-1</sup>] |
 | 4 | INT | **OS**: |
-|   |     | orientation speed [deg s<sup>-1</sup>s] |
+|   |     | orientation speed [deg s<sup>-1</sup>] |
 | 4 | INT | **SBT**: |
 |   |     | speed by time (if **SC** = `T`) [ms] |
-| 1 | CHAR | **SC** |
+| 1 | CHAR | **SC**: |
 |   |      | `V` = velocity dependent |
 |   |      | `T` = time-dependent |
-| 4 | INT | **Z** |
+| 4 | INT | **Z**: |
 |   |     | zone (destination accuracy) |
 | 4 | INT | **PAN_ID** |
-| 4 | INT | **PAN_STEPS** |
+| 4 | INT | **PAN_STEPS**: |
 |   |     | tool panning step-motor [-] |
 | 4 | INT | **FIB_DELIV_ID** |
-| 4 | INT | **FIB_DELIV_STEPS** |
+| 4 | INT | **FIB_DELIV_STEPS**: |
 |   |     | fiber delivery step-motor [-] |
 | 4 | INT | **MOR_PUMP_ID** |
-| 4 | INT | **MOR_PUMP_STEPS** |
+| 4 | INT | **MOR_PUMP_STEPS**: |
 |   |     | *not in use* |
 | 4 | INT | **PNMTC_CLAMP_ID** |
-| 4 | INT | **PNMTC_CLAMP_YN** |
+| 4 | INT | **PNMTC_CLAMP_YN**: |
 |   |     | pneumatic clamp on/off [0/1] |
 | 4 | INT | **KNIFE_POS_ID** |
-| 4 | INT | **KNIFE_POS_YN** |
+| 4 | INT | **KNIFE_POS_YN**: |
 |   |     | knife in cutting pos on/off [0/1] |
 | 4 | INT | **KNIFE_ID** |
-| 4 | INT | **KNIFE_YN** |
+| 4 | INT | **KNIFE_YN**: |
 |   |     | rotary knife on/off [0/1] |
 | 4 | INT | **PNMTC_FIBER_ID** |
-| 4 | INT | **PNMTC_FIBER_YN** |
+| 4 | INT | **PNMTC_FIBER_YN**: |
 |   |     | pneumatic fiber delivery system on/off [0/1] |
 | 4 | INT | **TIME_ID** |
-| 4 | INT | **TIME_TIME** |
+| 4 | INT | **TIME_TIME**: |
 |   |     | time [ms] |
 
 #### Position update
 
 | size [byte] | type | description |
 | ---- | ---- | ----------- |
-| 4 | FLOAT | **TCP_SPEED** |
+| 4 | FLOAT | **TCP_SPEED**: |
 |   |       | tool center point velocity [mm s<sup>-1</sup>] |
-| 1 | INT | **ID** |
+| 1 | INT | **ID**: |
 |   |     | current command ID being processed |
 | 4 | FLOAT | **X**: |
 |   |       | current position on global x-axis [mm] |
