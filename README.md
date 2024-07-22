@@ -21,43 +21,49 @@ of, though. You can write me issues, I'll see to them, if I find the time.
 >
 > #### c
 >
-> source codes for data access points and microcontrollers, everything written
-> in C or C++; platformIO projects for esp idf or Arduino using
-> OLIMEX ESP32-PoE-ISO
+>   * source codes for data access points and microcontrollers
+>   * everything written in C or C++ 
+>   * [PlatformIO](https://platformio.org/) projects for [esp-idf](https://github.com/espressif/esp-idf) or Arduino using [OLIMEX ESP32-PoE-ISO](https://github.com/OLIMEX/ESP32-POE-ISO)
 >
 > #### conv
 >
-> LabView VI for GCode to RAPID conversion, used for testing and in
-> hand mode operation
+>   * [LabView](https://www.ni.com/de.html) VI for GCode :arrow_right: RAPID conversion
+>   * used for testing and in hand mode operation
 >
 > #### gh
 >
-> (Grashopper) grasshopper scripts used to extract control points as list
-> or GCode from one or multiple Rhino3D curve objects either controlled
-> by minimum control points per degree of curviture (with or without
-> alternating curve seams) or with unidistance mode
+>   * grasshopper scripts used for conversion of:
+        - CAD object :arrow_right: GCode
+        - CAD object :arrow_right: RAPID
+        - CAD object :arrow_right: point list
+>   * uses one or multiple curve objects
+>   * solids or surfaces need to be sliced beforehand
+>   * conversion either controlled by minimum CP[^1] per curviture or fixed CP distance
+> [^1]: control points
 >
 > #### libs
 >
-> (libraries) actual software libraries for PRINT_py, libs with the "win" prefix
-> control the GUIs, TCP and COM interfaces are scripted in
-> threads.py
+>   * actual software libraries for PRINT_py
+>   * libs with the `win_` prefix for GUIs
+>   * TCP and COM interfaces are scripted in `threads.py`
 >
 > #### mtec 
 >
-> Modbus interface for mtec P20 & P50 (original by m-tec-com)
+>   * Modbus interface for mtec P20 & P50 mortar pumps 
+>   * modded version with custom return values and common serial interface
+>     for multipe pumps ([original module by m-tec](https://github.com/m-tec-com/m-tecConnectModbus))
 >
 > #### simCom
 >
-> (simulated communication) virtual robot used for simplified integration tests
+>   * virtual robot used for simplified integration tests
 > 
 > #### test
 >
-> unittests für most libs (:warning: not up-to-date)
+>   * unittests für most libs (:warning: not up-to-date)
 >
 > ### ui
 >
-> (user interfaces) Qt designer files and pyuic5 outputs
+>   * Qt designer files and pyuic5 outputs
 
 ## Scope
 
