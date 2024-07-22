@@ -25,6 +25,7 @@ class MtecMod:
         self.settings_serial_dataBits = serial.EIGHTBITS
         self.settings_serial_stopBits = serial.STOPBITS_TWO
         self.settings_serial_parity = serial.PARITY_NONE
+        self.settings_serial_port = 'COM3'
 
         self.temp_sendBuffer = []
         self.temp_valueBuffer = []
@@ -35,7 +36,7 @@ class MtecMod:
         self.connected = False
 
 
-    def connect(self) -> None:
+    def connect(self) -> bool:
         if not self.connected:
             if self.serial_default is None:
                 self.serial = serial.Serial(
@@ -43,13 +44,17 @@ class MtecMod:
                     parity=self.settings_serial_parity,
                     stopbits=self.settings_serial_stopBits,
                     bytesize=self.settings_serial_dataBits,
-                    port=self.serial_port,
+                    port=self.settings_serial_port,
                 )
             else:
                 self.serial = self.serial_default
-
+            
+            if self.frequency is None:
+                return False
+            
             self.connected = True
             self.temp_sendReady = True
+            return True
 
 
     def disconnect(self) -> None:
@@ -83,6 +88,8 @@ class MtecMod:
                 return command, self.temp_valueBuffer.pop()
             else:
                 return command, None
+        else:
+            return None, None
 
 
     def keepAlive(self):

@@ -52,6 +52,9 @@ if arg_len == 2:
         case 'local': 
             du.ROBTcp.ip = 'localhost'
             p_connect = (None, None)
+        case 'overwrite':
+            du.ROBTcp.ip = '192.168.125.1'
+            p_connect = (None, None)
         case _: 
             raise KeyError(f"{arg1} is not a valid argument for PRINT.py!")
 
@@ -61,7 +64,7 @@ elif arg_len > 2:
 
 ################################    SETUP    #################################
 
-if arg1 != 'local':
+if arg1 != 'local' and arg1 != 'overwrite':
     # ask user if default TCP (or USB) connection parameters are to be used,
     # otherwise set new ones
     cd_ret = conn_dialog(

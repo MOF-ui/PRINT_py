@@ -64,10 +64,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     _LastP1Telem = None
     _LastP2Telem = None
 
-    _RoboCommThread = QThread()
-    _PumpCommThread = QThread()
-    _LoadFileThread = QThread()
-    _SensorArrThread = QThread()
     _RoboCommWorker = None
     _PumpCommWorker = None
     _LoadFileWorker = None
@@ -142,6 +138,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.load_defaults(setup=True)
 
         self.log_entry('GNRL', 'init threading...')
+        self._RoboCommThread = QThread()
+        self._LoadFileThread = QThread()
+        self._PumpCommThread = QThread()
+        self._SensorArrThread = QThread()
         self.connect_threads('OTHER')
 
         # TESTRUN OPTION
@@ -556,9 +556,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 elem_group:list
         ) -> bool:
             if 'COM' in port:
-                fu.connect_pump(p_num)
-
-                if serial.connected:
+                if fu.connect_pump(p_num):
                     if not self._PumpCommThread.isRunning():
                         # restart if necessary; if so reconnect threads
                         self.connect_threads('PMP')
@@ -624,12 +622,17 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         else:
             log_txt = "user disconnected"
             
-        def safe_positions():
+        def safe_reset_positions():
             self.log_entry('SAFE', f"Last robot positions:")
             self.log_entry('SAFE', f"zero: {du.DCCurrZero}")
             self.log_entry('SAFE', f"curr: {du.ROBTelem.Coor}")
             self.log_entry('SAFE', f"rel: {du.ROBTelem.Coor - du.DCCurrZero}")
             self.log_entry('SAFE', f"last active ID was: {du.ROBTelem.id}")
+            Mutex.lock()
+            du.ROBCommQueue.clear()
+            du.ROB_send_list.clear()
+            Mutex.unlock()
+            self.switch_rob_moving(end=True)
 
         def p_disconnect(
                 serial:MtecMod,
@@ -660,18 +663,19 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                     return
                 
                 # send stop command to robot; stop threading & watchdog
-                du.ROBTcp.send(du.QEntry(id=1, mt="E"))
+                du.ROBTcp.send(du.QEntry(id=du.SC_curr_comm_id, mt="E"))
                 self.kill_watchdog("ROB")
                 self._RoboCommThread.quit()
                 du.ROBTcp.close()
 
+                # indicate to user
                 self.TCP_ROB_indi_connected.setStyleSheet(css)
                 for elem in self.ROB_group:
                     elem.setEnabled(False)
 
                 # safe data & wait for Thread:
                 self.log_entry("CONN", f"{log_txt} robot.")
-                safe_positions()
+                safe_reset_positions()
                 self._RoboCommThread.wait()
 
             case 'P1':
@@ -789,6 +793,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     ) -> None:
         """handle UI update after new command was send"""
 
+        write_buffer = command.print_short()
         if no_error:
             du.SC_curr_comm_id += num_send
 
@@ -799,10 +804,8 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             log_txt = "DC" if dc else 'SC'
             log_txt = f"{num_send} {log_txt} command(s) send"
-
-            self.log_entry("ROBO", log_txt)
             self.label_update_on_send(command)
-            write_buffer = command.print_short()
+            self.log_entry("ROBO", log_txt)
 
         else:
             self.log_entry(
@@ -1539,11 +1542,20 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         with the robot, should happen only with on-the-fly restarts,
         theoretically
         """
+        
+        if du.DC_rob_moving:
+            return
+        id_dist = (du.ROBTelem.id + 1) - du.SC_curr_comm_id
+        
+        Mutex.lock()
+        du.SC_curr_comm_id = du.ROBTelem.id + 1
+        du.SCQueue.increment(id_dist)
+        Mutex.unlock()
 
-        self.mutex_setattr(du, 'SC_curr_comm_id', du.ROBTelem.id + 1)
         self.label_update_on_receive(
             data_string=self.TCP_ROB_disp_readBuffer.text()
         )
+        self.log_entry('GNRL', f"User overwrote current comm ID to {du.SC_curr_comm_id}.")
 
 
     def start_SCTRL_queue(self) -> None:
@@ -2071,21 +2083,17 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         if fs_warning.result():
             self.stop_SCTRL_queue()
-            self.send_command(Command, dc=True)
+            du.ROBTcp.send(Command) # bypass all queued commands
 
             Mutex.lock()
-
             LostBuf = copy.deepcopy(du.ROBCommQueue)
-
             for Entry in du.ROB_send_list:
                 if Entry[0].mt != "S":
                     LostBuf.append(Entry[0])
-
             du.SC_curr_comm_id = du.ROBTelem.id
             du.SCQueue = LostBuf + du.SCQueue
             du.ROBCommQueue.clear()
             du.ROB_send_list.clear()
-
             Mutex.unlock()
 
             self.label_update_on_queue_change()

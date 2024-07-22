@@ -105,13 +105,13 @@ class ConnDialog(QDialog, Ui_ConnDialog):
 
         if rob_def is None or pump1_def is None or pump2_def is None:
             self.close()
-
         else:
             self.def_rob_tcp = rob_def
             self.def_pump1_tcp = pump1_def
             self.def_pump2_tcp = pump2_def
             self.set_default()
             self.TCP_btt_default.pressed.connect(self.set_default)
+            self.buttonBox.accepted.connect(self.safe_settings)
 
     def set_default(self) -> None:
         self.TCP_ROB_entry_ip.setText(str(self.def_rob_tcp["IP"]))
@@ -132,7 +132,7 @@ class ConnDialog(QDialog, Ui_ConnDialog):
         self.TCP_PUMP2_num_bytesToRead.setValue(int(self.def_pump2_tcp["R_BL"]))
         self.TCP_PUMP2_num_tio_rw.setValue(int(self.def_pump2_tcp["RW_TOUT"]))
 
-    def closeEvent(self, event) -> None:
+    def safe_settings(self) -> None:
         self.set_rob_tcp = {}
         self.set_pump1_tcp = {}
         self.set_pump2_tcp = {}
@@ -160,8 +160,7 @@ class ConnDialog(QDialog, Ui_ConnDialog):
         self.set_pump2_tcp["R_BL"] = self.TCP_PUMP2_num_bytesToRead.value()
         self.set_pump2_tcp["RW_TOUT"] = self.TCP_PUMP2_num_tio_rw.value() / 1000
         self.set_pump2_tcp["W_BL"] = self.def_pump2_tcp["W_BL"]
-        
-        event.accept()
+
 
 
 

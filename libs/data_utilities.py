@@ -827,13 +827,13 @@ class Queue:
         return ["Queue is empty!"]
 
 
-    def increment(self) -> None:
+    def increment(self, summand=1) -> None:
         """increments all QEntry.ID to handle DC commands send before the
         queue
         """
 
         for i in self._queue:
-            i.id += 1
+            i.id += summand
 
 
     def add(self, entry, thread_call=False) -> None | Exception:
@@ -1708,7 +1708,6 @@ class RobConnection(TCPIP):
         Telem.Coor.ry = struct.unpack("<f", data[24:28])[0]
         Telem.Coor.rz = struct.unpack("<f", data[28:32])[0]
         Telem.Coor.ext = struct.unpack("<f", data[32:36])[0]
-
         return Telem, data
 
 

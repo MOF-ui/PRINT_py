@@ -302,8 +302,8 @@ class RoboCommWorker(QObject):
                     if check_dist < 1:
                         self.endDcMoving.emit()
 
-        # inform user if error occured in websocket connection
-        else:
+        # inform user if error occured in websocket connection (ignore timeouts)
+        elif not isinstance(Telem, TimeoutError):
             err_txt = f"ERROR from ROBTcp ({Telem}), raw data: {raw_data}"
             self.logEntry.emit('RTel', err_txt)
             Mutex.lock()
@@ -354,13 +354,11 @@ class RoboCommWorker(QObject):
         check if sending was successful each time
         """
 
-        num_to_send = len(du.ROB_send_list)
         num_send = 0
 
         # send commands until send_list is empty
-        while num_to_send > 0:
+        while len(du.ROB_send_list) > 0:
             comm_tuple = du.ROB_send_list.pop(0)
-            num_to_send = len(du.ROB_send_list)
             Command = comm_tuple[0]
             direct_ctrl = comm_tuple[1]
 
@@ -396,12 +394,15 @@ class RoboCommWorker(QObject):
                 if direct_ctrl:
                     du.SCQueue.increment()
                 Mutex.unlock()
+
+                self.logEntry.emit('ROBO', f"send: {Command}")
+
             else:
                 print(f" Message Error: {msg_len}")
                 self.sendElem.emit(Command, False, msg_len, direct_ctrl)
         
             # inform mainframe if command block was send successfully 
-            if num_to_send == 0:
+            if len(du.ROB_send_list) == 0:
                 self.sendElem.emit(Command, res, num_send, direct_ctrl)
 
 

@@ -226,7 +226,7 @@ def gcode_to_qentry(
             # set position and speed
             x = re_short(None, txt, pos.x, find_coor='X')
             if x != pos.x:
-                entry.Coor1.x = float(x[1:].replace(",", "."))
+                entry.Coor1.x = float(x[1:].replace(',', '.'))
                 entry.Coor1.x += zero.x
 
                 # calculate following position of external axis
