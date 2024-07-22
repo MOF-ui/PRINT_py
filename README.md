@@ -19,6 +19,17 @@ of, though. You can write me issues, I'll see to them, if I find the time.
 
 > [!NOTE]
 >
+> #### c
+>
+> source codes for data access points and microcontrollers, everything written
+> in C or C++; platformIO projects for esp idf or Arduino using
+> OLIMEX ESP32-PoE-ISO
+>
+> #### conv
+>
+> LabView VI for GCode to RAPID conversion, used for testing and in
+> hand mode operation
+>
 > #### gh
 >
 > (Grashopper) grasshopper scripts used to extract control points as list
