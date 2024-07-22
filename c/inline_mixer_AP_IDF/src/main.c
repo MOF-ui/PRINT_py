@@ -1,8 +1,6 @@
 /* 
 following examples from
-    espressif: http_server, ethernet_example
-    OLIMEX: ESP32_PoE_Ethernet_IDFv5.3
-    David Antliff: ds18b20_example
+    danak6jq: https://github.com/danak6jq/ESP32-WSPR
 */
 
 #include <stdio.h>
@@ -22,11 +20,13 @@ following examples from
 #include "esp_http_server.h"
 
 #include "driver\gpio.h"
+#include "driver\i2c.h"
 
+#include "si5351.h"
 #include "sdkconfig.h"
 
-#define GPIO_DS18B20_0      4
-#define DS18B20_RESOLUTION  DS18B20_RESOLUTION_12_BIT
+#define I2C_MASTER_SCL_IO   16      // siehe https://github.com/OLIMEX/ESP32-POE-ISO/blob/master/HARDWARE/ESP32-PoE-ISO-Rev.K/ESP32-PoE-ISO_Rev_K.pdf
+#define I2C_MASTER_SDA_IO   13
 #define SAMPLE_PERIOD       5000   // milliseconds
 #define BACKLOG_SIZE        1000
 #define DAQB_STR_SIZE       25
@@ -50,11 +50,136 @@ static const struct daq_block g_EMPTY_DAQ_BLOCK = {0};
 
 static TickType_t g_ticks_last_req = 0;
 
+static uint64_t g_step_freq = 0;
+
+
+
+/* --------------------------------- SI5351A ------------------------------ */
+
+static esp_err_t i2c_master_init() 
+{
+    int i2C_master_port = I2C_NUM_1;
+    i2c_config_t i2c_cfg;
+
+    i2c_cfg.mode = I2C_MODE_MASTER;
+    i2c_cfg.sda_io_num = I2C_MASTER_SDA_IO;
+    i2c_cfg.sda_pullup_en = 0;
+    i2c_cfg.scl_io_num = I2C_MASTER_SCL_IO;
+    i2c_cfg.scl_pullup_en = 0;
+    i2c_cfg.clk_flags = 0;
+    i2c_cfg.master.clk_speed = 400000;
+    i2c_cfg.clk_flags = 0;
+    
+    ESP_ERROR_CHECK(i2c_driver_install(i2C_master_port, i2c_cfg.mode, 0, 0, 0));
+    ESP_ERROR_CHECK(i2c_param_config(i2C_master_port, &i2c_cfg));
+
+    return (ESP_OK);
+}
+
+/*int si5351_write_xfer(uint8_t reg, uint8_t *data, int count)
+{
+    int ret;
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, SI5351_BUS_BASE_ADDR << 1, true);
+    i2c_master_write_byte(cmd, reg, true);
+    i2c_master_write(cmd, data, count, true);
+    i2c_master_stop(cmd);
+
+    ret = i2c_master_cmd_begin(I2C_NUM_1, cmd, 1000 / portTICK_PERIOD_MS);
+    i2c_cmd_link_delete(cmd);
+    return (ret);
+}
+
+int si5351_read_xfer(uint8_t reg, uint8_t *data, int count)
+{
+    int ret;
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+
+    i2c_master_start(cmd);
+    i2c_master_write_byte(
+        cmd,
+        (SI5351_BUS_BASE_ADDR << 1) | I2C_MASTER_WRITE,
+        true
+    );
+    i2c_master_write_byte(cmd, reg, 1);
+    i2c_master_stop(cmd);
+
+    ret = i2c_master_cmd_begin(I2C_NUM_1, cmd, 1000 / portTICK_PERIOD_MS);
+    i2c_cmd_link_delete(cmd);
+    if (ret != ESP_OK) {
+	    return (ret);
+    }
+
+    cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(
+        cmd,
+        (SI5351_BUS_BASE_ADDR << 1) | I2C_MASTER_READ,
+        true
+    );
+    i2c_master_read(cmd, data, count, 2);
+    i2c_master_stop(cmd);
+
+    ret = i2c_master_cmd_begin(I2C_NUM_1, cmd, 1000 / portTICK_PERIOD_MS);
+    i2c_cmd_link_delete(cmd);
+    return (ret);
+}
+
+void si5351_write_byte(uint8_t reg, uint8_t val)
+{
+	si5351_write_xfer(reg, &val, 1);
+}
+
+uint8_t si5351_read_byte(uint8_t reg)
+{
+	uint8_t data = 0;
+
+	(void) si5351_read_xfer(reg, &data, 1);
+	return (data);
+}
+
+void si5351_start(enum si5351_clock clk, int64_t freq)
+{
+
+	(void) si5351_set_freq(freq, clk);
+	si5351_output_enable(clk, 0);
+	si5351_drive_strength(clk, SI5351_DRIVE_8MA);
+}*/
+
+void si5351_main()
+{
+    i2c_master_init();
+    si5351_init(SI5351_CRYSTAL_LOAD_10PF, CONFIG_XTAL_FREQ, 175310);
+    si5351_set_freq(g_step_freq, SI5351_CLK0);
+    si5351_drive_strength(SI5351_CRYSTAL_LOAD_10PF, SI5351_DRIVE_8MA);
+
+    uint64_t old_freq = 0;
+    while (true) {
+
+        if (old_freq != g_step_freq) {
+
+            xSemaphoreTake(xMutex, portMAX_DELAY);
+            if (g_step_freq == 0) {
+                si5351_output_enable(SI5351_CLK0, 0);
+
+            } else {
+                si5351_set_freq(g_step_freq, SI5351_CLK0);
+                si5351_output_enable(SI5351_CLK0, 1);
+            }
+            old_freq = g_step_freq;
+            xSemaphoreGive(xMutex);
+
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+    }
+}
 
 /* --------------------------------- DAQ2STR ------------------------------ */
 
 // sz_ret for string-zero (\0 terminated) return
-void daq2str(
+static void daq2str(
         struct daq_block *daqb,
         char *sz_ret,
         int buff_len,
@@ -160,7 +285,7 @@ static esp_err_t data_request(httpd_req_t *req)
 }
 
 static const httpd_uri_t data_req = {
-    .uri       = "/temp",
+    .uri       = "/test",
     .method    = HTTP_GET,
     .handler   = data_request,
     .user_ctx  = NULL,
