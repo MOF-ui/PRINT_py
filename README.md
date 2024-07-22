@@ -33,9 +33,9 @@ of, though. You can write me issues, I'll see to them, if I find the time.
 > #### gh
 >
 >   * grasshopper scripts used for conversion of:
-        - CAD object :arrow_right: GCode
-        - CAD object :arrow_right: RAPID
-        - CAD object :arrow_right: point list
+>       * CAD object :arrow_right: GCode
+>       * CAD object :arrow_right: RAPID
+>       * CAD object :arrow_right: point list
 >   * uses one or multiple curve objects
 >   * solids or surfaces need to be sliced beforehand
 >   * conversion either controlled by minimum CP[^1] per curviture or fixed CP distance
