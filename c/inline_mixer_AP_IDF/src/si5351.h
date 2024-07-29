@@ -1,7 +1,7 @@
 /*
  * si5351.h - Si5351 library for Arduino
  *
- * Copyright (C) 2015 - 2016 Jason Milldrum <milldrum@gmail.com>
+ * Copyright (C) 2015 - 2019 Jason Milldrum <milldrum@gmail.com>
  *                           Dana H. Myers <k6jq@comcast.net>
  *
  * Many defines derived from clk-si5351.h in the Linux kernel.
@@ -29,9 +29,10 @@
 #ifndef SI5351_H_
 #define SI5351_H_
 
-//#include "Arduino.h"
-//#include "Wire.h"
 #include <stdint.h>
+#include <stdio.h>
+#include "esp_log.h"
+#include "driver/i2c.h"
 
 /* Define definitions */
 
@@ -276,35 +277,38 @@ struct Si5351IntStatus
 	uint8_t LOS_STKY;
 };
 
-bool si5351_init(uint8_t, uint32_t, int32_t);
-void si5351_reset(void);
-uint8_t si5351_set_freq(uint64_t, enum si5351_clock);
-uint8_t si5351_set_freq_manual(uint64_t, uint64_t, enum si5351_clock);
-void si5351_set_pll(uint64_t, enum si5351_pll);
-void si5351_set_ms(enum si5351_clock, struct Si5351RegSet, uint8_t, uint8_t, uint8_t);
-void si5351_output_enable(enum si5351_clock, uint8_t);
-void si5351_drive_strength(enum si5351_clock, enum si5351_drive);
-void si5351_update_status(void);
-void si5351_set_correction(int32_t, enum si5351_pll_input);
-void si5351_set_phase(enum si5351_clock, uint8_t);
-int32_t si5351_get_correction(enum si5351_pll_input);
-void si5351_pll_reset(enum si5351_pll);
-void si5351_set_ms_source(enum si5351_clock, enum si5351_pll);
-void si5351_set_int(enum si5351_clock, uint8_t);
-void si5351_set_clock_pwr(enum si5351_clock, uint8_t);
-void si5351_set_clock_invert(enum si5351_clock, uint8_t);
-void si5351_set_clock_source(enum si5351_clock, enum si5351_clock_source);
-void si5351_set_clock_disable(enum si5351_clock, enum si5351_clock_disable);
-void si5351_set_clock_fanout(enum si5351_clock_fanout, uint8_t);
-void si5351_set_pll_input(enum si5351_pll, enum si5351_pll_input);
-void si5351_set_vcxo(uint64_t, uint8_t);
-void si5351_set_ref_freq(uint32_t, enum si5351_pll_input);
+class Si5351
+{
+public:
+	Si5351(uint8_t i2c_addr = SI5351_BUS_BASE_ADDR);
 
-uint8_t si5351_write_bulk(uint8_t, uint8_t, uint8_t *);
-uint8_t si5351_write(uint8_t, uint8_t);
-uint8_t si5351_read(uint8_t);
+	bool init(i2c_port_t i2c_num, uint8_t, uint32_t, int32_t);
+	void reset(void);
+	uint8_t set_freq(uint64_t, enum si5351_clock);
+	uint8_t set_freq_manual(uint64_t, uint64_t, enum si5351_clock);
+	void set_pll(uint64_t, enum si5351_pll);
+	void set_ms(enum si5351_clock, struct Si5351RegSet, uint8_t, uint8_t, uint8_t);
+	void output_enable(enum si5351_clock, uint8_t);
+	void drive_strength(enum si5351_clock, enum si5351_drive);
+	void update_status(void);
+	void set_correction(int32_t, enum si5351_pll_input);
+	void set_phase(enum si5351_clock, uint8_t);
+	int32_t get_correction(enum si5351_pll_input);
+	void pll_reset(enum si5351_pll);
+	void set_ms_source(enum si5351_clock, enum si5351_pll);
+	void set_int(enum si5351_clock, uint8_t);
+	void set_clock_pwr(enum si5351_clock, uint8_t);
+	void set_clock_invert(enum si5351_clock, uint8_t);
+	void set_clock_source(enum si5351_clock, enum si5351_clock_source);
+	void set_clock_disable(enum si5351_clock, enum si5351_clock_disable);
+	void set_clock_fanout(enum si5351_clock_fanout, uint8_t);
+	void set_pll_input(enum si5351_pll, enum si5351_pll_input);
+	void set_vcxo(uint64_t, uint8_t);
+  void set_ref_freq(uint32_t, enum si5351_pll_input);
 
-#if 0
+	uint8_t si5351_write_bulk(uint8_t, uint8_t, uint8_t *);
+	uint8_t si5351_write(uint8_t, uint8_t);
+	uint8_t si5351_read(uint8_t);
 	struct Si5351Status dev_status = {.SYS_INIT = 0, .LOL_B = 0, .LOL_A = 0,
     .LOS = 0, .REVID = 0};
 	struct Si5351IntStatus dev_int_status = {.SYS_INIT_STKY = 0, .LOL_B_STKY = 0,
@@ -317,11 +321,20 @@ uint8_t si5351_read(uint8_t);
   enum si5351_pll_input pllb_ref_osc;
 	uint32_t xtal_freq[2];
 private:
-#endif
+	uint64_t pll_calc(enum si5351_pll, uint64_t, struct Si5351RegSet *, int32_t, uint8_t);
+	uint64_t multisynth_calc(uint64_t, uint64_t, struct Si5351RegSet *);
+	uint64_t multisynth67_calc(uint64_t, uint64_t, struct Si5351RegSet *);
+	void update_sys_status(struct Si5351Status *);
+	void update_int_status(struct Si5351IntStatus *);
+	void ms_div(enum si5351_clock, uint8_t, uint8_t);
+	uint8_t select_r_div(uint64_t *);
+	uint8_t select_r_div_ms67(uint64_t *);
+	int32_t ref_correction[2];
+  uint8_t clkin_div;
+  uint8_t i2c_bus_addr;
+  bool clk_first_set[8];
 
-int si5351_write_xfer(uint8_t, uint8_t *, int);
-int si5351_read_xfer(uint8_t, uint8_t *, int);
-void si5351_write_byte(uint8_t, uint8_t);
-uint8_t si5351_read_byte(uint8_t);
+  i2c_port_t _i2c_num;
+};
 
 #endif /* SI5351_H_ */

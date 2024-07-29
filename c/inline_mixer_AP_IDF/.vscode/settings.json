@@ -2,6 +2,19 @@
     "cmake.configureOnOpen": false,
     "files.associations": {
         "stdio.h": "c",
-        "nvs_flash.h": "c"
+        "nvs_flash.h": "c",
+        "string.h": "c",
+        "param.h": "c",
+        "si5351.h": "c",
+        "esp_log.h": "c",
+        "esp_http_server.h": "c",
+        "semphr.h": "c",
+        "socket.h": "c",
+        "freertos.h": "c",
+        "sdkconfig.h": "c",
+        "esp_event.h": "c",
+        "uri_handlers.h": "c",
+        "task.h": "c",
+        "esp_netif.h": "c"
     }
 }

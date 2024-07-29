@@ -107,29 +107,6 @@ void WiFiEvent(WiFiEvent_t event)
   }
 }
 
-// Try to read something from a webserver:
-void testClient(const char * host, uint16_t port)
-{
-  Serial.print("\nConnecting to ");
-  Serial.print(host);
-  Serial.print(":");
-  Serial.println(port);
-
-  WiFiClient client;
-  if (!client.connect(host, port)) {
-    Serial.println("connection failed");
-    return;
-  }
-  client.printf("GET / HTTP/1.1\r\nHost: %s\r\n\r\n", host);
-  while (client.connected() && !client.available());
-  while (client.available()) {
-    Serial.write(client.read());
-  }
-
-  Serial.println("closing connection\n");
-  client.stop();
-}
-
 // Initializing everything at start up / after reset:
 void setup()
 {
@@ -177,4 +154,48 @@ void loop ()
 {
   server.handleClient();
   delay(2);//allow the cpu to switch to other tasks
+}//*/
+
+
+/*#include <Arduino.h>
+#include <Adafruit_SI5351.h>
+
+Adafruit_SI5351 clockgen = Adafruit_SI5351();
+
+void setup(void)
+{
+  Serial.begin(115200);
+  Serial.println("Si5351 Clockgen Test"); Serial.println("");
+
+  ///Initialise the sensor
+  if (clockgen.begin() != ERROR_NONE)
+  {
+
+    Serial.print("Ooops, no Si5351 detected ... Check your wiring or I2C ADDR!");
+    while(1);
+  }
+
+  Serial.println("OK!");
+
+
+  Serial.println("Set PLLA to 900MHz");
+  clockgen.setupPLLInt(SI5351_PLL_A, 15);
+  Serial.println("Set Output #0 to 112.5MHz");
+  clockgen.setupMultisynthInt(0, SI5351_PLL_A, SI5351_MULTISYNTH_DIV_8);
+
+  clockgen.setupPLL(SI5351_PLL_B, 24, 2, 3);
+  Serial.println("Set Output #1 to 13.553115MHz");
+  clockgen.setupMultisynth(1, SI5351_PLL_B, 45, 1, 2);
+
+
+  Serial.println("Set Output #2 to 10.706 KHz");
+  clockgen.setupMultisynth(2, SI5351_PLL_B, 200, 0, 1);
+  clockgen.setupRdiv(2, SI5351_R_DIV_16);
+
+  clockgen.enableOutputs(true);
 }
+
+
+void loop(void)
+{
+}*/
