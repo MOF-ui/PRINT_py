@@ -148,6 +148,26 @@ esp_err_t data_request(httpd_req_t *req)
     return ESP_OK;
 }
 
+esp_err_t ping_request(httpd_req_t *req)
+{
+    // get client IP
+    int sockfd = httpd_req_to_sockfd(req);
+    char ipstr[INET6_ADDRSTRLEN];
+    struct sockaddr_in6 addr; // esp_http_server uses IPv6 addressing
+    socklen_t addr_size = sizeof(addr);
+    getpeername(sockfd, (struct sockaddr *)&addr, &addr_size);
+    
+    // convert to IPv6 string
+    inet_ntop(AF_INET6, &addr.sin6_addr, ipstr, sizeof(ipstr));
+    ESP_LOGI(g_URI_TAG, "ping request from: %s", ipstr);
+    
+    // set answering header
+    httpd_resp_set_hdr(req, "Allow", "GET");
+    
+    httpd_resp_send(req, "ack", HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
 // HTTP POST HANDLER
 esp_err_t freq_post(httpd_req_t *req)
 {
@@ -186,6 +206,9 @@ esp_err_t freq_post(httpd_req_t *req)
     asprintf(&resp, "RECV%f", g_motor_rpm);
     xSemaphoreGive(g_MUTEX);
     
+    // set response header
+    httpd_resp_set_hdr(req, "Allow", "POST");
+
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }

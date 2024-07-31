@@ -57,6 +57,7 @@ void daq2str(
 );
 esp_err_t freq_post(httpd_req_t *req);
 esp_err_t data_request(httpd_req_t *req);
+esp_err_t ping_request(httpd_req_t *req);
 esp_err_t http_400_handler(httpd_req_t *req, httpd_err_code_t err);
 esp_err_t http_404_handler(httpd_req_t *req, httpd_err_code_t err);
 esp_err_t http_405_handler(httpd_req_t *req, httpd_err_code_t err);
@@ -66,6 +67,13 @@ static const httpd_uri_t data_req = {
     .uri       = "/test",
     .method    = HTTP_GET,
     .handler   = data_request,
+    .user_ctx  = NULL,
+};
+
+static const httpd_uri_t data_req = {
+    .uri       = "/ping",
+    .method    = HTTP_GET,
+    .handler   = ping_request,
     .user_ctx  = NULL,
 };
 

@@ -1752,8 +1752,8 @@ class RobConnection(TCPIP):
 # wont be user setable for safety reasons, it can only be changed here, but 
 # only if you know what your doing!)
 DEF_TCP_MIXER = {
-    "IP": "193.0.0.1",
-    "PORT": "3000",
+    "IP": "192.168.178.36",
+    "PORT": "17",
     "C_TOUT": 10000,
     "RW_TOUT": 10,
     "R_BL": 4,
