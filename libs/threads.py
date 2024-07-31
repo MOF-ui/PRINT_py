@@ -51,8 +51,7 @@ class PumpCommWorker(QObject):
 
         self.LoopTimer = QTimer()
         self.LoopTimer.setInterval(250)
-        self.LoopTimer.timeout.connect(self.send)
-        self.LoopTimer.timeout.connect(self.receive)
+        self.LoopTimer.timeout.connect(self.active_state)
         self.LoopTimer.start()
 
         self.logEntry.emit('THRT','PumpComm thread running.')
@@ -63,7 +62,21 @@ class PumpCommWorker(QObject):
 
         self.LoopTimer.stop()
         self.LoopTimer.deleteLater()
+    
+    def active_state(self):
+        """extra function needed to set global indicator 'PMP_comm_active'
+        with is checked in win_mainframe.disconnect_tcp"""
 
+        Mutex.lock()
+        du.PMP_comm_active = True
+        Mutex.unlock()
+
+        self.send()
+        self.receive()
+        
+        Mutex.lock()
+        du.PMP_comm_active = False
+        Mutex.unlock()
 
     def send(self) -> None:
         """send pump speed to pump, uses modified setter in mtec's script 
@@ -93,7 +106,7 @@ class PumpCommWorker(QObject):
             user_speed = getattr(du, du_user_speed)
             if user_speed != -999:
                 locals()[calc_speed] = user_speed
-                setattr(du, setattr, -999)
+                setattr(du, du_user_speed, -999)
         
         # send to P1 and P2 & keepAlive both
         for serial, speed, live_ad, speed_global, p_num in [
@@ -102,13 +115,8 @@ class PumpCommWorker(QObject):
         ]:
             if serial.connected and speed is not None:
                 res = serial.set_speed(int(speed * getattr(du, live_ad)))
-                if res is None:
-                    self.connLost.emit(p_num, True)
-                    self.logEntry.emit(
-                        'PMP ',
-                        f"Error on send, Connection to {p_num} lost!"
-                    )
-                else:
+                
+                if res is not None:
                     Mutex.lock()
                     setattr(du, speed_global, speed)
                     Mutex.unlock()
@@ -136,6 +144,10 @@ class PumpCommWorker(QObject):
         """request data updates for frequency, voltage, current and torque
         from pump, pass to mainframe
         """
+
+        # for serial,dummy in [(du.PMP1Serial, None),(du.PMP2Serial, None)]:
+        #     if serial.connected:
+        #         print(f"P2 freq: {serial.frequency}")
 
         # RECEIVE FROM PUMPS:
         for serial, last_telem, speed_global, stt_attr, p_num in [

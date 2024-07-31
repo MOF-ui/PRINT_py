@@ -511,15 +511,13 @@ def connect_pump(p_num:int) -> None:
 
     match p_num:
         case "P1":
-            du.PMP1Serial.connect()
+            ret = du.PMP1Serial.connect()
         case "P2":
-            du.PMP2Serial.connect()
+            ret = du.PMP2Serial.connect()
         case _:
             raise ValueError(f"wrong pNum given: {p_num}")
     
-    # TO-DO: Check if connection was really established, or grab info from error messages
-    
-    return None
+    return ret
 
 
 def calc_pump_ratio(p1_speed:int, p2_speed:int) -> tuple[float, float]:

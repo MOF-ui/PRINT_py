@@ -1,16 +1,32 @@
 
 ############################     IMPORTS     ################################
+import os
+import sys
 
 from mtec_mod import MtecMod
 from threading import Timer
 
+# appending the parent directory path
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
+import libs.data_utilities as du
 
 ############################     METHODS     ################################
 
 def connect():
     # pump.serial_port = '/dev/cu.usbmodem1431201'
-    pump.serial_port = "COM3"
-    pump.connect()
+    pump.settings_serial_port = "COM3"
+    serial_def_bus=du.serial.Serial(
+        baudrate=du.DEF_SERIAL_PUMP["BR"],
+        parity=du.DEF_SERIAL_PUMP["P"],
+        stopbits=du.DEF_SERIAL_PUMP["SB"],
+        bytesize=du.DEF_SERIAL_PUMP["BS"],
+        port=du.DEF_SERIAL_PUMP["PORT"],
+    )
+    pump.serial_default = serial_def_bus
+    print(pump.connect())
     KeepAliveTmr.start()
 
 

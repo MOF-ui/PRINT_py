@@ -13,6 +13,7 @@ import os
 import re
 import sys
 import copy
+import time
 from pathlib import Path
 from datetime import datetime
 
@@ -644,6 +645,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             if not serial.connected:
                 return
             
+            # finish communication first
+            while du.PMP_comm_active:
+                time.sleep(0.005)
+
             if 'COM' in port:
                 self.kill_watchdog(p_num)
                 serial.disconnect()
@@ -1088,7 +1093,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 self._P1RecvWd.deleteLater()
             case 'P2':
                 self._P2RecvWd.stop()
-                self._P2RecvWd.deleteLater()
+                # self._P2RecvWd.deleteLater()
             case 'MIX':
                 self._MixRecvWd.stop()
                 self._MixRecvWd.deleteLater()
