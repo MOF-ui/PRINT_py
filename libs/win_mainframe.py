@@ -14,6 +14,7 @@ import re
 import sys
 import copy
 import time
+import requests
 from pathlib import Path
 from datetime import datetime
 
@@ -393,6 +394,16 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.DC_lbl_ext,
         ]
 
+        self.MIX_group = [
+            self.MIX_btt_actWithPump,
+            self.MIX_btt_setSpeed,
+            self.MIX_disp_currSpeed,
+            self.MIX_num_setSpeed,
+            self.MIX_sld_speed,
+        ]
+        for elem in self.MIX_group:
+            elem.setEnable(False)
+
         self.NC_group = [
             self.NC_btt_xyzSend,
             self.NC_btt_xyzExtSend,
@@ -517,10 +528,19 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         maybe more functionality later
         """
 
-        css = "border-radius: 25px; background-color: #00aaff;"
-        
+        def action_on_success(indi:object, elem_group:list, log_txt='') -> None:
+            self.set_watchdog(slot)
+            self.self.log_entry('CONN', log_txt)
+            css = "border-radius: 25px; background-color: #00aaff;"
+            indi.setStyleSheet(css)
+            for elem in elem_group:
+                elem.setEnabled(True)
+
+        # ROBOT CONNECTION
         def rob_connect() -> bool:
-            res  = du.ROBTcp.connect()
+            ip = du.ROBTcp.ip
+            port = du.ROBTcp.port
+            res = du.ROBTcp.connect()
 
             if isinstance(res, tuple):
                 # if successful, start threading and watchdog
@@ -529,58 +549,79 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                     self.connect_threads(slot)
                     self._RoboCommThread.start()
 
-                self.set_watchdog(slot)
-                self.log_entry(
-                    'CONN',
-                    f"connected to {du.ROBTcp.ip} at {du.ROBTcp.port}."
+                action_on_success(
+                    self.TCP_ROB_indi_connected,
+                    self.ROB_group,
+                    f"connected to {ip} at {port}.",
                 )
-                self.TCP_ROB_indi_connected.setStyleSheet(css)
-                for elem in self.ROB_group:
-                    elem.setEnabled(True)
                 return True
             
-            elif res == TimeoutError:
-                log_txt = f"timeout connecting {du.ROBTcp.ip}:{du.ROBTcp.port}."
-            elif res == ConnectionRefusedError:
-                log_txt = f"{du.ROBTcp.ip}:{du.ROBTcp.port} refused connection."
             else:
-                log_txt = f"failed to connect {du.ROBTcp.ip}:{du.ROBTcp.port}!"
-            
-            self.log_entry('CONN', log_txt)
-            return False
-            
+                log_txt = f"failed to connect {ip}:{port} ({res})!"
+                self.log_entry('CONN', log_txt)
+                return False
+        
+        # PUMP CONNECTION
         def pmp_connect(
                 serial:MtecMod,
                 port:str,
-                p_num:str,
                 indi,
                 elem_group:list
         ) -> bool:
-            if 'COM' in port:
-                if fu.connect_pump(p_num):
+            if not 'COM' in port:                
+                raise ConnectionError("TCP not supported, yet")
+            
+            else:
+                if fu.connect_pump(slot):
                     if not self._PumpCommThread.isRunning():
                         # restart if necessary; if so reconnect threads
                         self.connect_threads('PMP')
                         self._PumpCommThread.start()
                     
-                    self.log_entry(
-                        'CONN',
-                        f"connected to {p_num} as inverter "
-                        f"{serial.settings_inverter_id} at {port}"
+                    action_on_success(
+                        indi,
+                        elem_group,
+                        f"connected to {slot} as inverter "
+                        f"{serial.settings_inverter_id} at {port}",
                     )
-                    self.set_watchdog(p_num)
-                    indi.setStyleSheet(css)
-                    for elem in elem_group:
-                        elem.setEnabled(True)
                     return True
             
                 else:
-                    self.log_entry('CONN', f"connection to {p_num} failed!")
+                    self.log_entry('CONN', f"connection to {slot} failed!")
                     return False
+        
+        # MIXER CONNECTION
+        def mix_connect() -> bool:
+            # mixer running as a http server for now, just ping to see
+            # if the microcontroller is running
+            ip = du.DEF_TCP_MIXER['IP']
+            port = du.DEF_TCP_MIXER['PORT']
+            ping_url = f"http://{ip}:{port}/ping"
+            ping_resp = requests.get(ping_url)
+
+            # if request is valid, consider it "connected"
+            if ping_resp.ok and ping_resp.text == 'ack':
+                Mutex.lock()
+                du.MIX_connected = True
+                Mutex.unlock()
+                if not self._PumpCommThread.isRunning():
+                    # restart if necessary; if so reconnect threads
+                    self.connect_threads('PMP')
+                    self._PumpCommThread.start()
+
+                action_on_success(
+                    self.TCP_MIXER_indi_connected,
+                    self.MIX_group,
+                    f"mixer controller found at {ip}:{port}",
+                )
+                return True
             
             else:
-                raise ConnectionError("TCP not supported, yet")
-
+                log_txt = f"mixer controller not present at {ip}:{port}!"
+                self.log_entry('CONN', log_txt)
+                return False
+        
+        # FUNCTION CALLS
         match slot:
             case 'ROB':
                 return rob_connect()
@@ -589,7 +630,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 return pmp_connect(
                     du.PMP1Serial,
                     du.PMP1Tcp.port,
-                    slot,
                     self.TCP_PUMP1_indi_connected,
                     self.PMP1_group
                 )
@@ -598,18 +638,15 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 return pmp_connect(
                     du.PMP2Serial,
                     du.PMP2Tcp.port,
-                    slot,
                     self.TCP_PUMP2_indi_connected,
                     self.PMP2_group
                 )
 
             case 'MIX':
-                pass #to-do
+                return mix_connect()                    
 
             case _:
                 return False
-
-        return False
 
 
     def disconnect_tcp(self, slot='', internal_call=False) -> None:
@@ -617,13 +654,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         here should also send E command to robot on disconnect
         """
 
-        css = "border-radius: 25px; background-color: #4c4a48;"
         if internal_call:
             log_txt = "internal call to disconnect" 
         else:
             log_txt = "user disconnected"
-            
-        def safe_reset_positions():
+
+        def safe_reset_positions() -> None:
             self.log_entry('SAFE', f"Last robot positions:")
             self.log_entry('SAFE', f"zero: {du.DCCurrZero}")
             self.log_entry('SAFE', f"curr: {du.ROBTelem.Coor}")
@@ -635,74 +671,80 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             Mutex.unlock()
             self.switch_rob_moving(end=True)
 
-        def p_disconnect(
+        def action_on_success(indi:object, elem_group:list) -> None:
+            self.kill_watchdog(slot)
+            self.log_entry('CONN', f"{log_txt} {slot}.")
+            css = "border-radius: 25px; background-color: #4c4a48;"
+            indi.setStyleSheet(css)
+            for elem in elem_group:
+                elem.setEnabled(False)
+        
+        # ROBOT DISCONNECT
+        def rob_disconnect() -> None:
+            if not du.ROBTcp.connected:
+                return
+            
+            # send stop command to robot; stop threading & watchdog
+            du.ROBTcp.send(du.QEntry(id=du.SC_curr_comm_id, mt="E"))
+            action_on_success(self.TCP_ROB_indi_connected, self.ROB_group)
+            self._RoboCommThread.quit()
+            du.ROBTcp.close()
+
+            # safe data & wait for thread:
+            safe_reset_positions()
+            self._RoboCommThread.wait()
+
+        # PUMP DISCONNECT
+        def pmp_disconnect(
                 serial:MtecMod,
                 port:str,
-                p_num:str,
                 indi,
                 elem_group:list
         ) -> None:
             if not serial.connected:
                 return
-            
-            # finish communication first
-            while du.PMP_comm_active:
+            if not 'COM' in port:
+                raise ConnectionError("TCP not supported yet")
+            while du.PMP_comm_active: # finish communication first
                 time.sleep(0.005)
 
-            if 'COM' in port:
-                self.kill_watchdog(p_num)
-                serial.disconnect()
-                self.log_entry('CONN', f"{log_txt} {p_num}.")
-                indi.setStyleSheet(css)
-            else:
-                raise ConnectionError(
-                    "TCP not supported, unable to disconnect"
-                )
+            action_on_success(indi, elem_group)
+            serial.disconnect()
         
-            for elem in elem_group:
-                elem.setEnabled(False)
+        # MIXER DISCONNECT
+        def mix_disconnect() -> None:
+            if not du.MIX_connected:
+                return
+            
+            # no need to inform the server, just switch global toggle
+            Mutex.lock()
+            du.MIX_connected = False
+            Mutex.unlock()
+            action_on_success(self.TCP_MIXER_indi_connected, self.MIX_group)
 
+        # FUNCTION CALLS
         match slot:
             case 'ROB':
-                if not du.ROBTcp.connected:
-                    return
-                
-                # send stop command to robot; stop threading & watchdog
-                du.ROBTcp.send(du.QEntry(id=du.SC_curr_comm_id, mt="E"))
-                self.kill_watchdog("ROB")
-                self._RoboCommThread.quit()
-                du.ROBTcp.close()
-
-                # indicate to user
-                self.TCP_ROB_indi_connected.setStyleSheet(css)
-                for elem in self.ROB_group:
-                    elem.setEnabled(False)
-
-                # safe data & wait for Thread:
-                self.log_entry("CONN", f"{log_txt} robot.")
-                safe_reset_positions()
-                self._RoboCommThread.wait()
+                rob_disconnect()
 
             case 'P1':
-                p_disconnect(
+                pmp_disconnect(
                     du.PMP1Serial,
                     du.PMP1Tcp.port,
-                    slot,
                     self.TCP_PUMP1_indi_connected,
                     self.PMP1_group
                 )
 
             case 'P2':
-                p_disconnect(
+                pmp_disconnect(
                     du.PMP2Serial,
                     du.PMP2Tcp.port,
-                    slot,
                     self.TCP_PUMP2_indi_connected,
                     self.PMP2_group
                 )
 
             case 'MIX':
-                pass #to-do
+                mix_disconnect()
 
             case _:
                 pass
@@ -747,7 +789,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self._PumpCommWorker.logEntry.connect(self.log_entry)
             self._PumpCommWorker.dataSend.connect(self.pump_send)
             self._PumpCommWorker.dataRecv.connect(self.pump_recv)
-            self._PumpCommWorker.connLost.connect(self.disconnect_tcp)
             self._PumpCommWorker.dataMixerSend.connect(self.mixer_send)
             self._PumpCommWorker.dataMixerRecv.connect(self.mixer_recv)
             self._PumpCommWorker.connActive.connect(self.reset_watchdog)
@@ -944,11 +985,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 )
 
 
-    def mixer_send(self, mixer_speed:int, res:bool, data_len:bool) -> None:
+    def mixer_send(self, mixer_speed:float) -> None:
         """display mixer communication"""
 
         self.TCP_MIXER_disp_writeBuffer.setText(str(mixer_speed))
-        self.TCP_MIXER_disp_bytesWritten.setText(str(data_len))
+        self.TCP_MIXER_disp_bytesWritten.setText(str(len(mixer_speed)))
         self.log_entry("MIXR", f"speed set to {mixer_speed}")
 
 

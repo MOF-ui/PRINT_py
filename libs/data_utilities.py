@@ -1711,39 +1711,6 @@ class RobConnection(TCPIP):
         return Telem, data
 
 
-# not needed yet
-# class MixerConnection(TCPIP):
-#     """sets robot specific send/receive operations, inherits from TCPIP class, overwrites send & receive functions
-
-#     ATTRIBUTES:
-#         inherited from TCPIP class
-
-#     FUNCTIONS:
-#         send:
-#             sends instruction block to mixer: speed[float], admixture[float], pinch[bool]; packing according to mixer protocol
-#     """
-
-
-#     def send(self, msg) -> tuple[bool, int] | tuple[bool, Exception]:
-#         """sends instruction block to mixer: speed[float], admixture[float], pinch[bool]; packing according to mixer protocol"""
-
-#         message = []
-
-#         try:
-#             if not self._connected:
-#                 raise ConnectionError
-#             message = struct.pack("<ffb", msg[0:4], msg[4:8], msg[8])
-
-#             if len(message) != self.w_bl:
-#                 raise ValueError("wrong message length")
-
-#             self._Socket.sendall(message)
-
-#         except Exception as err:
-#             return False, err
-
-#         return True, len(message)
-
 
 
 #########################     GLOBALS CONST     #############################
@@ -1754,11 +1721,11 @@ class RobConnection(TCPIP):
 DEF_TCP_MIXER = {
     "IP": "192.168.178.36",
     "PORT": "17",
-    "C_TOUT": 10000,
-    "RW_TOUT": 10,
-    "R_BL": 4,
-    "W_BL": 4,
-}
+    "C_TOUT": 0,
+    "RW_TOUT": 0,
+    "R_BL": 0,
+    "W_BL": 0,
+} # mixer is a http server for now, using this structure to store parameters
 
 DEF_TCP_PUMP = {
     "IP": "",
@@ -1767,7 +1734,7 @@ DEF_TCP_PUMP = {
     "RW_TOUT": 0,
     "R_BL": 0,
     "W_BL": 0,
-}
+} # pumps are run via COM interface, using this structure to store parameters
 
 DEF_SERIAL_PUMP = {
     "BR": 19200,
@@ -1846,17 +1813,20 @@ IO_curr_filepath = None
 IO_fr_to_ts = DEF_IO_FR_TO_TS
 IO_zone = DEF_IO_ZONE
 
-MIX_last_speed = 0
-MIX_speed = 0
+MIX_last_speed = 0.0
+MIX_max_speed = 540.0 # [rpm]
+MIX_speed = 0.0
 MIX_act_with_pump = False
-MIXTcp = TCPIP(
-    DEF_TCP_MIXER["IP"],
-    DEF_TCP_MIXER["PORT"],
-    DEF_TCP_MIXER["C_TOUT"],
-    DEF_TCP_MIXER["RW_TOUT"],
-    DEF_TCP_MIXER["R_BL"],
-    DEF_TCP_MIXER["W_BL"],
-)
+MIX_connected = False
+# use this structure if mixer is ever upgraded to websocket
+# MIXTcp = TCPIP(
+#     DEF_TCP_MIXER["IP"],
+#     DEF_TCP_MIXER["PORT"],
+#     DEF_TCP_MIXER["C_TOUT"],
+#     DEF_TCP_MIXER["RW_TOUT"],
+#     DEF_TCP_MIXER["R_BL"],
+#     DEF_TCP_MIXER["W_BL"],
+# )
 
 PRINSpeed = copy.deepcopy(DEF_PRIN_SPEED)
 
@@ -1879,7 +1849,8 @@ PMP1Tcp = TCPIP(
     DEF_TCP_PUMP["RW_TOUT"],
     DEF_TCP_PUMP["R_BL"],
     DEF_TCP_PUMP["W_BL"],
-)
+) # pumps are run via COM interface, using this structure to store parameters
+# to-do: skip creating an unused socket object
 
 PMP2LastTelem = PumpTelemetry()
 PMP2_liter_per_s = DEF_PUMP_LPS
@@ -1894,7 +1865,8 @@ PMP2Tcp = TCPIP(
     DEF_TCP_PUMP["RW_TOUT"],
     DEF_TCP_PUMP["R_BL"],
     DEF_TCP_PUMP["W_BL"],
-)
+) # pumps are run via COM interface, using this structure to store parameters
+# to-do: skip creating an unused socket object
 
 ROB_comm_fr = DEF_ROB_COMM_FR
 ROBCommQueue = Queue()

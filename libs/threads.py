@@ -13,6 +13,7 @@ import os
 import sys
 import copy
 import math as m
+import requests
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -37,11 +38,10 @@ class PumpCommWorker(QObject):
     # naming conventions in PyQT are different,
     # for the signals I will stick with mixedCase
     connActive = pyqtSignal(str)
-    connLost = pyqtSignal(str, bool)
     dataRecv = pyqtSignal(du.PumpTelemetry, str)
     dataMixerRecv = pyqtSignal(int)
     dataSend = pyqtSignal(int, str, int, str)
-    dataMixerSend = pyqtSignal(int, bool, int)
+    dataMixerSend = pyqtSignal(float)
     logEntry = pyqtSignal(str, str)
 
 
@@ -126,18 +126,26 @@ class PumpCommWorker(QObject):
                 serial.keepAlive()
 
         # SEND TO MIXER
-        if du.MIXTcp.connected:
-            mixer_speed = pump_speed if (du.MIX_act_with_pump) else du.MIX_speed
+        if du.MIX_connected and du.MIX_last_speed != du.MIX_speed:
+            if du.MIX_act_with_pump:
+                mixer_speed = pump_speed * du.MIX_max_speed / 100.0
+            else:
+                mixer_speed = du.MIX_speed
+            
+            ip = du.DEF_TCP_MIXER['IP']
+            port = du.DEF_TCP_MIXER['PORT']
+            post_url = f"http://{ip}:{port}/motor"
+            post_resp = requests.post(post_url, data=f"{mixer_speed}")
 
-            if mixer_speed != PCW_lastMixerSpeed:
-                res, data_len = du.MIXTcp.send(int(mixer_speed))
-                if res:
-                    PCW_lastMixerSpeed = mixer_speed
-                    self.dataMixerSend.emit(mixer_speed, res, data_len)
-                else:
-                    self.logEntry.emit(
-                        "CONN", f"MIXER - sending data failed ({data_len})"
-                    )
+            if post_resp.ok and post_resp.text == f"RECV{mixer_speed}":
+                Mutex.lock()
+                du.MIX_last_speed = mixer_speed
+                Mutex.unlock()
+                print(f"MIX: {mixer_speed}")
+                self.dataMixerSend.emit(mixer_speed)
+            
+
+            
 
 
     def receive(self) -> None:
@@ -161,11 +169,10 @@ class PumpCommWorker(QObject):
                 torq = serial.torque
 
                 if None in [freq, volt, amps, torq]:
-                    self.connLost.emit(p_num, True)
                     self.logEntry.emit(
                         'PTel',
                         f"{p_num} telemetry package broken or not received, "
-                        f"connection lost!"
+                        f"connection probably lost!"
                     )
                 else:
                     Telem = du.PumpTelemetry(freq, volt, amps, torq)
@@ -185,24 +192,8 @@ class PumpCommWorker(QObject):
                         self.dataRecv.emit(Telem, p_num)
 
         # RECEIVE FROM MIXER
-        if du.MIXTcp.connected:
-            res, data = du.MIXTcp.receive()
-            if not isinstance(res, Exception):
-                self.connActive.emit("MIX")
-
-                if data != du.MIX_last_speed:
-                    Mutex.lock()
-                    du.MIX_last_speed = data
-                    du.STTDataBlock.imp_freq = data
-                    Mutex.unlock()
-
-                    self.dataMixerRecv.emit(data)
-
-            else:
-                self.logEntry.emit(
-                    "MTel",
-                    f"MIXER - receiving data failed ({data})"
-                )
+        if du.MIX_connected:
+            pass # to-do
 
 
 
