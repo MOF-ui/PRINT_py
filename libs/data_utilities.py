@@ -1863,6 +1863,7 @@ PRINSpeed = copy.deepcopy(DEF_PRIN_SPEED)
 PMP_retract_speed = DEF_PUMP_RETR_SPEED
 PMP_output_ratio = DEF_PUMP_OUTP_RATIO
 PMP_serial_def_bus = None  # is created after user input in win_mainframe
+PMP_comm_active = False
 PMP_speed = 0
 
 PMP1LastTelem = PumpTelemetry()

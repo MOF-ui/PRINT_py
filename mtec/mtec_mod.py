@@ -49,11 +49,15 @@ class MtecMod:
             else:
                 self.serial = self.serial_default
             
-            if self.frequency is None:
-                return False
-            
             self.connected = True
             self.temp_sendReady = True
+
+            try:
+                if self.frequency is None:
+                    return False
+            except Exception:
+                return False
+
             return True
 
 
