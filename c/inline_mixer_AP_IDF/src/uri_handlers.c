@@ -89,7 +89,7 @@ esp_err_t data_request(httpd_req_t *req)
     // get client IP
     int sockfd = httpd_req_to_sockfd(req);
     char ipstr[INET6_ADDRSTRLEN];
-    struct sockaddr_in6 addr;   // esp_http_server uses IPv6 addressing
+    struct sockaddr_in6 addr; // esp_http_server uses IPv6 addressing
     socklen_t addr_size = sizeof(addr);
     getpeername(sockfd, (struct sockaddr *)&addr, &addr_size);
     
@@ -226,10 +226,6 @@ void daq2str(
     int temp_len = snprintf(NULL, 0, "%.2f", daqb->temp);
     char *temp = malloc(temp_len + 1); // +1 for string terminator
     snprintf(temp, temp_len + 1, "%.2f", daqb->temp);
-     
-    /* int err_len = snprintf(NULL, 0, "%d", daqb->error);
-    char *err = malloc(err_len + 1);
-    snprintf(err, err_len + 1, "%d", daqb->error); */
     
     // calc age of entry
     u16_t age_s = curr_upt_s - daqb->upt_s;
@@ -240,13 +236,10 @@ void daq2str(
     // build str
     strlcpy(sz_ret, "T", buff_len);
     strlcat(sz_ret, temp, buff_len);
-    /* strlcat(sz_ret, "E", buff_len);
-    strlcat(sz_ret, err, buff_len); */
     strlcat(sz_ret, "/U", buff_len);
     strlcat(sz_ret, age, buff_len);
     strlcat(sz_ret, ";", buff_len);
 
     free(temp);
-    // free(err);
     free(age);
 }

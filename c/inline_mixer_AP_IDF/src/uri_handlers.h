@@ -71,7 +71,7 @@ static const httpd_uri_t data_req = {
 
 // POST URI REGISTER TYPE
 static const httpd_uri_t post_f = {
-    .uri       = "/test",
+    .uri       = "/motor",
     .method    = HTTP_POST,
     .handler   = freq_post,
     .user_ctx  = NULL,
