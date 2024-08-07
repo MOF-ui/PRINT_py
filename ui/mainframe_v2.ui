@@ -735,7 +735,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>50</x>
-         <y>670</y>
+         <y>677</y>
          <width>231</width>
          <height>31</height>
         </rect>
@@ -764,6 +764,39 @@ QWidget {
         <string>use automatic pump ctrl</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="IO_chk_externalFllwBhvr">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>642</y>
+         <width>231</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+    background-color: #f2f4f3;
+    border-radius: 4px;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #ffba00;
+    image: url(:/images/right.png);
+}
+
+QWidget {
+	background-color: #5d707f;
+	font-size: 12pt;
+	color: #f2f4f3;
+}
+</string>
+       </property>
+       <property name="text">
+        <string>use external trailing</string>
+       </property>
+      </widget>
       <zorder>IO_lbl_newFile</zorder>
       <zorder>IO_lbl_loadFile</zorder>
       <zorder>IO_0_frameLabel</zorder>
@@ -782,6 +815,7 @@ QWidget {
       <zorder>IO_btt_addByID</zorder>
       <zorder>IO_btt_loadFile</zorder>
       <zorder>IO_chk_autoPCtrl</zorder>
+      <zorder>IO_chk_externalFllwBhvr</zorder>
      </widget>
      <widget class="QFrame" name="SGLC_frame">
       <property name="geometry">
@@ -1039,7 +1073,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveL [[1.2,3.45,6.7],[0.0,0.0,0.0,0.0]],[80,90,80,90],z100,tool0 EXT:600&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveL [[1.2,3.45,6.7],[0.0,0.0,0.0,0.0]],[80,90,80,90],z100,tool0 EXT600&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="overwriteMode">
         <bool>false</bool>
@@ -7294,8 +7328,8 @@ color: #E1E5EE;</string>
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1400.0,1500.0,1900.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT:1900&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1400.0,1500.0,1600.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT:1900&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1400.0,1500.0,1900.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT1900&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1400.0,1500.0,1600.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT1900&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="acceptRichText">
         <bool>false</bool>
@@ -7343,8 +7377,8 @@ color: #E1E5EE;</string>
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[-340.0,2060.0,1400.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT:200&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[-340.0,2060.0,800.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT:200&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[-340.0,2060.0,1400.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT200&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[-340.0,2060.0,800.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT200&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="acceptRichText">
         <bool>false</bool>
@@ -7367,7 +7401,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1153.4,3945.6,1297.05],[0.70620,0.02032,0.70771,0.00352],[,,,,,]],[100,50,50,50],z0,tool0 EXT:1900&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1153.4,3945.6,1297.05],[0.70620,0.02032,0.70771,0.00352],[,,,,,]],[100,50,50,50],z0,tool0 EXT1900&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="acceptRichText">
         <bool>false</bool>
@@ -8231,9 +8265,9 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>304</x>
-         <y>110</y>
+         <y>117</y>
          <width>141</width>
-         <height>51</height>
+         <height>41</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -8243,11 +8277,10 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>follow behavior
-intervall</string>
+        <string>intervall</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_zone</cstring>
@@ -8291,9 +8324,9 @@ intervall</string>
        <property name="geometry">
         <rect>
          <x>314</x>
-         <y>160</y>
+         <y>167</y>
          <width>131</width>
-         <height>51</height>
+         <height>41</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -8303,11 +8336,10 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>follow behavior
-skip length</string>
+        <string>skip length</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_zone</cstring>
@@ -8503,6 +8535,35 @@ flow</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
+      <widget class="QLabel" name="SET_TE_1_fllwBhvr">
+       <property name="geometry">
+        <rect>
+         <x>289</x>
+         <y>79</y>
+         <width>341</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 14pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>FOLLOW BEHAVIOUR (TRAILING):</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+      </widget>
       <zorder>SET_TE_lbl_p1VolFlow</zorder>
       <zorder>SET_TE_lbl_retractSpeed</zorder>
       <zorder>SET_TE_0_framelabel</zorder>
@@ -8516,6 +8577,7 @@ flow</string>
       <zorder>SET_TE_float_p1VolFlow</zorder>
       <zorder>SET_TE_float_p2VolFlow</zorder>
       <zorder>SET_TE_lbl_p2VolFlow</zorder>
+      <zorder>SET_TE_1_fllwBhvr</zorder>
      </widget>
      <zorder>SET_frame</zorder>
      <zorder>SIB_frame</zorder>

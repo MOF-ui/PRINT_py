@@ -111,7 +111,7 @@ def pre_check_rapid_file(
         for row in rows:
             # the ' p' expression is to differ between 'MoveJ pHome,[...]'
             # and 'MoveJ Offs(pHome [...]'
-            if ("Move" in row) and (" p" not in row):
+            if ('Move' in row) and (' p' not in row):
                 comm_num += 1
                 x_new = float(re.findall('\d+\.\d+', row)[0])
                 y_new = float(re.findall('\d+\.\d+', row)[1])
@@ -136,7 +136,12 @@ def pre_check_rapid_file(
     return comm_num, filament_length, ''
 
 
-def re_short(regex:list, txt:str, default, find_coor=''):
+def re_short(
+        regex:list,
+        txt:str,
+        default:object,
+        find_coor=''
+) -> str | object:
     """tries all given regular expressions to match the txt,
     returns first match found, returns default if no match occurs;
     sure you could game it out with regex, but this way is less
@@ -144,13 +149,14 @@ def re_short(regex:list, txt:str, default, find_coor=''):
     
     accepts:
         regex:
-            regular expression to be matched (using re lib)
+            regular expression to be matched (using re lib), given as a list
+            of re, first re to match anything is used
         txt:
             string to be searched
         default:
             default return value if nothing is found, can be any type
-        fallback_regex:
-            second RE to try if regex doesnt match
+        find_coor:
+            short-hand parameter to find expressions like 'X-1.2' or similar
     """
 
     # if only used to find GCode coordinates like 'X1.2', use this shortcut:
@@ -159,10 +165,12 @@ def re_short(regex:list, txt:str, default, find_coor=''):
     #       matches 'X' and 'X-'
     #   '\d+': 
     #       matches any amount of consecutive decimal numbers
-    #   '[,.]?[\d+]?': 
+    #   '[,\.]?[\d+]?': 
     #       matches any amount of fractional digits, indifferent to ',' or '.'
+    #   '(' and ')' brackets:
+    #       specify only the inner part to be contained in the actual match
     if find_coor != '':
-        regex = [find_coor + '-?\d+[,.]?[\d+]?']
+        regex = [find_coor + '(-?\d+[,\.]?[\d+]?)']
     
     if not isinstance(regex, list):
         raise ValueError
@@ -177,11 +185,35 @@ def re_short(regex:list, txt:str, default, find_coor=''):
     return ans
 
 
+def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
+    """short-hand for pump & tool settings detection"""
+    
+    # set pump settings
+    entry.p_mode = re_short(None, txt, 'None', find_coor='PMP')
+    match entry.p_mode:
+        case '1': entry.p_mode = 'default'
+        case '2': entry.p_mode = 'class1'
+        case '3': entry.p_mode = 'class2'
+        case '10': entry.p_mode = 'start'
+        case '11': entry.p_mode = 'end'
+        case _: entry.p_mode = 'None'
+
+    # set tool settings
+    if 'TOOL' in txt:
+        entry.Tool.pnmtc_fiber_yn = True
+        entry.Tool.fib_deliv_steps = int(
+            du.TOOL_fib_ratio * du.DEF_TOOL_FIB_STPS
+        )
+    
+    return entry
+
+
 def gcode_to_qentry(
         mut_pos:du.Coordinate,
         mut_speed:du.SpeedVector,
         zone:int,
-        txt:str
+        txt:str,
+        ext_trail=True
     ) -> (
         tuple[du.QEntry|None, str]
     ):
@@ -201,6 +233,8 @@ def gcode_to_qentry(
             RAPID-like accuracy zone for the movement
         txt: 
             GCode line to be converted
+        ext_trail:
+            toggle for external trailing (fllwBhvr), True to turn on
     """
 
     # handle mutuables here
@@ -209,7 +243,7 @@ def gcode_to_qentry(
     zero = copy.deepcopy(du.DCCurrZero)
 
     if not isinstance(pos, du.Coordinate):
-        raise ValueError(f"{pos} is not an instance of QEntry!")
+        raise ValueError(f"{pos} is not an instance of Coordinate!")
     if not isinstance(speed, du.SpeedVector):
         raise ValueError(f"{speed} is not an instance of SpeedVector!")
     
@@ -226,124 +260,86 @@ def gcode_to_qentry(
             # set position and speed
             x = re_short(None, txt, pos.x, find_coor='X')
             if x != pos.x:
-                entry.Coor1.x = float(x[1:].replace(',', '.'))
+                entry.Coor1.x = float(x.replace(',', '.'))
                 entry.Coor1.x += zero.x
+                
+                if ext_trail:
+                    # calculate following position of external axis
+                    if entry.Coor1.x > 0:
+                        entry.Coor1.ext = (
+                            int(entry.Coor1.x / du.SC_ext_fllw_bhvr[0])
+                            * du.SC_ext_fllw_bhvr[1]
+                        )
+                        entry.Coor1.ext += zero.ext
 
-                # calculate following position of external axis
-                if entry.Coor1.x > 0:
-                    entry.Coor1.ext = (
-                        int(entry.Coor1.x / du.SC_ext_fllw_bhvr[0])
-                        * du.SC_ext_fllw_bhvr[1]
-                    )
-                    entry.Coor1.ext += zero.ext
-
-                else:
-                    entry.Coor1.ext = zero.ext
+                    else:
+                        entry.Coor1.ext = zero.ext
 
             y = re_short(None, txt, pos.y, find_coor='Y')
             if y != pos.y:
-                entry.Coor1.y = float(y[1:].replace(",", "."))
+                entry.Coor1.y = float(y.replace(',', '.'))
                 entry.Coor1.y += zero.y
 
             z = re_short(None, txt, pos.z, find_coor='Z')
             if z != pos.z:
-                entry.Coor1.z = float(z[1:].replace(",", "."))
+                entry.Coor1.z = float(z.replace(',', '.'))
                 entry.Coor1.z += zero.z
 
             # set tool angulation
             rx = re_short(None, txt, pos.rx, find_coor='XR')
             if rx != pos.rx:
-                entry.Coor1.rx = float(rx[1:].replace(",","."))
+                entry.Coor1.rx = float(rx.replace(',', '.'))
                 entry.Coor1.rx += zero.rx #to-do: check if running out of 0-359 crashes the robot
                 
             ry = re_short(None, txt, pos.ry, find_coor='YR')
             if ry != pos.ry:
-                entry.Coor1.ry = float(ry[1:].replace(",","."))
+                entry.Coor1.ry = float(ry.replace(',', '.'))
                 entry.Coor1.ry += zero.ry
                 
             rz = re_short(None, txt, pos.rz, find_coor='ZR')
             if rz != pos.rz:
-                entry.Coor1.rz = float(rz[1:].replace(",","."))
+                entry.Coor1.rz = float(rz.replace(',', '.'))
                 entry.Coor1.rz += zero.rz
 
             # set speed and external axis
-            fr = re_short(['F\d+[,.]\d+', 'F\d+'], txt, speed.ts)
+            fr = re_short(None, txt, speed.ts, find_coor='F')
             if fr != speed.ts:
-                fr = float(fr[1:].replace(",", "."))
+                fr = float(fr.replace(',', '.'))
                 entry.Speed.ts = int(fr * du.IO_fr_to_ts)
 
             ext = re_short(None, txt, pos.ext, find_coor='EXT')
             if ext != pos.ext:
-                entry.Coor1.ext = float(ext[3:].replace(",", "."))
+                entry.Coor1.ext = float(ext.replace(',', '.'))
                 entry.Coor1.ext += zero.ext
 
             entry.Coor1 = round(entry.Coor1, 2)
+            entry = re_pump_tool(entry, txt)
 
-            # set pump settings
-            pump = re.findall('P_([a-zA-Z]+)', txt)
-            if pump:
-                pump = pump[0]
-
-            if "start" in pump or "end" in pump or "default" in pump:
-                entry.p_mode = pump
-
-            elif "class" in pump:
-                p_class = re.findall("P_(class\d+)", txt)
-
-                if p_class:
-                    entry.p_mode = p_class[0]
-                else:
-                    return None, ''
-
-            # set tool settings
-            if "TOOL" in txt:
-                entry.Tool.fib_deliv_steps = int(
-                    du.TOOL_fib_ratio * du.DEF_TOOL_FIB_STPS
-                )
-                entry.Tool.pnmtc_fiber_yn = True
-
-        case "G28":
+        case 'G28':
             entry = du.QEntry(id=0, Coor1=pos, Speed=speed, z=zone)
-            if "X0" in txt:
+            if 'X0' in txt:
                 entry.Coor1.x = zero.x
-            if "Y0" in txt:
+            if 'Y0' in txt:
                 entry.Coor1.y = zero.y
-            if "Z0" in txt:
+            if 'Z0' in txt:
                 entry.Coor1.z = zero.z
-            if "EXT0" in txt:
+            if 'EXT0' in txt:
                 entry.Coor1.ext = zero.ext
 
-            # set tool settings
-            entry.Tool.fib_deliv_steps = 0
-            entry.Tool.pnmtc_fiber_yn = False
+            entry = re_pump_tool(entry, txt)
 
-            pump = re.findall("P_([a-zA-Z]+)", txt)
-            if pump:
-                pump = pump[0]
-
-            if "start" in pump or "end" in pump or "default" in pump:
-                entry.p_mode = pump
-
-            elif "class" in pump:
-                p_class = re.findall("P_(class\d+)", txt)
-
-                if p_class:
-                    entry.p_mode = p_class[0]
-                else:
-                    return None, ''
-
-        case "G92":
-            if "X0" in txt:
+        case 'G92':
+            if 'X0' in txt:
                 du.DCCurrZero.x = pos.x
-            if "Y0" in txt:
+            if 'Y0' in txt:
                 du.DCCurrZero.y = pos.y
-            if "Z0" in txt:
+            if 'Z0' in txt:
                 du.DCCurrZero.z = pos.z
-            if "EXT0" in txt:
+            if 'EXT0' in txt:
                 du.DCCurrZero.ext = pos.ext
             return None, command
 
-        case ";":
+        case ';':
             return None, command
 
         case _:
@@ -352,7 +348,7 @@ def gcode_to_qentry(
     return entry, command
 
 
-def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception: # to-do
+def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception:
     """converts a single line of MoveL, MoveJ, MoveC or Move* Offs command 
     (no Reltool) to a QEntry (relative to DC_curr_zero for 'Offs'), can be
     used in loops for multiline code, returns entry or any Exceptions, 
@@ -366,7 +362,7 @@ def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception: # to-do
 
     # if no movement-type command is given, return None
     try:
-        entry.mt = re.findall("Move[J,L,C]", txt, 0)[0][4]
+        entry.mt = re.findall('Move[J,L,C]', txt, 0)[0][4]
     except IndexError:
         return None
     
@@ -375,10 +371,16 @@ def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception: # to-do
         return None # to-do: add missing value handler
     
     # otherwise try to decode
+    # re matches '12', '12.3' or '12.34'
+    num_regex = '-?\d+\.?[\d+]*'
+    # but only if they follow a '[' or ','
+    regex = f"[\[,]({num_regex})" 
+    decimals = re.findall(regex, txt)
     try:
-        ext = float(ext[4:])
+        ext = float(ext)
 
-        if "Offs" in txt:
+        # look for relative coordinates
+        if 'Offs' in txt:
             res_coor = [
                 du.DCCurrZero.x,
                 du.DCCurrZero.y,
@@ -388,23 +390,20 @@ def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception: # to-do
                 du.DCCurrZero.rz,
                 du.DCCurrZero.q,
             ]
-
-            xyzOff = re.findall("pHome,\d+\.\d+,\d+\.\d+,\d+\.\d+", txt)[0]
-            xyzOff = re.findall("\d+\.\d+", xyzOff)
-
             for i in range(3):
-                res_coor[i] += float(xyzOff[i])
+                res_coor[i] += float(decimals[i])
             ext += du.DCCurrZero.ext
 
+        # or standard robtarget
         else:
-            entry.pt = "Q"
+            entry.pt = 'Q'
             res_coor = []
-            xyzOff = re.findall("\d+\.\d+", txt)
             for i in range(7):
-                res_coor.append(float(xyzOff[i]))
+                res_coor.append(float(decimals[i]))
 
-        res_speed = re.findall("\d+,\d+,\d+,\d+(?=\],z)", txt)[0]
-        res_speed = re.findall("\d+", res_speed)
+        speed_regex = f"{num_regex},{num_regex},{num_regex},{num_regex}\],z"
+        res_speed = re.findall(speed_regex, txt)[0]
+        res_speed = re.findall(num_regex, res_speed)
 
         entry.Coor1.x = res_coor[0]
         entry.Coor1.y = res_coor[1]
@@ -415,34 +414,19 @@ def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception: # to-do
         entry.Coor1.q = res_coor[6]
         entry.Coor1.ext = ext
 
-        entry.Speed.ts = int(res_speed[0])
-        entry.Speed.ors = int(res_speed[1])
-        entry.Speed.acr = int(res_speed[2])
-        entry.Speed.dcr = int(res_speed[3])
+        # converting '1.2'-like strings to int throws an error
+        # convert to float first
+        entry.Speed.ts = int(float(res_speed[0]))
+        entry.Speed.ors = int(float(res_speed[1]))
+        entry.Speed.acr = int(float(res_speed[2]))
+        entry.Speed.dcr = int(float(res_speed[3]))
 
         zone = re_short(['z\d+'], txt, du.IO_zone)
         entry.z = int(zone[1:])
 
-        entry.Coor1 = round(entry.Coor1, 2)
-
-        # set tool settings
-        if "TOOL" in txt:
-            entry.Tool.fib_deliv_steps = int(
-                du.TOOL_fib_ratio * du.DEF_TOOL_FIB_STPS
-            )
-            entry.Tool.pnmtc_fiber_yn = True
-
-        pump = re.findall("P_([a-zA-Z]+)", txt)
-        if pump:
-            pump = pump[0]
-
-        if (
-                "start" in pump 
-                or "end" in pump 
-                or "default" in pump 
-                or "None" in pump
-        ):
-            entry.p_mode = pump
+        # rounding everything to 2 decimals causes inaccuarcy on quaternions
+        # entry.Coor1 = round(entry.Coor1, 2)
+        entry = re_pump_tool(entry, txt)
 
     except Exception as err:
         return err

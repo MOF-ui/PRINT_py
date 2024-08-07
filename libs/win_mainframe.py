@@ -16,7 +16,6 @@ import copy
 import time
 import requests
 from pathlib import Path
-from datetime import datetime
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -25,18 +24,15 @@ sys.path.append(parent_dir)
 
 
 # PyQt stuff
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtCore import QTimer, QMutex, QThread
-from PyQt5.QtWidgets import QApplication, QMainWindow, QShortcut
+from PyQt5.QtCore import QTimer, QThread
+from PyQt5.QtWidgets import QApplication, QShortcut
 
 
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
-from ui.UI_mainframe_v6 import Ui_MainWindow
+from libs.win_mainframe_prearrange import PreMainframe, GlobalMutex
 
 
 # import my own libs
-from libs.win_daq import daq_window
 from libs.win_dialogs import strd_dialog, file_dialog
 from libs.pump_utilities import default_mode as PU_def_mode
 import libs.threads as workers
@@ -50,27 +46,21 @@ from mtec.mtec_mod import MtecMod
 
 ####################### MAINFRAME CLASS  #####################################
 
-class Mainframe(QMainWindow, Ui_MainWindow):
+class Mainframe(PreMainframe):
     """main UI of PRINT_py (further details pending)"""
 
     ##########################################################################
     #                                ATTRIBUTES                              #
     ##########################################################################
 
-    logpath = ""  # reference for logEntry, set by __init__
-
     _testrun = False  # switch for mainframe_test.py
     _first_pos = True  # one-time switch to get robot home position
-
-    _last_comm_id = 0
-    _LastP1Telem = None
-    _LastP2Telem = None
 
     _RoboCommWorker = None
     _PumpCommWorker = None
     _LoadFileWorker = None
     _SensorArrWorker = None
-    
+
     _RobRecvWd = None
     _P1RecvWd = None
     _P2RecvWd = None
@@ -90,46 +80,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         ) -> None:
         """setup main and daq UI, start subsystems & threads"""
 
-        super().__init__(parent)
-
-        # UI SETUP
-        self.setupUi(self)
-        self.setWindowTitle('---   PRINT_py  -  Main Window  ---')
-        self.setWindowFlags(
-            Qt.WindowMaximizeButtonHint
-            | Qt.WindowMinimizeButtonHint
-            | Qt.WindowCloseButtonHint
-        )
-
-        self.group_gui_elems()
+        # getting all prearranged UI functions from PreMainframe
+        super().__init__(lpath, testrun, parent)
         self._testrun = testrun
-
-        # LOGFILE SETUP
-        if lpath is None:
-            log_txt = (
-                f"No path for logfile!\n\n"
-                f"Press OK to continue anyways or Cancel to exit the program."
-            )
-            log_warning = strd_dialog(log_txt, 'LOGFILE ERROR')
-            log_warning.exec()
-
-            if log_warning.result() == 0:
-                # suicide after the actual .exec is finished,
-                # exit without chrash
-                print('no logpath given, user choose to exit after setup...')
-                QTimer.singleShot(0, self.close)
-            else:
-                print('no logpath given, user chose to continue without...')
-        else:
-            self.logpath = lpath
-            self.log_entry('GNRL', 'main GUI running.')
-
-        # DAQ SETUP
-        self.Daq = daq_window()
-        self.Daq.logEntry.connect(self.log_entry)
-        if not testrun:
-            self.Daq.show()
-        self.log_entry('GNRL', 'DAQ GUI running.')
 
         # LOAD THREADS, SIGNALS & DEFAULT SETTINGS
         self.log_entry('GNRL', 'connecting signals...')
@@ -205,6 +158,18 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.IO_btt_addByID.pressed.connect(lambda: self.load_file(lf_atID=True))
         self.IO_btt_xyzextZero.pressed.connect(lambda: self.set_zero([1, 2, 3, 8]))
         self.IO_btt_orientZero.pressed.connect(lambda: self.set_zero([4, 5, 6]))
+
+        # MIXER CONTROL
+        self.MIX_btt_actWithPump.pressed.connect(
+            lambda: self.mutex_setattr(
+                du,
+                'MIX_act_with_pump',
+                not self.MIX_btt_actWithPump.isChecked())
+        )
+        self.MIX_btt_setSpeed.pressed.connect(self.mixer_set_speed)
+        self.MIX_btt_stop.pressed.connect(lambda: self.mixer_set_speed('0'))
+        self.MIX_sld_speed.sliderMoved.connect(lambda: self.mixer_set_speed('sld'))
+
 
         # NUMERIC CONTROL
         self.NC_btt_getValues.pressed.connect(self.values_to_DC_spinbox)
@@ -365,158 +330,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         # PUMP CONTROL
         self._ctrl_E.activated.connect(lambda: self.pump_set_speed("0"))
         self._ctrl_R.activated.connect(lambda: self.pump_set_speed("-1"))
-    
-
-    def group_gui_elems(self) -> None:
-        """build groups for enable/disable actions"""
-
-        self.ADC_group = self.ADC_frame.findChildren(
-            (QtWidgets.QPushButton, QtWidgets.QSpinBox)
-        )
-
-        self.ASC_group = self.ASC_frame.findChildren(
-            (QtWidgets.QPushButton, QtWidgets.QSpinBox)
-        )
-
-        self.DC_group = [
-            self.DC_btt_xPlus,
-            self.DC_btt_xMinus,
-            self.DC_btt_yPlus,
-            self.DC_btt_yMinus,
-            self.DC_btt_zPlus,
-            self.DC_btt_zMinus,
-            self.DC_btt_extPlus,
-            self.DC_btt_extMinus,
-            self.DC_btt_home,
-            self.DC_lbl_x,
-            self.DC_lbl_y,
-            self.DC_lbl_z,
-            self.DC_lbl_ext,
-        ]
-
-        self.MIX_group = [
-            self.MIX_btt_actWithPump,
-            self.MIX_btt_setSpeed,
-            self.MIX_disp_currSpeed,
-            self.MIX_num_setSpeed,
-            self.MIX_sld_speed,
-        ]
-        for elem in self.MIX_group:
-            elem.setEnable(False)
-
-        self.NC_group = [
-            self.NC_btt_xyzSend,
-            self.NC_btt_xyzExtSend,
-            self.NC_btt_orientSend,
-        ]
-
-        self.PMP1_group = [
-            self.PUMP_num_setSpeedP1,
-            self.PUMP_btt_setSpeedP1,
-            self.PUMP_disp_freqP1,
-            self.PUMP_disp_voltP1,
-            self.PUMP_disp_ampsP1,
-            self.PUMP_disp_torqP1,
-        ]
-        for elem in self.PMP1_group:
-            elem.setEnabled(False)
-
-        self.PMP2_group = [
-            self.PUMP_num_setSpeedP2,
-            self.PUMP_btt_setSpeedP2,
-            self.PUMP_disp_freqP2,
-            self.PUMP_disp_voltP2,
-            self.PUMP_disp_ampsP2,
-            self.PUMP_disp_torqP2,
-        ]
-        for elem in self.PMP2_group:
-            elem.setEnabled(False)
-
-        self.ROB_group = [
-            self.SGLC_btt_sendFirstQComm,
-            self.SCTRL_btt_startQProcessing,
-            self.SCTRL_btt_holdQProcessing,
-            self.SCTRL_btt_forcedStop,
-            self.TERM_btt_gcodeInterp,
-            self.TERM_btt_rapidInterp,
-            self.ADC_btt_clamp,
-            self.ADC_btt_knifePos,
-            self.ADC_btt_knife,
-            self.ADC_btt_fiberPnmtc,
-            self.ADC_num_panning,
-            self.ADC_num_fibDeliv,
-        ]
-        self.ROB_group += self.DC_group
-        self.ROB_group += self.NC_group
-        for elem in self.ROB_group:
-            elem.setEnabled(False)
-
-        self.TERM_group = self.TERM_btt_gcodeInterp, self.TERM_btt_rapidInterp
-
-
-    def load_defaults(self, setup=False) -> None:
-        """load default general settings to user display"""
-
-        self.SET_float_volPerMM.setValue(du.DEF_SC_VOL_PER_M)
-        self.SET_float_frToMms.setValue(du.DEF_IO_FR_TO_TS)
-        self.SET_num_zone.setValue(du.DEF_IO_ZONE)
-        self.SET_num_transSpeed_dc.setValue(du.DEF_DC_SPEED.ts)
-        self.SET_num_orientSpeed_dc.setValue(du.DEF_DC_SPEED.ors)
-        self.SET_num_accelRamp_dc.setValue(du.DEF_DC_SPEED.acr)
-        self.SET_num_decelRamp_dc.setValue(du.DEF_DC_SPEED.dcr)
-        self.SET_num_transSpeed_print.setValue(du.DEF_PRIN_SPEED.ts)
-        self.SET_num_orientSpeed_print.setValue(du.DEF_PRIN_SPEED.ors)
-        self.SET_num_accelRamp_print.setValue(du.DEF_PRIN_SPEED.acr)
-        self.SET_num_decelRamp_print.setValue(du.DEF_PRIN_SPEED.dcr)
-
-        if not setup:
-            self.log_entry(
-                "SETS", "User resetted general properties to default values."
-            )
-        else:
-            self.load_TE_defaults(setup=True)
-            self.TCP_num_commForerun.setValue(du.DEF_ROB_COMM_FR)
-
-            self.load_ADC_defaults()
-            self.ASC_num_panning.setValue(du.DEF_AMC_PANNING)
-            self.ASC_num_fibDeliv.setValue(du.DEF_AMC_FIB_DELIV)
-            self.ASC_btt_clamp.setChecked(du.DEF_AMC_CLAMP)
-            self.ASC_btt_knifePos.setChecked(du.DEF_AMC_KNIFE_POS)
-            self.ASC_btt_knife.setChecked(du.DEF_AMC_KNIFE)
-            self.ASC_btt_fiberPnmtc.setChecked(du.DEF_AMC_FIBER_PNMTC)
-
-
-    def load_TE_defaults(self, setup=False) -> None:
-        """load default Tool/External settings to user display"""
-
-        self.SET_TE_num_fllwBhvrInterv.setValue(du.DEF_SC_EXT_FLLW_BHVR[0])
-        self.SET_TE_num_fllwBhvrSkip.setValue(du.DEF_SC_EXT_FLLW_BHVR[1])
-        self.SET_TE_float_p1VolFlow.setValue(du.DEF_PUMP_LPS)
-        self.SET_TE_float_p2VolFlow.setValue(du.DEF_PUMP_LPS)
-        self.SET_TE_num_retractSpeed.setValue(int(du.DEF_PUMP_RETR_SPEED))
-
-        if not setup:
-            self.log_entry("SETS", "User resetted TE properties to default values.")
-
-
-    def load_ADC_defaults(self, send_changes=False) -> None:
-        """load ADC default values"""
-
-        # stop UI changes to retrigger themselfs
-        for widget in self.ADC_group:
-            widget.blockSignals(True)
-
-        self.ADC_num_panning.setValue(du.DEF_AMC_PANNING)
-        self.ADC_num_fibDeliv.setValue(du.DEF_AMC_FIB_DELIV)
-        self.ADC_btt_clamp.setChecked(du.DEF_AMC_CLAMP)
-        self.ADC_btt_knifePos.setChecked(du.DEF_AMC_KNIFE_POS)
-        self.ADC_btt_knife.setChecked(du.DEF_AMC_KNIFE)
-        self.ADC_btt_fiberPnmtc.setChecked(du.DEF_AMC_FIBER_PNMTC)
-        if send_changes:
-            self.adc_user_change()
-
-        for widget in self.ADC_group:
-            widget.blockSignals(False)
 
 
     ##########################################################################
@@ -530,7 +343,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         def action_on_success(indi:object, elem_group:list, log_txt='') -> None:
             self.set_watchdog(slot)
-            self.self.log_entry('CONN', log_txt)
+            self.log_entry('CONN', log_txt)
             css = "border-radius: 25px; background-color: #00aaff;"
             indi.setStyleSheet(css)
             for elem in elem_group:
@@ -601,9 +414,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             # if request is valid, consider it "connected"
             if ping_resp.ok and ping_resp.text == 'ack':
-                Mutex.lock()
+                GlobalMutex.lock()
                 du.MIX_connected = True
-                Mutex.unlock()
+                GlobalMutex.unlock()
                 if not self._PumpCommThread.isRunning():
                     # restart if necessary; if so reconnect threads
                     self.connect_threads('PMP')
@@ -665,10 +478,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.log_entry('SAFE', f"curr: {du.ROBTelem.Coor}")
             self.log_entry('SAFE', f"rel: {du.ROBTelem.Coor - du.DCCurrZero}")
             self.log_entry('SAFE', f"last active ID was: {du.ROBTelem.id}")
-            Mutex.lock()
+            GlobalMutex.lock()
             du.ROBCommQueue.clear()
             du.ROB_send_list.clear()
-            Mutex.unlock()
+            GlobalMutex.unlock()
             self.switch_rob_moving(end=True)
 
         def action_on_success(indi:object, elem_group:list) -> None:
@@ -717,9 +530,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 return
             
             # no need to inform the server, just switch global toggle
-            Mutex.lock()
+            GlobalMutex.lock()
             du.MIX_connected = False
-            Mutex.unlock()
+            GlobalMutex.unlock()
             action_on_success(self.TCP_MIXER_indi_connected, self.MIX_group)
 
         # FUNCTION CALLS
@@ -827,177 +640,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 other_threads_connector()
             case _:
                 raise KeyError(f"Thread to activate not specified: ({slot})")
-
-
-
-    def robo_send(
-            self,
-            command:du.QEntry,
-            no_error:bool,
-            num_send:int | Exception,
-            dc:bool
-    ) -> None:
-        """handle UI update after new command was send"""
-
-        write_buffer = command.print_short()
-        if no_error:
-            du.SC_curr_comm_id += num_send
-
-            if du.SC_curr_comm_id > 3000:
-                Mutex.lock()
-                du.SC_curr_comm_id -= 3000
-                Mutex.unlock()
-
-            log_txt = "DC" if dc else 'SC'
-            log_txt = f"{num_send} {log_txt} command(s) send"
-            self.label_update_on_send(command)
-            self.log_entry("ROBO", log_txt)
-
-        else:
-            self.log_entry(
-                "CONN",
-                (
-                    f"TCPIP class 'ROB_tcpip' encountered {num_send} "
-                    f"in sendCommand!"
-                ),
-            )
-        self.TCP_ROB_disp_writeBuffer.setText(write_buffer)
-        self.TCP_ROB_disp_bytesWritten.setText(str(num_send))
-
-
-    def robo_recv(self, raw_data_string:str, telem:du.RoboTelemetry) -> None:
-        """write robots telemetry to log & user displays, resetting globals
-        position variables is done by RobCommWorker"""
-
-        # set the fist given position to zero as this is usually the standard
-        # position for Rob2, take current ID
-        if self._first_pos:
-            du.ROBMovStartP = copy.deepcopy(du.ROBTelem.Coor)
-            du.ROBMovEndP = copy.deepcopy(du.ROBTelem.Coor)
-            self.set_zero([1, 2, 3, 4, 5, 6, 8])
-            self._first_pos = False
-
-        if telem.id != self._last_comm_id:
-            log_txt = f"ID {telem.id},   {telem.Coor}   ToolSpeed: {telem.t_speed}"
-            
-            if du.PMP1Serial.connected:
-                log_txt += f"   PMP1: {self._LastP1Telem}"
-            if du.PMP2Serial.connected:
-                log_txt += f"   PMP1: {self._LastP2Telem}"
-
-            self.log_entry("RTel", log_txt)
-            self._last_comm_id = telem.id
-
-        self.label_update_on_receive(raw_data_string)
-        self.Daq.data_update()
-
-
-    def pump_send(
-            self,
-            new_speed:int,
-            command:str,
-            ans:int,
-            source:str
-    ) -> None:
-        """display pump communication, global vars are set by
-        PumpCommWorker, calc ratios and volume flow
-        """
-
-        def p_send(displays:list, speed:int, p_num:int) -> None:
-            displays[0].setText(str(command))
-            displays[1].setText(str(len(command)))
-            displays[2].setText(str(ans))
-
-            self.log_entry(
-                f"PMP{p_num}", f"speed set to {speed}, command: {command}"
-            )
-
-        match source:
-            case 'P1':
-                displays = [self.TCP_PUMP1_disp_writeBuffer,
-                            self.TCP_PUMP1_disp_bytesWritten,
-                            self.TCP_PUMP1_disp_readBuffer]
-                p_send(displays, du.PMP1_speed, 1)
-
-            case 'P2':
-                displays = [self.TCP_PUMP1_disp_writeBuffer,
-                            self.TCP_PUMP1_disp_bytesWritten,
-                            self.TCP_PUMP1_disp_readBuffer]
-                p_send(displays, du.PMP2_speed, 2)
-
-            case _:
-                raise KeyError(
-                    f"Pump signal from unspecified source ({source})!"
-                )
-
-        # keep track of PUMP_speed in case of user overwrite:
-        if du.PMP1Serial.connected and du.PMP2Serial.connected:
-            curr_total, p1_ratio = fu.calc_pump_ratio(
-                du.PMP1_speed, du.PMP2_speed
-            )
-
-            Mutex.lock()
-            du.PMP_speed = curr_total
-            du.PMP_output_ratio = p1_ratio
-            Mutex.unlock()
-
-        else:
-            curr_total = new_speed
-            p1_ratio = 1.0 if (source == 'P1') else 0.0
-
-        sld = int((1 - p1_ratio) * 100)
-        self.PUMP_disp_currSpeed.setText(f"{round(curr_total, 2)}%")
-        self.PUMP_disp_outputRatio.setText(f"{int(p1_ratio * 100)} / {sld}")
-        if not self.PUMP_sld_outputRatio.isSliderDown():
-            self.PUMP_sld_outputRatio.setValue(sld)
-
-
-    def pump_recv(self, telem:du.PumpTelemetry, source:str)  -> None:
-        """display pump telemetry, global vars are set by PumpCommWorker"""
-
-        def p_recv(display:list, stt_data:du.PumpTelemetry, dump:str) -> None:
-            # display & log
-            display[0].setText(f"{stt_data.freq}%")
-            display[1].setText(f"{stt_data.volt} V")
-            display[2].setText(f"{stt_data.amps} A")            
-            display[3].setText(f"{stt_data.torq} Nm")
-
-            setattr(self, dump, telem)
-
-        match source:
-            case 'P1':
-                displays = [self.PUMP_disp_freqP1,
-                            self.PUMP_disp_voltP1,
-                            self.PUMP_disp_ampsP1,
-                            self.PUMP_disp_torqP1]
-                p_recv(displays, du.STTDataBlock.Pump1, '_LastP1Telem')
-
-            case 'P2':
-                displays = [self.PUMP_disp_freqP2,
-                            self.PUMP_disp_voltP2,
-                            self.PUMP_disp_ampsP2,
-                            self.PUMP_disp_torqP2]
-                p_recv(displays, du.STTDataBlock.Pump2, '_LastP2Telem')
-
-            case _:
-                raise KeyError(
-                    f"Received Pump Telem from unspecified source ({source})!"
-                )
-
-
-    def mixer_send(self, mixer_speed:float) -> None:
-        """display mixer communication"""
-
-        self.TCP_MIXER_disp_writeBuffer.setText(str(mixer_speed))
-        self.TCP_MIXER_disp_bytesWritten.setText(str(len(mixer_speed)))
-        self.log_entry("MIXR", f"speed set to {mixer_speed}")
-
-
-    def mixer_recv(self, mixerSpeed:int) -> None:
-        """display mixer communication"""
-
-        self.MIX_disp_currSpeed.setText(f"{mixerSpeed}%")
-        self.log_entry("MTel", f"current speed at {mixerSpeed}%")
 
 
     ##########################################################################
@@ -1145,275 +787,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
     ##########################################################################
-    #                                SETTINGS                                #
-    ##########################################################################
-
-    def mutex_setattr(self, obj, attr, val) -> None:
-        """reduce the Mutex lock/unlock game to a single line,
-        but makes refactoring a little more tedious
-        """
-
-        Mutex.lock()
-        setattr(obj, attr, val)
-        Mutex.unlock()
-
-
-    def apply_settings(self) -> None:
-        """load default settings to settings display"""
-
-        Mutex.lock()
-        du.SC_vol_per_m = self.SET_float_volPerMM.value()
-        du.IO_fr_to_ts = self.SET_float_frToMms.value()
-        du.IO_zone = self.SET_num_zone.value()
-        du.DCSpeed.ts = self.SET_num_transSpeed_dc.value()
-        du.DCSpeed.ors = self.SET_num_orientSpeed_dc.value()
-        du.DCSpeed.acr = self.SET_num_accelRamp_dc.value()
-        du.DCSpeed.dcr = self.SET_num_decelRamp_dc.value()
-        du.PRINSpeed.ts = self.SET_num_transSpeed_print.value()
-        du.PRINSpeed.ors = self.SET_num_orientSpeed_print.value()
-        du.PRINSpeed.acr = self.SET_num_accelRamp_print.value()
-        du.PRINSpeed.dcr = self.SET_num_decelRamp_print.value()
-        Mutex.unlock()
-
-        self.log_entry(
-            'SETS',
-            f"General settings updated -- VolPerMM: {du.SC_vol_per_m}"
-            f", FR2TS: {du.IO_fr_to_ts}, IOZ: {du.IO_zone}"
-            f", PrinTS: {du.PRINSpeed.ts}, PrinOS: {du.PRINSpeed.ors}"
-            f", PrinACR: {du.PRINSpeed.acr} PrinDCR: {du.PRINSpeed.dcr}"
-            f", DCTS: {du.DCSpeed.ts}, DCOS: {du.DCSpeed.ors}"
-            f", DCACR: {du.DCSpeed.acr}, DCDCR: {du.DCSpeed.dcr}",
-        )
-
-
-    def apply_TE_settings(self) -> None:
-        """load default settings to settings display"""
-
-        Mutex.lock()
-        du.SC_ext_fllw_bhvr = (
-            self.SET_TE_num_fllwBhvrInterv.value(),
-            self.SET_TE_num_fllwBhvrSkip.value(),
-        )
-        du.PMP_retract_speed = self.SET_TE_num_retractSpeed.value()
-        du.PMP1_liter_per_s = self.SET_TE_float_p1VolFlow.value()
-        du.PMP2_liter_per_s = self.SET_TE_float_p2VolFlow.value()
-        Mutex.unlock()
-
-        self.log_entry(
-            'SETS',
-            f"TE settings updated -- FB_inter: {du.SC_ext_fllw_bhvr[0]}, "
-            f"FB_skip: {du.SC_ext_fllw_bhvr[1]}, "
-            f"PmpRS: {du.PMP_retract_speed}, "
-            f"Pmp1LPS: {du.PMP1_liter_per_s}, "
-            f"Pmp2LPS: {du.PMP2_liter_per_s}",
-        )
-
-
-    ##########################################################################
-    #                              LOG FUNCTION                              #
-    ##########################################################################
-
-    def log_entry(self, source="[    ]", text="") -> None:
-        """set one-liner for log entries, safes A LOT of repetitive code"""
-
-        if self.logpath == '':
-            return None
-        text = text.replace('\n', '')
-        text = text.replace('\t', '')
-
-        if source == 'newline':
-            text = '\n'
-        else:
-            time = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-            text = f"{time}    [{source}]:        {text}\n"
-
-        try:
-            logfile = open(self.logpath, 'a')
-        except FileExistsError:
-            pass
-
-        self.SET_disp_logEntry.setText(text)
-        logfile.write(text)
-        logfile.close()
-
-
-    ##########################################################################
-    #                            QLABEL UPDATES                              #
-    ##########################################################################
-
-    def label_update_on_receive(self, data_string:str) -> None:
-        """update all QLabels in the UI that may change with newly received
-        data from robot
-        """
-
-        Pos = du.ROBTelem.Coor
-        Zero = du.DCCurrZero
-        rob_id = du.ROBTelem.id
-        com_id = du.SC_curr_comm_id
-        Start = du.ROBMovStartP
-        End = du.ROBMovEndP
-        try:
-            prog_id = du.SCQueue[0].id
-        except AttributeError:
-            prog_id = com_id
-
-        # SCRIPT  CONTROL
-        self.TCP_ROB_disp_readBuffer.setText(data_string)
-        self.SCTRL_disp_buffComms.setText(str(prog_id - rob_id))
-        self.SCTRL_disp_robCommID.setText(str(rob_id))
-        self.SCTRL_disp_progCommID.setText(str(prog_id))
-        self.SCTRL_disp_elemInQ.setText(str(len(du.SCQueue)))
-
-        # DIRECT CONTROL
-        self.DC_disp_x.setText(str(round(Pos.x - Zero.x, 3)))
-        self.DC_disp_y.setText(str(round(Pos.y - Zero.y, 3)))
-        self.DC_disp_z.setText(str(round(Pos.z - Zero.z, 3)))
-        self.DC_disp_ext.setText(str(round(Pos.ext - Zero.ext, 3)))
-
-        # NUMERIC CONTROL
-        self.NC_disp_x.setText(f"{Pos.x}")
-        self.NC_disp_y.setText(f"{Pos.y}")
-        self.NC_disp_z.setText(f"{Pos.z}")
-        self.NC_disp_xOrient.setText(f"{Pos.rx}°")
-        self.NC_disp_yOrient.setText(f"{Pos.ry}°")
-        self.NC_disp_zOrient.setText(f"{Pos.rz}°")
-        self.NC_disp_ext.setText(f"{Pos.ext}")
-
-        # TERMINAL
-        self.TERM_disp_tcpSpeed.setText(str(du.ROBTelem.t_speed))
-        self.TERM_disp_robCommID.setText(str(rob_id))
-        self.TERM_disp_progCommID.setText(str(prog_id))
-
-        # SCRIPT ID
-        self.SID_disp_progID.setText(str(prog_id))
-        self.SID_disp_robID.setText(str(rob_id))
-
-        # CURRENT TRANSITION
-        # more practical to just display relative coordinates
-        if Start.rx != End.rx or Start.ry != End.ry or Start.rz != End.rz:
-            self.TRANS_indi_newOrient.setStyleSheet(
-                "border-radius: 15px; background-color: #4c4a48;"
-            )
-        else:
-            self.TRANS_indi_newOrient.setStyleSheet(
-                "border-radius: 15px; background-color: #00aaff;"
-            )
-
-        self.TRANS_disp_xStart.setText(str(round(Start.x - Zero.x, 2)))
-        self.TRANS_disp_yStart.setText(str(round(Start.y - Zero.y, 2)))
-        self.TRANS_disp_zStart.setText(str(round(Start.z - Zero.z, 2)))
-        self.TRANS_disp_extStart.setText(str(round(Start.ext - Zero.ext, 2)))
-        self.TRANS_disp_xEnd.setText(str(round(End.x - Zero.x, 2)))
-        self.TRANS_disp_yEnd.setText(str(round(End.y - Zero.y, 2)))
-        self.TRANS_disp_zEnd.setText(str(round(End.z - Zero.z, 2)))
-        self.TRANS_disp_extEnd.setText(str(round(End.ext - Zero.ext, 2)))
-
-
-    def label_update_on_send(self, entry:du.QEntry) -> None:
-        """update all UI QLabels that may change when data was send to robot"""
-
-        # update command lists and buffer size displays
-        self.label_update_on_queue_change()
-        self.label_update_on_terminal_change()
-        self.SCTRL_disp_elemInQ.setText(str(len(du.SCQueue)))
-
-        try:
-            rob_id = du.ROBTelem.id if (du.ROBTelem.id != -1) else 0
-            self.SCTRL_disp_buffComms.setText(
-                str(du.SCQueue[0].id - rob_id - 1)
-            )
-        except AttributeError:
-            pass
-
-        # update Amcon & Pump tab
-        for widget in self.ADC_group: widget.blockSignals(True)
-        for widget in self.ASC_group: widget.blockSignals(True)
-
-        self.ADC_num_panning.setValue(entry.Tool.pan_steps)
-        self.ASC_num_panning.setValue(entry.Tool.pan_steps)
-        self.ADC_num_fibDeliv.setValue(entry.Tool.fib_deliv_steps)
-        self.ASC_num_fibDeliv.setValue(entry.Tool.fib_deliv_steps)
-        self.ADC_btt_clamp.setChecked(entry.Tool.pnmtc_clamp_yn)
-        self.ASC_btt_clamp.setChecked(entry.Tool.pnmtc_clamp_yn)
-        self.ADC_btt_knifePos.setChecked(entry.Tool.knife_pos_yn)
-        self.ASC_btt_knifePos.setChecked(entry.Tool.knife_pos_yn)
-        self.ADC_btt_knife.setChecked(entry.Tool.knife_yn)
-        self.ASC_btt_knife.setChecked(entry.Tool.knife_yn)
-        self.ADC_btt_fiberPnmtc.setChecked(entry.Tool.pnmtc_fiber_yn)
-        self.ASC_btt_fiberPnmtc.setChecked(entry.Tool.pnmtc_fiber_yn)
-
-        for widget in self.ADC_group: widget.blockSignals(False)
-        for widget in self.ASC_group: widget.blockSignals(False)
-
-
-    def label_update_on_queue_change(self) -> None:
-        """show when new entries have been successfully placed in or taken
-        from Queue
-        """
-
-        list_to_display = du.SCQueue.display()
-        max_len = du.DEF_SC_MAX_LINES
-        length = len(list_to_display)
-        overlen = length - max_len
-
-        if length > max_len:
-            list_to_display = list_to_display[0:max_len]
-            list_to_display[max_len - 1] = (
-                f"{overlen + 1} further command are not display..."
-            )
-
-        self.SCTRL_arr_queue.clear()
-        self.SCTRL_arr_queue.addItems(list_to_display)
-        if self.SCTRL_chk_autoScroll.isChecked():
-            self.SCTRL_arr_queue.scrollToBottom()
-
-
-    def label_update_on_terminal_change(self) -> None:
-        """show when data was send or received, update ICQ"""
-
-        self.TERM_arr_terminal.clear()
-        self.TERM_arr_terminal.addItems(du.TERM_log)
-        if self.TERM_chk_autoScroll.isChecked():
-            self.TERM_arr_terminal.scrollToBottom()
-
-        list_to_display = du.ROBCommQueue.display()
-        max_len = du.DEF_ICQ_MAX_LINES
-        length = len(list_to_display)
-        overlen = length - max_len
-
-        if length > max_len:
-            list_to_display = list_to_display[0:max_len]
-            list_to_display[max_len - 1] = (
-                f"{overlen} further command are not display..."
-            )
-
-        self.ICQ_arr_terminal.clear()
-        self.ICQ_arr_terminal.addItems(list_to_display)
-        if self.ICQ_chk_autoScroll.isChecked():
-            self.ICQ_arr_terminal.scrollToBottom()
-
-
-    def label_update_on_new_zero(self) -> None:
-        """show when DC_zero has changed"""
-
-        self.ZERO_disp_x.setText(str(du.DCCurrZero.x))
-        self.ZERO_disp_y.setText(str(du.DCCurrZero.y))
-        self.ZERO_disp_z.setText(str(du.DCCurrZero.z))
-        self.ZERO_disp_xOrient.setText(str(du.DCCurrZero.rx))
-        self.ZERO_disp_yOrient.setText(str(du.DCCurrZero.ry))
-        self.ZERO_disp_zOrient.setText(str(du.DCCurrZero.rz))
-        self.ZERO_disp_ext.setText(str(du.DCCurrZero.ext))
-
-        self.ZERO_float_x.setValue(du.DCCurrZero.x)
-        self.ZERO_float_y.setValue(du.DCCurrZero.y)
-        self.ZERO_float_z.setValue(du.DCCurrZero.z)
-        self.ZERO_float_rx.setValue(du.DCCurrZero.rx)
-        self.ZERO_float_ry.setValue(du.DCCurrZero.ry)
-        self.ZERO_float_rz.setValue(du.DCCurrZero.rz)
-        self.ZERO_float_ext.setValue(du.DCCurrZero.ext)
-
-
-    ##########################################################################
     #                               FILE IO                                  #
     ##########################################################################
 
@@ -1489,6 +862,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
         # get user input
         start_id = self.IO_num_addByID.value() if (lf_at_id) else 0
+        ext_trail = self.IO_chk_externalFllwBhvr.isChecked()
         p_ctrl = self.IO_chk_autoPCtrl.isChecked()
         fpath = du.IO_curr_filepath
 
@@ -1508,11 +882,12 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         )
 
         # set up THREADS vars and start
-        Mutex.lock()
+        GlobalMutex.lock()
         workers.lfw_file_path = fpath
         workers.lfw_line_id = start_id
+        workers.lfw_ext_trail = ext_trail
         workers.lfw_p_ctrl = p_ctrl
-        Mutex.unlock()
+        GlobalMutex.unlock()
 
         if not testrun:
             self._LoadFileThread.start()
@@ -1528,11 +903,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.log_entry("F-IO", f"ERROR: file IO from aborted! {txt}")
 
         # reset THREADS vars and exit
-        Mutex.lock()
+        GlobalMutex.lock()
         workers.lfw_file_path = None
         workers.lfw_line_id = 0
         workers.lfw_p_ctrl = False
-        Mutex.unlock()
+        GlobalMutex.unlock()
 
         self.IO_btt_loadFile.setStyleSheet("font-size: 16pt;")
         self._LoadFileThread.exit()
@@ -1569,11 +944,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         self.log_entry("F-IO", log_text)
 
         # reset THREADS vars and exit
-        Mutex.lock()
+        GlobalMutex.lock()
         workers.lfw_file_path = None
         workers.lfw_line_id = 0
         workers.lfw_p_ctrl = False
-        Mutex.unlock()
+        GlobalMutex.unlock()
 
         self.IO_btt_loadFile.setStyleSheet("font-size: 16pt;")
         self._LoadFileThread.exit()
@@ -1582,80 +957,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     ##########################################################################
     #                             COMMAND QUEUE                              #
     ##########################################################################
-
-    def reset_SC_id(self) -> None:
-        """synchronize SC and ROB ID with this, if program falls out of sync
-        with the robot, should happen only with on-the-fly restarts,
-        theoretically
-        """
-        
-        if du.DC_rob_moving:
-            return
-        id_dist = (du.ROBTelem.id + 1) - du.SC_curr_comm_id
-        
-        Mutex.lock()
-        du.SC_curr_comm_id = du.ROBTelem.id + 1
-        du.SCQueue.increment(id_dist)
-        Mutex.unlock()
-
-        self.label_update_on_receive(
-            data_string=self.TCP_ROB_disp_readBuffer.text()
-        )
-        self.log_entry('GNRL', f"User overwrote current comm ID to {du.SC_curr_comm_id}.")
-
-
-    def start_SCTRL_queue(self) -> None:
-        """set UI indicators, send the boring work of timing the command to
-        our trusty threads
-        """
-
-        # set parameters
-        Mutex.lock()
-        du.SC_q_processing = True
-        du.SC_q_prep_end = False
-        Mutex.unlock()
-        self.log_entry("ComQ", "queue processing started")
-
-        # update GUI
-        css = "border-radius: 20px; background-color: #00aaff;"
-        self.SCTRL_indi_qProcessing.setStyleSheet(css)
-        self.TCP_indi_qProcessing.setStyleSheet(css)
-        self.ASC_indi_qProcessing.setStyleSheet(css)
-
-        for widget in self.ASC_group:
-            widget.setEnabled(False)
-        self.switch_rob_moving()
-
-        self.label_update_on_queue_change()
-
-
-    def stop_SCTRL_queue(self, prep_end=False) -> None:
-        """set UI indicators, turn off threads"""
-
-        if prep_end:
-            css = "border-radius: 20px; background-color: #ffda1e;"
-            du.SC_q_prep_end = True
-
-        else:
-            Mutex.lock()
-            du.PMP_speed = 0
-            du.SC_q_prep_end = False
-            du.SC_q_processing = False
-            Mutex.unlock()
-            self.log_entry("ComQ", "queue processing stopped")
-
-            self.label_update_on_queue_change()
-            self.switch_rob_moving(end=True)
-            css = "border-radius: 20px; background-color: #4c4a48;"
-
-            for widget in self.ASC_group:
-                widget.setEnabled(True)
-
-        # update GUI
-        self.SCTRL_indi_qProcessing.setStyleSheet(css)
-        self.TCP_indi_qProcessing.setStyleSheet(css)
-        self.ASC_indi_qProcessing.setStyleSheet(css)
-
 
     def add_gcode_sgl(
             self,
@@ -1715,9 +1016,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if at_id:
             Entry.id = id
 
-        Mutex.lock()
+        GlobalMutex.lock()
         res = du.SCQueue.add(Entry)
-        Mutex.unlock()
+        GlobalMutex.unlock()
 
         if res == ValueError:
             if not from_file:
@@ -1775,9 +1076,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
         if at_id:
             Entry.id = id
 
-        Mutex.lock()
+        GlobalMutex.lock()
         res = du.SCQueue.add(Entry)
-        Mutex.unlock()
+        GlobalMutex.unlock()
 
         if res == ValueError:
             if not from_file:
@@ -1870,76 +1171,11 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             log_txt += " in front of queue"
         self.log_entry(f"SIB{num + 1}", log_txt)
         return True
-    
-
-    def clr_queue(self, partial=False) -> None:
-        """delete specific or all items from queue"""
-
-        Mutex.lock()
-        if partial:
-            du.SCQueue.clear(all=False, id=self.SCTRL_entry_clrByID.text())
-        else:
-            du.SCQueue.clear(all=True)
-        Mutex.unlock()
-
-        if not partial:
-            self.log_entry("ComQ", "queue emptied by user")
-        else:
-            self.log_entry(
-                "ComQ",
-                f"queue IDs cleared: {self.SCTRL_entry_clrByID.text()}"
-            )
-        self.label_update_on_queue_change()
 
 
     ##########################################################################
     #                               DC COMMANDS                              #
     ##########################################################################
-
-    def values_to_DC_spinbox(self) -> None:
-        """button function to help the user adjust a postion via numeric
-        control, copys the current position to the set coordinates
-        spinboxes
-        """
-
-        self.NC_float_x.setValue(du.ROBTelem.Coor.x)
-        self.NC_float_y.setValue(du.ROBTelem.Coor.y)
-        self.NC_float_z.setValue(du.ROBTelem.Coor.z)
-        self.NC_float_xOrient.setValue(du.ROBTelem.Coor.rx)
-        self.NC_float_yOrient.setValue(du.ROBTelem.Coor.ry)
-        self.NC_float_zOrient.setValue(du.ROBTelem.Coor.rz)
-        self.NC_float_ext.setValue(du.ROBTelem.Coor.ext)
-
-
-    def switch_rob_moving(self, end=False) -> None:
-        """change UTIL.DC_robMoving"""
-
-        Mutex.lock()
-        if end:
-            du.DC_rob_moving = False
-            button_toggle = True
-            self.DC_indi_robotMoving.setStyleSheet(
-                "border-radius: 25px; background-color: #4c4a48;"
-            )
-            self.ADC_indi_robotMoving.setStyleSheet(
-                "border-radius: 20px; background-color: #4c4a48;"
-            )
-        else:
-            du.DC_rob_moving = True
-            button_toggle = False
-            self.DC_indi_robotMoving.setStyleSheet(
-                "border-radius: 25px; background-color: #00aaff;"
-            )
-            self.ADC_indi_robotMoving.setStyleSheet(
-                "border-radius: 20px; background-color: #00aaff;"
-            )
-
-        for widget in self.ADC_group: widget.setEnabled(button_toggle)
-        for widget in self.DC_group: widget.setEnabled(button_toggle)
-        for widget in self.NC_group: widget.setEnabled(button_toggle)
-        for widget in self.TERM_group: widget.setEnabled(button_toggle)
-        Mutex.unlock()
-
 
     def home_command(self) -> None:
         """sets up a command to drive back to DC_curr_zero, gives it to the
@@ -2131,7 +1367,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             self.stop_SCTRL_queue()
             du.ROBTcp.send(Command) # bypass all queued commands
 
-            Mutex.lock()
+            GlobalMutex.lock()
             LostBuf = copy.deepcopy(du.ROBCommQueue)
             for Entry in du.ROB_send_list:
                 if Entry[0].mt != "S":
@@ -2140,7 +1376,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             du.SCQueue = LostBuf + du.SCQueue
             du.ROBCommQueue.clear()
             du.ROB_send_list.clear()
-            Mutex.unlock()
+            GlobalMutex.unlock()
 
             self.label_update_on_queue_change()
             self.log_entry("SysC", f"FORCED STOP (user committed).")
@@ -2161,9 +1397,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             if du.SC_q_processing:
                 self.stop_SCTRL_queue()
 
-            Mutex.lock()
+            GlobalMutex.lock()
             du.ROB_send_list.clear()
-            Mutex.unlock()
+            GlobalMutex.unlock()
 
             return self.send_command(Command, dc=True)
 
@@ -2188,54 +1424,9 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 command.id = LastCom.id + 1
         
         # pass command to sendList
-        Mutex.lock()
+        GlobalMutex.lock()
         du.ROB_send_list.append((command, dc))
-        Mutex.unlock()
-
-
-    def set_zero(self, axis:list, from_sys_monitor=False) -> None:
-        """overwrite DC_curr_zero, uses deepcopy to avoid large mutual
-        exclusion blocks
-        """
-
-        NewZero = copy.deepcopy(du.DCCurrZero)
-        if from_sys_monitor:
-            CurrPos = du.Coordinate(
-                x=self.ZERO_float_x.value(),
-                y=self.ZERO_float_y.value(),
-                z=self.ZERO_float_z.value(),
-                rx=self.ZERO_float_rx.value(),
-                ry=self.ZERO_float_ry.value(),
-                rz=self.ZERO_float_rz.value(),
-                ext=self.ZERO_float_ext.value(),
-            )
-        else:
-            CurrPos = copy.deepcopy(du.ROBTelem.Coor)
-
-        if axis:
-            # 7 is a placeholder for Q, which can not be set by hand
-            if 1 in axis:
-                NewZero.x = CurrPos.x
-            if 2 in axis:
-                NewZero.y = CurrPos.y
-            if 3 in axis:
-                NewZero.z = CurrPos.z
-            if 4 in axis:
-                NewZero.rx = CurrPos.rx
-            if 5 in axis:
-                NewZero.ry = CurrPos.ry
-            if 6 in axis:
-                NewZero.rz = CurrPos.rz
-            if 8 in axis:
-                NewZero.ext = CurrPos.ext
-
-            self.mutex_setattr(du, 'DCCurrZero', NewZero)
-
-        self.label_update_on_new_zero()
-        self.log_entry(
-            "ZERO",
-            f"current zero position updated: ({du.DCCurrZero})"
-        )
+        GlobalMutex.unlock()
 
 
     ##########################################################################
@@ -2245,7 +1436,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     def pump_set_speed(self, type="") -> None:
         """handle user inputs regarding pump frequency"""
 
-        Mutex.lock()
+        GlobalMutex.lock()
         match type:
             case "1":
                 du.PMP_speed += 1
@@ -2283,7 +1474,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             case _:
                 du.PMP_speed = self.PUMP_num_setSpeed.value()
-        Mutex.unlock()
+        GlobalMutex.unlock()
 
 
     def pump_script_overwrite(self) -> None:
@@ -2300,10 +1491,10 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             return
 
         # overwrite
-        Mutex.lock()
+        GlobalMutex.lock()
         for i in range(len(du.SCQueue)):
             du.SCQueue[i].p_mode = "default"
-        Mutex.unlock()
+        GlobalMutex.unlock()
         return
 
 
@@ -2320,13 +1511,13 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     #                              MIXER CONTROL                             #
     ##########################################################################
 
-    def mixer_set_speed(self, type="") -> None:
+    def mixer_set_speed(self, type='') -> None:
         """handle user inputs for 2K mixer"""
 
         match type:
-            case "sld":
+            case 'sld':
                 speed = self.MIX_sld_speed.value()
-            case "0":
+            case '0':
                 speed = 0
             case _:
                 speed = self.MIX_num_setSpeed.value()
@@ -2337,6 +1528,34 @@ class Mainframe(QMainWindow, Ui_MainWindow):
     ##########################################################################
     #                              AMCON CONTROL                             #
     ##########################################################################
+
+    def adc_user_change(self) -> None:
+        """send changes to Amcon, if user commit them"""
+
+        if du.DC_rob_moving:
+            return None
+
+        Pos = copy.deepcopy(du.ROBTelem.Coor)
+        Tool = du.ToolCommand(
+            pan_steps=self.ADC_num_panning.value(),
+            fib_deliv_steps=self.ADC_num_fibDeliv.value(),
+            pnmtc_clamp_yn=self.ADC_btt_clamp.isChecked(),
+            knife_pos_yn=self.ADC_btt_knifePos.isChecked(),
+            knife_yn=self.ADC_btt_knife.isChecked(),
+            pnmtc_fiber_yn=self.ADC_btt_fiberPnmtc.isChecked(),
+        )
+
+        Command = du.QEntry(
+            id=du.SC_curr_comm_id,
+            Coor1=Pos,
+            Speed=copy.deepcopy(du.DCSpeed),
+            z=0,
+            Tool=Tool,
+        )
+
+        self.log_entry("ACON", f"updating tool status by user: ({Tool})")
+        return self.send_command(Command, dc=True)
+
 
     def amcon_script_overwrite(self) -> None:
         """override entire/partial SC queue with custom Amcon settings"""
@@ -2386,7 +1605,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             id_start = int(ids[0])
             id_end = int(ids[1])
 
-            Mutex.lock()
+            GlobalMutex.lock()
             for i in range(id_end - id_start + 1):
 
                 try:
@@ -2400,7 +1619,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 du.SCQueue[j].Tool.knife_pos_yn = bool(knife_pos)
                 du.SCQueue[j].Tool.knife_yn = bool(knife)
                 du.SCQueue[j].Tool.pnmtc_fiber_yn = bool(fiber_pnmtc)
-            Mutex.unlock()
+            GlobalMutex.unlock()
 
         else:
             ids = re.findall("\d+", id_range)
@@ -2414,7 +1633,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
             id_start = int(ids[0])
 
-            Mutex.lock()
+            GlobalMutex.lock()
             try:
                 j = du.SCQueue.id_pos(id_start)
             except AttributeError:
@@ -2426,7 +1645,7 @@ class Mainframe(QMainWindow, Ui_MainWindow):
             du.SCQueue[j].Tool.knife_pos_yn = bool(knife_pos)
             du.SCQueue[j].Tool.knife_yn = bool(knife)
             du.SCQueue[j].Tool.pnmtc_fiber_yn = bool(fiber_pnmtc)
-            Mutex.unlock()
+            GlobalMutex.unlock()
 
         check_entry = du.SCQueue.id_pos(id_start)
         Tool = du.SCQueue[check_entry].Tool
@@ -2437,34 +1656,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
                 f"settings: ({ Tool })"
             ),
         )
-
-
-    def adc_user_change(self) -> None:
-        """send changes to Amcon, if user commit them"""
-
-        if du.DC_rob_moving:
-            return None
-
-        Pos = copy.deepcopy(du.ROBTelem.Coor)
-        Tool = du.ToolCommand(
-            pan_steps=self.ADC_num_panning.value(),
-            fib_deliv_steps=self.ADC_num_fibDeliv.value(),
-            pnmtc_clamp_yn=self.ADC_btt_clamp.isChecked(),
-            knife_pos_yn=self.ADC_btt_knifePos.isChecked(),
-            knife_yn=self.ADC_btt_knife.isChecked(),
-            pnmtc_fiber_yn=self.ADC_btt_fiberPnmtc.isChecked(),
-        )
-
-        Command = du.QEntry(
-            id=du.SC_curr_comm_id,
-            Coor1=Pos,
-            Speed=copy.deepcopy(du.DCSpeed),
-            z=0,
-            Tool=Tool,
-        )
-
-        self.log_entry("ACON", f"updating tool status by user: ({ Tool })")
-        return self.send_command(Command, dc=True)
 
 
     ##########################################################################
@@ -2508,9 +1699,6 @@ class Mainframe(QMainWindow, Ui_MainWindow):
 
 
 ##################################   MAIN  ###################################
-
-# mutual exclusion object, used to manage global data exchange
-Mutex = QMutex()
 
 # only do the following if run as main program
 if __name__ == "__main__":

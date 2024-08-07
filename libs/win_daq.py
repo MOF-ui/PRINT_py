@@ -259,7 +259,7 @@ class DAQWindow(QWidget, Ui_DAQWindow):
                 self.logEntry.emit(
                     'DAQW',
                     f"error writing to DB at {self._Database.url}: {err}")
-                self.logEntry.emit('DAWQ', 'trying to reconnect..')
+                self.logEntry.emit('DAQW', 'trying to reconnect..')
             return
                 
         if self._influx_error:

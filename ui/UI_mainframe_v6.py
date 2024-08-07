@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\mainframe.ui'
+# Form implementation generated from reading ui file '.\mainframe_v2.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -485,7 +485,7 @@ class Ui_MainWindow(object):
         )
         self.IO_lbl_newFile.setObjectName("IO_lbl_newFile")
         self.IO_chk_autoPCtrl = QtWidgets.QCheckBox(self.IO_frame)
-        self.IO_chk_autoPCtrl.setGeometry(QtCore.QRect(50, 670, 231, 31))
+        self.IO_chk_autoPCtrl.setGeometry(QtCore.QRect(50, 677, 231, 31))
         self.IO_chk_autoPCtrl.setStyleSheet(
             "QCheckBox::indicator {\n"
             "    width: 20px;\n"
@@ -507,6 +507,29 @@ class Ui_MainWindow(object):
             ""
         )
         self.IO_chk_autoPCtrl.setObjectName("IO_chk_autoPCtrl")
+        self.IO_chk_externalFllwBhvr = QtWidgets.QCheckBox(self.IO_frame)
+        self.IO_chk_externalFllwBhvr.setGeometry(QtCore.QRect(50, 642, 231, 31))
+        self.IO_chk_externalFllwBhvr.setStyleSheet(
+            "QCheckBox::indicator {\n"
+            "    width: 20px;\n"
+            "    height: 20px;\n"
+            "    background-color: #f2f4f3;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "\n"
+            "QCheckBox::indicator:checked {\n"
+            "    background-color: #ffba00;\n"
+            "    image: url(:/images/right.png);\n"
+            "}\n"
+            "\n"
+            "QWidget {\n"
+            "    background-color: #5d707f;\n"
+            "    font-size: 12pt;\n"
+            "    color: #f2f4f3;\n"
+            "}\n"
+            ""
+        )
+        self.IO_chk_externalFllwBhvr.setObjectName("IO_chk_externalFllwBhvr")
         self.IO_lbl_newFile.raise_()
         self.IO_lbl_loadFile.raise_()
         self.IO_0_frameLabel.raise_()
@@ -525,6 +548,7 @@ class Ui_MainWindow(object):
         self.IO_btt_addByID.raise_()
         self.IO_btt_loadFile.raise_()
         self.IO_chk_autoPCtrl.raise_()
+        self.IO_chk_externalFllwBhvr.raise_()
         self.SGLC_frame = QtWidgets.QFrame(self.PRINT_tab)
         self.SGLC_frame.setGeometry(QtCore.QRect(360, 20, 311, 911))
         self.SGLC_frame.setMouseTracking(False)
@@ -3932,7 +3956,7 @@ class Ui_MainWindow(object):
         self.SET_TE_btt_default.setGeometry(QtCore.QRect(40, 180, 171, 31))
         self.SET_TE_btt_default.setObjectName("SET_TE_btt_default")
         self.SET_TE_lbl_fllwBhvrInterv = QtWidgets.QLabel(self.SET_TE_frame)
-        self.SET_TE_lbl_fllwBhvrInterv.setGeometry(QtCore.QRect(304, 110, 141, 51))
+        self.SET_TE_lbl_fllwBhvrInterv.setGeometry(QtCore.QRect(304, 117, 141, 41))
         self.SET_TE_lbl_fllwBhvrInterv.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -3940,7 +3964,7 @@ class Ui_MainWindow(object):
             "color: #E1E5EE;"
         )
         self.SET_TE_lbl_fllwBhvrInterv.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.SET_TE_lbl_fllwBhvrInterv.setObjectName("SET_TE_lbl_fllwBhvrInterv")
         self.SET_TE_num_fllwBhvrInterv = QtWidgets.QSpinBox(self.SET_TE_frame)
@@ -3956,7 +3980,7 @@ class Ui_MainWindow(object):
         self.SET_TE_num_fllwBhvrInterv.setDisplayIntegerBase(10)
         self.SET_TE_num_fllwBhvrInterv.setObjectName("SET_TE_num_fllwBhvrInterv")
         self.SET_TE_lbl_fllwBhvrSkip = QtWidgets.QLabel(self.SET_TE_frame)
-        self.SET_TE_lbl_fllwBhvrSkip.setGeometry(QtCore.QRect(314, 160, 131, 51))
+        self.SET_TE_lbl_fllwBhvrSkip.setGeometry(QtCore.QRect(314, 167, 131, 41))
         self.SET_TE_lbl_fllwBhvrSkip.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -3964,7 +3988,7 @@ class Ui_MainWindow(object):
             "color: #E1E5EE;"
         )
         self.SET_TE_lbl_fllwBhvrSkip.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.SET_TE_lbl_fllwBhvrSkip.setObjectName("SET_TE_lbl_fllwBhvrSkip")
         self.SET_TE_num_fllwBhvrSkip = QtWidgets.QSpinBox(self.SET_TE_frame)
@@ -4045,6 +4069,23 @@ class Ui_MainWindow(object):
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
         self.SET_TE_lbl_p2VolFlow.setObjectName("SET_TE_lbl_p2VolFlow")
+        self.SET_TE_1_fllwBhvr = QtWidgets.QLabel(self.SET_TE_frame)
+        self.SET_TE_1_fllwBhvr.setGeometry(QtCore.QRect(289, 79, 341, 31))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(14)
+        self.SET_TE_1_fllwBhvr.setFont(font)
+        self.SET_TE_1_fllwBhvr.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 14pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.SET_TE_1_fllwBhvr.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.SET_TE_1_fllwBhvr.setObjectName("SET_TE_1_fllwBhvr")
         self.SET_TE_lbl_p1VolFlow.raise_()
         self.SET_TE_lbl_retractSpeed.raise_()
         self.SET_TE_0_framelabel.raise_()
@@ -4058,6 +4099,7 @@ class Ui_MainWindow(object):
         self.SET_TE_float_p1VolFlow.raise_()
         self.SET_TE_float_p2VolFlow.raise_()
         self.SET_TE_lbl_p2VolFlow.raise_()
+        self.SET_TE_1_fllwBhvr.raise_()
         self.SET_frame.raise_()
         self.SIB_frame.raise_()
         self.TCP_frame.raise_()
@@ -4659,6 +4701,9 @@ class Ui_MainWindow(object):
         self.IO_chk_autoPCtrl.setText(
             _translate("MainWindow", "use automatic pump ctrl")
         )
+        self.IO_chk_externalFllwBhvr.setText(
+            _translate("MainWindow", "use external trailing")
+        )
         self.SGLC_0_frameLabel.setText(_translate("MainWindow", "SINGLE COMMAND"))
         self.SGLC_lbl_gcodeSglComm.setText(
             _translate("MainWindow", "GCode single command")
@@ -4691,7 +4736,7 @@ class Ui_MainWindow(object):
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
                 "</style></head><body style=\" font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveL [[1.2,3.45,6.7],[0.0,0.0,0.0,0.0]],[80,90,80,90],z100,tool0 EXT:600</p></body></html>',
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveL [[1.2,3.45,6.7],[0.0,0.0,0.0,0.0]],[80,90,80,90],z100,tool0 EXT600</p></body></html>',
             )
         )
         self.SGLC_btt_sendFirstQComm.setText(
@@ -5069,8 +5114,8 @@ class Ui_MainWindow(object):
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
                 "</style></head><body style=\" font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1400.0,1500.0,1900.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT:1900</p>\n'
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1400.0,1500.0,1600.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT:1900</p></body></html>',
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1400.0,1500.0,1900.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT1900</p>\n'
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1400.0,1500.0,1600.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT1900</p></body></html>',
             )
         )
         self.SIB_lbl_sib2.setText(
@@ -5083,8 +5128,8 @@ class Ui_MainWindow(object):
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
                 "</style></head><body style=\" font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[-340.0,2060.0,1400.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT:200</p>\n'
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[-340.0,2060.0,800.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT:200</p></body></html>',
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[-340.0,2060.0,1400.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT200</p>\n'
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[-340.0,2060.0,800.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT200</p></body></html>',
             )
         )
         self.SIB_entry_sib3.setHtml(
@@ -5094,7 +5139,7 @@ class Ui_MainWindow(object):
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
                 "</style></head><body style=\" font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1153.4,3945.6,1297.05],[0.70620,0.02032,0.70771,0.00352],[,,,,,]],[100,50,50,50],z0,tool0 EXT:1900</p></body></html>',
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1153.4,3945.6,1297.05],[0.70620,0.02032,0.70771,0.00352],[,,,,,]],[100,50,50,50],z0,tool0 EXT1900</p></body></html>',
             )
         )
         self.SIB_lbl_sib3.setText(
@@ -5149,13 +5194,9 @@ class Ui_MainWindow(object):
         self.SET_TE_0_framelabel.setText(_translate("MainWindow", "ADVANCED SETTINGS"))
         self.SET_TE_btt_apply.setText(_translate("MainWindow", "APPLY"))
         self.SET_TE_btt_default.setText(_translate("MainWindow", "DEFAULT"))
-        self.SET_TE_lbl_fllwBhvrInterv.setText(
-            _translate("MainWindow", "follow behavior\n" "intervall")
-        )
+        self.SET_TE_lbl_fllwBhvrInterv.setText(_translate("MainWindow", "intervall"))
         self.SET_TE_num_fllwBhvrInterv.setSuffix(_translate("MainWindow", " mm"))
-        self.SET_TE_lbl_fllwBhvrSkip.setText(
-            _translate("MainWindow", "follow behavior\n" "skip length")
-        )
+        self.SET_TE_lbl_fllwBhvrSkip.setText(_translate("MainWindow", "skip length"))
         self.SET_TE_num_fllwBhvrSkip.setSuffix(_translate("MainWindow", " mm"))
         self.SET_TE_num_retractSpeed.setSuffix(_translate("MainWindow", "%"))
         self.SET_TE_lbl_retractSpeed.setText(
@@ -5168,6 +5209,9 @@ class Ui_MainWindow(object):
         self.SET_TE_float_p2VolFlow.setSuffix(_translate("MainWindow", " L/s"))
         self.SET_TE_lbl_p2VolFlow.setText(
             _translate("MainWindow", "P2 volume\n" "flow")
+        )
+        self.SET_TE_1_fllwBhvr.setText(
+            _translate("MainWindow", "FOLLOW BEHAVIOUR (TRAILING):")
         )
         self.tab.setTabText(
             self.tab.indexOf(self.SET_tab),

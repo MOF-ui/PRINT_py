@@ -30,9 +30,11 @@ following examples from
 #define I2C_MASTER_SDA_IO   13
 #define SAMPLE_PERIOD       5000   // milliseconds
 #define FQ_STEP             50ULL
+#define P_CTRL_CONST        0.2
 
 static const char *g_TAG = "DAQ_S";
 static bool g_connected = false;
+static uint64_t freq_target = 0;
 
 extern "C" void app_main();
 
@@ -62,29 +64,32 @@ static esp_err_t i2c_master_init()
 
 void si5351_main()
 {
-    i2c_master_init();
-    clk_gen.init(I2C_NUM_1, SI5351_CRYSTAL_LOAD_10PF, 25000000, 0);
-
-    float old_rpm = 0;
+    float curr_freq = 0;
     float steps_per_rot = 20000.0;
     bool clk_running = false;
-    
+
+    i2c_master_init();
+    clk_gen.init(I2C_NUM_1, SI5351_CRYSTAL_LOAD_10PF, 25000000, 0);    
     clk_gen.set_ms_source(SI5351_CLK0, SI5351_PLLA);
     clk_gen.set_pll_input(SI5351_PLLA, SI5351_PLL_INPUT_XO);
-    while (true) {
 
-        if (old_rpm != g_motor_rpm) {
+    while (true) {
+        float rps = g_motor_rpm / 60.0;
+        uint64_t freq_target = (uint64_t)(rps * steps_per_rot);
+
+        if (curr_freq != freq_target) {
             xSemaphoreTake(g_MUTEX, portMAX_DELAY);
 
-            if (g_motor_rpm == 0) {
+            if (freq_target == 0) {
                 clk_gen.output_enable(SI5351_CLK0, 0);
+                curr_freq = 0;
                 clk_running = false;
                 ESP_LOGI("CLK_F", "clk stopped.");
 
             } else {
-                float rps = g_motor_rpm / 60.0;
-                uint64_t freq = (uint64_t)(rps * steps_per_rot) ;
-                clk_gen.set_freq(freq * 100ULL, SI5351_CLK0);
+                // use simple p-controller for acceleration ramp
+                curr_freq += P_CTRL_CONST * (freq_target - curr_freq);
+                clk_gen.set_freq(curr_freq * 100ULL, SI5351_CLK0);
 
                 if (!clk_running) {
                     clk_gen.output_enable(SI5351_CLK0, 1);
@@ -94,8 +99,8 @@ void si5351_main()
                 }
             }
             
-            old_rpm = g_motor_rpm;
-            ESP_LOGI("CLK_F", "freq set to %f", old_rpm);
+            curr_freq = g_motor_rpm;
+            ESP_LOGI("CLK_F", "freq set to %f", curr_freq);
             xSemaphoreGive(g_MUTEX);
         }
 

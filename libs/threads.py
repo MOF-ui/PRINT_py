@@ -21,12 +21,13 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 # PyQt stuff
-from PyQt5.QtCore import QObject, QTimer, QMutex, pyqtSignal
+from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
 # import my own libs
 import libs.data_utilities as du
 import libs.func_utilities as fu
 import libs.pump_utilities as pu
+from libs.win_mainframe_prearrange import GlobalMutex
 
 
 
@@ -67,16 +68,16 @@ class PumpCommWorker(QObject):
         """extra function needed to set global indicator 'PMP_comm_active'
         with is checked in win_mainframe.disconnect_tcp"""
 
-        Mutex.lock()
+        GlobalMutex.lock()
         du.PMP_comm_active = True
-        Mutex.unlock()
+        GlobalMutex.unlock()
 
         self.send()
         self.receive()
         
-        Mutex.lock()
+        GlobalMutex.lock()
         du.PMP_comm_active = False
-        Mutex.unlock()
+        GlobalMutex.unlock()
 
     def send(self) -> None:
         """send pump speed to pump, uses modified setter in mtec's script 
@@ -117,9 +118,9 @@ class PumpCommWorker(QObject):
                 res = serial.set_speed(int(speed * getattr(du, live_ad)))
                 
                 if res is not None:
-                    Mutex.lock()
+                    GlobalMutex.lock()
                     setattr(du, speed_global, speed)
-                    Mutex.unlock()
+                    GlobalMutex.unlock()
                     print(f"{p_num}: {speed}")
                     self.dataSend.emit(speed, res[0], res[1], p_num)
 
@@ -138,9 +139,9 @@ class PumpCommWorker(QObject):
             post_resp = requests.post(post_url, data=f"{mixer_speed}")
 
             if post_resp.ok and post_resp.text == f"RECV{mixer_speed}":
-                Mutex.lock()
+                GlobalMutex.lock()
                 du.MIX_last_speed = mixer_speed
-                Mutex.unlock()
+                GlobalMutex.unlock()
                 print(f"MIX: {mixer_speed}")
                 self.dataMixerSend.emit(mixer_speed)
             
@@ -185,10 +186,10 @@ class PumpCommWorker(QObject):
                         Telem.freq *= -1
 
                     if Telem != getattr(du, last_telem):
-                        Mutex.lock()
+                        GlobalMutex.lock()
                         setattr(du, last_telem, Telem)
                         setattr(du.STTDataBlock, stt_attr, Telem)
-                        Mutex.unlock()
+                        GlobalMutex.unlock()
                         self.dataRecv.emit(Telem, p_num)
 
         # RECEIVE FROM MIXER
@@ -252,7 +253,7 @@ class RoboCommWorker(QObject):
             Telem = round(Telem, 1)
             self.dataReceived.emit()
 
-            Mutex.lock()
+            GlobalMutex.lock()
             fu.add_to_comm_protocol(
                 f"RECV:    ID {Telem.id},   {Telem.Coor}   "
                 f"TCP: {Telem.t_speed}"
@@ -296,7 +297,7 @@ class RoboCommWorker(QObject):
                 
                 # print
                 print(f"RECV:    {Telem}")
-            Mutex.unlock()
+            GlobalMutex.unlock()
 
             # reset robMoving indicator if near end, skip if queue is processed
             if du.DC_rob_moving and not du.SC_q_processing:
@@ -309,9 +310,9 @@ class RoboCommWorker(QObject):
         elif not isinstance(Telem, TimeoutError):
             err_txt = f"ERROR from ROBTcp ({Telem}), raw data: {raw_data}"
             self.logEntry.emit('RTel', err_txt)
-            Mutex.lock()
+            GlobalMutex.lock()
             fu.add_to_comm_protocol(f"RECV:    {err_txt}")
-            Mutex.unlock()
+            GlobalMutex.unlock()
 
 
     def check_queue(self) -> None:
@@ -336,14 +337,14 @@ class RoboCommWorker(QObject):
         # end qProcessing (immediately if ROB_commQueue is empty as well)
         elif du.SC_q_processing:
             if len_sc > 0:
-                Mutex.lock()
+                GlobalMutex.lock()
                 try:
                     while (rob_id + du.ROB_comm_fr) >= du.SCQueue[0].id:
                         comm_tuple = (du.SCQueue.pop_first_item(), False)
                         du.ROB_send_list.append(comm_tuple)
                 except AttributeError:
                     pass
-                Mutex.unlock()
+                GlobalMutex.unlock()
 
             else:
                 if len_rob == 0:
@@ -383,7 +384,7 @@ class RoboCommWorker(QObject):
 
             # see if sending was successful
             if res:
-                Mutex.lock()
+                GlobalMutex.lock()
                 num_send += 1
                 du.ROBCommQueue.append(Command)
                 fu.add_to_comm_protocol(
@@ -396,7 +397,7 @@ class RoboCommWorker(QObject):
                 )
                 if direct_ctrl:
                     du.SCQueue.increment()
-                Mutex.unlock()
+                GlobalMutex.unlock()
 
                 self.logEntry.emit('ROBO', f"send: {Command}")
 
@@ -479,9 +480,9 @@ class SensorCommWorker(QObject):
                         latest_data = data[len(data) - 1]
                         loc['err'] = False
 
-                        Mutex.lock()
+                        GlobalMutex.lock()
                         fu.store_sensor_data(latest_data, key, sub_key)
-                        Mutex.unlock()
+                        GlobalMutex.unlock()
 
                     elif data is not None:
                         # log recurring error from one location only once
@@ -522,6 +523,7 @@ class LoadFileWorker(QObject):
 
         global lfw_file_path
         global lfw_line_id
+        global lfw_ext_trail
         global lfw_p_ctrl
         global lfw_running
         global lfw_pre_run_time
@@ -638,7 +640,7 @@ class LoadFileWorker(QObject):
             Pos = du.DCCurrZero
 
         # act according to GCode command
-        Entry, command = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
+        Entry, command = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt, lfw_ext_trail)
 
         if (command != "G1") and (command != "G28"):
             return Entry, command
@@ -693,11 +695,10 @@ class LoadFileWorker(QObject):
 
 ##############################     MAIN      #################################
 
-Mutex = QMutex()
-
 # LoadFileWorker:
 lfw_file_path = None
 lfw_line_id = 0
+lfw_ext_trail = True
 lfw_p_ctrl = False
 lfw_running = False
 lfw_pre_run_time = 10

@@ -203,6 +203,7 @@ esp_err_t freq_post(httpd_req_t *req)
 
     xSemaphoreTake(g_MUTEX, portMAX_DELAY);
     sscanf(content, "%f", &g_motor_rpm);
+    if (g_motor_rpm < 0.0) g_motor_rpm = 0.0;
     asprintf(&resp, "RECV%f", g_motor_rpm);
     xSemaphoreGive(g_MUTEX);
     
