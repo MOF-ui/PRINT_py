@@ -38,7 +38,8 @@ class PumpCommWorker(QObject):
 
     # naming conventions in PyQT are different,
     # for the signals I will stick with mixedCase
-    connActive = pyqtSignal(str)
+    p1Active = pyqtSignal()
+    p2Active = pyqtSignal()
     dataRecv = pyqtSignal(du.PumpTelemetry, str)
     dataMixerRecv = pyqtSignal(int)
     dataSend = pyqtSignal(int, str, int, str)
@@ -85,7 +86,6 @@ class PumpCommWorker(QObject):
         the machines answer and the original command string, uses user-set
         pump speed if no script is running
         """
-        global PCW_lastMixerSpeed
 
         # SEND TO PUMPS
         pump_speed = pu.calc_speed() if (du.SC_q_processing) else du.PMP_speed
@@ -178,7 +178,8 @@ class PumpCommWorker(QObject):
                 else:
                     Telem = du.PumpTelemetry(freq, volt, amps, torq)
                     Telem = round(Telem, 3)
-                    self.connActive.emit(p_num)
+                    if p_num == 'P1': self.p1Active.emit()
+                    elif p_num == 'P2': self.p2Active.emit()
 
                     # telemetry contains no info about the rotation direction,
                     # interpret according to settings
@@ -307,7 +308,10 @@ class RoboCommWorker(QObject):
                         self.endDcMoving.emit()
 
         # inform user if error occured in websocket connection (ignore timeouts)
-        elif not isinstance(Telem, TimeoutError):
+        elif (
+                not isinstance(Telem, TimeoutError)
+                and not isinstance(Telem, WindowsError)
+        ):
             err_txt = f"ERROR from ROBTcp ({Telem}), raw data: {raw_data}"
             self.logEntry.emit('RTel', err_txt)
             GlobalMutex.lock()

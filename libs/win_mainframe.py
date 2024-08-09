@@ -29,7 +29,7 @@ from PyQt5.QtWidgets import QApplication, QShortcut
 
 
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
-from libs.win_mainframe_prearrange import PreMainframe, GlobalMutex
+from libs.win_mainframe_prearrange import PreMainframe, Watchdog, GlobalMutex
 
 
 # import my own libs
@@ -106,6 +106,14 @@ class Mainframe(PreMainframe):
             self.log_entry('newline')
             return
 
+        # INIT WATCHDOGS
+        self.log_entry('GNRL', "connect to Robot...")
+        self._RobRecvWd = Watchdog(True, 'Robot', 'ROBTcp', 'ROB')
+        self._P1RecvWd = Watchdog(True, 'Pump 1', 'PMP1Serial', 'P1')
+        self._P2RecvWd = Watchdog(True, 'Pump 2', 'PMP2Serial', 'P2')
+        self._MixRecvWd = Watchdog(True, 'Pump 1', 'MIX_connected', 'MIX')
+        self.connect_watchdogs()
+
         # CONNECTIONS SETUP
         self.log_entry('GNRL', "connect to Robot...")
         self.connect_tcp('ROB')
@@ -169,7 +177,6 @@ class Mainframe(PreMainframe):
         self.MIX_btt_setSpeed.pressed.connect(self.mixer_set_speed)
         self.MIX_btt_stop.pressed.connect(lambda: self.mixer_set_speed('0'))
         self.MIX_sld_speed.sliderMoved.connect(lambda: self.mixer_set_speed('sld'))
-
 
         # NUMERIC CONTROL
         self.NC_btt_getValues.pressed.connect(self.values_to_DC_spinbox)
@@ -341,8 +348,13 @@ class Mainframe(PreMainframe):
         maybe more functionality later
         """
 
-        def action_on_success(indi:object, elem_group:list, log_txt='') -> None:
-            self.set_watchdog(slot)
+        def action_on_success(
+                wd:Watchdog,
+                indi:object,
+                elem_group:list,
+                log_txt=''
+        ) -> None:
+            wd.start()
             self.log_entry('CONN', log_txt)
             css = "border-radius: 25px; background-color: #00aaff;"
             indi.setStyleSheet(css)
@@ -363,6 +375,7 @@ class Mainframe(PreMainframe):
                     self._RoboCommThread.start()
 
                 action_on_success(
+                    self._RobRecvWd,
                     self.TCP_ROB_indi_connected,
                     self.ROB_group,
                     f"connected to {ip} at {port}.",
@@ -378,10 +391,11 @@ class Mainframe(PreMainframe):
         def pmp_connect(
                 serial:MtecMod,
                 port:str,
+                wd:Watchdog,
                 indi,
                 elem_group:list
         ) -> bool:
-            if not 'COM' in port:                
+            if not 'COM' in port:
                 raise ConnectionError("TCP not supported, yet")
             
             else:
@@ -390,15 +404,17 @@ class Mainframe(PreMainframe):
                         # restart if necessary; if so reconnect threads
                         self.connect_threads('PMP')
                         self._PumpCommThread.start()
-                    
+
+                    self._P1RecvWd.start()
                     action_on_success(
+                        wd,
                         indi,
                         elem_group,
                         f"connected to {slot} as inverter "
                         f"{serial.settings_inverter_id} at {port}",
                     )
                     return True
-            
+
                 else:
                     self.log_entry('CONN', f"connection to {slot} failed!")
                     return False
@@ -423,12 +439,13 @@ class Mainframe(PreMainframe):
                     self._PumpCommThread.start()
 
                 action_on_success(
+                    self._MixRecvWd,
                     self.TCP_MIXER_indi_connected,
                     self.MIX_group,
                     f"mixer controller found at {ip}:{port}",
                 )
                 return True
-            
+
             else:
                 log_txt = f"mixer controller not present at {ip}:{port}!"
                 self.log_entry('CONN', log_txt)
@@ -438,26 +455,24 @@ class Mainframe(PreMainframe):
         match slot:
             case 'ROB':
                 return rob_connect()
-            
             case 'P1':
                 return pmp_connect(
                     du.PMP1Serial,
                     du.PMP1Tcp.port,
+                    self._P1RecvWd,
                     self.TCP_PUMP1_indi_connected,
                     self.PMP1_group
                 )
-
             case 'P2':
                 return pmp_connect(
                     du.PMP2Serial,
                     du.PMP2Tcp.port,
+                    self._P2RecvWd,
                     self.TCP_PUMP2_indi_connected,
                     self.PMP2_group
                 )
-
             case 'MIX':
                 return mix_connect()                    
-
             case _:
                 return False
 
@@ -484,8 +499,8 @@ class Mainframe(PreMainframe):
             GlobalMutex.unlock()
             self.switch_rob_moving(end=True)
 
-        def action_on_success(indi:object, elem_group:list) -> None:
-            self.kill_watchdog(slot)
+        def action_on_success(wd:Watchdog, indi:object, elem_group:list) -> None:
+            wd.kill()
             self.log_entry('CONN', f"{log_txt} {slot}.")
             css = "border-radius: 25px; background-color: #4c4a48;"
             indi.setStyleSheet(css)
@@ -499,7 +514,11 @@ class Mainframe(PreMainframe):
             
             # send stop command to robot; stop threading & watchdog
             du.ROBTcp.send(du.QEntry(id=du.SC_curr_comm_id, mt="E"))
-            action_on_success(self.TCP_ROB_indi_connected, self.ROB_group)
+            action_on_success(
+                self._RobRecvWd,
+                self.TCP_ROB_indi_connected,
+                self.ROB_group
+            )
             self._RoboCommThread.quit()
             du.ROBTcp.close()
 
@@ -511,6 +530,7 @@ class Mainframe(PreMainframe):
         def pmp_disconnect(
                 serial:MtecMod,
                 port:str,
+                wd:Watchdog,
                 indi,
                 elem_group:list
         ) -> None:
@@ -521,7 +541,7 @@ class Mainframe(PreMainframe):
             while du.PMP_comm_active: # finish communication first
                 time.sleep(0.005)
 
-            action_on_success(indi, elem_group)
+            action_on_success(wd, indi, elem_group)
             serial.disconnect()
         
         # MIXER DISCONNECT
@@ -533,32 +553,34 @@ class Mainframe(PreMainframe):
             GlobalMutex.lock()
             du.MIX_connected = False
             GlobalMutex.unlock()
-            action_on_success(self.TCP_MIXER_indi_connected, self.MIX_group)
+            action_on_success(
+                self._MixRecvWd,
+                self.TCP_MIXER_indi_connected,
+                self.MIX_group
+            )
 
         # FUNCTION CALLS
         match slot:
             case 'ROB':
                 rob_disconnect()
-
             case 'P1':
                 pmp_disconnect(
                     du.PMP1Serial,
                     du.PMP1Tcp.port,
+                    self._P1RecvWd,
                     self.TCP_PUMP1_indi_connected,
                     self.PMP1_group
                 )
-
             case 'P2':
                 pmp_disconnect(
                     du.PMP2Serial,
                     du.PMP2Tcp.port,
+                    self._P2RecvWd,
                     self.TCP_PUMP2_indi_connected,
                     self.PMP2_group
                 )
-
             case 'MIX':
                 mix_disconnect()
-
             case _:
                 pass
 
@@ -586,7 +608,7 @@ class Mainframe(PreMainframe):
             self._RoboCommWorker.sendElem.connect(self.robo_send)
             self._RoboCommWorker.dataUpdated.connect(self.robo_recv)
             self._RoboCommWorker.endProcessing.connect(self.stop_SCTRL_queue)
-            self._RoboCommWorker.dataReceived.connect(lambda: self.reset_watchdog("ROB"))
+            self._RoboCommWorker.dataReceived.connect(self._RobRecvWd.reset)
             self._RoboCommWorker.dataReceived.connect(self.label_update_on_terminal_change)
             self._RoboCommWorker.endDcMoving.connect(lambda: self.switch_rob_moving(end=True))
             self._RoboCommWorker.queueEmtpy.connect(lambda: self.stop_SCTRL_queue(prep_end=True))
@@ -604,7 +626,8 @@ class Mainframe(PreMainframe):
             self._PumpCommWorker.dataRecv.connect(self.pump_recv)
             self._PumpCommWorker.dataMixerSend.connect(self.mixer_send)
             self._PumpCommWorker.dataMixerRecv.connect(self.mixer_recv)
-            self._PumpCommWorker.connActive.connect(self.reset_watchdog)
+            self._PumpCommWorker.p1Active.connect(self._P1RecvWd.reset)
+            self._PumpCommWorker.p2Active.connect(self._P2RecvWd.reset)
         
         def other_threads_connector():
             # thread for file loading
@@ -646,144 +669,15 @@ class Mainframe(PreMainframe):
     #                               WATCHDOGS                                #
     ##########################################################################
 
-    def set_watchdog(self, dog:str) -> None:
-        """set Watchdog, check data updates from robot and pump occure at
-        least every 10 sec"""
+    def connect_watchdogs(self):
+        """connect all signals, the same for every WD"""
 
-        watchdog = QTimer()
-        watchdog.setSingleShot(True)
-        watchdog.setInterval(10000)
-        watchdog.timeout.connect(lambda: self.watchdog_bite(dog))
-
-        match dog:
-            case 'ROB':
-                self._RobRecvWd = watchdog
-                self._RobRecvWd.start()
-            case 'P1':
-                self._P1RecvWd = watchdog
-                self._P1RecvWd.start()
-            case 'P2':
-                self._P2RecvWd = watchdog
-                self._P2RecvWd.start()
-            case 'MIX':
-                self._MixRecvWd = watchdog
-                self._MixRecvWd.start()
-            case _:
-                raise ValueError(f"{dog} is invalad as a watchdog!")
-        self.log_entry("WDOG", f"Watchdog {dog} started.")
-
-
-    def reset_watchdog(self, dog:str) -> None:
-        """reset the Watchdog on every newly received data block, check
-        connection everytime if disconnected inbetween
-        """
-
-        match dog:
-            case 'ROB':
-                if du.ROBTcp.connected:
-                    self._RobRecvWd.start()
-            case 'P1':
-                if du.PMP1Serial.connected:
-                    self._P1RecvWd.start()
-            case 'P2':
-                if du.PMP2Serial.connected:
-                    self._P2RecvWd.start()
-            case 'MIX':
-                if du.MIXTcp.connected:
-                    self._MixRecvWd.start()
-            case _:
-                self.log_entry('WDOG', f"no such WD: {dog}, reset failed!")
-
-
-    def watchdog_bite(self, dog:str) -> None:
-        """infrom user on any biting WD, log info"""
-
-        cancel_operation = False
-        match dog:
-            case 'ROB':
-                result = "Robot offline"
-                if du.SC_q_processing:
-                    cancel_operation = True
-
-            case 'P1':
-                result = "Pump 1 offline"
-                if du.SC_q_processing:
-                    cancel_operation = True
-
-            case 'P2':
-                result = "Pump 2 offline"
-                if du.SC_q_processing:
-                    cancel_operation = True
-
-            case 'MIX':
-                result = "Mixer offline"
-
-            case _:
-                result = "Internal error"
-                return
-
-        # stop critical operations, build user text
-        if cancel_operation:
-            self.log_entry(
-                'WDOG',
-                (
-                    f"Watchdog {dog} has bitten! Stopping script control & "
-                    f"forwarding forced-stop to robot!"
-                ),
-            )
-            self.forced_stop_command()
-            self.stop_SCTRL_queue()
-
-            wd_text = (
-                f"Watchdog {dog} has bitten!\n\nScript control was stopped "
-                f"and forced-stop command was send to robot!\nPress OK to "
-                f"keep PRINT_py running or Cancel to exit and close."
-            )
-
-        else:
-            self.log_entry('WDOG', f"Watchdog {dog} has bitten!")
-            wd_text = (
-                (
-                    f"Watchdog {dog} has bitten!\n\n{result}.\nPress OK to "
-                    f"keep PRINT_py running or Cancel to exit and close."
-                )
-            )
-
-        # disconnect, also stops watchdog
-        self.disconnect_tcp(slot=dog, internal_call=True)
-
-        # ask user to close application
-        watchdog_warning = strd_dialog(wd_text, "WATCHDOG ALARM")
-        watchdog_warning.exec()
-
-        if watchdog_warning.result():
-            self.log_entry('WDOG', f"User chose to return to main screen.")
-
-        else:
-            self.log_entry('WDOG', f"User chose to close PRINT_py, exiting...")
-            self.close()
-
-
-    def kill_watchdog(self, dog:str) -> None:
-        """put them to sleep (dont do this to real dogs)"""
-
-        match dog:
-            case 'ROB':
-                self._RobRecvWd.stop()
-                self._RobRecvWd.deleteLater()
-            case 'P1':
-                self._P1RecvWd.stop()
-                self._P1RecvWd.deleteLater()
-            case 'P2':
-                self._P2RecvWd.stop()
-                # self._P2RecvWd.deleteLater()
-            case 'MIX':
-                self._MixRecvWd.stop()
-                self._MixRecvWd.deleteLater()
-            case _:
-                pass
-            
-        self.log_entry('WDOG', f"Watchdog {dog} deleted.")
+        for wd in [self._RobRecvWd, self._P1RecvWd, self._P2RecvWd, self._MixRecvWd]:
+            wd.logEntry.connect(self.log_entry)
+            wd.criticalBite.connect(self.forced_stop_command)
+            wd.criticalBite.connect(self.stop_SCTRL_queue)
+            wd.disconnectDevice.connect(self.disconnect_tcp)
+            wd.closeMainframe.connect(self.close)
 
 
     ##########################################################################
@@ -811,7 +705,6 @@ class Mainframe(PreMainframe):
             self.IO_disp_filename.setText("no file selected")
             du.IO_curr_filepath = None
             return
-
         file = open(file_path, "r")
         txt = file.read()
         file.close()
@@ -837,7 +730,6 @@ class Mainframe(PreMainframe):
 
         # display data
         filament_vol = round(filament_length * du.SC_vol_per_m, 1)
-
         self.IO_disp_filename.setText(file_path.name)
         self.IO_disp_commNum.setText(str(comm_num))
         self.IO_disp_estimLen.setText(str(filament_length))
@@ -952,6 +844,7 @@ class Mainframe(PreMainframe):
 
         self.IO_btt_loadFile.setStyleSheet("font-size: 16pt;")
         self._LoadFileThread.exit()
+
 
 
     ##########################################################################
@@ -1493,7 +1386,7 @@ class Mainframe(PreMainframe):
         # overwrite
         GlobalMutex.lock()
         for i in range(len(du.SCQueue)):
-            du.SCQueue[i].p_mode = "default"
+            du.SCQueue[i].p_mode = 'default'
         GlobalMutex.unlock()
         return
 
@@ -1502,7 +1395,7 @@ class Mainframe(PreMainframe):
         """not implemented yet"""
 
         usr_info = strd_dialog(
-            "Pinch valve not supported, yet!", "Process does not exist"
+            'Pinch valve not supported, yet!', 'Process does not exist'
         )
         usr_info.exec()
 
@@ -1529,6 +1422,20 @@ class Mainframe(PreMainframe):
     #                              AMCON CONTROL                             #
     ##########################################################################
 
+    def adc_read_user_input(self, panel) -> du.ToolCommand:
+        """short-hand to get user input"""
+
+        group = self.ADC_group if (panel=='ADC') else self.ASC_group
+        return du.ToolCommand(
+            pnmtc_clamp_yn=self.group[0].isChecked(),
+            knife_pos_yn=self.group[1].isChecked(),
+            knife_yn=self.group[2].isChecked(),
+            pnmtc_fiber_yn=self.group[3].isChecked(),
+            pan_steps=self.group[4].value(),
+            fib_deliv_steps=self.group[5].value(),
+        )
+
+
     def adc_user_change(self) -> None:
         """send changes to Amcon, if user commit them"""
 
@@ -1536,14 +1443,7 @@ class Mainframe(PreMainframe):
             return None
 
         Pos = copy.deepcopy(du.ROBTelem.Coor)
-        Tool = du.ToolCommand(
-            pan_steps=self.ADC_num_panning.value(),
-            fib_deliv_steps=self.ADC_num_fibDeliv.value(),
-            pnmtc_clamp_yn=self.ADC_btt_clamp.isChecked(),
-            knife_pos_yn=self.ADC_btt_knifePos.isChecked(),
-            knife_yn=self.ADC_btt_knife.isChecked(),
-            pnmtc_fiber_yn=self.ADC_btt_fiberPnmtc.isChecked(),
-        )
+        Tool = self.adc_read_user_input('ADC')
 
         Command = du.QEntry(
             id=du.SC_curr_comm_id,
@@ -1553,107 +1453,94 @@ class Mainframe(PreMainframe):
             Tool=Tool,
         )
 
-        self.log_entry("ACON", f"updating tool status by user: ({Tool})")
+        self.log_entry('ACON', f"updating tool status by user: ({Tool})")
         return self.send_command(Command, dc=True)
 
 
     def amcon_script_overwrite(self) -> None:
         """override entire/partial SC queue with custom Amcon settings"""
 
-        # actual overwrite
+        def overwrite(i:int, tool:du.ToolCommand) -> bool:
+            try:
+                j = du.SCQueue.id_pos(i + id_start)
+            except AttributeError:
+                return False
+
+            du.SCQueue[j].Tool.pan_steps = tool.pan_steps
+            du.SCQueue[j].Tool.fib_deliv_steps = tool.fib_deliv_steps
+            du.SCQueue[j].Tool.pnmtc_clamp_yn= tool.pnmtc_clamp_yn
+            du.SCQueue[j].Tool.knife_pos_yn = tool.knife_pos_yn
+            du.SCQueue[j].Tool.knife_yn = tool.knife_yn
+            du.SCQueue[j].Tool.pnmtc_fiber_yn = tool.pnmtc_fiber_yn
+            return True
+
+
         id_range = self.ASC_entry_SCLines.text()
         SC_first = 1
         usr_txt = ''
 
         try:
-            start = int(re.findall("\d+", id_range)[0])
+            start = int(re.findall('\d+', id_range)[0])
             if start < SC_first:
                 usr_txt = (
                     f"SC lines value is lower than lowest SC queue ID, "
                     f"nothing was done."
                 )
         except IndexError:
-            usr_txt = "Invalid command in SC lines."
+            usr_txt = 'Invalid command in SC lines.'
 
         try:
             SC_first = du.SCQueue[0].id
         except AttributeError:
-            usr_txt = "SC queue contains no commands, nothing was done."
+            usr_txt = 'SC queue contains no commands, nothing was done.'
         
         if usr_txt:
-            user_info = strd_dialog(usr_txt, "Command error")
+            user_info = strd_dialog(usr_txt, 'Command error')
             user_info.exec()
             return None
 
-        pan_val = self.ASC_num_panning.value()
-        fib_deliv = self.ASC_num_fibDeliv.value()
-        clamp = self.ASC_btt_clamp.isChecked()
-        knife_pos = self.ASC_btt_knifePos.isChecked()
-        knife = self.ASC_btt_knife.isChecked()
-        fiber_pnmtc = self.ASC_btt_fiberPnmtc.isChecked()
+        Tool = self.adc_read_user_input('ASC')
 
         if ".." in id_range:
-            ids = re.findall("\d+", id_range)
+            ids = re.findall('\d+', id_range)
             if len(ids) != 2:
                 user_info = strd_dialog(
-                    "Worng syntax used in SC lines value, nothing was done.",
-                    "Command error",
+                    'Worng syntax used in SC lines value, nothing was done.',
+                    'Command error',
                 )
                 user_info.exec()
                 return None
-
             id_start = int(ids[0])
             id_end = int(ids[1])
 
             GlobalMutex.lock()
             for i in range(id_end - id_start + 1):
-
-                try:
-                    j = du.SCQueue.id_pos(i + id_start)
-                except AttributeError:
+                if not overwrite(i, Tool):
                     break
-
-                du.SCQueue[j].Tool.pan_steps = int(pan_val)
-                du.SCQueue[j].Tool.fib_deliv_steps = int(fib_deliv)
-                du.SCQueue[j].Tool.pnmtc_clamp_yn= bool(clamp)
-                du.SCQueue[j].Tool.knife_pos_yn = bool(knife_pos)
-                du.SCQueue[j].Tool.knife_yn = bool(knife)
-                du.SCQueue[j].Tool.pnmtc_fiber_yn = bool(fiber_pnmtc)
             GlobalMutex.unlock()
 
         else:
-            ids = re.findall("\d+", id_range)
+            ids = re.findall('\d+', id_range)
             if len(ids) != 1:
                 user_info = strd_dialog(
-                    "Worng syntax used in SC lines value, nothing was done.",
-                    "Command error",
+                    'Worng syntax used in SC lines value, nothing was done.',
+                    'Command error',
                 )
                 user_info.exec()
                 return None
-
             id_start = int(ids[0])
 
             GlobalMutex.lock()
-            try:
-                j = du.SCQueue.id_pos(id_start)
-            except AttributeError:
-                return
-
-            du.SCQueue[j].Tool.pan_steps = int(pan_val)
-            du.SCQueue[j].Tool.fib_deliv_steps = int(fib_deliv)
-            du.SCQueue[j].Tool.pnmtc_clamp_yn = bool(clamp)
-            du.SCQueue[j].Tool.knife_pos_yn = bool(knife_pos)
-            du.SCQueue[j].Tool.knife_yn = bool(knife)
-            du.SCQueue[j].Tool.pnmtc_fiber_yn = bool(fiber_pnmtc)
+            overwrite(id_start, Tool)
             GlobalMutex.unlock()
 
         check_entry = du.SCQueue.id_pos(id_start)
         Tool = du.SCQueue[check_entry].Tool
         self.log_entry(
-            "ACON",
+            'ACON',
             (
-                f"{ id_range } SC commands overwritten to new tool "
-                f"settings: ({ Tool })"
+                f"{id_range} SC commands overwritten to new tool "
+                f"settings: ({Tool})"
             ),
         )
 
@@ -1665,9 +1552,9 @@ class Mainframe(PreMainframe):
     def closeEvent(self, event) -> None:
         """exit all threads and connections clean(ish)"""
 
-        self.log_entry("newline")
-        self.log_entry("GNRL", "closeEvent signal.")
-        self.log_entry("GNRL", "cut connections...")
+        self.log_entry('newline')
+        self.log_entry('GNRL', 'closeEvent signal.')
+        self.log_entry('GNRL', 'cut connections...')
 
         # stop pump thread
         if self._PumpCommThread.isRunning():
@@ -1680,19 +1567,19 @@ class Mainframe(PreMainframe):
             self._SensorArrThread.wait()
 
         # disconnect everything
-        self.disconnect_tcp("ROB", internal_call=True)
-        self.disconnect_tcp("P1", internal_call=True)
-        self.disconnect_tcp("P2", internal_call=True)
-        self.disconnect_tcp("MIX", internal_call=True)
+        self.disconnect_tcp('ROB', internal_call=True)
+        self.disconnect_tcp('P1', internal_call=True)
+        self.disconnect_tcp('P2', internal_call=True)
+        self.disconnect_tcp('MIX', internal_call=True)
 
         # delete threads
-        self.log_entry("GNRL", "stop threading...")
+        self.log_entry('GNRL', 'stop threading...')
         self._RoboCommThread.deleteLater()
         self._PumpCommThread.deleteLater()
         self._LoadFileThread.deleteLater()
 
         # bye
-        self.log_entry("GNRL", "exiting GUI.")
+        self.log_entry('GNRL', 'exiting GUI.')
         self.Daq.close()
         event.accept()
 
@@ -1701,7 +1588,7 @@ class Mainframe(PreMainframe):
 ##################################   MAIN  ###################################
 
 # only do the following if run as main program
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     from libs.win_dialogs import strd_dialog
     import libs.data_utilities as du
@@ -1712,7 +1599,7 @@ if __name__ == "__main__":
     logpath = fu.create_logfile()
 
     # overwrite ROB_tcpip for testing, delete later
-    du.ROBTcp.ip = "localhost"
+    du.ROBTcp.ip = 'localhost'
     du.ROBTcp.port = 10001
 
     # start the UI and assign to app

@@ -23,7 +23,7 @@ sys.path.append(parent_dir)
 # PyQt stuff
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtCore import QTimer, QMutex
+from PyQt5.QtCore import QObject, QTimer, QMutex, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
 
@@ -50,7 +50,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     #                                ATTRIBUTES                              #
     ##########################################################################
 
-    _logpath = ""  # reference for logEntry, set by __init__
+    _logpath = ''  # reference for logEntry, set by __init__
 
     _last_comm_id = 0
     _LastP1Telem = None
@@ -196,7 +196,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     #                              LOG FUNCTION                              #
     ##########################################################################
 
-    def log_entry(self, source="[    ]", text="") -> None:
+    def log_entry(self, source='[    ]', text='') -> None:
         """set one-liner for log entries, safes A LOT of repetitive code"""
 
         if self._logpath == '':
@@ -207,7 +207,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         if source == 'newline':
             text = '\n'
         else:
-            time = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+            time = datetime.now().strftime('%Y-%m-%d_%H%M%S')
             text = f"{time}    [{source}]:        {text}\n"
 
         try:
@@ -374,14 +374,14 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                 du.SC_curr_comm_id -= 3000
                 GlobalMutex.unlock()
 
-            log_txt = "DC" if dc else 'SC'
+            log_txt = 'DC' if dc else 'SC'
             log_txt = f"{num_send} {log_txt} command(s) send"
             self.label_update_on_send(command)
-            self.log_entry("ROBO", log_txt)
+            self.log_entry('ROBO', log_txt)
 
         else:
             self.log_entry(
-                "CONN",
+                'CONN',
                 (
                     f"TCPIP class 'ROB_tcpip' encountered {num_send} "
                     f"in sendCommand!"
@@ -409,7 +409,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             if du.PMP1Serial.connected:
                 log_txt += f"   PMP1: {self._LastP1Telem}"
             if du.PMP2Serial.connected:
-                log_txt += f"   PMP1: {self._LastP2Telem}"
+                log_txt += f"   PMP2: {self._LastP2Telem}"
 
             self.log_entry("RTel", log_txt)
             self._last_comm_id = telem.id
@@ -904,6 +904,112 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             "ZERO",
             f"current zero position updated: ({du.DCCurrZero})"
         )
+
+
+
+
+class Watchdog(QObject):
+    
+    logEntry = pyqtSignal(str, str)
+    criticalBite = pyqtSignal()
+    disconnectDevice = pyqtSignal(str, bool)
+    closeMainframe = pyqtSignal()
+
+    def __init__(
+            self,
+            operation_critical:bool,
+            name:str,
+            device:str,
+            token:str
+    ) -> None:
+        """setup and validate input"""
+
+        super().__init__()
+        self._name = name
+        self._device = device
+        if not hasattr(du, device):
+            raise AttributeError(f"{device} doesn't exist in data_utilities!")
+        self._token = token
+        self._critical = operation_critical
+        self._timer = QTimer()
+        self._timer.setSingleShot(True)
+        self._timer.setInterval(10000)
+        self._timer.timeout.connect(self.bite)
+
+
+    def start(self) -> None:
+        """set Watchdog, check data updates from device occure at
+        least every 10 sec
+        """
+        
+        self._timer.start()
+        self.logEntry.emit('WDOG', f"Watchdog {self.name} started.")
+
+    def reset(self) -> None:
+        """reset the Watchdog on every newly received data block, check
+        connection everytime if disconnected inbetween
+        """
+
+        Connection = getattr(du, self._device)
+        try:
+            if Connection.connected:
+                self._timer.start()
+        except AttributeError:
+            if getattr(du, self._device):
+                self._timer.start()
+
+
+    def bite(self) -> None:
+        """infrom user on any biting WD, log info"""
+
+        # stop critical operations, build user text
+        if du.SC_q_processing and self._critical:
+            wd_txt = (
+                f"Watchdog {self.name} has bitten! Stopping script control & "
+                f"forwarding forced-stop to robot!"
+            )
+            self.logEntry.emit('WDOG', wd_txt)
+            self.criticalBite.emit()
+        else:
+            wd_txt = f"Watchdog {self.name} has bitten!"
+            self.logEntry.emit('WDOG', wd_txt)
+            
+        # disconnect, also stops watchdog
+        self.disconnectDevice.emit(self._token, True)
+
+        # ask user to close application
+        usr_txt = f"{wd_txt}\nOK to continue or Cancel to exit and close."
+        warning = strd_dialog(usr_txt, "WATCHDOG ALARM")
+        warning.exec()
+
+        if warning.result():
+            self.logEntry.emit('WDOG', f"User chose to return to main screen.")
+        else:
+            self.logEntry.emit(
+                'WDOG',
+                f"User chose to close PRINT_py, exiting..."
+            )
+            self.closeMainframe.emit()
+
+
+    def kill(self) -> None:
+        """put them to sleep (dont do this to real dogs)"""
+
+        self._timer.stop()
+        self.logEntry.emit('WDOG', f"Watchdog {self.name} stopped.")
+
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def device(self):
+        return self._device
+
+    @property
+    def token(self):
+        return self._token
 
 
 

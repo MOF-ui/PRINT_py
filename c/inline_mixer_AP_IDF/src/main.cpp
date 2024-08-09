@@ -26,11 +26,11 @@ following examples from
 #include "si5351.h"
 #include "uri_handlers.h"
 
-#define I2C_MASTER_SCL_IO   16      // siehe https://github.com/OLIMEX/ESP32-POE-ISO/blob/master/HARDWARE/ESP32-PoE-ISO-Rev.K/ESP32-PoE-ISO_Rev_K.pdf
+#define I2C_MASTER_SCL_IO   16     // siehe https://github.com/OLIMEX/ESP32-POE-ISO/blob/master/HARDWARE/ESP32-PoE-ISO-Rev.K/ESP32-PoE-ISO_Rev_K.pdf
 #define I2C_MASTER_SDA_IO   13
 #define SAMPLE_PERIOD       5000   // milliseconds
 #define FQ_STEP             50ULL
-#define P_CTRL_CONST        0.2
+#define P_CTRL_CONST        0.2    // 20 %
 
 static const char *g_TAG = "DAQ_S";
 static bool g_connected = false;
