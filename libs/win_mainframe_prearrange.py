@@ -22,7 +22,7 @@ sys.path.append(parent_dir)
 
 # PyQt stuff
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtCore import QObject, QTimer, QMutex, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
@@ -56,6 +56,16 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     _LastP1Telem = None
     _LastP2Telem = None
 
+    _RoboCommWorker = None
+    _PumpCommWorker = None
+    _LoadFileWorker = None
+    _SensorArrWorker = None
+
+    _RobRecvWd = None
+    _P1RecvWd = None
+    _P2RecvWd = None
+    _MixRecvWd = None
+
     #########################################################################
     #                                  SETUP                                #
     #########################################################################
@@ -73,8 +83,20 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             | Qt.WindowCloseButtonHint
         )
 
+        # INIT THREADS
+        self._RoboCommThread = QThread()
+        self._LoadFileThread = QThread()
+        self._PumpCommThread = QThread()
+        self._SensorArrThread = QThread()
+
+        # INIT WATCHDOGS
+        self._RobRecvWd = Watchdog(True, 'Robot', 'ROBTcp', 'ROB')
+        self._P1RecvWd = Watchdog(True, 'Pump 1', 'PMP1Serial', 'P1')
+        self._P2RecvWd = Watchdog(True, 'Pump 2', 'PMP2Serial', 'P2')
+        self._MixRecvWd = Watchdog(True, 'Pump 1', 'MIX_connected', 'MIX')
+
         # GROUP PANEL ELEMENTS
-        self.group_gui_elems()
+        self.group_elems()
 
         # LOGFILE SETUP
         if lpath is None:
@@ -104,7 +126,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.log_entry('GNRL', 'DAQ GUI running.')
     
 
-    def group_gui_elems(self) -> None:
+    def group_elems(self) -> None:
         """build groups for enable/disable actions"""
 
         self.ADC_group = self.ADC_frame.findChildren(
@@ -189,6 +211,13 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             elem.setEnabled(False)
 
         self.TERM_group = self.TERM_btt_gcodeInterp, self.TERM_btt_rapidInterp
+        
+        self.WD_group = [
+            self._RobRecvWd,
+            self._P1RecvWd,
+            self._P2RecvWd,
+            self._MixRecvWd
+        ]
 
 
     

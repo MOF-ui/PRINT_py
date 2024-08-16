@@ -24,7 +24,6 @@ sys.path.append(parent_dir)
 
 
 # PyQt stuff
-from PyQt5.QtCore import QTimer, QThread
 from PyQt5.QtWidgets import QApplication, QShortcut
 
 
@@ -56,16 +55,6 @@ class Mainframe(PreMainframe):
     _testrun = False  # switch for mainframe_test.py
     _first_pos = True  # one-time switch to get robot home position
 
-    _RoboCommWorker = None
-    _PumpCommWorker = None
-    _LoadFileWorker = None
-    _SensorArrWorker = None
-
-    _RobRecvWd = None
-    _P1RecvWd = None
-    _P2RecvWd = None
-    _MixRecvWd = None
-
 
     #########################################################################
     #                                  SETUP                                #
@@ -93,10 +82,6 @@ class Mainframe(PreMainframe):
         self.load_defaults(setup=True)
 
         self.log_entry('GNRL', 'init threading...')
-        self._RoboCommThread = QThread()
-        self._LoadFileThread = QThread()
-        self._PumpCommThread = QThread()
-        self._SensorArrThread = QThread()
         self.connect_threads('OTHER')
 
         # TESTRUN OPTION
@@ -108,10 +93,6 @@ class Mainframe(PreMainframe):
 
         # INIT WATCHDOGS
         self.log_entry('GNRL', "connect to Robot...")
-        self._RobRecvWd = Watchdog(True, 'Robot', 'ROBTcp', 'ROB')
-        self._P1RecvWd = Watchdog(True, 'Pump 1', 'PMP1Serial', 'P1')
-        self._P2RecvWd = Watchdog(True, 'Pump 2', 'PMP2Serial', 'P2')
-        self._MixRecvWd = Watchdog(True, 'Pump 1', 'MIX_connected', 'MIX')
         self.connect_watchdogs()
 
         # CONNECTIONS SETUP
@@ -303,14 +284,14 @@ class Mainframe(PreMainframe):
         self._ctrl_P = QShortcut("Ctrl+P", self)
         self._ctrl_Q = QShortcut("Ctrl+Q", self)
         self._ctrl_R = QShortcut("Ctrl+R", self)
-        self._ctrl_S = QShortcut("Ctrl+S", self)
+        self._ctrl_alt_S = QShortcut("Ctrl+Alt+S", self)
         self._ctrl_T = QShortcut("Ctrl+T", self)
         self._ctrl_U = QShortcut("Ctrl+U", self)
         self._ctrl_Raute = QShortcut("Ctrl+#", self)
         self._ctrl_alt_I = QShortcut("Ctrl+Alt+I", self)
 
         # SCRIPT CONTROL
-        self._ctrl_S.activated.connect(self.start_SCTRL_queue)
+        self._ctrl_alt_S.activated.connect(self.start_SCTRL_queue)
         self._ctrl_A.activated.connect(lambda: self.stop_SCTRL_queue(prep_end=True))
         self._ctrl_F.activated.connect(lambda: self.send_command(du.SCQueue.pop_first_item()))
         self._ctrl_Raute.activated.connect(lambda: self.clr_queue(partial=False))
@@ -672,7 +653,7 @@ class Mainframe(PreMainframe):
     def connect_watchdogs(self):
         """connect all signals, the same for every WD"""
 
-        for wd in [self._RobRecvWd, self._P1RecvWd, self._P2RecvWd, self._MixRecvWd]:
+        for wd in self.WD_group:
             wd.logEntry.connect(self.log_entry)
             wd.criticalBite.connect(self.forced_stop_command)
             wd.criticalBite.connect(self.stop_SCTRL_queue)

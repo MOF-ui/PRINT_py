@@ -95,6 +95,42 @@ conversion unit. Both pumps are connected to this converter via Modbus, sharing
 the same bus and therefore the same COM port. Modbus adresses are '01' & '02'. 
 There is no testing environment for the pumps, yet.
 
+## Shortcuts
+
+#### Script control
+
+| button | shortcut |
+| ------ | -------- |
+| start queue processing | :arrow-right: `CTRL+ALT+S` |
+| stop queue processing | :arrow-right: `CTRL+A` |
+| send first queue command | :arrow-right: `CTRL+F` |
+| clear queue | :arrow-right: `CTRL+#` |
+| forced stop | :arrow-right: `CTRL+Q` |
+| reset script ID to robot ID | :arrow-right: `CTRL+ALT+I` |
+
+#### Direct control
+
+| button | shortcut |
+| ------ | -------- |
+| (step) + X | :arrow-right: `CTRL+U` |
+| (step) - X | :arrow-right: `CTRL+J` |
+| (step) + Y | :arrow-right: `CTRL+I` |
+| (step) - Y | :arrow-right: `CTRL+K` |
+| (step) + Z | :arrow-right: `CTRL+O` |
+| (step) - Z | :arrow-right: `CTRL+L` |
+| (step) + EXT | :arrow-right: `CTRL+P` |
+| (step) - EXT | :arrow-right: `CTRL+OE` |
+| NC set current position | :arrow-right: `CTRL+T` |
+
+#### Other
+
+| button | shortcut |
+| ------ | -------- |
+| browse files | :arrow-right: `CTRL+N` |
+| load selected file | :arrow-right: `CTRL+M` |
+| stop pumps | :arrow-right: `CTRL+E` |
+| invert pump speed | :arrow-right: `CTRL+R` |
+
 ## Robot communication syntax 
 
 #### Command
