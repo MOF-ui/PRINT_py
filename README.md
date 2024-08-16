@@ -101,35 +101,35 @@ There is no testing environment for the pumps, yet.
 
 | button | shortcut |
 | ------ | -------- |
-| start queue processing | :arrow-right: `CTRL+ALT+S` |
-| stop queue processing | :arrow-right: `CTRL+A` |
-| send first queue command | :arrow-right: `CTRL+F` |
-| clear queue | :arrow-right: `CTRL+#` |
-| forced stop | :arrow-right: `CTRL+Q` |
-| reset script ID to robot ID | :arrow-right: `CTRL+ALT+I` |
+| start queue processing | :arrow_right: `CTRL+ALT+S` |
+| stop queue processing | :arrow_right: `CTRL+A` |
+| send first queue command | :arrow_right: `CTRL+F` |
+| clear queue | :arrow_right: `CTRL+#` |
+| forced stop | :arrow_right: `CTRL+Q` |
+| reset script ID to robot ID | :arrow_right: `CTRL+ALT+I` |
 
 #### Direct control
 
 | button | shortcut |
 | ------ | -------- |
-| (step) + X | :arrow-right: `CTRL+U` |
-| (step) - X | :arrow-right: `CTRL+J` |
-| (step) + Y | :arrow-right: `CTRL+I` |
-| (step) - Y | :arrow-right: `CTRL+K` |
-| (step) + Z | :arrow-right: `CTRL+O` |
-| (step) - Z | :arrow-right: `CTRL+L` |
-| (step) + EXT | :arrow-right: `CTRL+P` |
-| (step) - EXT | :arrow-right: `CTRL+OE` |
-| NC set current position | :arrow-right: `CTRL+T` |
+| (step) + X | :arrow_right: `CTRL+U` |
+| (step) - X | :arrow_right: `CTRL+J` |
+| (step) + Y | :arrow_right: `CTRL+I` |
+| (step) - Y | :arrow_right: `CTRL+K` |
+| (step) + Z | :arrow_right: `CTRL+O` |
+| (step) - Z | :arrow_right: `CTRL+L` |
+| (step) + EXT | :arrow_right: `CTRL+P` |
+| (step) - EXT | :arrow_right: `CTRL+OE` |
+| NC set current position | :arrow_right: `CTRL+T` |
 
 #### Other
 
 | button | shortcut |
 | ------ | -------- |
-| browse files | :arrow-right: `CTRL+N` |
-| load selected file | :arrow-right: `CTRL+M` |
-| stop pumps | :arrow-right: `CTRL+E` |
-| invert pump speed | :arrow-right: `CTRL+R` |
+| browse files | :arrow_right: `CTRL+N` |
+| load selected file | :arrow_right: `CTRL+M` |
+| stop pumps | :arrow_right: `CTRL+E` |
+| invert pump speed | :arrow_right: `CTRL+R` |
 
 ## Robot communication syntax 
 
