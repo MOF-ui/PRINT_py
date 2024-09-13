@@ -1,8 +1,17 @@
+/*  This work is licensed under Creativ Commons Attribution-ShareAlike 4.0
+/   International (CC BY-SA 4.0).
+/   (https://creativecommons.org/licenses/by-sa/4.0/)
+/   Feel free to use, modify or distribute this code as far as you like, so
+/   long as you make anything based on it publicly avialable under the same
+/   license.
+*/
 /* 
 following examples from
     danak6jq: https://github.com/danak6jq/ESP32-WSPR
     espressif.com
 */
+
+/* --------------------------------- IMPORTS ------------------------------ */
 
 #include <stdio.h>
 #include <string.h>
@@ -24,7 +33,7 @@ following examples from
 #include "driver\i2c.h"
 
 #include "si5351.h"
-#include "uri_handlers.h"
+#include "uri_handlers_inline.h"
 
 #define I2C_MASTER_SCL_IO   16     // siehe https://github.com/OLIMEX/ESP32-POE-ISO/blob/master/HARDWARE/ESP32-PoE-ISO-Rev.K/ESP32-PoE-ISO_Rev_K.pdf
 #define I2C_MASTER_SDA_IO   13
@@ -108,7 +117,6 @@ void si5351_main()
     }
 }
 
-
 /* ----------------------------- ETHERNET EVENTS -------------------------- */
 
 static void eth_event_handler(
@@ -186,7 +194,6 @@ static void got_ip_event_handler(
     ESP_LOGI(g_TAG, "ETHGW:" IPSTR, IP2STR(&ip_info->gw));
     ESP_LOGI(g_TAG, "~~~~~~~~~~~");
 }
-
 
 /* ---------------------------------- MAIN ------------------------------- */
 

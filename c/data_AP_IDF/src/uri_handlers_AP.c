@@ -1,3 +1,5 @@
+/* --------------------------------- IMPORTS ------------------------------ */
+
 #include <stdio.h>
 #include <string.h>
 #include <nvs_flash.h>
@@ -13,8 +15,9 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "esp_http_server.h"
-#include "uri_handlers.h"
+#include "uri_handlers_AP.h"
 
+/* -------------------------------- VARIABLES ----------------------------- */
 
 // global const
 const struct daq_block g_EMPTY_DAQ_BLOCK = {0};
@@ -28,15 +31,17 @@ SemaphoreHandle_t g_MUTEX = NULL;
 TickType_t g_ticks_last_req = 0;
 float g_motor_rpm = 0;
 
+/* -------------------------------- FUNCTIONS ----------------------------- */
 
-// initialize g_MUTEX
+// initialize g_MUTEX handle
 esp_err_t init_uri()
 {
     g_MUTEX = xSemaphoreCreateMutex();
     return (ESP_OK);
 }
 
-// return server_handle with registered URI handlers
+// return server_handle with registered URI handlers;
+// registered handles are: '/data' and '/ping'
 httpd_handle_t start_daqs()
 {
     httpd_handle_t server = NULL;
@@ -51,7 +56,7 @@ httpd_handle_t start_daqs()
         
         // set URIs
         httpd_register_uri_handler(server, &data_req);
-        httpd_register_uri_handler(server, &post_f);
+        httpd_register_uri_handler(server, &ping_req);
 
         // set error handlers
         httpd_register_err_handler(
@@ -83,7 +88,8 @@ esp_err_t stop_daqs(httpd_handle_t server)
     return httpd_stop(server);
 }
 
-// HTTP GET HANDLER
+// returns all backlogged data to IP request (LIFO) with heading data-lost
+// token; prints requests IP first
 esp_err_t data_request(httpd_req_t *req)
 {
     // get client IP
@@ -148,6 +154,7 @@ esp_err_t data_request(httpd_req_t *req)
     return ESP_OK;
 }
 
+// returns 'ack' to ping request from IP client
 esp_err_t ping_request(httpd_req_t *req)
 {
     // get client IP
@@ -165,52 +172,6 @@ esp_err_t ping_request(httpd_req_t *req)
     httpd_resp_set_hdr(req, "Allow", "GET");
     
     httpd_resp_send(req, "ack", HTTPD_RESP_USE_STRLEN);
-    return ESP_OK;
-}
-
-// HTTP POST HANDLER
-esp_err_t freq_post(httpd_req_t *req)
-{
-    /* Destination buffer for content of HTTP POST request.
-     * httpd_req_recv() accepts char* only, but content could
-     * as well be any binary data (needs type casting).
-     * In case of string data, null termination will be absent, and
-     * content length would give length of string */
-    char content[100];
-
-    /* Truncate if content length larger than the buffer */
-    size_t recv_size = MIN(req->content_len, sizeof(content));
-
-    int ret = httpd_req_recv(req, content, recv_size);
-    if (ret <= 0) {  /* 0 return value indicates connection closed */
-        /* Check if timeout occurred */
-        if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
-            /* In case of timeout one can choose to retry calling
-             * httpd_req_recv(), but to keep it simple, here we
-             * respond with an HTTP 408 (Request Timeout) error */
-            httpd_resp_send_408(req);
-        }
-        /* In case of error, returning ESP_FAIL will
-         * ensure that the underlying socket is closed */
-        ESP_LOGI(g_URI_TAG, "POST HANDLING FAILED!");
-        return ESP_FAIL;
-    }
-
-    char* resp;
-    uint16_t len = req->content_len;
-    content[len+1] = '\0';
-    ESP_LOGI(g_URI_TAG, "received: %s", content);
-
-    xSemaphoreTake(g_MUTEX, portMAX_DELAY);
-    sscanf(content, "%f", &g_motor_rpm);
-    if (g_motor_rpm < 0.0) g_motor_rpm = 0.0;
-    asprintf(&resp, "RECV%f", g_motor_rpm);
-    xSemaphoreGive(g_MUTEX);
-    
-    // set response header
-    httpd_resp_set_hdr(req, "Allow", "POST");
-
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -236,8 +197,10 @@ esp_err_t http_405_handler(httpd_req_t *req, httpd_err_code_t err)
     return ESP_FAIL;
 }
 
-// DAQ2STR
-// sz_ret for string-zero (\0 terminated) return
+/* -------------------------------- FUNCTIONS ----------------------------- */
+
+// short-hand function to construct string from daq_block list entry
+// sz_ret for string-zero ('\0' terminated) return
 void daq2str(
         struct daq_block *daqb,
         char *sz_ret,

@@ -517,6 +517,7 @@ class QEntry:
         z=10,
         Tool=None,
         p_mode=None,
+        p_ratio=1.0,
     ) -> None:
 
         self.id = int(id)
@@ -526,6 +527,7 @@ class QEntry:
         self.sc = str(sc)
         self.z = int(z)
         self.p_mode = str(p_mode)
+        self.p_ratio = float(p_ratio)
 
         # handle those beasty mutables
         self.Coor1 = Coordinate() if (Coor1 is None) else Coor1
@@ -543,7 +545,7 @@ class QEntry:
             f"\n\t\t|| SV:     {self.Speed} "
             f"\t|| SBT: {self.sbt}   SC: {self.sc}   Z: {self.z}"
             f"\n\t\t|| TOOL:   {self.Tool}"
-            f"\n\t\t|| PMODE:  {self.p_mode}"
+            f"\n\t\t|| PM/PR:  {self.p_mode}/{self.p_ratio}"
         )
 
 
@@ -562,6 +564,7 @@ class QEntry:
                 and self.z == other.z
                 and self.Tool == other.Tool
                 and self.p_mode == other.p_mode
+                and self.p_ratio == other.p_ratio
             ):
                 return True
 
@@ -591,6 +594,7 @@ class QEntry:
                 or self.z != other.z
                 or self.Tool != other.Tool
                 or self.p_mode != other.p_mode
+                or self.p_ratio != other.p_ratio
             ):
                 return True
 
@@ -608,7 +612,7 @@ class QEntry:
         return (
             f"ID: {self.id} -- {self.mt}, {self.pt} -- "
             f"COOR_1: {self.Coor1} -- SV: {self.Speed} -- "
-            f"PMODE:  {self.p_mode}"
+            f"PM/PR:  {self.p_mode}/{self.p_ratio}"
         )
 
 

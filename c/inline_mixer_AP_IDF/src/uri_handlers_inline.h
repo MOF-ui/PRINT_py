@@ -1,6 +1,8 @@
 #ifndef URI_HANDLERS_H
 #define URI_HANDLERS_H
 
+/* --------------------------------- IMPORTS ------------------------------ */
+
 #include <stdio.h>
 #include <string.h>
 #include <nvs_flash.h>
@@ -17,7 +19,8 @@
 #include "esp_log.h"
 #include "esp_http_server.h"
 
-// preprocessor const
+/* -------------------------------- VARIABLES ----------------------------- */
+
 #define BACKLOG_SIZE        1000
 #define DAQB_STR_SIZE       25
 
@@ -45,7 +48,8 @@ extern SemaphoreHandle_t g_MUTEX;
 extern TickType_t g_ticks_last_req;
 extern float g_motor_rpm;
 
-// functions
+/* -------------------------------- FUNCTIONS ----------------------------- */
+
 esp_err_t init_uri(void);
 httpd_handle_t start_daqs(void);
 esp_err_t stop_daqs(httpd_handle_t server);
@@ -62,22 +66,25 @@ esp_err_t http_400_handler(httpd_req_t *req, httpd_err_code_t err);
 esp_err_t http_404_handler(httpd_req_t *req, httpd_err_code_t err);
 esp_err_t http_405_handler(httpd_req_t *req, httpd_err_code_t err);
 
-// GET URI REGISTER TYPE
+
+/* --------------------------------- URI TYPS ------------------------------ */
+
+// get
 static const httpd_uri_t data_req = {
-    .uri       = "/test",
+    .uri       = "/data",
     .method    = HTTP_GET,
     .handler   = data_request,
     .user_ctx  = NULL,
 };
 
-static const httpd_uri_t data_req = {
+static const httpd_uri_t ping_req = {
     .uri       = "/ping",
     .method    = HTTP_GET,
     .handler   = ping_request,
     .user_ctx  = NULL,
 };
 
-// POST URI REGISTER TYPE
+// post
 static const httpd_uri_t post_f = {
     .uri       = "/motor",
     .method    = HTTP_POST,

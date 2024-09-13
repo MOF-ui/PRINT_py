@@ -189,14 +189,22 @@ def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
     """short-hand for pump & tool settings detection"""
     
     # set pump settings
-    entry.p_mode = re_short(None, txt, 'None', find_coor='PMP')
-    match entry.p_mode:
+    p_mode = re_short(None, txt, None, find_coor='PMP')
+    match p_mode:
         case '1': entry.p_mode = 'default'
         case '2': entry.p_mode = 'class1'
         case '3': entry.p_mode = 'class2'
         case '10': entry.p_mode = 'start'
         case '11': entry.p_mode = 'end'
         case _: entry.p_mode = 'None'
+    p_ratio = re_short(None, txt, None, find_coor='PR')
+    try:
+        p_ratio = float(p_ratio)
+        if p_ratio > 1.0: p_ratio = 1.0
+        if p_ratio < 0: p_ratio = 0.0
+        entry.p_ratio = p_ratio
+    except:
+        pass
 
     # set tool settings
     if 'TOOL' in txt:
@@ -516,7 +524,7 @@ def calc_pump_ratio(p1_speed:int, p2_speed:int) -> tuple[float, float]:
     """
 
     curr_total = p1_speed + p2_speed
-    p1_ratio = (p1_speed / curr_total) if (curr_total != 0) else 0.5
+    p1_ratio = (p1_speed / curr_total) if (curr_total != 0) else 1.0
     curr_total = curr_total / 2
 
     return curr_total, p1_ratio

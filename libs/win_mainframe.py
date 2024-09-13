@@ -92,7 +92,7 @@ class Mainframe(PreMainframe):
             return
 
         # INIT WATCHDOGS
-        self.log_entry('GNRL', "connect to Robot...")
+        self.log_entry('GNRL', "init watchdog...")
         self.connect_watchdogs()
 
         # CONNECTIONS SETUP

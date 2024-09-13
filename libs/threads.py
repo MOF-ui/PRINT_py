@@ -65,9 +65,10 @@ class PumpCommWorker(QObject):
         self.LoopTimer.stop()
         self.LoopTimer.deleteLater()
     
+
     def active_state(self):
         """extra function needed to set global indicator 'PMP_comm_active'
-        with is checked in win_mainframe.disconnect_tcp"""
+        which is checked in win_mainframe.disconnect_tcp"""
 
         GlobalMutex.lock()
         du.PMP_comm_active = True
@@ -79,6 +80,42 @@ class PumpCommWorker(QObject):
         GlobalMutex.lock()
         du.PMP_comm_active = False
         GlobalMutex.unlock()
+    
+
+    def get_speed_settings() -> tuple[int, int, int]:
+        """see if pump settings have been scripted, otherwise use user 
+        input; interpret total_speed as combined maximum possible flow,
+        if both pumps are connected; pump values are capped at 100, e.g.
+        when P1 & P2 are connected, speed is set to 100 & ratio is set to
+        1.0, pump1_speed would otherwise be 200.
+        """
+
+        # SEND TO PUMPS
+        p_ratio = du.PMP_output_ratio
+        if du.SC_q_processing:
+            total_speed, p_ratio = pu.calc_speed()
+        else: 
+            total_speed = du.PMP_speed
+
+        # get speed
+        if du.PMP1Serial.connected and du.PMP2Serial.connected:
+            total_speed *= 2
+            p1_speed = total_speed * p_ratio
+            p2_speed = total_speed * (1 - p_ratio)
+        else:
+            p1_speed = p2_speed = total_speed
+
+        # look for user overwrite, no mutex, as changing 
+        # global PUMP_user_speed would not harm the process
+        if du.PMP1_user_speed != -999:
+            p1_speed = du.PMP1_user_speed
+            du.PMP1_user_speed = -999
+        if du.PMP2_user_speed != -999:
+            p2_speed = du.PMP2_user_speed
+            du.PMP2_user_speed = -999
+        
+        return total_speed, p1_speed, p2_speed
+
 
     def send(self) -> None:
         """send pump speed to pump, uses modified setter in mtec's script 
@@ -86,33 +123,12 @@ class PumpCommWorker(QObject):
         the machines answer and the original command string, uses user-set
         pump speed if no script is running
         """
-
-        # SEND TO PUMPS
-        pump_speed = pu.calc_speed() if (du.SC_q_processing) else du.PMP_speed
-
-        # get speed
-        if du.PMP1Serial.connected and du.PMP2Serial.connected:
-            pump_speed *= 2
-            pump1_speed = pump_speed * du.PMP_output_ratio
-            pump2_speed = pump_speed * (1 - du.PMP_output_ratio)
-        else:
-            pump1_speed = pump2_speed = pump_speed
-
-        # look for user overwrite, no mutex, as changing 
-        # global PUMP_user_speed would not harm the process
-        for du_user_speed, calc_speed in [
-                ('PMP1_user_speed', 'pump1_speed'),
-                ('PMP2_user_speed', 'pump2_speed'),
-        ]:
-            user_speed = getattr(du, du_user_speed)
-            if user_speed != -999:
-                locals()[calc_speed] = user_speed
-                setattr(du, du_user_speed, -999)
         
         # send to P1 and P2 & keepAlive both
+        pmp_speed, p1_speed, p2_speed = self.get_speed_settings() 
         for serial, speed, live_ad, speed_global, p_num in [
-                (du.PMP1Serial, pump1_speed, 'PMP1_live_ad', 'PMP1_speed', 'P1'),
-                (du.PMP2Serial, pump2_speed, 'PMP2_live_ad', 'PMP2_speed', 'P2'),
+                (du.PMP1Serial, p1_speed, 'PMP1_live_ad', 'PMP1_speed', 'P1'),
+                (du.PMP2Serial, p2_speed, 'PMP2_live_ad', 'PMP2_speed', 'P2'),
         ]:
             if serial.connected and speed is not None:
                 res = serial.set_speed(int(speed * getattr(du, live_ad)))
@@ -129,7 +145,7 @@ class PumpCommWorker(QObject):
         # SEND TO MIXER
         if du.MIX_connected and du.MIX_last_speed != du.MIX_speed:
             if du.MIX_act_with_pump:
-                mixer_speed = pump_speed * du.MIX_max_speed / 100.0
+                mixer_speed = pmp_speed * du.MIX_max_speed / 100.0
             else:
                 mixer_speed = du.MIX_speed
             

@@ -26,7 +26,7 @@ import libs.data_utilities as du
 
 ###########################     FUNCTIONS      ###############################
 
-def calc_speed() -> int | None:
+def calc_speed() -> tuple[int | None, float]:
     """main function to be called from outside this file, calculates speed the
     pump needs to be set to for the current robot position
     """
@@ -44,6 +44,7 @@ def calc_speed() -> int | None:
 
     if isinstance(curr_comm, du.QEntry):
         p_mode = curr_comm.p_mode
+        p_ratio = curr_comm.p_ratio
 
         if curr_comm != preceeding_comm:
             preceeding_comm = copy.deepcopy(curr_comm)
@@ -76,7 +77,7 @@ def calc_speed() -> int | None:
         speed = -100.0
 
     last_speed = float(speed)
-    return int(round(speed, 0))
+    return int(round(speed, 0)), p_ratio
 
 
 def default_mode(command=None) -> float | None:

@@ -49,7 +49,7 @@ if arg_len == 2:
     
     match arg1:
         case 'test': test_arg = True
-        case 'local': 
+        case 'local':
             du.ROBTcp.ip = 'localhost'
             p_connect = (None, None)
         case 'overwrite':
