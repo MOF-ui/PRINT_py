@@ -1,5 +1,5 @@
-#ifndef URI_HANDLERS_H
-#define URI_HANDLERS_H
+#ifndef URI_HANDLERS_INLINE_H
+#define URI_HANDLERS_INLINE_H
 
 /* --------------------------------- IMPORTS ------------------------------ */
 
@@ -21,8 +21,9 @@
 
 /* -------------------------------- VARIABLES ----------------------------- */
 
-#define BACKLOG_SIZE        1000
-#define DAQB_STR_SIZE       25
+#define MAX_TEMP_SENSORS    8
+#define BACKLOG_SIZE        200
+#define DAQB_STR_SIZE       128
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,9 +32,8 @@ extern "C" {
 // global structures
 struct daq_block
 {
-    float temp;
-    bool error;
-    u16_t upt_s;
+    float temp[MAX_TEMP_SENSORS];
+    u64_t upt_s;
 };
 
 // global const
@@ -43,6 +43,7 @@ extern const char *g_URI_TAG;
 // global vars
 extern struct daq_block g_measure_buff[BACKLOG_SIZE];
 extern int g_backlog_idx;
+extern bool g_pinch_state;
 extern bool g_data_lost;
 extern SemaphoreHandle_t g_MUTEX;
 extern TickType_t g_ticks_last_req;
@@ -53,43 +54,53 @@ extern float g_motor_rpm;
 esp_err_t init_uri(void);
 httpd_handle_t start_daqs(void);
 esp_err_t stop_daqs(httpd_handle_t server);
+esp_err_t freq_post(httpd_req_t *req);
+esp_err_t pinch_post(httpd_req_t *req);
+esp_err_t data_request(httpd_req_t *req);
+esp_err_t ping_request(httpd_req_t *req);
+esp_err_t http_400_handler(httpd_req_t *req, httpd_err_code_t err);
+esp_err_t http_404_handler(httpd_req_t *req, httpd_err_code_t err);
+esp_err_t http_405_handler(httpd_req_t *req, httpd_err_code_t err);
 void daq2str(
         struct daq_block *daqb,
         char *sz_ret,
         int buff_len,
         u16_t curr_upt_s
 );
-esp_err_t freq_post(httpd_req_t *req);
-esp_err_t data_request(httpd_req_t *req);
-esp_err_t ping_request(httpd_req_t *req);
-esp_err_t http_400_handler(httpd_req_t *req, httpd_err_code_t err);
-esp_err_t http_404_handler(httpd_req_t *req, httpd_err_code_t err);
-esp_err_t http_405_handler(httpd_req_t *req, httpd_err_code_t err);
+void _copy_to_daqb(float* readings[MAX_TEMP_SENSORS], u64_t* uptime);
+struct daq_block empty_daqb();
 
 
 /* --------------------------------- URI TYPS ------------------------------ */
 
 // get
 static const httpd_uri_t data_req = {
-    .uri       = "/data",
-    .method    = HTTP_GET,
-    .handler   = data_request,
-    .user_ctx  = NULL,
+    .uri = "/data",
+    .method = HTTP_GET,
+    .handler = data_request,
+    .user_ctx = NULL,
 };
 
 static const httpd_uri_t ping_req = {
-    .uri       = "/ping",
-    .method    = HTTP_GET,
-    .handler   = ping_request,
-    .user_ctx  = NULL,
+    .uri = "/ping",
+    .method = HTTP_GET,
+    .handler = ping_request,
+    .user_ctx = NULL,
 };
 
 // post
-static const httpd_uri_t post_f = {
-    .uri       = "/motor",
-    .method    = HTTP_POST,
-    .handler   = freq_post,
-    .user_ctx  = NULL,
+static const httpd_uri_t post_freq = {
+    .uri = "/motor",
+    .method = HTTP_POST,
+    .handler = freq_post,
+    .user_ctx = NULL,
+};
+
+static const httpd_uri_t post_pinch = {
+    .uri = "/pinch",
+    .method = HTTP_POST,
+    .handler = pinch_post,
+    .user_ctx = NULL,
 };
 
 #ifdef __cplusplus

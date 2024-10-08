@@ -34,23 +34,27 @@ following examples from
 
 #include "si5351.h"
 #include "uri_handlers_inline.h"
+#include "temp_readout.h"
 
 #define I2C_MASTER_SCL_IO   16     // siehe https://github.com/OLIMEX/ESP32-POE-ISO/blob/master/HARDWARE/ESP32-PoE-ISO-Rev.K/ESP32-PoE-ISO_Rev_K.pdf
 #define I2C_MASTER_SDA_IO   13
-#define SAMPLE_PERIOD       5000   // milliseconds
+#define OUTPUT_PHY_PIN      12
+#define OUTPUT_PINCH_PIN    33
 #define FQ_STEP             50ULL
 #define P_CTRL_CONST        0.2    // 20 %
 
 static const char *g_TAG = "DAQ_S";
 static bool g_connected = false;
-static uint64_t freq_target = 0;
+static const gpio_num_t pinch_pin = (gpio_num_t)OUTPUT_PINCH_PIN;
+static const gpio_num_t phy_power_pin = (gpio_num_t)OUTPUT_PHY_PIN;
 
 extern "C" void app_main();
 
 Si5351 clk_gen;
 
-/* --------------------------------- SI5351A ------------------------------ */
+/* ---------------------------------- LOOP ------------------------------- */
 
+// setup I2C fro ESP32
 static esp_err_t i2c_master_init() 
 {
     i2c_port_t i2C_master_port = I2C_NUM_1;
@@ -71,18 +75,44 @@ static esp_err_t i2c_master_init()
     return (ESP_OK);
 }
 
-void si5351_main()
+// setup pinch_pin to OUTPUT, start with low
+static esp_err_t pinch_pin_init()
+{
+    gpio_config_t pinch_conf = {0};
+    pinch_conf.mode = GPIO_MODE_OUTPUT;
+    pinch_conf.pin_bit_mask = (1ULL << pinch_pin);
+    ESP_ERROR_CHECK(gpio_config(&pinch_conf));
+    ESP_ERROR_CHECK(gpio_set_level(pinch_pin, 0));
+
+    return (ESP_OK);
+}
+
+// start infinity loop, checking all inputs from webserver and use peripherals
+void printhead_loop()
 {
     float curr_freq = 0;
     float steps_per_rot = 20000.0;
     bool clk_running = false;
 
+    // SI5351 - motor control frequency generation
     i2c_master_init();
     clk_gen.init(I2C_NUM_1, SI5351_CRYSTAL_LOAD_10PF, 25000000, 0);    
     clk_gen.set_ms_source(SI5351_CLK0, SI5351_PLLA);
     clk_gen.set_pll_input(SI5351_PLLA, SI5351_PLL_INPUT_XO);
 
+    // PINCH - valve toggle
+    bool curr_pinch = false;
+    pinch_pin_init();
+
+    // TEMP_READOUT - init
+    temp_readout_init();
+    temp_readout_find();
+    float *readings[MAX_TEMP_SENSORS];
+    u64_t *uptime = 0;
+
+    // infinity loop
     while (true) {
+        // SI5351 CLOCK
         float rps = g_motor_rpm / 60.0;
         uint64_t freq_target = (uint64_t)(rps * steps_per_rot);
 
@@ -108,11 +138,26 @@ void si5351_main()
                 }
             }
             
-            curr_freq = g_motor_rpm;
             ESP_LOGI("CLK_F", "freq set to %f", curr_freq);
             xSemaphoreGive(g_MUTEX);
         }
 
+        // PINCH VALVE
+        bool new_pinch = g_pinch_state;
+        if (curr_pinch != new_pinch) {
+            curr_pinch = new_pinch;
+            if (new_pinch) {
+                ESP_ERROR_CHECK(gpio_set_level(pinch_pin, 1));
+            } else {
+                ESP_ERROR_CHECK(gpio_set_level(pinch_pin, 0));
+            }
+        }
+
+        // TEMPERATUR READOUT
+        temp_readout_all(readings, uptime);
+        _copy_to_daqb(readings, uptime);
+
+        // TASK DELAY
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
@@ -219,7 +264,6 @@ void app_main(void)
 
     // turn on PHY on designated pin following espressif/esp-idf issue #12557 (github)
     ESP_LOGI(g_TAG, "turn on phy via pin..");
-    const gpio_num_t phy_power_pin = (gpio_num_t)12;
     gpio_config_t phy_power_conf = {0};
     phy_power_conf.mode = GPIO_MODE_OUTPUT;
     phy_power_conf.pin_bit_mask = (1ULL << phy_power_pin);
@@ -270,6 +314,8 @@ void app_main(void)
     );
     ESP_ERROR_CHECK(esp_eth_start(eth_handle));
 
+    // wait for connection
+    // if established start looping over sensors & actuators
     ESP_LOGI(g_TAG, "waiting for network..");
     while (!g_connected) {
         TickType_t netw_wait = 3000 / portTICK_PERIOD_MS;
@@ -277,7 +323,7 @@ void app_main(void)
     }
 
     if (!daqs) daqs = start_daqs();
-    si5351_main();
+    printhead_loop();
 
     while (daqs) {
         TickType_t loop_delay = 100 / portTICK_PERIOD_MS; 

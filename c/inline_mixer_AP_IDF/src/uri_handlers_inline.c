@@ -26,10 +26,27 @@ const char *g_URI_TAG = "URI_H";
 // global vars
 struct daq_block g_measure_buff[BACKLOG_SIZE] = {0};
 int g_backlog_idx = 0;
+bool g_pinch_state = 0;
 bool g_data_lost = false;
 SemaphoreHandle_t g_MUTEX = NULL;
 TickType_t g_ticks_last_req = 0;
 float g_motor_rpm = 0;
+
+/* ---------------------------- PRIVATE FUNCTIONS ------------------------- */
+
+// get client IP
+static void req_ip_readout(char* source, httpd_req_t *req)
+{
+    int sockfd = httpd_req_to_sockfd(req);
+    char ipstr[INET6_ADDRSTRLEN];
+    struct sockaddr_in6 addr; // esp_http_server uses IPv6 addressing
+    socklen_t addr_size = sizeof(addr);
+    getpeername(sockfd, (struct sockaddr *)&addr, &addr_size);
+    
+    // convert to IPv6 string
+    inet_ntop(AF_INET6, &addr.sin6_addr, ipstr, sizeof(ipstr));
+    ESP_LOGI(g_URI_TAG, "%s request from: %s", source, ipstr);
+}
 
 /* -------------------------------- FUNCTIONS ----------------------------- */
 
@@ -37,7 +54,7 @@ float g_motor_rpm = 0;
 esp_err_t init_uri()
 {
     g_MUTEX = xSemaphoreCreateMutex();
-    return (ESP_OK);
+    return ESP_OK;
 }
 
 // return server_handle with registered URI handlers;
@@ -57,7 +74,8 @@ httpd_handle_t start_daqs()
         // set URIs
         httpd_register_uri_handler(server, &data_req);
         httpd_register_uri_handler(server, &ping_req);
-        httpd_register_uri_handler(server, &post_f);
+        httpd_register_uri_handler(server, &post_freq);
+        httpd_register_uri_handler(server, &post_pinch);
 
         // set error handlers
         httpd_register_err_handler(
@@ -92,18 +110,9 @@ esp_err_t stop_daqs(httpd_handle_t server)
 // returns all backlogged data to IP request (LIFO) with heading data-lost
 // token; prints requests IP first
 esp_err_t data_request(httpd_req_t *req)
-{
-    // get client IP
-    int sockfd = httpd_req_to_sockfd(req);
-    char ipstr[INET6_ADDRSTRLEN];
-    struct sockaddr_in6 addr; // esp_http_server uses IPv6 addressing
-    socklen_t addr_size = sizeof(addr);
-    getpeername(sockfd, (struct sockaddr *)&addr, &addr_size);
-    
-    // convert to IPv6 string
-    inet_ntop(AF_INET6, &addr.sin6_addr, ipstr, sizeof(ipstr));
-    ESP_LOGI(g_URI_TAG, "data request from: %s", ipstr);
-    
+{   
+    req_ip_readout("data", req);
+
     // set answering header
     httpd_resp_set_hdr(req, "Allow", "GET");
 
@@ -112,6 +121,8 @@ esp_err_t data_request(httpd_req_t *req)
     
     // answer with data if available
     static char data_str[BACKLOG_SIZE * DAQB_STR_SIZE];
+    memset(data_str, '\0', sizeof(data_str));
+
     if(g_backlog_idx == 0) 
     {
         strlcpy(data_str, "no data available", sizeof(data_str));
@@ -126,7 +137,7 @@ esp_err_t data_request(httpd_req_t *req)
         // calc current uptime to get the age of each value in daq2str
         TickType_t curr_uptime_ticks = xTaskGetTickCount() - g_ticks_last_req;
         u64_t curr_uptime = (u64_t)(curr_uptime_ticks * portTICK_PERIOD_MS);
-        u16_t curr_uptime_s = (u16_t)(curr_uptime / 1000);
+        u64_t curr_uptime_s = (u64_t)(curr_uptime / 1000);
 
         // build ans str
         for (int idx=0; idx < g_backlog_idx; idx++) 
@@ -157,21 +168,9 @@ esp_err_t data_request(httpd_req_t *req)
 
 // returns 'ack' to ping request from IP client
 esp_err_t ping_request(httpd_req_t *req)
-{
-    // get client IP
-    int sockfd = httpd_req_to_sockfd(req);
-    char ipstr[INET6_ADDRSTRLEN];
-    struct sockaddr_in6 addr; // esp_http_server uses IPv6 addressing
-    socklen_t addr_size = sizeof(addr);
-    getpeername(sockfd, (struct sockaddr *)&addr, &addr_size);
-    
-    // convert to IPv6 string
-    inet_ntop(AF_INET6, &addr.sin6_addr, ipstr, sizeof(ipstr));
-    ESP_LOGI(g_URI_TAG, "ping request from: %s", ipstr);
-    
-    // set answering header
+{   
+    req_ip_readout("ping", req);
     httpd_resp_set_hdr(req, "Allow", "GET");
-    
     httpd_resp_send(req, "ack", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
@@ -213,7 +212,49 @@ esp_err_t freq_post(httpd_req_t *req)
     xSemaphoreTake(g_MUTEX, portMAX_DELAY);
     sscanf(content, "%f", &g_motor_rpm);
     if (g_motor_rpm < 0.0) g_motor_rpm = 0.0;
-    asprintf(&resp, "RECV%f", g_motor_rpm);
+    asprintf(&resp, "RECV: %f", g_motor_rpm);
+    xSemaphoreGive(g_MUTEX);
+    
+    // set response header
+    httpd_resp_set_hdr(req, "Allow", "POST");
+
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+// accepts state toggle from POST, expects string representing a boolean;
+// returns string received and sets g_pinch_state to value read
+esp_err_t pinch_post(httpd_req_t *req)
+{
+    char content[8];
+
+    /* Truncate if content length larger than the buffer */
+    size_t recv_size = MIN(req->content_len, sizeof(content));
+
+    int ret = httpd_req_recv(req, content, recv_size);
+    if (ret <= 0) {  /* 0 return value indicates connection closed */
+        /* Check if timeout occurred */
+        if (ret == HTTPD_SOCK_ERR_TIMEOUT) httpd_resp_send_408(req);
+        ESP_LOGI(g_URI_TAG, "FREQ POST HANDLING FAILED!");
+        return ESP_FAIL;
+    }
+
+    char* resp;
+    uint16_t len = req->content_len;
+    content[len+1] = '\0';
+    ESP_LOGI(g_URI_TAG, "received: %s", content);
+
+    xSemaphoreTake(g_MUTEX, portMAX_DELAY);
+    int msg_int = -1;
+    sscanf(content, "%d", &msg_int);
+    if (msg_int != 0 && msg_int != 1) {
+        httpd_resp_send_500(req);
+        ESP_LOGI(g_URI_TAG, "PINCH POST HANDLING FAILED!");
+        ESP_LOGI(g_URI_TAG, "can not handle msg_int: %i", msg_int);
+    } else {
+        g_pinch_state = !!msg_int; // '!!' double-negation as cast to bool
+    }
+    asprintf(&resp, "RECV: %d", g_pinch_state);
     xSemaphoreGive(g_MUTEX);
     
     // set response header
@@ -257,24 +298,73 @@ void daq2str(
 ) {  
     // save bytes by setting wrong T measurements to -274
     // (impossible temperature)
-    if (daqb->error == true) daqb->temp = -274.0;
-    int temp_len = snprintf(NULL, 0, "%.2f", daqb->temp);
-    char *temp = malloc(temp_len + 1); // +1 for string terminator
-    snprintf(temp, temp_len + 1, "%.2f", daqb->temp);
-    
+    for (int i=0; i<MAX_TEMP_SENSORS; i++){
+        int temp_len = snprintf(NULL, 0, "%.2f", daqb->temp[i]);
+        char *temp_char = malloc(temp_len + 1); // +1 for string terminator
+        snprintf(temp_char, temp_len + 1, "%.2f", daqb->temp[i]);
+        
+        // build str
+        char *count = malloc(5);
+        snprintf(count, 5, "_T%d>", i);
+        strlcat(sz_ret, count, buff_len);
+        strlcat(sz_ret, temp_char, buff_len);
+        
+        free(temp_char);
+        free(count);
+    }
+
     // calc age of entry
-    u16_t age_s = curr_upt_s - daqb->upt_s;
-    int age_len = snprintf(NULL, 0, "%u", age_s);
+    u64_t age_s = curr_upt_s - daqb->upt_s;
+    int age_len = snprintf(NULL, 0, "%llu", age_s);
     char *age = malloc(age_len + 1);
-    snprintf(age, age_len + 1, "%u", age_s);
-    
-    // build str
-    strlcpy(sz_ret, "T", buff_len);
-    strlcat(sz_ret, temp, buff_len);
+    snprintf(age, age_len + 1, "%llu", age_s);
+
+    // attach uptime
     strlcat(sz_ret, "/U", buff_len);
     strlcat(sz_ret, age, buff_len);
     strlcat(sz_ret, ";", buff_len);
 
-    free(temp);
     free(age);
+}
+
+// copies pointer-array stored data to daqb struct
+// keeps track of backlog_idx & data loss
+void _copy_to_daqb(float* readings[MAX_TEMP_SENSORS], u64_t* uptime)
+{
+    xSemaphoreTake(g_MUTEX, portMAX_DELAY);
+    // save to the backlog, first check needed to avoid index error
+    if (g_backlog_idx != 0)
+    {
+        for (int i=0; i<MAX_TEMP_SENSORS; i++) {
+            g_measure_buff[g_backlog_idx].temp[i] = *readings[i];
+        }
+        // just communicate seconds
+        g_measure_buff[g_backlog_idx].upt_s = (u64_t)(*uptime / 1000);
+        g_backlog_idx++;
+
+        // check if the backlog is full
+        // if so throw of the oldest measurement
+        if (g_backlog_idx >= (BACKLOG_SIZE - 1)) 
+        {
+            g_data_lost = true;
+            for (int idx=1; idx < BACKLOG_SIZE; idx++) 
+            {
+                g_measure_buff[idx - 1] = g_measure_buff[idx];
+            }
+            // -1 for off-by-zero & -1 since we made 1 space
+            g_backlog_idx = BACKLOG_SIZE - 2; 
+            ESP_LOGE(
+                g_URI_TAG,
+                "Backlog full, oldest entry overwritten!"
+            );
+        }
+    } else { 
+        // first measurement since last request, reset error_counter
+        for (int i=0; i<MAX_TEMP_SENSORS; i++) {
+            g_measure_buff[g_backlog_idx].temp[i] = *readings[i];
+        }
+        g_measure_buff[g_backlog_idx].upt_s = (u16_t)(*uptime / 1000);
+        g_backlog_idx++;
+    }
+    xSemaphoreGive(g_MUTEX);
 }
