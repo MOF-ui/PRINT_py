@@ -1,201 +1,138 @@
-/*
- * This example combines the Espressif examples:
- * WebServer --> HelloServer
- * Ethernet --> ETH_LAN8720
- * It implements a webserver using the ethernet interface (instead of WiFi)
- *
- * Once the sktech is compiled and uploaded, the board will log
- * its IP address to the Serial Monitor (should be set to 115000 bauds)
- * 
- * Open the IP in your browser and you should see
- * a message on the homepage: "hello from esp32!"
- * If you append "/inline" to the end of the address
- * you should see: "this works as well"
- * 
- * Tested with Espressif package (2.0.11)
- * and Olimex board ESP32-PoE and ESP32-EVB
+/*  This work is licensed under Creativ Commons Attribution-ShareAlike 4.0
+/   International (CC BY-SA 4.0).
+/   (https://creativecommons.org/licenses/by-sa/4.0/)
+/   Feel free to use, modify or distribute this code as far as you like, so
+/   long as you make anything based on it publicly avialable under the same
+/   license.
+*/
+/* 
+following examples from
+    danak6jq: https://github.com/danak6jq/ESP32-WSPR
+    espressif.com
 */
 
+/* -------------------------- IMPORTS & DEFINITIONS ----------------------- */
+
 #include <Arduino.h>
-#include <ETH.h>
-#include <WebServer.h>
-#include <ESPmDNS.h>
 
-static bool eth_connected = false;
-WebServer server(80);
+#include "ETH.h"
 
-// ESP32-POE doesn't have an onboard LED so if you want to use a LED you have to attach one to the extended pins on either UEXT or one of the 10 pin extentions.
-// in this example the default value is 13 which is UEXT pin 6, or Extention 2 pin 1. If you want to attach the LED to another pin you need to change this value accordingly.
-const int led_pin = 13;
+#include "data_AP_support.h"
 
-// Web Server: handle a request to / (root of the server)
-void handleRoot() {
-  digitalWrite(led_pin, 1);
-  server.send(200, "text/plain", "hello from esp32!");
-  delay(100);    // Wait x ms so we have time to see the Led blinking
-  digitalWrite(led_pin, 0);
-}
+/* --------------------------- VARIABLES & CLASSES ------------------------ */
 
-// Web Server: handle a request to an unknown URI (unknown "File")
-void handleNotFound() {
-  digitalWrite(led_pin, 1);
-  String message = "File Not Found\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
-  server.send(404, "text/plain", message);
-  // digitalWrite(led_pin, 0);  // If this is commented out, the LED will stay on in case of 404 error
-}
+// ETH
+WebServer http_server(HTTP_SERVER_PORT);
+bool eth_connected = false;
 
-// Handle Ethernet Events:
+// DS18B20
+struct t_block TSensor[MAX_TEMP_SENSORS];
+String t_sensor_names[MAX_TEMP_SENSORS] = {"IN", "OUT"};
+u64_t last_temp_reading = 0;
+int temp_reading_freq = 500; // [ms]
+
+/* -------------------------- FUNCTION DECLARATIONS ----------------------- */
+
+// handle Ethernet events
 void WiFiEvent(WiFiEvent_t event)
 {
   switch (event) {
-
     case ARDUINO_EVENT_ETH_START:
-      // This will happen during setup, when the Ethernet service starts
-      Serial.println("ETH Started");
-      //set eth hostname here
-      ETH.setHostname("esp32-ethernet");
-      break;
+		// This will happen during setup, when the Ethernet service starts
+		Serial.println("HTTP:\tETH started.");
+		ETH.setHostname("printhead_interface");
+		break;
 
     case ARDUINO_EVENT_ETH_CONNECTED:
-      // This will happen when the Ethernet cable is plugged 
-      Serial.println("ETH Connected");
-      break;
+		// This will happen when the Ethernet cable is plugged 
+		Serial.println("HTTP:\tETH connected.");
+		break;
 
     case ARDUINO_EVENT_ETH_GOT_IP:
-    // This will happen when we obtain an IP address through DHCP:
-      Serial.print("Got an IP Address for ETH MAC: ");
-      Serial.print(ETH.macAddress());
-      Serial.print(", IPv4: ");
-      Serial.print(ETH.localIP());
-      if (ETH.fullDuplex()) {
-        Serial.print(", FULL_DUPLEX");
-      }
-      Serial.print(", ");
-      Serial.print(ETH.linkSpeed());
-      Serial.println("Mbps");
-      eth_connected = true;
+    	// This will happen when we obtain an IP address through DHCP:
+		Serial.print("HTTP:\tGot an IP Address for ETH MAC: ");
+		Serial.print(ETH.macAddress());
+		Serial.print(", IPv4: ");
+		Serial.print(ETH.localIP());
+		if (ETH.fullDuplex()) {
+			Serial.print(", FULL_DUPLEX");
+		}
+		Serial.print(", ");
+		Serial.print(ETH.linkSpeed());
+		Serial.println("Mbps.");
 
-      // Uncomment to automatically make a test connection to a server:
-      // testClient( "192.168.0.1", 80 );
-
-      break;
+	  	// set up web server
+		http_server.begin();
+		Serial.println("HTTP:\tweb server running.");
+		eth_connected = true;
+		break;
 
     case ARDUINO_EVENT_ETH_DISCONNECTED:
-      // This will happen when the Ethernet cable is unplugged 
-      Serial.println("ETH Disconnected");
-      eth_connected = false;
-      break;
+		// This will happen when the Ethernet cable is unplugged 
+		Serial.println("HTTP:\tETH disconnected.");
+
+		// stopping web server
+		http_server.stop();
+		Serial.println("HTTP:\tweb server stopped.");
+		eth_connected = false;
+		break;
 
     case ARDUINO_EVENT_ETH_STOP:
-      // This will happen when the ETH interface is stopped but this never happens
-      Serial.println("ETH Stopped");
-      eth_connected = false;
-      break;
+		// This will happen when the ETH interface is stopped but this never happens
+		Serial.println("HTTP:\tETH stopped.");
+		eth_connected = false;
+		break;
 
     default:
-      break;
+		break;
   }
 }
 
-// Initializing everything at start up / after reset:
-void setup()
-{
-  // Wait for the hardware to initialize:
-  delay(500);
+/* ---------------------------------- SETUP ------------------------------- */
 
-  // This sketch will log some information to the serial console:
+void setup() {
+	// PHdM -- printhead main
+	Serial.begin(115200);
+	Serial.println("\n\nPHdM:\t--------------------------------");
+	Serial.println("PHdM:\t             DATA_AP            ");
+	Serial.println("PHdM:\t--------------------------------\n");
 
+	// ETH
+	Serial.println("ETHN:\tsetting up event handler..");
+	// using the WiFi event handling setup here, but this response
+	// to the Ethernet port of the OLIMEX PoE IsO when using ETH.h
+	WiFi.onEvent(WiFiEvent);
+	ETH.begin();
+	init_uri();
+	if (!MDNS.begin("data_AP")) {
+		Serial.println("ETHN:\tmDNS setup failed, restarting..");
+		Serial.flush();
+		ESP.restart();
+	}
 
-  Serial.begin(115200); // Assuming computer will be connected to serial port at 115200 bauds
-  Serial.print("Setup...");
-  
-  // Add a handler for network events. This is misnamed "WiFi" because the ESP32 is historically WiFi only,
-  // but in our case, this will react to Ethernet events.
-  Serial.print("Registering event handler for ETH events...");
-  WiFi.onEvent(WiFiEvent);
-  
-  // Starth Ethernet (this does NOT start WiFi at the same time)
-  Serial.print("Starting ETH interface...");
-  ETH.begin();
-
-  
-  // multicast DNS (mDNS) allows to resolve hostnames to IP addresses without a DNS server
-  if (MDNS.begin("esp32")) {  // using mDNS name "esp32"
-    Serial.println("MDNS responder started");
-  }
-
-  // Web Server handlers: 
-  // Handle a request to / (root of the server)
-  server.on("/", handleRoot);
-  // Minimalistic handling of another URI (LED will not flash on this one):
-  server.on("/inline", []() {
-    server.send(200, "text/plain", "this works as well");
-  });
-  // Handle all other URIs:
-  server.onNotFound(handleNotFound);
-
-  server.begin();
-  Serial.println("HTTP server started");
-  
-  pinMode( led_pin, OUTPUT);  // Initialize the LED pin as a digital output (on/off)
-}
-
-void loop ()
-{
-  server.handleClient();
-  delay(2);//allow the cpu to switch to other tasks
-}//*/
-
-
-/*#include <Arduino.h>
-#include <Adafruit_SI5351.h>
-
-Adafruit_SI5351 clockgen = Adafruit_SI5351();
-
-void setup(void)
-{
-  Serial.begin(115200);
-  Serial.println("Si5351 Clockgen Test"); Serial.println("");
-
-  ///Initialise the sensor
-  if (clockgen.begin() != ERROR_NONE)
-  {
-
-    Serial.print("Ooops, no Si5351 detected ... Check your wiring or I2C ADDR!");
-    while(1);
-  }
-
-  Serial.println("OK!");
-
-
-  Serial.println("Set PLLA to 900MHz");
-  clockgen.setupPLLInt(SI5351_PLL_A, 15);
-  Serial.println("Set Output #0 to 112.5MHz");
-  clockgen.setupMultisynthInt(0, SI5351_PLL_A, SI5351_MULTISYNTH_DIV_8);
-
-  clockgen.setupPLL(SI5351_PLL_B, 24, 2, 3);
-  Serial.println("Set Output #1 to 13.553115MHz");
-  clockgen.setupMultisynth(1, SI5351_PLL_B, 45, 1, 2);
-
-
-  Serial.println("Set Output #2 to 10.706 KHz");
-  clockgen.setupMultisynth(2, SI5351_PLL_B, 200, 0, 1);
-  clockgen.setupRdiv(2, SI5351_R_DIV_16);
-
-  clockgen.enableOutputs(true);
+	// TEMP_READOUT
+	Serial.println("TEMP:\tinit DS18B20..");
+	init_DS18B20(TSensor, t_sensor_names);
 }
 
 
-void loop(void)
-{
-}*/
+/* ---------------------------------- LOOP -------------------------------- */
+
+void loop() {
+
+	// TEMP_READOUT
+	TickType_t uptimeTicks = xTaskGetTickCount() - g_ticks_last_req;
+	u64_t uptime = (u64_t)(uptimeTicks * portTICK_PERIOD_MS);
+	
+	if (uptime > (last_temp_reading + temp_reading_freq)) {
+		for (int i=0; i<MAX_TEMP_SENSORS; i++) {
+			TSensor[i].last_reading = DS18B20.getTempC(TSensor[i].addr);
+		}
+		_copy_to_daqb(TSensor, &uptime);
+		last_temp_reading = uptime;
+	}
+
+	// SERVER
+	http_server.handleClient();
+	delay(5);
+}

@@ -21,7 +21,7 @@ following examples from
 #include "OneWire.h"
 #include "DallasTemperature.h"
 
-#include "printhead_support.h"
+#include "data_AP_support.h"
 
 /* --------------------------- VARIABLES & CLASSES ------------------------ */
 
@@ -29,9 +29,7 @@ following examples from
 const struct daq_block g_EMPTY_DAQ_BLOCK = {0};
 struct daq_block g_measure_buff[BACKLOG_SIZE] = {0};
 TickType_t g_ticks_last_req = 0;
-float g_motor_rpm = 0;
 int g_backlog_idx = 0;
-bool g_pinch_state = 0;
 bool g_data_lost = false;
 
 // DS18B20
@@ -88,14 +86,12 @@ void init_uri()
     http_server.on("/", HTTP_GET, root_handler);
     http_server.on("/data", HTTP_GET, data_request);
     http_server.on("/ping", HTTP_GET, ping_request);
-    http_server.on("/motor", HTTP_POST, freq_post);
-    http_server.on("/pinch", HTTP_POST, pinch_post);
     http_server.on("/restart", HTTP_POST, restart_post);
     http_server.onNotFound(http_404_handler);
 }
 
 void root_handler() 
-{   
+{
     _print_client_ip("root");
     http_server.send(200, "text/plain", "The Krauts want you for 3DCP.");
 }
@@ -154,48 +150,6 @@ void ping_request()
     http_server.sendHeader("Allow", "GET");
     http_server.send(200, "text/plain", "ack");
     Serial.printf("HTTP:\treturning: ack\n");
-}
-
-// accepts motor rpm data from POST, expects string representing a float;
-// returns string received and sets g_motor_rpm to value read
-void freq_post()
-{   
-    static char recv_c[POST_MAX_CONT_LEN] = {0};
-    static char resp[POST_MAX_CONT_LEN + 6];
-    _print_client_ip("freq");
-    _retrieve_post_body(recv_c);
-
-    g_motor_rpm = atof(recv_c);
-    if (g_motor_rpm < 0.0) g_motor_rpm = 0.0;
-    snprintf(resp, POST_MAX_CONT_LEN, "RECV: %f", g_motor_rpm);
-    
-    // send answer
-    http_server.sendHeader("Allow", "GET");
-    http_server.send(200, "text/plain", resp);
-    Serial.printf("HTTP:\treturning: %s\n", resp);
-}
-
-// accepts state toggle from POST, expects string representing a boolean;
-// returns string received and sets g_pinch_state to value read
-void pinch_post() 
-{
-    static char recv_c[POST_MAX_CONT_LEN] = {0};
-    static char resp[8];
-    _print_client_ip("pinch");
-    _retrieve_post_body(recv_c);
-
-    int msg_int = atoi(recv_c);
-    if (msg_int == 0) g_pinch_state = false;
-    else if (msg_int == 1) g_pinch_state = true;
-    else {
-        http_server.send(400, "text/plain", "request malformed");
-        Serial.printf("HTTP:\tFAILED. Cant handle: %i.\n", msg_int);
-        return;
-    }
-
-    sprintf(resp, "%d", g_pinch_state);
-    http_server.send(200, "text/plain", resp);
-    Serial.printf("HTTP:\treturning: %s\n", resp);
 }
 
 // restart ESP, if correct token is passed
@@ -276,6 +230,7 @@ void _daq2str(
 // keeps track of backlog_idx & data loss
 void _copy_to_daqb(const t_block* tb, u64_t* uptime)
 {
+    // xSemaphoreTake(g_MUTEX, portMAX_DELAY);
     // save to the backlog, first check needed to avoid index error
     if (g_backlog_idx != 0)
     {
@@ -307,6 +262,7 @@ void _copy_to_daqb(const t_block* tb, u64_t* uptime)
         g_measure_buff[g_backlog_idx].upt_s = (u16_t)(*uptime / 1000);
         g_backlog_idx++;
     }
+    // xSemaphoreGive(g_MUTEX);
 }
 
 void _print_client_ip(const char* source)

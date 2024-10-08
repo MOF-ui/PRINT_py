@@ -11,8 +11,8 @@ following examples from
     espressif.com
 */
 
-#ifndef PRINTHEAD_SUPPORT_H
-#define PRINTHEAD_SUPPORT_H
+#ifndef DATA_AP_SUPPORT_H
+#define DATA_AP_SUPPORT_H
 
 /* -------------------------- IMPORTS & DEFINITIONS ----------------------- */
 
@@ -33,8 +33,6 @@ following examples from
 #define IP_MAX_STR_LEN      64
 
 #define ONE_WIRE_PIN 		2
-#define PINCH_PIN 			33
-#define P_CTRL_CONST        0.2    // 20 %
 
 /* --------------------------- VARIABLES & CLASSES ------------------------ */
 
@@ -53,9 +51,7 @@ struct daq_block
 extern const struct daq_block g_EMPTY_DAQ_BLOCK;
 extern struct daq_block g_measure_buff[BACKLOG_SIZE];
 extern TickType_t g_ticks_last_req;
-extern float g_motor_rpm;
 extern int g_backlog_idx;
-extern bool g_pinch_state;
 extern bool g_data_lost;
 
 // DS18B20
@@ -77,8 +73,6 @@ void init_DS18B20(struct t_block* TSensor, String* t_sensor_names);
 // ETH
 void init_uri(void);
 void root_handler(void);
-void freq_post(void);
-void pinch_post(void);
 void data_request(void);
 void ping_request(void);
 void restart_post(void);
