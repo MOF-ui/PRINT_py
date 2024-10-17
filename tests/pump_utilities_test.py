@@ -18,7 +18,7 @@ import libs.pump_utilities as pu
 
 
 
-class PUTIL_test(unittest.TestCase):
+class PumpLibTest(unittest.TestCase):
 
 
     def test_calcSpeed(self):
@@ -28,33 +28,42 @@ class PUTIL_test(unittest.TestCase):
 
         # domain control
         du.ROBCommQueue.clear()
-        testEntry = du.QEntry(Speed=du.SpeedVector(ts=2000), p_mode="default")
+        testEntry = du.QEntry(
+            Speed=du.SpeedVector(ts=2000),
+            p_mode="default",
+            p_ratio=0.345
+        )
 
         du.ROBCommQueue.add(testEntry)
-        self.assertEqual(pu.calc_speed(), 100.0)
+        self.assertEqual(pu.calc_speed(), (100, 0.345))
 
         du.ROBCommQueue[0].Speed.ts = -2000
-        self.assertEqual(pu.calc_speed(), -100.0)
+        self.assertEqual(pu.calc_speed(), (-100, 0.345))
 
         # test empty ROB_commQueue
         du.ROBCommQueue.clear()
-        self.assertEqual(pu.calc_speed(), 89)
+        self.assertEqual(pu.calc_speed(), (89, 1.0))
 
         # mode: None
         testEntry = du.QEntry(Speed=du.SpeedVector(ts=123))
         du.ROBCommQueue.add(testEntry)
-        self.assertEqual(pu.calc_speed(), 89)
+        self.assertEqual(pu.calc_speed(), (89, 1.0))
 
         # mode: default
-        testEntry = du.QEntry(id=1, Speed=du.SpeedVector(ts=234), p_mode="default")
+        testEntry = du.QEntry(
+            id=1,
+            Speed=du.SpeedVector(ts=234),
+            p_mode="default",
+            p_ratio=0.765
+        )
         du.ROBCommQueue.add(testEntry)
-        self.assertEqual(pu.calc_speed(), 19)
+        self.assertEqual(pu.calc_speed(), (19, 0.765))
 
         du.ROBCommQueue.clear()
 
 
     def test_defaultMode(self):
-        """ """
+        """  """
 
         # None
         self.assertIsNone(pu.default_mode(None))
@@ -108,10 +117,10 @@ class PUTIL_test(unittest.TestCase):
 
         # END_SUPP_PTS
         du.ROBTelem.Coor = du.Coordinate(x=4)
-        self.assertEqual(pu.profile_mode(testEntry, pu.END_SUPP_PTS), 0.08)
+        self.assertEqual(pu.profile_mode(testEntry, pu.END_SUPP_PTS), 0.0)
 
         du.ROBTelem.Coor = du.Coordinate(x=7)
-        self.assertEqual(pu.profile_mode(testEntry, pu.END_SUPP_PTS), -24.96)
+        self.assertEqual(pu.profile_mode(testEntry, pu.END_SUPP_PTS), -25)
 
         du.ROBTelem.Coor = du.Coordinate(x=10)
         self.assertEqual(pu.profile_mode(testEntry, pu.END_SUPP_PTS), 0)

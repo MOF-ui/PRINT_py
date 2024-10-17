@@ -20,13 +20,15 @@ import libs.data_utilities as du
 import libs.win_mainframe as mf
 
 from libs.win_daq import DAQWindow as DAQ
-from libs.threads import RoboCommWorker, PumpCommWorker
+from libs.threads import (
+    RoboCommWorker, PumpCommWorker, LoadFileWorker, SensorCommWorker
+)
 
 
 
 ########################################## TEST CLASS ##############################################
 
-class Mainframe_test(unittest.TestCase):
+class MainframeWinTest(unittest.TestCase):
 
 
     def assert_is_file(self, path):
@@ -40,6 +42,7 @@ class Mainframe_test(unittest.TestCase):
         global test_frame
 
         du.SCQueue.clear()
+        du.DCCurrZero = du.Coordinate()
 
         # G1
         test_frame.SGLC_entry_gcodeSglComm.setText("G1 X1 Y2.2 EXT3 F40")
@@ -136,8 +139,9 @@ class Mainframe_test(unittest.TestCase):
     def test_add_rapid_sgl(self):
         global test_frame
 
+        du.DCCurrZero = du.Coordinate()
         test_frame.SGLC_entry_rapidSglComm.setText(
-            "MoveL [[1.0,2.2,0.0][0.0,0.0,0.0,0.0]],[4,50,50,50],z10,tool0 EXT:3;"
+            "MoveL [[1.0,2.2,0.0][0.0,0.0,0.0,0.0]],[4,50,50,50],z10,tool0 EXT3;"
         )
         test_frame.add_rapid_sgl()
         self.assertEqual(
@@ -153,7 +157,7 @@ class Mainframe_test(unittest.TestCase):
         )
 
         test_frame.SGLC_entry_rapidSglComm.setText(
-            "MoveL [[1.0,0.0,0.0][0.0,0.0,0.0,0.0]],[200,50,50,50],z10,tool0 EXT:0.0;"
+            "MoveL [[1.0,0.0,0.0][0.0,0.0,0.0,0.0]],[200,50,50,50],z10,tool0 EXT0.0;"
         )
         test_frame.add_rapid_sgl(at_id=True, id=1)
         self.assertEqual(
@@ -174,7 +178,7 @@ class Mainframe_test(unittest.TestCase):
             at_id=True,
             id=2,
             from_file=True,
-            file_txt="MoveL Offs(pHome,0.0,0.0,1.0),[200,50,50,50],z10,tool0 EXT:0;",
+            file_txt="MoveL Offs(pHome,0.0,0.0,1.0),[200,50,50,50],z10,tool0 EXT0;",
         )
         self.assertEqual(
             du.SCQueue.display(),
@@ -202,12 +206,12 @@ class Mainframe_test(unittest.TestCase):
             f"G1 X1.0 Y2.0 Z3.0 F4000 EXT500\n" f"G1 X6.0 Y7.0 Z8.0 F9000 EXT990"
         )
         test_frame.SIB_entry_sib2.setText(
-            f"MoveL [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[8,9,10,11],[12,13,14,15,16,17]],[18,19,20,21],z50,tool0  EXT:600\n"
-            f"MoveJ Offs(pHome,7.0,8.0,9.0),[110,120,130,140],z15,tool0 EXT:160"
+            f"MoveL [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[8,9,10,11],[12,13,14,15,16,17]],[18,19,20,21],z50,tool0  EXT600\n"
+            f"MoveJ Offs(pHome,7.0,8.0,9.0),[110,120,130,140],z15,tool0 EXT160"
         )
         test_frame.SIB_entry_sib3.setText(
-            f"MoveL [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[8,9,10,11],[12,13,14,15,16,17]],[18,19,20,21],z50,tool0  EXT:600\n"
-            f"MoveJ Offs(pHome,7.0,8.0,9.0),[110,120,130,140],z15,tool0 EXT:160"
+            f"MoveL [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[8,9,10,11],[12,13,14,15,16,17]],[18,19,20,21],z50,tool0  EXT600\n"
+            f"MoveJ Offs(pHome,7.0,8.0,9.0),[110,120,130,140],z15,tool0 EXT160"
         )
 
         test_frame.add_SIB(num=1, at_end=False)
@@ -317,8 +321,9 @@ class Mainframe_test(unittest.TestCase):
 
     def test_amcon_script_overwrite(self):
         global test_frame
-        self.maxDiff = 2000
+        self.maxDiff = 3000
 
+        du.SCQueue.clear()
         for i in range(1, 5, 1):
             test_frame.add_gcode_sgl(
                 at_id=False, id=0, from_file=True, file_txt=f"G1 X{i}"
@@ -332,74 +337,29 @@ class Mainframe_test(unittest.TestCase):
 
         test_frame.ASC_entry_SCLines.setText("2..3")
         test_frame.amcon_script_overwrite()
+
+        ToolOff = du.ToolCommand(
+            0, 0, 0, 0, 0, 0, 0, False, 0, False, 0, False, 0, False
+        )
+        ToolOn = du.ToolCommand(
+            0, 1, 0, 2, 0, 0, 0, True, 0, True, 0, True, 0, True
+        )
         self.assertEqual(
-            du.SCQueue._queue,
-            [
-                du.QEntry(
-                    id=1,
-                    Coor1=du.Coordinate(x=1),
-                    Tool=du.ToolCommand(
-                        0, 0, 0, 0, 0, 0, 0, False, 0, False, 0, False, 0, False
-                    ),
-                ),
-                du.QEntry(
-                    id=2,
-                    Coor1=du.Coordinate(x=2),
-                    Tool=du.ToolCommand(
-                        0, 1, 0, 2, 0, 0, 0, True, 0, True, 0, True, 0, True
-                    ),
-                ),
-                du.QEntry(
-                    id=3,
-                    Coor1=du.Coordinate(x=3),
-                    Tool=du.ToolCommand(
-                        0, 1, 0, 2, 0, 0, 0, True, 0, True, 0, True, 0, True
-                    ),
-                ),
-                du.QEntry(
-                    id=4,
-                    Coor1=du.Coordinate(x=4),
-                    Tool=du.ToolCommand(
-                        0, 0, 0, 0, 0, 0, 0, False, 0, False, 0, False, 0, False
-                    ),
-                ),
-            ],
+            f"{du.SCQueue}",
+            f"{du.QEntry(id=1, Coor1=du.Coordinate(x=1), Tool=ToolOff)}\n"\
+            f"{du.QEntry(id=2, Coor1=du.Coordinate(x=2), Tool=ToolOn)}\n"\
+            f"{du.QEntry(id=3, Coor1=du.Coordinate(x=3), Tool=ToolOn)}\n"\
+            f"{du.QEntry(id=4, Coor1=du.Coordinate(x=4), Tool=ToolOff)}\n"
         )
 
         test_frame.ASC_entry_SCLines.setText("4")
         test_frame.amcon_script_overwrite()
         self.assertEqual(
-            du.SCQueue._queue,
-            [
-                du.QEntry(
-                    id=1,
-                    Coor1=du.Coordinate(x=1),
-                    Tool=du.ToolCommand(
-                        0, 0, 0, 0, 0, 0, 0, False, 0, False, 0, False, 0, False
-                    ),
-                ),
-                du.QEntry(
-                    id=2,
-                    Coor1=du.Coordinate(x=2),
-                    Tool=du.ToolCommand(
-                        0, 1, 0, 2, 0, 0, 0, True, 0, True, 0, True, 0, True
-                    ),
-                ),
-                du.QEntry(
-                    id=3,
-                    Coor1=du.Coordinate(x=3),
-                    Tool=du.ToolCommand(
-                        0, 1, 0, 2, 0, 0, 0, True, 0, True, 0, True, 0, True
-                    ),
-                ),
-                du.QEntry(
-                    id=4,
-                    Coor1=du.Coordinate(x=4),
-                    Tool=du.ToolCommand(
-                        0, 1, 0, 2, 0, 0, 0, True, 0, True, 0, True, 0, True
-                    ),
-                ),
-            ],
+            f"{du.SCQueue}",
+            f"{du.QEntry(id=1, Coor1=du.Coordinate(x=1), Tool=ToolOff)}\n"\
+            f"{du.QEntry(id=2, Coor1=du.Coordinate(x=2), Tool=ToolOn)}\n"\
+            f"{du.QEntry(id=3, Coor1=du.Coordinate(x=3), Tool=ToolOn)}\n"\
+            f"{du.QEntry(id=4, Coor1=du.Coordinate(x=4), Tool=ToolOn)}\n"
         )
 
         test_frame.clr_queue(partial=False)
@@ -525,7 +485,6 @@ class Mainframe_test(unittest.TestCase):
         test_frame.SET_num_accelRamp_print.setValue(11)
         test_frame.SET_num_decelRamp_print.setValue(12)
         test_frame.apply_settings()
-        test_frame.update_comm_forerun()
 
         test_frame.SET_TE_num_fllwBhvrInterv.setValue(13)
         test_frame.SET_TE_num_fllwBhvrSkip.setValue(14)
@@ -557,7 +516,6 @@ class Mainframe_test(unittest.TestCase):
         test_frame.TCP_num_commForerun.setValue(10)
         test_frame.load_defaults()
         test_frame.apply_settings()
-        test_frame.update_comm_forerun()
         test_frame.load_TE_defaults()
         test_frame.apply_TE_settings()
 
@@ -598,6 +556,7 @@ class Mainframe_test(unittest.TestCase):
         global test_frame
         self.maxDiff = 2000
 
+        du.SCQueue.clear()
         du.SC_ext_fllw_bhvr = (500, 200)
 
         for i in range(1, 7, 1):
@@ -649,7 +608,7 @@ class Mainframe_test(unittest.TestCase):
         )
         self.assertTrue(du.DC_rob_moving)
 
-        test_frame.robo_send(command[0], True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True)
         du.DC_rob_moving = False
 
         test_frame.DC_drpd_moveType.setCurrentText("JOINT")
@@ -676,7 +635,7 @@ class Mainframe_test(unittest.TestCase):
         global logpath
 
         # general values
-        self.assertEqual(test_frame.logpath, logpath)
+        self.assertEqual(test_frame._logpath, logpath)
         self.assertIsInstance(test_frame.Daq, DAQ)
 
         # logfile
@@ -688,11 +647,15 @@ class Mainframe_test(unittest.TestCase):
 
         # defaults test with 'applySettings'
 
-        # threads
+        # threads -- R
         self.assertIsInstance(test_frame._RoboCommThread, QThread)
         self.assertIsInstance(test_frame._PumpCommThread, QThread)
+        self.assertIsInstance(test_frame._LoadFileThread, QThread)
+        self.assertIsInstance(test_frame._SensorArrThread, QThread)
         self.assertIsInstance(test_frame._RoboCommWorker, RoboCommWorker)
         self.assertIsInstance(test_frame._PumpCommWorker, PumpCommWorker)
+        self.assertIsInstance(test_frame._LoadFileWorker, LoadFileWorker)
+        self.assertIsInstance(test_frame._SensorArrWorker, SensorCommWorker)
 
 
     def test_label_update_on_new_zero(self):
@@ -887,19 +850,30 @@ class Mainframe_test(unittest.TestCase):
     def test_robo_send(self):
         """test overflow control etc. labelUpdate_onSend tested by own function"""
         global test_frame
+        self.maxDiff = 2000
 
         du.SC_curr_comm_id = 2991
 
-        test_frame.robo_send(du.QEntry(id=12), True, 10, True, True)
+        test_frame.robo_send(du.QEntry(id=12), True, 10, True)
         self.assertEqual(du.SC_curr_comm_id, 1)
         self.assertEqual(
             test_frame.TCP_ROB_disp_writeBuffer.text(),
-            f"ID: 12 -- L, E -- COOR_1: X: 0.0   Y: 0.0   Z: 0.0   Rx: 0.0   Ry: 0.0   Rz: 0.0   Q: 0.0   EXT: 0.0 -- SV: TS: 200   OS: 50   ACR: 50   DCR: 50 -- PMODE:  None",
+            f"ID: 12 -- L, E -- COOR_1: X: 0.0   Y: 0.0   Z: 0.0   "
+            f"Rx: 0.0   Ry: 0.0   Rz: 0.0   Q: 0.0   EXT: 0.0 -- "
+            f"SV: TS: 200   OS: 50   ACR: 50   DCR: 50 -- PM/PR:  None/1.0",
         )
         self.assertEqual(test_frame.TCP_ROB_disp_bytesWritten.text(), "10")
 
-        test_frame.robo_send(None, True, ValueError, False, False)
-        self.assertEqual(test_frame.TCP_ROB_disp_writeBuffer.text(), "ValueError")
+        test_frame.robo_send(
+            None,
+            False,
+            ValueError(f"None is not an instance of QEntry!"),
+            False
+        )
+        self.assertEqual(
+            test_frame.TCP_ROB_disp_writeBuffer.text(),
+            "None is not an instance of QEntry!"
+        )
 
         du.ROB_send_list.clear()
 
@@ -981,7 +955,7 @@ class Mainframe_test(unittest.TestCase):
         )
 
         du.DC_rob_moving = False
-        test_frame.robo_send(command[0], True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True)
         test_frame.DC_sld_stepWidth.setValue(2)
         test_frame.DC_drpd_moveType.setCurrentText("JOINT")
 
@@ -993,7 +967,7 @@ class Mainframe_test(unittest.TestCase):
         )
 
         du.DC_rob_moving = False
-        test_frame.robo_send(command[0], True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True)
         test_frame.DC_sld_stepWidth.setValue(3)
 
         test_frame.send_DC_command(axis="Z", dir="+")
@@ -1004,7 +978,7 @@ class Mainframe_test(unittest.TestCase):
         )
 
         du.DC_rob_moving = False
-        test_frame.robo_send(command[0], True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True)
         self.assertRaises(ValueError, test_frame.send_DC_command, axis="A", dir="+")
 
         du.DC_rob_moving = False
@@ -1021,10 +995,9 @@ class Mainframe_test(unittest.TestCase):
         du.SC_curr_comm_id = 1
         test_frame.robo_send(
             command=du.QEntry(id=1, Coor1=du.Coordinate(x=2.2)),
-            msg=True,
+            no_error=True,
             num_send=1,
             dc=True,
-            no_error=True,
         )
         self.assertEqual(du.SC_curr_comm_id, 2)
 
@@ -1038,6 +1011,7 @@ class Mainframe_test(unittest.TestCase):
         test_frame.TERM_entry_gcodeInterp.setText("G1 Y2.2 TOOL")
         du.ROBTelem.Coor = du.Coordinate(1, 1, 1, 1, 1, 1, 1, 1)
         du.DCCurrZero = du.Coordinate(y=1)
+        TCoor = du.Coordinate(x=1, y=3.2, z=1, rx=1, ry=1, rz=1, q=1, ext=1)
 
         test_frame.send_gcode_command()
         command = du.ROB_send_list[len(du.ROB_send_list) - 1]
@@ -1045,13 +1019,13 @@ class Mainframe_test(unittest.TestCase):
             command[0],
             du.QEntry(
                 id=1,
-                Coor1=du.Coordinate(x=1, y=3.2, z=1, rx=1, ry=1, rz=1, q=1, ext=1),
+                Coor1=TCoor,
                 Tool=du.ToolCommand(fib_deliv_steps=10, pnmtc_fiber_yn=True),
             ),
         )
 
         du.DC_rob_moving = False
-        test_frame.robo_send(command[0], True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True)
         test_frame.TERM_entry_gcodeInterp.setText("G1 X1 Z3")
         du.ROBTelem.Coor = du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
         du.DCCurrZero = du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
@@ -1073,7 +1047,8 @@ class Mainframe_test(unittest.TestCase):
 
     def test_send_NC_command(self):
         global test_frame
-
+        self.maxDiff = 2000
+        
         test_frame.NC_float_x.setValue(1)
         test_frame.NC_float_y.setValue(2.2)
         test_frame.NC_float_z.setValue(3)
@@ -1083,15 +1058,17 @@ class Mainframe_test(unittest.TestCase):
         test_frame.NC_float_ext.setValue(7)
         test_frame.DC_drpd_moveType.setCurrentText("LINEAR")
 
+        du.ROB_send_list.clear()
+        du.SC_curr_comm_id = 1
         test_frame.send_NC_command([1, 2, 3])
-        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command, dc_dummy = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
-            command[0],
-            du.QEntry(id=1, z=0, Coor1=du.Coordinate(x=1, y=2.2, z=3))
+            f"{command}",
+            f"{du.QEntry(id=1, z=0, Coor1=du.Coordinate(x=1, y=2.2, z=3))}"
         )
 
         du.DC_rob_moving = False
-        test_frame.robo_send(command[0], True, 1, True, True)
+        test_frame.robo_send(command, True, 1, True)
         du.ROBTelem.Coor = du.Coordinate(1, 1, 1, 1, 1, 1, 0, 1)
         test_frame.DC_drpd_moveType.setCurrentText("JOINT")
 
@@ -1117,7 +1094,7 @@ class Mainframe_test(unittest.TestCase):
         global test_frame
 
         test_frame.TERM_entry_rapidInterp.setText(
-            "MoveL [[1.0,2.0,3.0],[4.0,5.0,6.0,7.0]],[200,50,50,50],z50,tool0  EXT:600  TOOL"
+            "MoveL [[1.0,2.0,3.0],[4.0,5.0,6.0,7.0]],[200,50,50,50],z50,tool0  EXT600  TOOL"
         )
         test_frame.send_rapid_command()
         command = du.ROB_send_list[len(du.ROB_send_list) - 1]
@@ -1168,12 +1145,12 @@ class Mainframe_test(unittest.TestCase):
         command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(command[0], du.QEntry(id=1, mt="S"))
 
-        test_frame.robo_send(command[0], True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True)
         test_frame.robot_stop_command()
         command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(command[0], du.QEntry(id=1, mt="E"))
 
-        test_frame.robo_send(command[0], True, 1, True, True)
+        test_frame.robo_send(command[0], True, 1, True)
         test_frame.robot_stop_command(directly=False)
 
         self.assertEqual(du.SCQueue.display(), [du.QEntry(id=3, mt="E").print_short()])
@@ -1190,7 +1167,7 @@ class Mainframe_test(unittest.TestCase):
         du.ROBTcp.connected = False
         du.PMP1Serial.connected = False
         du.PMP2Serial.connected = False
-        du.MIXTcp.connected = False
+        du.MIX_connected = False
         test_frame.close()
 
         du.ROBTcp.close(end=True)

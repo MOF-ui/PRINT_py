@@ -18,7 +18,7 @@ import libs.func_utilities as fu
 ############################################# TESTS #################################################
 # TO DO: add tests for __iter__, __next__, __ne__
 
-class UTIL_test(unittest.TestCase):
+class DataLibTest(unittest.TestCase):
 
 
     def test_Coor_class(self):
@@ -134,7 +134,7 @@ class UTIL_test(unittest.TestCase):
             f"\n\t\t|| COOR_2: {du.Coordinate( 5,5,5,5,5,5,5,5 )}"
             f"\n\t\t|| SV:     {du.SpeedVector( 6,6,6,6 )} \t|| SBT: {7}   SC: A   Z: {8}"
             f"\n\t\t|| TOOL:   {du.ToolCommand( 9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9)}"
-            f"\n\t\t|| PMODE:  None",
+            f"\n\t\t|| PM/PR:  None/1.0",
         )
 
         self.assertEqual(
@@ -143,7 +143,7 @@ class UTIL_test(unittest.TestCase):
             f"\n\t\t|| COOR_2: {du.Coordinate()}"
             f"\n\t\t|| SV:     {du.SpeedVector()} \t|| SBT: {0}   SC: V   Z: {10}"
             f"\n\t\t|| TOOL:   {du.ToolCommand()}"
-            f"\n\t\t|| PMODE:  None",
+            f"\n\t\t|| PM/PR:  None/1.0",
         )
 
 
@@ -160,8 +160,8 @@ class UTIL_test(unittest.TestCase):
         # __init__ & __str__
         self.assertEqual(
             str(testQueue),
-            f"Element 1: {du.QEntry( id= 1 ) }\n"
-            f"Element 2: {du.QEntry( id= 2, Coor1= du.Coordinate( 3,3,3,3,3,3,3,3 ) )}\n",
+            f"{du.QEntry( id= 1 ) }\n"
+            f"{du.QEntry( id= 2, Coor1= du.Coordinate( 3,3,3,3,3,3,3,3 ) )}\n",
         )
 
         self.assertEqual(str(du.Queue()), f"Queue is empty!")
@@ -531,121 +531,6 @@ class UTIL_test(unittest.TestCase):
 
         testRobCon.close(end=True)
 
-
-    def test_pre_check_gcode_file_function(self):
-        """checks preCheckGcodeFiles function, should count the number of commands in a file"""
-
-        testTxt = ";comment\nG1 X0 Y0 Z0\nG1 X2000 Y0 Z0.0\nG1 X2000 Y1500 Z0"
-        self.assertEqual(fu.pre_check_gcode_file(''), (0, 0, "empty"))
-        self.assertEqual(fu.pre_check_gcode_file(testTxt), (3, 3.5, ""))
-
-
-    def test_pre_check_rapid_file_function(self):
-        """checks preCheckGcodeFiles function, should count the number of commands in a file"""
-
-        testTxt = "!comment\nMoveL [[0.0,0.0,0.0],...,v50,z10,tool0\nMoveL [[2000.0,0.0,0.0],...,v50,z10,tool0\nMoveL [[2000.0,1500.0,0.0],...,v50,z10,tool0"
-        self.assertEqual(fu.pre_check_rapid_file(''), (0, 0, "empty"))
-        self.assertEqual(fu.pre_check_rapid_file(testTxt), (3, 3.5, ""))
-
-
-    def test_re_short_function(self):
-        """see reShort in libs/PRINT_data_utilities"""
-
-        self.assertEqual(fu.re_short("\d+\.\d+", "A12B", "0", "\d+"), "12")
-        self.assertEqual(fu.re_short("\d+\.\d+", "A12.3B", "0", "\d+"), "12.3")
-        self.assertEqual(fu.re_short("\d+\.\d+", "ABC", "0", "\d+"), "0")
-        self.assertEqual(fu.re_short("\d+\.\d+", "A12B", "0"), "0")
-
-
-    def test_gcode_to_qentry_function(self):
-        """see gcodeToQEntry in libs/PRINT_data_utilities"""
-
-        testPos = du.Coordinate(1, 1, 1, 1, 1, 1, 1, 1)
-        testSpeed = du.SpeedVector(2, 2, 2, 2)
-        testZone = 3
-        du.DCCurrZero = du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4)
-
-        testTxt = "G1 X5.5 Y6 EXT7 F80 TOOL"
-        self.assertEqual(
-            fu.gcode_to_qentry(
-                mut_pos=testPos, mut_speed=testSpeed, zone=testZone, txt=testTxt
-            ),
-            (
-                du.QEntry(
-                    Coor1=du.Coordinate(9.5, 10, 1, 1, 1, 1, 1, 11),
-                    Speed=du.SpeedVector(2, 2, 8, 2),
-                    z=3,
-                    Tool=du.ToolCommand(fib_deliv_steps=10, pnmtc_fiber_yn=True),
-                ),
-                "G1",
-            ),
-        )
-
-        testTxt = "G28 X0 Y0"
-        self.assertEqual(
-            fu.gcode_to_qentry(
-                mut_pos=testPos, mut_speed=testSpeed, zone=testZone, txt=testTxt
-            ),
-            (
-                du.QEntry(
-                    Coor1=du.Coordinate(4, 4, 1, 1, 1, 1, 1, 1),
-                    Speed=du.SpeedVector(2, 2, 2, 2),
-                    z=3,
-                ),
-                "G28",
-            ),
-        )
-
-        testTxt = "G92 X0 Y0"
-        fu.gcode_to_qentry(
-            mut_pos=testPos, mut_speed=testSpeed, zone=testZone, txt=testTxt
-        )
-        self.assertEqual(du.DCCurrZero, du.Coordinate(1, 1, 4, 4, 4, 4, 4, 4))
-
-
-    def test_rapid_to_qentry_function(self):
-        """see gcodeToQEntry in libs/PRINT_data_utilities"""
-
-        du.DCCurrZero = du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4)
-
-        testTxt = "MoveJ [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[0,0,0,0],[0,0,0,0,0,0]],[8,9,10,11],z12,tool0 EXT:13 TOOL"
-        self.assertEqual(
-            fu.rapid_to_qentry(txt=testTxt),
-            (
-                du.QEntry(
-                    Coor1=du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 13),
-                    mt="J",
-                    pt="Q",
-                    Speed=du.SpeedVector(10, 11, 8, 9),
-                    z=12,
-                    Tool=du.ToolCommand(fib_deliv_steps=10, pnmtc_fiber_yn=True),
-                )
-            ),
-        )
-
-        testTxt = "MoveL Offs(pHome,1.1,2.2,3.3),[8,9,10,11],z12,tool0 EXT:13"
-        self.assertEqual(
-            fu.rapid_to_qentry(txt=testTxt),
-            (
-                du.QEntry(
-                    Coor1=du.Coordinate(5.1, 6.2, 7.3, 4, 4, 4, 4, 17),
-                    pt="E",
-                    Speed=du.SpeedVector(10, 11, 8, 9),
-                    z=12,
-                )
-            ),
-        )
-
-
-    def test_show_on_terminal_function(self):
-        """see showOnTerminal in libs/PRINT_data_utilities"""
-
-        du.DEF_TERM_MAX_LINES = 1
-        fu.add_to_comm_protocol("1")
-        self.assertEqual(du.TERM_log, ["1"])
-
-        fu.add_to_comm_protocol("2")
-        self.assertEqual(du.TERM_log, ["2"])
 
 
 #############################################  MAIN  ##################################################

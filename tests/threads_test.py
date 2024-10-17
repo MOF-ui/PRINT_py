@@ -19,7 +19,7 @@ import libs.threads as T
 ########################################## TEST CLASS ##############################################
 
 
-class Thread_test(unittest.TestCase):
+class ThreadsTest(unittest.TestCase):
 
     def test_loadFileWorker(self):
         global LFWorker
@@ -143,8 +143,8 @@ rapid_test_path = dir_path / pl.Path("0_UT_testfile.mod")
 gcode_txt = ";comment\nG1 Y2000\nG1 Z1000"
 rapid_txt = "!comment\nMoveJ pHome,v200,fine,tool0;\n\n\
              ! start printjob relative to pStart\n\
-             MoveL Offs(pHome,0.0,2000.0,0.0),[200,50,50,50],z10,tool0 EXT:11;\n\
-             MoveL Offs(pHome,0.0,2000.0,1000.0),[200,50,50,50],z10,tool0 EXT:11;"
+             MoveL Offs(pHome,0.0,2000.0,0.0),[200,50,50,50],z10,tool0 EXT11;\n\
+             MoveL Offs(pHome,0.0,2000.0,1000.0),[200,50,50,50],z10,tool0 EXT11;"
 
 gcode_test_file = open(gcode_test_path, "w")
 rapid_test_file = open(rapid_test_path, "w")
