@@ -1,9 +1,10 @@
 # test data_utilities
 
-############################################# IMPORTS #################################################
+################################## IMPORTS ###################################
 
 import os
 import sys
+import time
 import unittest
 
 # appending the parent directory path
@@ -14,99 +15,131 @@ sys.path.append(parent_dir)
 import libs.data_utilities as du
 import libs.func_utilities as fu
 
+from datetime import timedelta
 
-############################################# TESTS #################################################
+
+################################### TESTS ####################################
 # TO DO: add tests for __iter__, __next__, __ne__
 
 class DataLibTest(unittest.TestCase):
-
 
     def test_Coor_class(self):
         """test Coor class, used to store positional data from robot"""
 
         # __init__ & __str__
+        TestCoor = du.Coordinate(
+            x=1.2, y=3.4, z=5.6, rx=7.8, ry=9.11, rz=22.33, q=44.55, ext=66.77
+        )
         self.assertEqual(
-            str(
-                du.Coordinate(
-                    x=1.2, y=3.4, z=5.6, rx=7.8, ry=9.11, rz=22.33, q=44.55, ext=66.77
-                )
-            ),
-            f"X: {1.2}   Y: {3.4}   Z: {5.6}   Rx: {7.8}   Ry: {9.11}   Rz: {22.33}   Q: {44.55}   EXT: {66.77}",
+            str(TestCoor),
+            f"X: 1.2   Y: 3.4   Z: 5.6   Rx: 7.8   "
+            f"Ry: 9.11   Rz: 22.33   Q: 44.55   EXT: 66.77",
         )
         self.assertEqual(
             str(du.Coordinate()),
-            f"X: {0.0}   Y: {0.0}   Z: {0.0}   Rx: {0.0}   Ry: {0.0}   Rz: {0.0}   Q: {0.0}   EXT: {0.0}",
+            f"X: 0.0   Y: 0.0   Z: 0.0   Rx: 0.0   "
+            f"Ry: 0.0   Rz: 0.0   Q: 0.0   EXT: 0.0",
         )
+
+        # __eq__ & __ne__
+        self.assertFalse(TestCoor == du.Coordinate())
+        self.assertFalse(TestCoor == None)
+        self.assertTrue(TestCoor == TestCoor)
+        with self.assertRaises(ValueError):
+            TestCoor == 5
+        self.assertTrue(TestCoor != du.Coordinate())
+        self.assertTrue(TestCoor != None)
+        self.assertFalse(TestCoor != TestCoor)
+        with self.assertRaises(ValueError):
+            TestCoor != 5
 
         # __add__
-        self.assertEqual(
-            du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
-            + du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8),
-            du.Coordinate(2.2, 4.4, 6.6, 8.8, 11.0, 13.2, 15.4, 17.6),
-        )
-        self.assertEqual(
-            du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8) + 11.1,
-            du.Coordinate(12.2, 13.3, 14.4, 15.5, 16.6, 17.7, 18.8, 19.9),
-        )
+        TestCoor = du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
+        ResCoor = du.Coordinate(2.2, 4.4, 6.6, 8.8, 11.0, 13.2, 15.4, 17.6)
+        self.assertEqual(TestCoor + TestCoor, ResCoor)
+        ResCoor = du.Coordinate(12.2, 13.3, 14.4, 15.5, 16.6, 17.7, 18.8, 19.9)
+        self.assertEqual(TestCoor + 11.1, ResCoor)
 
         # __sub__
-        self.assertEqual(
-            du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
-            - du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8),
-            du.Coordinate(),
-        )
-        self.assertEqual(
-            du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8) - 1.1,
-            du.Coordinate(0.0, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7),
-        )
+        self.assertEqual(TestCoor - TestCoor, du.Coordinate())
+        ResCoor = du.Coordinate(0.0, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7)
+        self.assertEqual(TestCoor - 1.1, ResCoor)
 
         # __round__
-        self.assertEqual(
-            round(
-                du.Coordinate(1.111, 2.222, 3.333, 4.444, 5.555, 6.666, 7.777, 8.888), 1
-            ),
-            du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.6, 6.7, 7.8, 8.9),
+        TestCoor = du.Coordinate(
+            1.111,
+            2.222,
+            3.333,
+            4.444,
+            5.555,
+            6.666,
+            7.777,
+            8.888
         )
+        ResCoor = du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.6, 6.7, 7.8, 8.9)
+        self.assertEqual(round(TestCoor, 1), ResCoor)
 
 
     def test_Speed_class(self):
-        """test Speed class, used to store acceleration and travel speed settings"""
+        """test Speed class, used to store acceleration and travel speed 
+        settings"""
 
         # __init__ & __str__
+        TestVector = du.SpeedVector(acr=1.2, dcr=3.4, ts=5.6, ors=7.8)
+        self.assertEqual(str(TestVector), f"TS: 6   OS: 8   ACR: 1   DCR: 3")
         self.assertEqual(
-            str(du.SpeedVector(acr=1.2, dcr=3.4, ts=5.6, ors=7.8)),
-            f"TS: {6}   OS: {8}   ACR: {1}   DCR: {3}",
-        )
-        self.assertEqual(
-            str(du.SpeedVector()), f"TS: {200}   OS: {50}   ACR: {50}   DCR: {50}"
+            str(du.SpeedVector()),
+            f"TS: 200   OS: 50   ACR: 50   DCR: 50"
         )
 
+        # __eq__ & __ne__
+        self.assertFalse(TestVector == du.SpeedVector())
+        self.assertFalse(TestVector == None)
+        self.assertTrue(TestVector == TestVector)
+        with self.assertRaises(ValueError):
+            TestVector == 5
+        self.assertTrue(TestVector != du.SpeedVector())
+        self.assertTrue(TestVector != None)
+        self.assertFalse(TestVector != TestVector)
+        with self.assertRaises(ValueError):
+            TestVector != 5
+
         # __mul__ & __rmul__
-        self.assertEqual(
-            du.SpeedVector(22, 44, 6, 8) * 1.1, du.SpeedVector(24, 48, 7, 9)
-        )
-        self.assertEqual(
-            du.SpeedVector(22, 44, 6, 8) * 1.1, 1.1 * du.SpeedVector(22, 44, 6, 8)
-        )
+        TestVector = du.SpeedVector(22, 44, 6, 8)
+        ResVector = du.SpeedVector(24, 48, 7, 9)
+        self.assertEqual(TestVector * 1.1, ResVector)
+        self.assertEqual(TestVector * 1.1, 1.1 * TestVector)
 
 
     def test_ToolCommand_class(self):
         """test ToolCommand class, used to store AmConEE data"""
 
         # __init__ & __str__
-        self.assertEqual(
-            str(
-                du.ToolCommand(
-                    1, 2, 3, 4, 5, 6, 7, True, 8, False, 9, False, 10, True, 11, 12
-                )
-            ),
-            f"PAN: {1}, {2}   FB: {3}, {4}   MP: {5}, {6}   PC: {7}, {True}   KP: {8}, {False}   K: {9}, {False}   PF: {10}, {True}   TIME: {11}, {12}",
+        TestTool = du.ToolCommand(
+            1, 2.2, 3, 4, 5, 6, 7.7, True, 8, False, 9, 0, 10, 5, 11, 12
         )
-
+        self.assertEqual(
+            str(TestTool),
+            f"PAN: 1, 2   FB: 3, 4   MP: 5, 6   PC: 7, True   KP: 8, False   "
+            f"K: 9, False   PF: 10, True   TIME: 11, 12",
+        )
         self.assertEqual(
             str(du.ToolCommand()),
-            f"PAN: {0}, {0}   FB: {0}, {0}   MP: {0}, {0}   PC: {0}, {False}   KP: {0}, {False}   K: {0}, {False}   PF: {0}, {False}   TIME: {0}, {0}",
+            f"PAN: 0, 0   FB: 0, 0   MP: 0, 0   PC: 0, False   "
+            f"KP: 0, False   K: 0, False   PF: 0, False   TIME: 0, 0",
         )
+
+        # __eq__ & __ne__
+        self.assertFalse(TestTool == du.ToolCommand())
+        self.assertFalse(TestTool == None)
+        self.assertTrue(TestTool == TestTool)
+        with self.assertRaises(ValueError):
+            TestTool == 5
+        self.assertTrue(TestTool != du.ToolCommand())
+        self.assertTrue(TestTool != None)
+        self.assertFalse(TestTool != TestTool)
+        with self.assertRaises(ValueError):
+            TestTool != 5
 
 
     def test_QEntry_class(self):
@@ -115,35 +148,52 @@ class DataLibTest(unittest.TestCase):
         self.maxDiff = 2000
 
         # __init__ & __str__
+        TestCoor1 = du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4)
+        TestCoor2 = du.Coordinate(5, 5, 5, 5, 5, 5, 5, 5)
+        TestVector = du.SpeedVector(6, 6, 6, 6)
+        TestTool = du.ToolCommand(
+            9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9
+        )
+        TestEntry = du.QEntry(
+            1, 'A', 'B', TestCoor1, TestCoor2, TestVector, 7, 'C', 8, TestTool
+        )
         self.assertEqual(
-            str(
-                du.QEntry(
-                    id=1,
-                    mt=2,
-                    pt=3,
-                    Coor1=du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4),
-                    Coor2=du.Coordinate(5, 5, 5, 5, 5, 5, 5, 5),
-                    Speed=du.SpeedVector(6, 6, 6, 6),
-                    sbt=7,
-                    sc="A",
-                    z=8,
-                    Tool=du.ToolCommand(9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9),
-                )
-            ),
-            f"ID: {1}  MT: {2}  PT: {3} \t|| COOR_1: {du.Coordinate( 4,4,4,4,4,4,4,4 )}"
-            f"\n\t\t|| COOR_2: {du.Coordinate( 5,5,5,5,5,5,5,5 )}"
-            f"\n\t\t|| SV:     {du.SpeedVector( 6,6,6,6 )} \t|| SBT: {7}   SC: A   Z: {8}"
-            f"\n\t\t|| TOOL:   {du.ToolCommand( 9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9)}"
+            str(TestEntry),
+            f"ID: 1  MT: A  PT: B \t|| COOR_1: {TestCoor1}"
+            f"\n\t\t|| COOR_2: {TestCoor2}"
+            f"\n\t\t|| SV:     {TestVector} \t|| SBT: 7   SC: C   Z: 8"
+            f"\n\t\t|| TOOL:   {TestTool}"
+            f"\n\t\t|| PM/PR:  None/1.0",
+        )
+        self.assertEqual(
+            str(du.QEntry()),
+            f"ID: 0  MT: L  PT: E \t|| COOR_1: {du.Coordinate()}"
+            f"\n\t\t|| COOR_2: {du.Coordinate()}"
+            f"\n\t\t|| SV:     {du.SpeedVector()} \t|| SBT: 0   SC: V   Z: 10"
+            f"\n\t\t|| TOOL:   {du.ToolCommand()}"
             f"\n\t\t|| PM/PR:  None/1.0",
         )
 
+        # __eq__ & __ne__
+        self.assertFalse(TestEntry == du.QEntry())
+        self.assertFalse(TestEntry == None)
+        self.assertTrue(TestEntry == TestEntry)
+        with self.assertRaises(ValueError):
+            TestEntry == 5
+        self.assertTrue(TestEntry != du.QEntry())
+        self.assertTrue(TestEntry != None)
+        self.assertFalse(TestEntry != TestEntry)
+        with self.assertRaises(ValueError):
+            TestEntry != 5
+
+        # print_short
+        TestEntry.p_mode = 'default'
+        TestEntry.p_ratio = 0.2
         self.assertEqual(
-            str(du.QEntry()),
-            f"ID: {0}  MT: L  PT: E \t|| COOR_1: {du.Coordinate()}"
-            f"\n\t\t|| COOR_2: {du.Coordinate()}"
-            f"\n\t\t|| SV:     {du.SpeedVector()} \t|| SBT: {0}   SC: V   Z: {10}"
-            f"\n\t\t|| TOOL:   {du.ToolCommand()}"
-            f"\n\t\t|| PM/PR:  None/1.0",
+            TestEntry.print_short(),
+            f"ID: 1 -- A, B -- "
+            f"COOR_1: {TestCoor1} -- SV: {TestVector} -- "
+            f"PM/PR:  default/0.2"
         )
 
 
@@ -152,183 +202,279 @@ class DataLibTest(unittest.TestCase):
 
         self.maxDiff = 2000
 
-        emptyQueue = du.Queue()
-        testQueue = du.Queue()
-        testQueue.add(du.QEntry())
-        testQueue.add(du.QEntry(id=3, Coor1=du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)))
+        EmptyQueue = du.Queue()
+        TestCoor = du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)
+        TestQueue = du.Queue()
+        TestQueue.add(du.QEntry())
+        TestQueue.add(du.QEntry(id=10, Coor1=TestCoor))
+        TestQueue.add(du.QEntry(id=2, Coor1=TestCoor+1))
+        TestStrs = [
+            f"{du.QEntry(id=1)}\n",
+            f"{du.QEntry(id=2, Coor1=TestCoor+1)}\n",
+            f"{du.QEntry(id=3, Coor1=TestCoor)}\n",
+        ]
 
         # __init__ & __str__
+        self.assertEqual(str(du.Queue()), 'Queue is empty!')
         self.assertEqual(
-            str(testQueue),
-            f"{du.QEntry( id= 1 ) }\n"
-            f"{du.QEntry( id= 2, Coor1= du.Coordinate( 3,3,3,3,3,3,3,3 ) )}\n",
+            str(TestQueue),
+            f"{TestStrs[0]}{TestStrs[1]}{TestStrs[2]}"
         )
-
-        self.assertEqual(str(du.Queue()), f"Queue is empty!")
 
         # __getitem__
-        self.assertIsNone(emptyQueue[1])
-        self.assertEqual(
-            testQueue[1], du.QEntry(id=2, Coor1=du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3))
-        )
+        self.assertIsNone(EmptyQueue[1])
+        self.assertEqual(TestQueue[1], du.QEntry(id=2, Coor1=TestCoor+1))
+
+        # __iter__ & __next__
+        i = 0
+        for Entry in TestQueue:
+            self.assertEqual(f"{Entry}\n", TestStrs[i])
+            i += 1
 
         # __len__
-        self.assertEqual(len(testQueue), 2)
+        self.assertEqual(len(TestQueue), 3)
 
-        # __eq__
-        self.assertFalse(testQueue == du.Queue())
-        self.assertTrue(testQueue == testQueue)
+        # __eq__ & __ne__
+        self.assertFalse(TestQueue == du.Queue())
+        self.assertFalse(TestQueue == None)
+        self.assertTrue(TestQueue == TestQueue)
+        with self.assertRaises(ValueError):
+            TestQueue == 5
+        self.assertTrue(TestQueue != du.Queue())
+        self.assertTrue(TestQueue != None)
+        self.assertFalse(TestQueue != TestQueue)
+        with self.assertRaises(ValueError):
+            TestQueue != 5
 
-        # lastEntry
-        self.assertIsNone(emptyQueue.last_entry())
+        # last_entry
+        self.assertIsNone(EmptyQueue.last_entry())
         self.assertEqual(
-            testQueue.last_entry(),
-            du.QEntry(id=2, Coor1=du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)),
+            TestQueue.last_entry(),
+            du.QEntry(id=3, Coor1=TestCoor),
         )
 
-        # entryBeforeID
-        self.assertRaises(AttributeError, emptyQueue.entry_before_id, 1)
-        self.assertRaises(AttributeError, testQueue.entry_before_id, 1)
-        self.assertRaises(AttributeError, testQueue.entry_before_id, 3)
-        self.assertEqual(testQueue.entry_before_id(2), du.QEntry(id=1))
+        # entry_before_id
+        self.assertRaises(AttributeError, EmptyQueue.entry_before_id, 1)
+        self.assertRaises(AttributeError, TestQueue.entry_before_id, 1)
+        self.assertRaises(AttributeError, TestQueue.entry_before_id, 4)
+        self.assertEqual(TestQueue.entry_before_id(2), du.QEntry(id=1))
 
         # display
+        self.assertEqual(EmptyQueue.display(), ['Queue is empty!'])
         self.assertEqual(
-            testQueue.display(),
+            TestQueue.display(),
             [
                 du.QEntry(id=1).print_short(),
-                du.QEntry(
-                    id=2, Coor1=du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)
-                ).print_short(),
+                du.QEntry(id=2, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor).print_short(),
             ],
         )
 
-        self.assertEqual(emptyQueue.display(), ["Queue is empty!"])
-
         # increment
-        testQueue.increment()
+        TestQueue.increment()
         self.assertEqual(
-            testQueue.display(),
+            TestQueue.display(),
             [
                 du.QEntry(id=2).print_short(),
-                du.QEntry(
-                    id=3, Coor1=du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)
-                ).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor).print_short(),
+            ],
+        )
+        TestQueue.increment(6)
+        self.assertEqual(
+            TestQueue.display(),
+            [
+                du.QEntry(id=8).print_short(),
+                du.QEntry(id=9, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=10, Coor1=TestCoor).print_short(),
+            ],
+        )
+        TestQueue.increment(-6)
+        self.assertEqual(
+            TestQueue.display(),
+            [
+                du.QEntry(id=2).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor).print_short(),
             ],
         )
 
         # add
-        self.assertEqual(testQueue.add(du.QEntry(id=-1)), ValueError)
-
-        testQueue.add(du.QEntry(id=0, Coor1=du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4)))
-        testQueue.add(du.QEntry(id=9, Coor1=du.Coordinate(5, 5, 5, 5, 5, 5, 5, 5)))
+        self.assertEqual(TestQueue.add(du.QEntry(id=-1)), ValueError)
+        TestQueue.add(du.QEntry(id=0, Coor1=TestCoor+2))
+        TestQueue.add(du.QEntry(id=9, Coor1=TestCoor+3))
         self.assertEqual(
-            testQueue.display(),
+            TestQueue.display(),
             [
                 du.QEntry(id=2).print_short(),
-                du.QEntry(
-                    id=3, Coor1=du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)
-                ).print_short(),
-                du.QEntry(
-                    id=4, Coor1=du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4)
-                ).print_short(),
-                du.QEntry(
-                    id=5, Coor1=du.Coordinate(5, 5, 5, 5, 5, 5, 5, 5)
-                ).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor).print_short(),
+                du.QEntry(id=5, Coor1=TestCoor+2).print_short(),
+                du.QEntry(id=6, Coor1=TestCoor+3).print_short(),
             ],
         )
-
-        testQueue.add(du.QEntry(id=1, Coor1=du.Coordinate(1, 1, 1, 1, 1, 1, 1, 1)))
-        testQueue.add(du.QEntry(id=4, Coor1=du.Coordinate(6, 6, 6, 6, 6, 6, 6, 6)))
+        TestQueue.add(du.QEntry(id=1, Coor1=TestCoor+4))
+        TestQueue.add(du.QEntry(id=4, Coor1=TestCoor+5))
         self.assertEqual(
-            testQueue.display(),
+            TestQueue.display(),
             [
-                du.QEntry(
-                    id=2, Coor1=du.Coordinate(1, 1, 1, 1, 1, 1, 1, 1)
-                ).print_short(),
+                du.QEntry(id=2, Coor1=TestCoor+4).print_short(),
                 du.QEntry(id=3).print_short(),
-                du.QEntry(
-                    id=4, Coor1=du.Coordinate(6, 6, 6, 6, 6, 6, 6, 6)
-                ).print_short(),
-                du.QEntry(
-                    id=5, Coor1=du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)
-                ).print_short(),
-                du.QEntry(
-                    id=6, Coor1=du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4)
-                ).print_short(),
-                du.QEntry(
-                    id=7, Coor1=du.Coordinate(5, 5, 5, 5, 5, 5, 5, 5)
-                ).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor+5).print_short(),
+                du.QEntry(id=5, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=6, Coor1=TestCoor).print_short(),
+                du.QEntry(id=7, Coor1=TestCoor+2).print_short(),
+                du.QEntry(id=8, Coor1=TestCoor+3).print_short(),
             ],
         )
 
-        curr_disp = testQueue.display()
         # clear
-        testQueue.clear(all=False, id="")
-        self.assertEqual(testQueue.display(), curr_disp)
-        testQueue.clear(all=False, id="3..4.5")
-        self.assertEqual(testQueue.display(), curr_disp)
-        testQueue.clear(all=False, id="8")
-        self.assertEqual(testQueue.display(), curr_disp)
-        testQueue.clear(all=False, id="1")
-        self.assertEqual(testQueue.display(), curr_disp)
-        testQueue.clear(all=False, id="1..3")
-        self.assertEqual(testQueue.display(), curr_disp)
-        testQueue.clear(all=False, id="5..8")
-        self.assertEqual(testQueue.display(), curr_disp)
-        testQueue.clear(all=False, id="5..3")
-        self.assertEqual(testQueue.display(), curr_disp)
-        testQueue.clear(all=False, id="3,,5")
-        self.assertEqual(testQueue.display(), curr_disp)
+        unchanged_disp = TestQueue.display()
+        TestQueue.clear(all=False, id='')
+        self.assertEqual(TestQueue.display(), unchanged_disp)
+        TestQueue.clear(all=False, id="3..4.5")
+        self.assertEqual(TestQueue.display(), unchanged_disp)
+        TestQueue.clear(all=False, id="9")
+        self.assertEqual(TestQueue.display(), unchanged_disp)
+        TestQueue.clear(all=False, id="1")
+        self.assertEqual(TestQueue.display(), unchanged_disp)
+        TestQueue.clear(all=False, id="1..3")
+        self.assertEqual(TestQueue.display(), unchanged_disp)
+        TestQueue.clear(all=False, id="5..9")
+        self.assertEqual(TestQueue.display(), unchanged_disp)
+        TestQueue.clear(all=False, id="5..3")
+        self.assertEqual(TestQueue.display(), unchanged_disp)
+        TestQueue.clear(all=False, id="3,,5")
+        self.assertEqual(TestQueue.display(), unchanged_disp)
 
-        testQueue.clear(all=False, id="4")
+        TestQueue.clear(all=False, id="4")
         self.assertEqual(
-            testQueue.display(),
+            TestQueue.display(),
             [
-                du.QEntry(
-                    id=2, Coor1=du.Coordinate(1, 1, 1, 1, 1, 1, 1, 1)
-                ).print_short(),
+                du.QEntry(id=2, Coor1=TestCoor+4).print_short(),
                 du.QEntry(id=3).print_short(),
-                du.QEntry(
-                    id=4, Coor1=du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)
-                ).print_short(),
-                du.QEntry(
-                    id=5, Coor1=du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4)
-                ).print_short(),
-                du.QEntry(
-                    id=6, Coor1=du.Coordinate(5, 5, 5, 5, 5, 5, 5, 5)
-                ).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=5, Coor1=TestCoor).print_short(),
+                du.QEntry(id=6, Coor1=TestCoor+2).print_short(),
+                du.QEntry(id=7, Coor1=TestCoor+3).print_short(),
             ],
         )
-
-        testQueue.clear(all=False, id="3..5")
+        TestQueue.clear(all=False, id="3..5")
         self.assertEqual(
-            testQueue.display(),
+            TestQueue.display(),
             [
-                du.QEntry(
-                    id=2, Coor1=du.Coordinate(1, 1, 1, 1, 1, 1, 1, 1)
-                ).print_short(),
-                du.QEntry(
-                    id=3, Coor1=du.Coordinate(5, 5, 5, 5, 5, 5, 5, 5)
-                ).print_short(),
+                du.QEntry(id=2, Coor1=TestCoor+4).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor+2).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor+3).print_short(),
             ],
         )
+        TestQueue.clear()
+        self.assertEqual(TestQueue.display(), ['Queue is empty!'])
 
-        testQueue.clear()
-        self.assertEqual(testQueue.display(), ["Queue is empty!"])
-
-        # popFirstItem
-        self.assertEqual(emptyQueue.pop_first_item(), IndexError)
-
-        testQueue.add(du.QEntry())
-        testQueue.add(du.QEntry(id=3, Coor1=du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)))
-        self.assertEqual(testQueue.pop_first_item(), du.QEntry(id=1))
+        # pop_first_item
+        self.assertEqual(EmptyQueue.pop_first_item(), IndexError)
+        TestQueue.add(du.QEntry())
+        TestQueue.add(du.QEntry(id=3, Coor1=TestCoor))
+        self.assertEqual(TestQueue.pop_first_item(), du.QEntry(id=1))
         self.assertEqual(
-            testQueue.display(),
+            TestQueue.display(),
+            [du.QEntry(id=2, Coor1=TestCoor).print_short()],
+        )
+
+        # add_queue
+        AddQueue = du.Queue()
+        AddQueue.add(du.QEntry(id=1, Coor1=TestCoor+1), thread_call=True)
+        AddQueue.add(du.QEntry(id=2, Coor1=TestCoor+2), thread_call=True)
+        TestQueue.add_queue(AddQueue)
+        self.assertEqual(
+            TestQueue.display(),
             [
-                du.QEntry(
-                    id=2, Coor1=du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)
-                ).print_short()
+                du.QEntry(id=2, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor+2).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor).print_short(),
+            ],
+        )
+        AddQueue.clear()
+        AddQueue.add(du.QEntry(id=4, Coor1=TestCoor+4), thread_call=True)
+        AddQueue.add(du.QEntry(id=5, Coor1=TestCoor+5), thread_call=True)
+        TestQueue.add_queue(AddQueue)
+        self.assertEqual(
+            TestQueue.display(),
+            [
+                du.QEntry(id=2, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor+2).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor+4).print_short(),
+                du.QEntry(id=5, Coor1=TestCoor+5).print_short(),
+                du.QEntry(id=6, Coor1=TestCoor).print_short(),
+            ],
+        )
+        TestQueue.clear(all=False, id='3..5')
+        AddQueue.clear()
+        AddQueue.add(du.QEntry(id=4, Coor1=TestCoor+4), thread_call=True)
+        AddQueue.add(du.QEntry(id=5, Coor1=TestCoor+5), thread_call=True)
+        TestQueue.add_queue(AddQueue)
+        self.assertEqual(
+            TestQueue.display(),
+            [
+                du.QEntry(id=2, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor+4).print_short(),
+                du.QEntry(id=5, Coor1=TestCoor+5).print_short(),
+            ],
+        )
+        TestQueue.clear(all=False, id='4..5')
+        AddQueue.clear()
+        AddQueue.add(du.QEntry(id=0, Coor1=TestCoor+4), thread_call=True)
+        AddQueue.add(du.QEntry(id=1, Coor1=TestCoor+5), thread_call=True)
+        TestQueue.add_queue(AddQueue)
+        self.assertEqual(
+            TestQueue.display(),
+            [
+                du.QEntry(id=2, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor+4).print_short(),
+                du.QEntry(id=5, Coor1=TestCoor+5).print_short(),
+            ],
+        )
+        TestQueue.clear(all=False, id='4..5')
+        AddQueue.clear()
+        AddQueue.add(du.QEntry(id=10, Coor1=TestCoor+4), thread_call=True)
+        AddQueue.add(du.QEntry(id=11, Coor1=TestCoor+5), thread_call=True)
+        TestQueue.add_queue(AddQueue)
+        self.assertEqual(
+            TestQueue.display(),
+            [
+                du.QEntry(id=2, Coor1=TestCoor+1).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor+4).print_short(),
+                du.QEntry(id=5, Coor1=TestCoor+5).print_short(),
+            ],
+        )
+        TestQueue.clear(all=True)
+        AddQueue.clear()
+        du.SC_curr_comm_id = 8
+        AddQueue.add(du.QEntry(id=10, Coor1=TestCoor+4), thread_call=True)
+        AddQueue.add(du.QEntry(id=11, Coor1=TestCoor+5), thread_call=True)
+        TestQueue.add_queue(AddQueue)
+        self.assertEqual(
+            TestQueue.display(),
+            [
+                du.QEntry(id=8, Coor1=TestCoor+4).print_short(),
+                du.QEntry(id=9, Coor1=TestCoor+5).print_short(),
+            ],
+        )
+        self.assertIsInstance(TestQueue.add_queue(du.Queue()), AttributeError)
+        self.assertIsInstance(TestQueue.add_queue(None), ValueError)
+
+        # append
+        TestEntry = du.QEntry(id=2, Coor1=TestCoor+6)
+        TestQueue.append(TestEntry)
+        self.assertEqual(
+            TestQueue.display(),
+            [
+                du.QEntry(id=8, Coor1=TestCoor+4).print_short(),
+                du.QEntry(id=9, Coor1=TestCoor+5).print_short(),
+                du.QEntry(id=2, Coor1=TestCoor+6).print_short(),
             ],
         )
 
@@ -337,36 +483,40 @@ class DataLibTest(unittest.TestCase):
         """test RoboTelemetry class, used to store 36 TCP-response from robot"""
 
         # __init__ & __str__
+        TestCoor = du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)
+        TestTelem = du.RoboTelemetry(t_speed=1.1, id=2, Coor=TestCoor)
         self.assertEqual(
-            str(
-                du.RoboTelemetry(
-                    t_speed=1.1, id=2, Coor=du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)
-                )
-            ),
-            f"ID: {2}   X: {3.0}   Y: {3.0}   Z: {3.0}   Rx: {3.0}   Ry: {3.0}   Rz: {3.0}   EXT:   {3.0}   TOOL_SPEED: {1.1}",
+            str(TestTelem),
+            f"ID: 2   X: 3.0   Y: 3.0   Z: 3.0   Rx: 3.0   Ry: 3.0   "
+            f"Rz: 3.0   EXT:   3.0   TOOL_SPEED: 1.1",
         )
         self.assertEqual(
             str(du.RoboTelemetry()),
-            f"ID: {-1}   X: {0.0}   Y: {0.0}   Z: {0.0}   Rx: {0.0}   Ry: {0.0}   Rz: {0.0}   EXT:   {0.0}   TOOL_SPEED: {0.0}",
+            f"ID: -1   X: 0.0   Y: 0.0   Z: 0.0   Rx: 0.0   Ry: 0.0   "
+            f"Rz: 0.0   EXT:   0.0   TOOL_SPEED: 0.0",
         )
 
-        # __round__
+        # __eq__ & __ne__
+        self.assertFalse(TestTelem == du.RoboTelemetry())
+        self.assertFalse(TestTelem == None)
+        self.assertTrue(TestTelem == TestTelem)
+        with self.assertRaises(ValueError):
+            TestTelem == 5
+        self.assertTrue(TestTelem != du.RoboTelemetry())
+        self.assertTrue(TestTelem != None)
+        self.assertFalse(TestTelem != TestTelem)
+        with self.assertRaises(ValueError):
+            TestTelem != 5
+
+        # __round__ (and automatic ID conversion to int)
+        RoundCoor = du.Coordinate(
+            3.333, 3.333, 3.333, 3.333, 3.333, 3.333, 3.333, 3.333
+        )
+        RoundTelem = du.RoboTelemetry(t_speed=1.111, id=2.222, Coor=RoundCoor)
+        RoundedCoor = du.Coordinate(3.3, 3.3, 3.3, 3.3, 3.3, 3.3, 3.3, 3.3)
         self.assertEqual(
-            round(
-                du.RoboTelemetry(
-                    t_speed=1.111,
-                    id=2.222,
-                    Coor=du.Coordinate(
-                        3.333, 3.333, 3.333, 3.333, 3.333, 3.333, 3.333, 3.333
-                    ),
-                ),
-                1,
-            ),
-            du.RoboTelemetry(
-                t_speed=1.1,
-                id=2,
-                Coor=du.Coordinate(3.3, 3.3, 3.3, 3.3, 3.3, 3.3, 3.3, 3.3),
-            ),
+            round(RoundTelem, 1),
+            du.RoboTelemetry(t_speed=1.1, id=2, Coor=RoundedCoor),
         )
 
 
@@ -374,20 +524,86 @@ class DataLibTest(unittest.TestCase):
         """test RoboTelemetry class, used to store 36 TCP-response from robot"""
 
         # __init__ & __str__
+        TestTelem = du.PumpTelemetry(freq=1.1, volt=2.2, amps=3.3, torq=4.4)
         self.assertEqual(
-            str(du.PumpTelemetry(freq=1.1, volt=2.2, amps=3.3, torq=4.4)),
-            f"FREQ: {1.1}   VOLT: {2.2}   AMPS: {3.3}   TORQ: {4.4}",
+            str(TestTelem),
+            f"FREQ: 1.1   VOLT: 2.2   AMPS: 3.3   TORQ: 4.4",
         )
         self.assertEqual(
             str(du.PumpTelemetry()),
-            f"FREQ: {0.0}   VOLT: {0.0}   AMPS: {0.0}   TORQ: {0.0}",
+            f"FREQ: 0.0   VOLT: 0.0   AMPS: 0.0   TORQ: 0.0",
         )
 
+        # __eq__ & __ne__
+        self.assertFalse(TestTelem == du.PumpTelemetry())
+        self.assertFalse(TestTelem == None)
+        self.assertTrue(TestTelem == TestTelem)
+        with self.assertRaises(ValueError):
+            TestTelem == 5
+        self.assertTrue(TestTelem != du.PumpTelemetry())
+        self.assertTrue(TestTelem != None)
+        self.assertFalse(TestTelem != TestTelem)
+        with self.assertRaises(ValueError):
+            TestTelem != 5
+
         # __round__
+        RoundTelem = du.PumpTelemetry(
+            freq=1.111, volt=2.222, amps=3.333, torq=4.444
+        )
         self.assertEqual(
-            round(du.PumpTelemetry(freq=1.111, volt=2.222, amps=3.333, torq=4.444), 1),
+            round(RoundTelem, 1),
             du.PumpTelemetry(freq=1.1, volt=2.2, amps=3.3, torq=4.4),
         )
+
+
+    def test_TSData_class(self):
+        """test TSData class, a decriptor used in DataBlock class"""
+
+        # descriptor needs to be a metaclass to have __set__ invoked
+        # on expressions like 'Class.attribute = 2', where 'attribute'
+        # has to be an instance of the descriptor class
+        # 'Descriptor() = 2' will just overwrite
+        class TestClass():
+            ts_val = du.TSData()
+            def __init__(self, val):
+                self.ts_val = du.TSData(val)
+                self.valid_time = timedelta(seconds=60)
+
+        # __init__, __str__ & __get__ (valid case)
+        TestC = TestClass(4.5)
+        self.assertEqual(TestC.ts_val, 4.5)
+        self.assertEqual(str(TestC.ts_val), '4.5')
+
+        # __set__
+        TestC.ts_val = 5
+        self.assertEqual(TestC.ts_val, 5.0)
+        TestC.ts_val = du.TSData(4.3)
+        self.assertEqual(TestC.ts_val, 4.3)
+        TestC.ts_val = 6.7
+        self.assertEqual(TestC.ts_val, 6.7)
+        with self.assertRaises(ValueError):
+            TestC.ts_val = 'A'
+
+        # __eq__ & __ne__
+        self.assertFalse(TestC.ts_val == du.TSData())
+        self.assertFalse(TestC.ts_val == None)
+        self.assertFalse(TestC.ts_val == 5)
+        self.assertTrue(TestC.ts_val == du.TSData(6.7))
+        self.assertTrue(TestC.ts_val == TestC.ts_val)
+        self.assertTrue(TestC.ts_val == 6.7)
+        self.assertTrue(TestC.ts_val != du.TSData())
+        self.assertTrue(TestC.ts_val != None)
+        self.assertTrue(TestC.ts_val != 5)
+        self.assertFalse(TestC.ts_val != TestC.ts_val)
+        self.assertFalse(TestC.ts_val != 6.7)
+
+        # change valid_time & __get__ (invalid case)
+        TestC.ts_val = 8.9
+        TestC.valid_time = timedelta(seconds=1) # [s]
+        self.assertEqual(TestC.valid_time, timedelta(seconds=1))
+        self.assertEqual(TestC.ts_val, 8.9)
+        time.sleep(2)
+        self.assertIsNone(TestC.ts_val)
 
 
     def test_DataBlock_class(self):
@@ -395,94 +611,123 @@ class DataLibTest(unittest.TestCase):
         self.maxDiff = 2000
 
         # __init__ & __str__
+        TestCoor = du.Coordinate(14.14, 15, 16, 17, 18, 19, 20, 21)
+        TestDqB = du.DaqBlock(
+            amb_temp = 1.1,
+            amb_humidity = 2.2,
+            rb_temp = 3.3,
+            msp_temp = 4.4,
+            msp_press = 5.5,
+            asp_freq = 6.6,
+            asp_amps = 7.7,
+            imp_temp = 8.8,
+            imp_press = 9.9,
+            imp_freq = 10.1,
+            imp_amps = 11.11,
+            Robo = du.RoboTelemetry(12.12, 13, TestCoor),
+            Pump1 = du.PumpTelemetry(23, 24, 25, 26),
+            Pump2 = du.PumpTelemetry(27, 28, 29, 30),
+            phc_aircon = 31.31,
+            phc_fdist = 32.32,
+            phc_edist = 33.33,
+            )
         self.assertEqual(
-            str(
-                du.DaqBlock(
-                    amb_temp = 1.1,
-                    amb_humidity = 2.2,
-                    rb_temp = 3.3,
-                    msp_temp = 4.4,
-                    msp_press = 5.5,
-                    asp_freq = 6.6,
-                    asp_amps = 7.7,
-                    imp_temp = 8.8,
-                    imp_press = 9.9,
-                    imp_freq = 10.1,
-                    imp_amps = 11.11,
-                    Robo = du.RoboTelemetry(
-                        12.12, 13, du.Coordinate(14.14, 15, 16, 17, 18, 19, 20, 21)
-                    ),
-                    Pump1 = du.PumpTelemetry(23, 24, 25, 26),
-                    Pump2 = du.PumpTelemetry(27, 28, 29, 30),
-                    phc_aircon = 31.31,
-                    phc_fdist = 32.32,
-                    phc_edist = 33.33,
-                )
-            ),
-            f"Amb. temp.: {1.1}    Amb. humid.: {2.2}    RB temp.: {3.3}    MSP temp.: {4.4}    "
-            f"MSP press.: {5.5}    APS freq.: {6.6}    APS amp.: {7.7}    IMP temp.: {8.8}    "
-            f"IMP press.: {9.9}    IMP freq.: {10.10}    IMP amp.: {11.11}    "
-            f"ROB: {du.RoboTelemetry(12.12, 13, du.Coordinate(14.14, 15, 16, 17, 18, 19, 20, 21))}    "
-            f"PUMP1: {du.PumpTelemetry(23, 24, 25, 26)}    PUMP2: {du.PumpTelemetry(27, 28, 29, 30)}    "
-            f"PHC air cont.: {31.31}    PHC front dist.: {32.32}    PHC end dist.: {33.33}",
+            str(TestDqB),
+            f"Amb. temp.: 1.1    Amb. humid.: 2.2    RB temp.: 3.3    "
+            f"MSP temp.: 4.4    MSP press.: 5.5    APS freq.: 6.6    "
+            f"APS amp.: 7.7    IMP temp.: 8.8    IMP press.: 9.9    "
+            f"IMP freq.: 10.1    IMP amp.: 11.11    "
+            f"ROB: {du.RoboTelemetry(12.12, 13, TestCoor)}    "
+            f"PUMP1: {du.PumpTelemetry(23, 24, 25, 26)}    "
+            f"PUMP2: {du.PumpTelemetry(27, 28, 29, 30)}    "
+            f"PHC air cont.: 31.31    PHC front dist.: 32.32    "
+            f"PHC end dist.: 33.33",
         )
-
         self.assertEqual(
             str(du.DaqBlock()),
-            f"Amb. temp.: {0.0}    Amb. humid.: {0.0}    RB temp.: {0.0}    MSP temp.: {0.0}    "
-            f"MSP press.: {0.0}    APS freq.: {0.0}    APS amp.: {0.0}    IMP temp.: {0.0}    "
-            f"IMP press.: {0.0}    IMP freq.: {0.0}    IMP amp.: {0.0}    "
-            f"ROB: {du.RoboTelemetry()}    PUMP1: {du.PumpTelemetry()}    "
-            f"PUMP2: {du.PumpTelemetry()}    "
-            f"PHC air cont.: {0.0}    PHC front dist.: {0.0}    PHC end dist.: {0.0}",
+            f"Amb. temp.: 0.0    Amb. humid.: 0.0    RB temp.: 0.0    "
+            f"MSP temp.: 0.0    MSP press.: 0.0    APS freq.: 0.0    "
+            f"APS amp.: 0.0    IMP temp.: 0.0    IMP press.: 0.0    "
+            f"IMP freq.: 0.0    IMP amp.: 0.0    ROB: {du.RoboTelemetry()}    "
+            f"PUMP1: {du.PumpTelemetry()}    PUMP2: {du.PumpTelemetry()}    "
+            f"PHC air cont.: 0.0    PHC front dist.: 0.0    "
+            f"PHC end dist.: 0.0",
         )
+
+        # __eq__ & __ne__
+        self.assertFalse(TestDqB == du.DaqBlock())
+        self.assertFalse(TestDqB == None)
+        self.assertTrue(TestDqB == TestDqB)
+        with self.assertRaises(ValueError):
+            TestDqB == 5
+        self.assertTrue(TestDqB != du.DaqBlock())
+        self.assertTrue(TestDqB != None)
+        self.assertFalse(TestDqB != TestDqB)
+        with self.assertRaises(ValueError):
+            TestDqB != 5
+        
+        # store
+        invalid_time = du.DEF_STT_VALID_TIME + 1
+        self.assertIsNone(TestDqB.store((1, invalid_time), '', ''))
+        with self.assertRaises(KeyError):
+            TestDqB.store((0, 0), 'wrong', 'wrong')
+        with self.assertRaises(KeyError):
+            TestDqB.store((0, 0), 'amb', 'wrong')
+        # just try one overwrite for example
+        TestDqB.store((-1.1, 0), 'amb', 'temp')
+        self.assertEqual(TestDqB.amb_temp, -1.1)
+
+        # valid_time setter
+        TestDqB.valid_time = 6.54
+        self.assertEqual(TestDqB.valid_time, timedelta(seconds=7))
 
 
     def test_TCPIP_class(self):
         """test TCPIP class, handles connection data und functions"""
 
-        testTCPIP = du.TCPIP()
-
         # __init__ & __str__
+        testTCPIP = du.TCPIP()
         initTestTCPIP = du.TCPIP(
-            ip="1.1.1.1", PORT=2222, C_TOUT=3.3, RW_TOUT=4.4, R_BL=5.5, W_BL=6.6
+            ip="1.1.1.1",
+            PORT=2222,
+            C_TOUT=3.3,
+            RW_TOUT=4.4,
+            R_BL=5.5,
+            W_BL=6.6
         )
-
         self.assertEqual(
             str(initTestTCPIP),
-            f"IP: 1.1.1.1   PORT: {2222}   C_TOUT: {3.3}   RW_TOUT: {4.4}   R_BL: {5}   W_BL: {6}",
+            f"IP: 1.1.1.1   PORT: 2222   C_TOUT: 3.3   RW_TOUT: 4.4   "
+            f"R_BL: 5   W_BL: 6",
         )
         self.assertEqual(
             str(testTCPIP),
-            f"IP:    PORT: {0}   C_TOUT: {1.0}   RW_TOUT: {1.0}   R_BL: {0}   W_BL: {0}",
+            f"IP:    PORT: 0   C_TOUT: 1.0   RW_TOUT: 1.0   "
+            f"R_BL: 0   W_BL: 0",
         )
-
         initTestTCPIP.close(end=True)
 
         # setParams
-        testTCPIP.set_params(
-            {
-                "IP": "1.1.1.1",
-                "PORT": 2222,
-                "C_TOUT": 0.003,
-                "RW_TOUT": 0.004,
-                "R_BL": 5.5,
-                "W_BL": 6.6,
-            }
-        )
+        testTCPIP.set_params({
+            "IP": "1.1.1.1",
+            "PORT": 2222,
+            "C_TOUT": 0.003,
+            "RW_TOUT": 0.004,
+            "R_BL": 5.5,
+            "W_BL": 6.6,
+        })
         self.assertEqual(
             str(testTCPIP),
-            f"IP: 1.1.1.1   PORT: {2222}   C_TOUT: {0.003}   RW_TOUT: {0.004}   R_BL: {5}   W_BL: {6}",
+            f"IP: 1.1.1.1   PORT: 2222   C_TOUT: 0.003   RW_TOUT: 0.004   "
+            f"R_BL: 5   W_BL: 6",
         )
-
         testTCPIP.connected = True
-        self.assertRaises(PermissionError, testTCPIP.set_params, param_dict=None)
+        self.assertRaises(PermissionError, testTCPIP.set_params, None)
         testTCPIP.connected = False
 
         # connect
         ans0 = testTCPIP.connect()
         self.assertIsInstance(ans0, TimeoutError)
-
         testTCPIP.port = "ABC"
         self.assertRaises(ConnectionError, testTCPIP.connect)
 
@@ -490,7 +735,6 @@ class DataLibTest(unittest.TestCase):
         ans0, ans1 = testTCPIP.send([True,True])
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ConnectionError)
-
         testTCPIP.connected = True
         ans0, ans1 = testTCPIP.send([True, True])
         self.assertFalse(ans0)
@@ -509,10 +753,10 @@ class DataLibTest(unittest.TestCase):
     def test_RobConnection_class(self):
         """test RobConnection class, handles connection data und functions"""
 
-        testRobCon = du.RobConnection()
 
         # send
-        
+        testRobCon = du.RobConnection()
+    
         ans0, ans1 = testRobCon.send(du.QEntry(id=1))
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ConnectionError)
@@ -532,8 +776,7 @@ class DataLibTest(unittest.TestCase):
         testRobCon.close(end=True)
 
 
-
-#############################################  MAIN  ##################################################
+#################################  MAIN  #####################################
 
 if __name__ == "__main__":
     unittest.main()

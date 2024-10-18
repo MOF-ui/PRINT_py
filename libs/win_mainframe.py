@@ -82,10 +82,11 @@ class Mainframe(PreMainframe):
         self.load_defaults(setup=True)
 
         self.log_entry('GNRL', 'init threading...')
-        self.connect_threads('OTHER')
-
-        # TESTRUN OPTION
-        if testrun:
+        if not testrun:
+            self.connect_threads('OTHER')
+        else: 
+            # TESTRUN OPTION WITH RETURN
+            self.connect_threads('ALL')
             self.log_entry('TEST', 'testrun, skipping robot connection...')
             self.log_entry('GNRL', 'setup finished.')
             self.log_entry('newline')
@@ -935,7 +936,7 @@ class Mainframe(PreMainframe):
             if not from_file:
                 self.SGLC_entry_rapidSglComm.setText(
                     f"ERROR: no detectable move-type "
-                    f"or missing 'EXT:' in:\n {txt}"
+                    f"or missing 'EXT' in:\n {txt}"
                 )
             return Entry
         
@@ -1296,6 +1297,8 @@ class Mainframe(PreMainframe):
             LastCom, dummy = du.ROB_send_list[len(du.ROB_send_list) - 1]
             if command.id <= LastCom.id:
                 command.id = LastCom.id + 1
+
+        # to-do: catch SC ID > ROB ID errors
         
         # pass command to sendList
         GlobalMutex.lock()
@@ -1405,16 +1408,16 @@ class Mainframe(PreMainframe):
 
     def adc_read_user_input(self, panel) -> du.ToolCommand:
         """short-hand to get user input"""
-
+        
+        RetTool = du.ToolCommand()
         group = self.ADC_group if (panel=='ADC') else self.ASC_group
-        return du.ToolCommand(
-            pnmtc_clamp_yn=self.group[0].isChecked(),
-            knife_pos_yn=self.group[1].isChecked(),
-            knife_yn=self.group[2].isChecked(),
-            pnmtc_fiber_yn=self.group[3].isChecked(),
-            pan_steps=self.group[4].value(),
-            fib_deliv_steps=self.group[5].value(),
-        )
+        RetTool.pnmtc_clamp_yn = group[0].isChecked()
+        RetTool.knife_pos_yn = group[1].isChecked()
+        RetTool.knife_yn = group[2].isChecked()
+        RetTool.pnmtc_fiber_yn = group[3].isChecked()
+        RetTool.pan_steps = group[4].value()
+        RetTool.fib_deliv_steps = group[5].value()
+        return RetTool
 
 
     def adc_user_change(self) -> None:
@@ -1425,7 +1428,6 @@ class Mainframe(PreMainframe):
 
         Pos = copy.deepcopy(du.ROBTelem.Coor)
         Tool = self.adc_read_user_input('ADC')
-
         Command = du.QEntry(
             id=du.SC_curr_comm_id,
             Coor1=Pos,
@@ -1474,14 +1476,13 @@ class Mainframe(PreMainframe):
             SC_first = du.SCQueue[0].id
         except AttributeError:
             usr_txt = 'SC queue contains no commands, nothing was done.'
-        
+
         if usr_txt:
             user_info = strd_dialog(usr_txt, 'Command error')
             user_info.exec()
             return None
 
         Tool = self.adc_read_user_input('ASC')
-
         if ".." in id_range:
             ids = re.findall('\d+', id_range)
             if len(ids) != 2:
@@ -1512,17 +1513,15 @@ class Mainframe(PreMainframe):
             id_start = int(ids[0])
 
             GlobalMutex.lock()
-            overwrite(id_start, Tool)
+            overwrite(0, Tool)
             GlobalMutex.unlock()
+            id_range = id_start
 
         check_entry = du.SCQueue.id_pos(id_start)
         Tool = du.SCQueue[check_entry].Tool
         self.log_entry(
             'ACON',
-            (
-                f"{id_range} SC commands overwritten to new tool "
-                f"settings: ({Tool})"
-            ),
+            f"{id_range} SC commands overwritten; settings: ({Tool})"
         )
 
 

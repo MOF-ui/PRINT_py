@@ -1,6 +1,6 @@
 # test threads
 
-############################################# IMPORTS #################################################
+################################## IMPORTS ###################################
 
 import os
 import sys
@@ -16,7 +16,7 @@ import libs.data_utilities as du
 import libs.threads as T
 
 
-########################################## TEST CLASS ##############################################
+################################### TESTS ####################################
 
 
 class ThreadsTest(unittest.TestCase):
@@ -35,12 +35,14 @@ class ThreadsTest(unittest.TestCase):
         T.lfw_file_path = gcode_test_path
         T.lfw_line_id = 0
         LFWorker.run(testrun=True)
+        TestCoor1 = du.Coordinate(y=2000, z=0)
+        TestCoor2 = du.Coordinate(y=2000, z=1000)
 
         self.assertEqual(
             du.SCQueue.display(),
             [
-                du.QEntry(id=1, Coor1=du.Coordinate(y=2000, z=0)).print_short(),
-                du.QEntry(id=2, Coor1=du.Coordinate(y=2000, z=1000)).print_short(),
+                du.QEntry(id=1, Coor1=TestCoor1).print_short(),
+                du.QEntry(id=2, Coor1=TestCoor2).print_short(),
             ],
         )
 
@@ -52,10 +54,10 @@ class ThreadsTest(unittest.TestCase):
         self.assertEqual(
             du.SCQueue.display(),
             [
-                du.QEntry(id=1, Coor1=du.Coordinate(y=2000, z=0)).print_short(),
-                du.QEntry(id=2, Coor1=du.Coordinate(y=2000, z=0)).print_short(),
-                du.QEntry(id=3, Coor1=du.Coordinate(y=2000, z=1000)).print_short(),
-                du.QEntry(id=4, Coor1=du.Coordinate(y=2000, z=1000)).print_short(),
+                du.QEntry(id=1, Coor1=TestCoor1).print_short(),
+                du.QEntry(id=2, Coor1=TestCoor1).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor2).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor2).print_short(),
             ],
         )
 
@@ -131,7 +133,7 @@ class ThreadsTest(unittest.TestCase):
         self.assertEqual(RCWorker.check_zero_dist(), 2)
 
 
-########################################## MAIN ##############################################
+#################################  MAIN  #####################################
 
 # create 0_BT_testfiles
 desk = os.environ["USERPROFILE"]

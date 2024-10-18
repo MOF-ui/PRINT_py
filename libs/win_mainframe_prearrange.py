@@ -129,13 +129,23 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     def group_elems(self) -> None:
         """build groups for enable/disable actions"""
 
-        self.ADC_group = self.ADC_frame.findChildren(
-            (QtWidgets.QPushButton, QtWidgets.QSpinBox)
-        )
+        self.ADC_group = [
+            self.ADC_btt_clamp,
+            self.ADC_btt_knifePos,
+            self.ADC_btt_knife,
+            self.ADC_btt_fiberPnmtc,
+            self.ADC_num_panning,
+            self.ADC_num_fibDeliv,
+        ]
 
-        self.ASC_group = self.ASC_frame.findChildren(
-            (QtWidgets.QPushButton, QtWidgets.QSpinBox)
-        )
+        self.ASC_group = [
+            self.ASC_btt_clamp,
+            self.ASC_btt_knifePos,
+            self.ASC_btt_knife,
+            self.ASC_btt_fiberPnmtc,
+            self.ASC_num_panning,
+            self.ASC_num_fibDeliv,
+        ]
 
         self.DC_group = [
             self.DC_btt_xPlus,
@@ -394,8 +404,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     ) -> None:
         """handle UI update after new command was send"""
 
-        write_buffer = command.print_short()
         if no_error:
+            write_buffer = command.print_short()
             du.SC_curr_comm_id += num_send
 
             if du.SC_curr_comm_id > 3000:
@@ -409,6 +419,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self.log_entry('ROBO', log_txt)
 
         else:
+            write_buffer = f"{num_send}"
             self.log_entry(
                 'CONN',
                 (
@@ -478,9 +489,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
             case 'P2':
                 displays = [
-                    self.TCP_PUMP1_disp_writeBuffer,
-                    self.TCP_PUMP1_disp_bytesWritten,
-                    self.TCP_PUMP1_disp_readBuffer
+                    self.TCP_PUMP2_disp_writeBuffer,
+                    self.TCP_PUMP2_disp_bytesWritten,
+                    self.TCP_PUMP2_disp_readBuffer
                 ]
                 p_send(displays, du.PMP2_speed, 2)
 

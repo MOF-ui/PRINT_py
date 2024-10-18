@@ -501,7 +501,7 @@ class SensorCommWorker(QObject):
                         loc['err'] = False
 
                         GlobalMutex.lock()
-                        fu.store_sensor_data(latest_data, key, sub_key)
+                        du.STTDataBlock.store(latest_data, key, sub_key)
                         GlobalMutex.unlock()
 
                     elif data is not None:

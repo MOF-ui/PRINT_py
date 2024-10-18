@@ -179,6 +179,7 @@ def re_short(
     for curr_regex in regex:
         try:
             ans = re.findall(curr_regex, txt)[0]
+            break
         except IndexError:
             continue
 
@@ -589,61 +590,3 @@ def sensor_req(
         entry_pos = remain_str.find(';')
 
     return val
-
-
-def store_sensor_data(data:tuple, key:str, sub_key:str) -> None:
-    """Stores data according to key and sub_key, mutual exclusion needs to
-    be called beforehand, as values are stored in global variables.
-    No data is stored, if the corresponding uptime exceeds the datas
-    valid_time.
-
-    accepts: 
-        data:
-            data to be stored, expected as a tuple: (value, uptime)
-        key:
-            superior key in du.SEN_dict, specifying sensor location
-        sub_key:
-            inferior key in du.SEN_dict, specifying parameter type
-    """
-
-    val, uptime = data
-
-    if uptime > du.STTDataBlock.valid_time.seconds:
-        return None
-    match key:
-        case 'amb':
-            match sub_key:
-                case 'temp': du.STTDataBlock.amb_temp = val
-                case 'humid': du.STTDataBlock.amb_humidity = val
-                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
-        case 'asp': 
-            match sub_key:
-                case 'freq': du.STTDataBlock.asp_freq = val
-                case 'amps': du.STTDataBlock.asp_amps = val
-                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
-        case 'rb':
-            match sub_key:
-                case 'temp': du.STTDataBlock.rb_temp = val
-                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
-        case 'msp': 
-            match sub_key:
-                case 'temp': du.STTDataBlock.msp_temp = val
-                case 'press': du.STTDataBlock.msp_press = val
-                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
-        case 'imp':
-            match sub_key:
-                case 'temp': du.STTDataBlock.imp_temp = val
-                case 'press': du.STTDataBlock.imp_press = val
-                case 'freq': du.STTDataBlock.imp_freq = val
-                case 'amps': du.STTDataBlock.imp_amps = val
-                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
-        case 'phc':
-            match sub_key:
-                case 'aircon': du.STTDataBlock.imp_temp = val
-                case 'fdist': du.STTDataBlock.imp_press = val
-                case 'edist': du.STTDataBlock.imp_freq = val
-                case _: raise KeyError(f"no storage reserved for {sub_key} in {key}!")
-        case _:
-            raise KeyError(f"no storage reserved for {key} in du.STTDataBlock!")
-        
-    return None

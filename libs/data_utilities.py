@@ -495,9 +495,11 @@ class QEntry:
             tool command in Jonas' standard format
         p_mode:
             option for automatic pump control
+        p_ratio:
+            option for dual pump printing
 
     FUNCTIONS:
-        __init__, __str__, __eq__
+        __init__, __str__, __eq__, __ne__
 
         print_short:
             prints only most important parameters
@@ -633,11 +635,11 @@ class Queue:
             returns last entry
         id_pos:
             returns queue entry index(!) of given ID
-        entry_befo
+        entry_before_id
         id:
             returns entry before given ID
         display:
-            returns queue as a str list (uses __str__ of QEntry)
+            returns queue as a str list (uses QEntry.print_short())
         increment:
             increments all QEntry.ID to handle DC commands send before
             the queue
@@ -706,14 +708,11 @@ class Queue:
     def __str__(self) -> str:
 
         if len(self._queue) != 0:
-            i = 0
             ans = ""
-
             for x in self._queue:
-                i += 1
-                ans += f"Element {i}: {x}\n"
-
+                ans += f"{x}\n"
             return ans
+        
         return "Queue is empty!"
 
 
@@ -815,7 +814,7 @@ class Queue:
 
 
     def display(self) -> list[str]:
-        """returns queue as a str list (uses __str__ of QEntry)"""
+        """returns queue as a str list (uses QEntry.print_short())"""
 
         if len(self._queue) != 0:
             ans = []
@@ -836,7 +835,7 @@ class Queue:
         queue
         """
 
-        for i in self._queue:
+        for i in self:
             i.id += summand
 
 
@@ -848,16 +847,13 @@ class Queue:
 
         new_entry = copy.deepcopy(entry)
         last_item = len(self._queue) - 1
-
         if not isinstance(new_entry, QEntry):
             return ValueError('entry is not an instance of QEntry')
 
         if last_item < 0:
             global SC_curr_comm_id
-
             if not thread_call:
                 new_entry.id = SC_curr_comm_id
-
             self._queue.append(new_entry)
             return None
 
@@ -896,55 +892,39 @@ class Queue:
         new_list = copy.deepcopy(list)
         if not isinstance(new_list, Queue):
             return ValueError(f"{new_list} is not an instance of 'Queue'!")
-
         try:
             nl_first_id = new_list[0].id
         except Exception as err:
             return err
 
         last_item = len(self._queue) - 1
-        len_new_list = len(new_list)
-
+        # if current queue is empty
         if last_item < 0:
             global SC_curr_comm_id
-
             if nl_first_id != SC_curr_comm_id:
-                i = 0
-                for entry in new_list._queue:
-                    entry.id = SC_curr_comm_id + i
-                    i += 1
-
+                new_list.increment(SC_curr_comm_id - nl_first_id)
             self._queue.extend(new_list._queue)
-            return None
+            return
 
-        last_id = self._queue[last_item].id
-        first_id = self._queue[0].id
+        len_new_list = len(new_list)
+        last_id = self[last_item].id
+        first_id = self[0].id
 
+        if (nl_first_id > last_id + 1) or (nl_first_id == 0):
+            new_list.increment(last_id + 1 - nl_first_id)
+            nl_first_id = last_id + 1
+            
         if nl_first_id == (last_id + 1):
             self._queue.extend(new_list._queue)
-
-        elif nl_first_id == 0:
-            i = 1
-            for entry in new_list:
-                entry.id = last_id + i
-                i += 1
-            self._queue.extend(new_list._queue)
-
+        
         else:
             if nl_first_id < first_id:
-                i = 0
-                for entry in new_list:
-                    entry.id = first_id + i
-                    i += 1
-
-            front_skip = new_list[0].id - first_id
+                new_list.increment(first_id - nl_first_id)
+                nl_first_id = first_id
+            front_skip = nl_first_id - first_id
+            for i in range(len(self) - front_skip):
+                self[i + front_skip].id += len_new_list
             self._queue[front_skip:front_skip] = new_list._queue
-
-            for i in range(last_item + 1 - front_skip):
-                i += len_new_list
-                self._queue[i + front_skip].id += len_new_list
-
-        return None
 
 
     def append(self, entry) -> None:
@@ -957,7 +937,7 @@ class Queue:
         return None
 
 
-    def clear(self, all=True, id="") -> None:
+    def clear(self, all=True, id='') -> None:
         """deletes single or multiple QEntry from queue, adjusts following
         ID accordingly
         """
@@ -969,7 +949,7 @@ class Queue:
         if len(self._queue) == 0:
             return
 
-        ids = re.findall("\d+", id)
+        ids = re.findall('\d+', id)
         id_num = len(ids)
         first_id = self._queue[0].id
         last_id = self._queue[len(self._queue) - 1].id
@@ -977,7 +957,6 @@ class Queue:
         match id_num:
             case 1:
                 id1 = int(ids[0])
-
                 if id1 < first_id or id1 > last_id:
                     return
 
@@ -995,13 +974,12 @@ class Queue:
 
             case 2:
                 id1, id2 = int(ids[0]), int(ids[1])
-
                 if (
                     id1 < first_id
                     or id1 > last_id
                     or id2 < id1
                     or id2 > last_id
-                    or id.find("..") == -1
+                    or id.find('..') == -1
                 ):
                     return
 
@@ -1210,7 +1188,7 @@ class PumpTelemetry:
 
 class TSData:
     """simple descriptor for timestamped data, will take values but only
-    return them if there less old than the valid_time, otherwise returns None
+    return them if there less old than the valid_time, otherwise returns None.
     
     ATTRIBUTES:
         val:
@@ -1221,22 +1199,60 @@ class TSData:
             user_defined time, the value remains valid
 
     FUNCTIONS:
-        __init__, __get__, __set__
+        __init__, __get__, __set__, __eq__, __ne__, __str__
     """
 
     def __init__(self, val=0.0) -> None:
         self.val = float(val)
         self._created_at = datetime.now()
 
+
     def __get__(self, instance, owner) -> float | None:
         age = datetime.now() - self._created_at
-        if age < instance._valid_time:
+        if age < instance.valid_time:
             return self.val
         return None
+    
 
     def __set__(self, instance, value) -> None:
-        self.val = float(value)
         self._created_at = datetime.now()
+        if isinstance(value, TSData):
+            self.val = float(value.val)
+        elif isinstance(value, float) or isinstance(value, int):
+            self.val = float(value)
+        elif value is None:
+            self.val = None
+        else:
+            raise ValueError(f"new value can not be of type {type(value)}!")
+    
+    
+    def __eq__(self, other):
+        if isinstance(other, TSData):
+            if self.val == other.val:
+                return True
+        elif isinstance(other, float) or isinstance(other, int):
+            if self.val == other:
+                return True
+        else:
+            raise ValueError(
+                f"{other} is not comparable to {TSData}!"
+            )
+        return False
+    
+    
+    def __ne__(self, other):
+        if isinstance(other, TSData):
+            if self.val != other.val:
+                return True
+        elif isinstance(other, float) or isinstance(other, int):
+            if self.val != other:
+                return True
+        else:
+            raise ValueError(
+                f"{other} is not comparable to {TSData}!"
+            )
+        return False
+
 
     def __str__(self) -> str:
         return f"{self.__get__(self, None)}"
@@ -1246,8 +1262,8 @@ class TSData:
 
 
 class DaqBlock:
-    """structure for DAQ, uses TSData except for Robo & Pumps which have to
-    update periodically in order for the program to run anyways
+    """structure for DAQ, uses TSData (except for Robo & Pumps) which have to
+    be updated periodically to stay valid, for more see TSData() 
 
     ATTRIBUTES:
         Robo:
@@ -1291,11 +1307,13 @@ class DaqBlock:
         phc_edist:
             PHC = print head controller; deposition layer distance behind
             the nozzle
-        valid time:
-            changes the valid_time of all TSData entries (property attribute)
 
     FUNCTIONS:
         __init__, __str__, __eq__,
+
+        store:
+            Stores data according to key and sub_key, mutual exclusion needs to
+            be called beforehand, as values are stored in global variables.
     """
 
     amb_temp = TSData()
@@ -1312,7 +1330,6 @@ class DaqBlock:
     phc_aircon = TSData()
     phc_fdist = TSData()
     phc_edist = TSData()
-    
     
     def __init__(
             self,
@@ -1336,21 +1353,21 @@ class DaqBlock:
     ) -> None:
         global DEF_STT_VALID_TIME
 
+        self.amb_temp = TSData(amb_temp)
+        self.amb_humidity = TSData(amb_humidity)
+        self.rb_temp = TSData(rb_temp)
+        self.msp_temp = TSData(msp_temp)
+        self.msp_press = TSData(msp_press)
+        self.asp_freq = TSData(asp_freq)
+        self.asp_amps = TSData(asp_amps)
+        self.imp_temp = TSData(imp_temp)
+        self.imp_press = TSData(imp_press)
+        self.imp_freq = TSData(imp_freq)
+        self.imp_amps = TSData(imp_amps)
+        self.phc_aircon = TSData(phc_aircon)
+        self.phc_fdist = TSData(phc_fdist)
+        self.phc_edist = TSData(phc_edist)
         self.valid_time = DEF_STT_VALID_TIME
-        self.amb_temp = amb_temp
-        self.amb_humidity = amb_humidity
-        self.rb_temp = rb_temp
-        self.msp_temp = msp_temp
-        self.msp_press = msp_press
-        self.asp_freq = asp_freq
-        self.asp_amps = asp_amps
-        self.imp_temp = imp_temp
-        self.imp_press = imp_press
-        self.imp_freq = imp_freq
-        self.imp_amps = imp_amps
-        self.phc_aircon = phc_aircon
-        self.phc_fdist = phc_fdist
-        self.phc_edist = phc_edist
 
         # handle those beasty mutables
         self.Robo = RoboTelemetry() if (Robo is None) else Robo
@@ -1439,16 +1456,77 @@ class DaqBlock:
             )
 
         return False
+
+
+    def store(self, data:tuple, key:str, sub_key:str) -> None:
+        """Stores data according to key and sub_key, mutual exclusion needs to
+        be called beforehand, as values are stored in global variables. If
+        val_age (from data) exceeds the value-specific valid_time, nothing
+        will be done
+
+        accepts: 
+            data:
+                data to be stored, expected as a tuple: (value, uptime)
+            key:
+                superior key in du.SEN_dict, specifying sensor location
+            sub_key:
+                inferior key in du.SEN_dict, specifying parameter type
+        """
+
+        val, val_age = data
+        if val_age > self.valid_time.seconds: 
+            return
+        err =  KeyError(f"no storage reserved for {sub_key} in {key}!")
+        match key:
+            case 'amb':
+                match sub_key:
+                    case 'temp': self.amb_temp = val
+                    case 'humid': self.amb_humidity = val
+                    case _: raise err
+            case 'asp': 
+                match sub_key:
+                    case 'freq': self.asp_freq = val
+                    case 'amps': self.asp_amps = val
+                    case _: raise err
+            case 'rb':
+                match sub_key:
+                    case 'temp': self.rb_temp = val
+                    case _: raise err
+            case 'msp': 
+                match sub_key:
+                    case 'temp': self.msp_temp = val
+                    case 'press': self.msp_press = val
+                    case _: raise err
+            case 'imp':
+                match sub_key:
+                    case 'temp': self.imp_temp = val
+                    case 'press': self.imp_press = val
+                    case 'freq': self.imp_freq = val
+                    case 'amps': self.imp_amps = val
+                    case _: raise err
+            case 'phc':
+                match sub_key:
+                    case 'aircon': self.imp_temp = val
+                    case 'fdist': self.imp_press = val
+                    case 'edist': self.imp_freq = val
+                    case _: raise err
+            case _:
+                raise KeyError(
+                    f"no storage reserved for {key} in du.STTDataBlock!"
+                )
+            
+        return None
+    
     
     @property
     def valid_time(self):
         return self._valid_time
     
+    
     @valid_time.setter
     def valid_time(self, new_valid_time):
-        if not isinstance(new_valid_time, int):
-            raise ValueError(f"{new_valid_time} is not an instance of int!")
-        
+        # convert to int
+        new_valid_time = int(round(new_valid_time, 0))
         self._valid_time = timedelta(seconds=new_valid_time) 
 
 
@@ -1895,6 +1973,7 @@ SCQueue = Queue()
 SC_q_processing = False
 SC_q_prep_end = False
 SC_ext_fllw_bhvr = DEF_SC_EXT_FLLW_BHVR
+SCBreakPoint = Coordinate() # write routine to stop at predefined point during SC using this Coordinate
 
 SEN_timeout = 0.5
 SEN_dict = { # add available datasources here

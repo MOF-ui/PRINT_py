@@ -37,6 +37,7 @@ def calc_speed() -> tuple[int | None, float]:
     global last_speed
 
     p_mode = 'None'
+    p_ratio = 1.0
     try:
         curr_comm = du.ROBCommQueue[0]
     except IndexError:
@@ -88,26 +89,19 @@ def default_mode(command=None) -> float | None:
         command:
             QEntry-like object specifying next movement
     """
-    global last_def_command
-    global last_speed
 
     if not isinstance(command, du.QEntry):
         return None
     else:
         Comm = command
 
-    if Comm != last_def_command:
-        # determine current volume output:
-        lps = (du.PMP1_liter_per_s * du.PMP_output_ratio) + (
-            du.PMP2_liter_per_s * (1.0 - du.PMP_output_ratio)
-        )
-
-        # [%] =      ( [mm/s]       * [L/m]           * [m/mm]/ [L/s])*100.0
-        speed = float(Comm.Speed.ts * du.SC_vol_per_m * 0.001 / lps) * 100.0
-        last_def_command = copy.deepcopy(Comm)
-
-    else:
-        speed = last_speed
+    # determine current volume output:
+    lps = (du.PMP1_liter_per_s * du.PMP_output_ratio) + (
+        du.PMP2_liter_per_s * (1.0 - du.PMP_output_ratio)
+    )
+    # [%] =      ( [mm/s]       * [L/m]           * [m/mm]/ [L/s])*100.0
+    speed = float(Comm.Speed.ts * du.SC_vol_per_m * 0.001 / lps) * 100.0
+    last_def_command = copy.deepcopy(Comm)
 
     return speed
 
@@ -125,7 +119,6 @@ def profile_mode(command=None, profile=None) -> float | None:
             list[dict{"until": float, "base": str, "mode": str},...]
     """
     global preceeding_speed
-    global last_speed
 
     # check passed arguments
     if None in [command, profile]:
@@ -141,7 +134,6 @@ def profile_mode(command=None, profile=None) -> float | None:
     # as more complex pump scripts should only apply to linear movements,
     # the remaining travel distance can be calculated using pythagoras
     curr = copy.deepcopy(du.ROBTelem.Coor)
-
     dist_remaining = m.sqrt(
         m.pow(Comm.Coor1.x - curr.x, 2)
         + m.pow(Comm.Coor1.y - curr.y, 2)
@@ -216,8 +208,7 @@ def profile_mode(command=None, profile=None) -> float | None:
                 base_0 = preceeding_speed
 
             normalized_t = float(
-                (time_remaining - time_0) 
-                / (settings['until'] - time_0)
+                (time_remaining - time_0) / (settings['until'] - time_0)
             )
             # get sigmoid function with x * x * ( 3 - 2 * x )
             speed = (
@@ -282,5 +273,4 @@ END_SUPP_PTS = [
 preceeding_comm = None
 preceeding_speed = 0.0
 
-last_def_command = None
 last_speed = 0.0

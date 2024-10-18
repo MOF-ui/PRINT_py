@@ -1,6 +1,6 @@
 # test pump_utilities
 
-############################################# IMPORTS #################################################
+################################## IMPORTS ###################################
 
 import os
 import sys
@@ -14,7 +14,7 @@ sys.path.append(parent_dir)
 import libs.data_utilities as du
 import libs.pump_utilities as pu
 
-############################################  CLASS  ##################################################
+################################### TESTS ####################################
 
 
 
@@ -65,28 +65,31 @@ class PumpLibTest(unittest.TestCase):
     def test_defaultMode(self):
         """  """
 
+        du.PMP1_liter_per_s = 1.0
+        du.PMP_output_ratio = 1.0
+        du.SC_vol_per_m = 100.0
         # None
         self.assertIsNone(pu.default_mode(None))
 
-        # lastDefCommand
-        testEntry = du.QEntry(Coor1=du.Coordinate(x=10))
-        pu.last_def_command = du.QEntry(Coor1=du.Coordinate(x=10))
-        pu.last_speed = 45
-
-        self.assertEqual(pu.default_mode(testEntry), 45)
-
         # newCommand ( default Speed.ts for QEntry is 200 )
-        testEntry = du.QEntry(Coor1=du.Coordinate(x=11))
-
-        self.assertEqual(pu.default_mode(testEntry), 16)
+        testEntry = du.QEntry(Speed=du.SpeedVector(ts=1))
+        self.assertEqual(pu.default_mode(testEntry), 10)
 
 
     def test_profileMode(self):
         """ """
 
-        du.ROBCommQueue.add(du.QEntry())
-        du.ROBCommQueue.add(du.QEntry())
-        du.ROBTelem.Coor = du.Coordinate()
+        du.PMP_retract_speed = -50.0
+        du.ROBMovStartP = du.Coordinate()
+        TestCoor= du.Coordinate(10)
+        TestVector=du.SpeedVector(ts=1)
+        TestEntry = du.QEntry(Coor1=TestCoor, Speed=TestVector)
+        du.ROBCommQueue.append(
+            du.QEntry(id=2, Coor1=TestCoor, Speed=TestVector)
+        )
+        du.ROBCommQueue.append(
+            du.QEntry(id=3, Coor1=TestCoor+10, Speed=TestVector)
+        )
         pu.START_SUPP_PTS = [
             {'until': 5.0, 'base': 'zero', 'mode': 'instant'},
             {'until': 1.0, 'base': 'max', 'mode': 'instant'},
@@ -100,30 +103,25 @@ class PumpLibTest(unittest.TestCase):
         ]
 
         # START_SUPP_PTS
-        testEntry = du.QEntry(Coor1=du.Coordinate(x=10), Speed=du.SpeedVector(ts=1))
-        self.assertEqual(pu.profile_mode(testEntry, pu.START_SUPP_PTS), 0)
-
-        du.ROBTelem.Coor = du.Coordinate(x=5)
-        self.assertEqual(pu.profile_mode(testEntry, pu.START_SUPP_PTS), 0)
-
-        du.ROBTelem.Coor = du.Coordinate(x=8)
-        self.assertEqual(pu.profile_mode(testEntry, pu.START_SUPP_PTS), 100.0)
+        expected_ans = [0, 0, 0, 0, 0, 0, 100.0, 100.0, 100.0, 100.0, 10.0]
+        for i in range(0, 11):
+            du.ROBTelem.Coor = du.Coordinate(x=i)
+            self.assertEqual(
+                pu.profile_mode(TestEntry, pu.START_SUPP_PTS),
+                expected_ans[i],
+            )
 
         du.ROBTelem.Coor = du.Coordinate(x=9.5)
-        self.assertEqual(pu.profile_mode(testEntry, pu.START_SUPP_PTS), 58.0)
-
-        du.ROBTelem.Coor = du.Coordinate(x=10)
-        self.assertEqual(pu.profile_mode(testEntry, pu.START_SUPP_PTS), 16.0)
+        self.assertEqual(pu.profile_mode(TestEntry, pu.START_SUPP_PTS), 55.0)
 
         # END_SUPP_PTS
-        du.ROBTelem.Coor = du.Coordinate(x=4)
-        self.assertEqual(pu.profile_mode(testEntry, pu.END_SUPP_PTS), 0.0)
-
-        du.ROBTelem.Coor = du.Coordinate(x=7)
-        self.assertEqual(pu.profile_mode(testEntry, pu.END_SUPP_PTS), -25)
-
-        du.ROBTelem.Coor = du.Coordinate(x=10)
-        self.assertEqual(pu.profile_mode(testEntry, pu.END_SUPP_PTS), 0)
+        expected_ans = [10, 10, 10, 10, 10, 10, 0.625, -20, -40.625, -50.0, 0]
+        for i in range(0, 11):
+            du.ROBTelem.Coor = du.Coordinate(x=i)
+            self.assertEqual(
+                pu.profile_mode(TestEntry, pu.END_SUPP_PTS),
+                expected_ans[i],
+            )
 
         du.ROBCommQueue.clear()
 
@@ -138,12 +136,19 @@ class PumpLibTest(unittest.TestCase):
         self.assertEqual(pu.get_base_speed("retract", 12), -50)
         self.assertEqual(pu.get_base_speed("conn", 12), 12)
 
-        du.ROBCommQueue.add(du.QEntry())
-        du.ROBCommQueue.add(du.QEntry())
-        self.assertEqual(pu.get_base_speed("conn", 12), 16)
+        TestCoor= du.Coordinate(10)
+        TestVector=du.SpeedVector(ts=1)
+        du.ROBCommQueue.append(
+            du.QEntry(id=2, Coor1=TestCoor, Speed=TestVector)
+        )
+        du.ROBCommQueue.append(
+            du.QEntry(id=3, Coor1=TestCoor+10, Speed=TestVector)
+        )
+        self.assertEqual(pu.get_base_speed("conn", 12), 10)
+        du.ROBCommQueue.clear()
 
 
-############################################  MAIN  ##################################################
+#################################  MAIN  #####################################
 
 if __name__ == "__main__":
     unittest.main()
