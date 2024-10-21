@@ -8,9 +8,9 @@ import sys
 import unittest
 
 # comment out tests you dont want to run here
-from win_mainframe_test import MainframeWinTest
 from data_utilities_test import DataLibTest
 from func_utilities_test import FuncLibTest
+from win_mainframe_test import MainframeWinTest
 from pump_utilities_test import PumpLibTest
 from tests.threads_test import ThreadsTest
 

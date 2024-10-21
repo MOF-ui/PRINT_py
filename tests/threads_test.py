@@ -64,18 +64,17 @@ class ThreadsTest(unittest.TestCase):
         # RAPID
         du.SCQueue.clear()
         du.SC_curr_comm_id = 1
+        TestCoor1.ext = 11.0
+        TestCoor2.ext = 11.0
 
         T.lfw_file_path = rapid_test_path
         T.lfw_line_id = 0
         LFWorker.run(testrun=True)
-
         self.assertEqual(
             du.SCQueue.display(),
             [
-                du.QEntry(id=1, Coor1=du.Coordinate(y=2000, z=0, ext=11)).print_short(),
-                du.QEntry(
-                    id=2, Coor1=du.Coordinate(y=2000, z=1000, ext=11)
-                ).print_short(),
+                du.QEntry(id=1, Coor1=TestCoor1).print_short(),
+                du.QEntry(id=2, Coor1=TestCoor2).print_short(),
             ],
         )
 
@@ -83,18 +82,13 @@ class ThreadsTest(unittest.TestCase):
         T.lfw_file_path = rapid_test_path
         T.lfw_line_id = 2
         LFWorker.run(testrun=True)
-
         self.assertEqual(
             du.SCQueue.display(),
             [
-                du.QEntry(id=1, Coor1=du.Coordinate(y=2000, z=0, ext=11)).print_short(),
-                du.QEntry(id=2, Coor1=du.Coordinate(y=2000, z=0, ext=11)).print_short(),
-                du.QEntry(
-                    id=3, Coor1=du.Coordinate(y=2000, z=1000, ext=11)
-                ).print_short(),
-                du.QEntry(
-                    id=4, Coor1=du.Coordinate(y=2000, z=1000, ext=11)
-                ).print_short(),
+                du.QEntry(id=1, Coor1=TestCoor1).print_short(),
+                du.QEntry(id=2, Coor1=TestCoor1).print_short(),
+                du.QEntry(id=3, Coor1=TestCoor2).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor2).print_short(),
             ],
         )
 
@@ -109,13 +103,13 @@ class ThreadsTest(unittest.TestCase):
         du.SCQueue.clear()
         du.ROBCommQueue.clear()
         du.ROB_send_list.clear()
-
         du.SCQueue.add(du.QEntry(id=1, Coor1=du.Coordinate(y=1.1)))
 
         du.ROB_send_list.append((du.QEntry(id=3001, mt="A"), True))
         RCWorker.send(testrun=True)
         self.assertEqual(
-            du.ROBCommQueue.display(), [du.QEntry(id=1, mt="A").print_short()]
+            du.ROBCommQueue.display(),
+            [du.QEntry(id=1, mt="A").print_short()],
         )
         self.assertEqual(
             du.SCQueue.display(),
@@ -128,7 +122,8 @@ class ThreadsTest(unittest.TestCase):
         du.ROBCommQueue.clear()
         self.assertIsNone(RCWorker.check_zero_dist())
 
-        du.ROBCommQueue.add(du.QEntry(Coor1=du.Coordinate(x=1, y=1, z=1, ext=1)))
+        TestCoor3 = du.Coordinate(x=1, y=1, z=1, ext=1)
+        du.ROBCommQueue.add(du.QEntry(Coor1=TestCoor3))
         du.ROBTelem.Coor = du.Coordinate()
         self.assertEqual(RCWorker.check_zero_dist(), 2)
 

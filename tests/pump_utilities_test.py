@@ -76,6 +76,28 @@ class PumpLibTest(unittest.TestCase):
         self.assertEqual(pu.default_mode(testEntry), 10)
 
 
+    def test_getBaseSpeed(self):
+        """ """
+
+        self.assertEqual(pu.get_base_speed("zero", 12), 0)
+        self.assertEqual(pu.get_base_speed("max", 12), 100)
+        self.assertEqual(pu.get_base_speed("min", 12), -100)
+        self.assertEqual(pu.get_base_speed("default", 12), 12)
+        self.assertEqual(pu.get_base_speed("retract", 12), -50)
+        self.assertEqual(pu.get_base_speed("conn", 12), 12)
+
+        TestCoor= du.Coordinate(10)
+        TestVector=du.SpeedVector(ts=1)
+        du.ROBCommQueue.append(
+            du.QEntry(id=2, Coor1=TestCoor, Speed=TestVector)
+        )
+        du.ROBCommQueue.append(
+            du.QEntry(id=3, Coor1=TestCoor+10, Speed=TestVector)
+        )
+        self.assertEqual(pu.get_base_speed("conn", 12), 10)
+        du.ROBCommQueue.clear()
+
+
     def test_profileMode(self):
         """ """
 
@@ -124,28 +146,10 @@ class PumpLibTest(unittest.TestCase):
             )
 
         du.ROBCommQueue.clear()
-
-
-    def test_getBaseSpeed(self):
-        """ """
-
-        self.assertEqual(pu.get_base_speed("zero", 12), 0)
-        self.assertEqual(pu.get_base_speed("max", 12), 100)
-        self.assertEqual(pu.get_base_speed("min", 12), -100)
-        self.assertEqual(pu.get_base_speed("default", 12), 12)
-        self.assertEqual(pu.get_base_speed("retract", 12), -50)
-        self.assertEqual(pu.get_base_speed("conn", 12), 12)
-
-        TestCoor= du.Coordinate(10)
-        TestVector=du.SpeedVector(ts=1)
-        du.ROBCommQueue.append(
-            du.QEntry(id=2, Coor1=TestCoor, Speed=TestVector)
-        )
-        du.ROBCommQueue.append(
-            du.QEntry(id=3, Coor1=TestCoor+10, Speed=TestVector)
-        )
-        self.assertEqual(pu.get_base_speed("conn", 12), 10)
-        du.ROBCommQueue.clear()
+        du.PMP1_liter_per_s = du.DEF_PUMP_LPS
+        du.PMP_output_ratio = 1.0
+        du.SC_vol_per_m = du.DEF_SC_VOL_PER_M
+        du.PMP_retract_speed = du.DEF_PUMP_RETR_SPEED
 
 
 #################################  MAIN  #####################################

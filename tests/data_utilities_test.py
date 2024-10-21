@@ -328,6 +328,12 @@ class DataLibTest(unittest.TestCase):
             ],
         )
 
+        # id_pos
+        self.assertEqual(TestQueue.id_pos(4), 2)
+        self.assertIsNone(TestQueue.id_pos(1))
+        self.assertIsNone(TestQueue.id_pos(10))
+        self.assertIsNone(EmptyQueue.id_pos(10))
+
         # clear
         unchanged_disp = TestQueue.display()
         TestQueue.clear(all=False, id='')
@@ -372,7 +378,8 @@ class DataLibTest(unittest.TestCase):
         self.assertEqual(TestQueue.display(), ['Queue is empty!'])
 
         # pop_first_item
-        self.assertEqual(EmptyQueue.pop_first_item(), IndexError)
+        with self.assertRaises(IndexError):
+            EmptyQueue.pop_first_item()
         TestQueue.add(du.QEntry())
         TestQueue.add(du.QEntry(id=3, Coor1=TestCoor))
         self.assertEqual(TestQueue.pop_first_item(), du.QEntry(id=1))
@@ -477,6 +484,8 @@ class DataLibTest(unittest.TestCase):
                 du.QEntry(id=2, Coor1=TestCoor+6).print_short(),
             ],
         )
+
+        du.SC_curr_comm_id = 1
 
 
     def test_RoboTelemetry_class(self):
@@ -686,8 +695,8 @@ class DataLibTest(unittest.TestCase):
         """test TCPIP class, handles connection data und functions"""
 
         # __init__ & __str__
-        testTCPIP = du.TCPIP()
-        initTestTCPIP = du.TCPIP(
+        TestTCPIP = du.TCPIP()
+        InitTestTCPIP = du.TCPIP(
             ip="1.1.1.1",
             PORT=2222,
             C_TOUT=3.3,
@@ -696,19 +705,19 @@ class DataLibTest(unittest.TestCase):
             W_BL=6.6
         )
         self.assertEqual(
-            str(initTestTCPIP),
+            str(InitTestTCPIP),
             f"IP: 1.1.1.1   PORT: 2222   C_TOUT: 3.3   RW_TOUT: 4.4   "
             f"R_BL: 5   W_BL: 6",
         )
         self.assertEqual(
-            str(testTCPIP),
+            str(TestTCPIP),
             f"IP:    PORT: 0   C_TOUT: 1.0   RW_TOUT: 1.0   "
             f"R_BL: 0   W_BL: 0",
         )
-        initTestTCPIP.close(end=True)
+        InitTestTCPIP.close(end=True)
 
         # setParams
-        testTCPIP.set_params({
+        TestTCPIP.set_params({
             "IP": "1.1.1.1",
             "PORT": 2222,
             "C_TOUT": 0.003,
@@ -717,63 +726,62 @@ class DataLibTest(unittest.TestCase):
             "W_BL": 6.6,
         })
         self.assertEqual(
-            str(testTCPIP),
+            str(TestTCPIP),
             f"IP: 1.1.1.1   PORT: 2222   C_TOUT: 0.003   RW_TOUT: 0.004   "
             f"R_BL: 5   W_BL: 6",
         )
-        testTCPIP.connected = True
-        self.assertRaises(PermissionError, testTCPIP.set_params, None)
-        testTCPIP.connected = False
+        TestTCPIP.connected = True
+        self.assertRaises(PermissionError, TestTCPIP.set_params, None)
+        TestTCPIP.connected = False
 
         # connect
-        ans0 = testTCPIP.connect()
+        ans0 = TestTCPIP.connect()
         self.assertIsInstance(ans0, TimeoutError)
-        testTCPIP.port = "ABC"
-        self.assertRaises(ConnectionError, testTCPIP.connect)
+        TestTCPIP.port = "ABC"
+        self.assertRaises(ConnectionError, TestTCPIP.connect)
 
         # send
-        ans0, ans1 = testTCPIP.send([True,True])
+        ans0, ans1 = TestTCPIP.send([True,True])
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ConnectionError)
-        testTCPIP.connected = True
-        ans0, ans1 = testTCPIP.send([True, True])
+        TestTCPIP.connected = True
+        ans0, ans1 = TestTCPIP.send([True, True])
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ValueError)
 
         # receive
-        ans0, ans1 = testTCPIP.receive()
+        ans0, ans1 = TestTCPIP.receive()
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, TimeoutError)
 
         # close
-        testTCPIP.close(end=True)
-        self.assertFalse(testTCPIP.connected)
+        TestTCPIP.close(end=True)
+        self.assertFalse(TestTCPIP.connected)
 
 
     def test_RobConnection_class(self):
         """test RobConnection class, handles connection data und functions"""
 
-
         # send
-        testRobCon = du.RobConnection()
+        TestRobCon = du.RobConnection()
     
-        ans0, ans1 = testRobCon.send(du.QEntry(id=1))
+        ans0, ans1 = TestRobCon.send(du.QEntry(id=1))
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ConnectionError)
 
-        testRobCon.connected = True
-        ans0, ans1 = testRobCon.send(du.QEntry(id=1))
+        TestRobCon.connected = True
+        ans0, ans1 = TestRobCon.send(du.QEntry(id=1))
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ValueError)
 
-        testRobCon.w_bl = 159
-        ans0, ans1 = testRobCon.send(du.QEntry(id=1))
+        TestRobCon.w_bl = 159
+        ans0, ans1 = TestRobCon.send(du.QEntry(id=1))
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, OSError)
 
-        # received (to add)
+        # received (to do)
 
-        testRobCon.close(end=True)
+        TestRobCon.close(end=True)
 
 
 #################################  MAIN  #####################################
