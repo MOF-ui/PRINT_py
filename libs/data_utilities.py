@@ -666,7 +666,8 @@ class Queue:
 
         if not isinstance(other, Queue):
             raise ValueError(f"{other} is not an instance of 'Queue'!")
-        return self.add_queue(other)
+        self.add_queue(other)
+        return self
 
 
     def __init__(self, queue=None) -> None:
@@ -1007,11 +1008,10 @@ class Queue:
     def pop_first_item(self) -> QEntry | Exception:
         """returns and deletes the QEntry at index 0"""
 
-        try:
-            entry = self[0]
-        except IndexError:
-            return IndexError
-
+        if len(self) <= 0:
+            return BufferError('Queue empty!')
+        
+        entry = self[0]
         self._queue.__delitem__(0)
         return entry
 
@@ -1217,7 +1217,7 @@ class TSData:
         self._created_at = datetime.now()
         if isinstance(value, TSData):
             self.val = float(value.val)
-        elif isinstance(value, float) or isinstance(value, int):
+        elif isinstance(value, (float, int)):
             self.val = float(value)
         elif value is None:
             self.val = None
@@ -1229,7 +1229,7 @@ class TSData:
         if isinstance(other, TSData):
             if self.val == other.val:
                 return True
-        elif isinstance(other, float) or isinstance(other, int):
+        elif isinstance(other, (float, int)):
             if self.val == other:
                 return True
         else:
@@ -1243,7 +1243,7 @@ class TSData:
         if isinstance(other, TSData):
             if self.val != other.val:
                 return True
-        elif isinstance(other, float) or isinstance(other, int):
+        elif isinstance(other, (float, int)):
             if self.val != other:
                 return True
         else:
@@ -1869,6 +1869,8 @@ DEF_TERM_MAX_LINES = 300
 
 DEF_TOOL_FIB_STPS = 10
 DEF_TOOL_FIB_RATIO = 1.0
+
+DEF_WD_TIMEOUT = 1000 # [ms]
 
 
 ##########################     GLOBALS VARS     ##############################

@@ -227,6 +227,7 @@ class Mainframe(PreMainframe):
         self.SET_TE_btt_apply.pressed.connect(self.apply_TE_settings)
         self.SET_TE_btt_default.pressed.connect(self.load_TE_defaults)
         self.SID_btt_robToProgID.pressed.connect(self.reset_SC_id)
+        self.SID_btt_scIdPlus1.pressed.connect(lambda: self.reset_SC_id(True))
 
         # SINGLE COMMAND
         self.SGLC_btt_gcodeSglComm_addByID.pressed.connect(
@@ -1297,6 +1298,11 @@ class Mainframe(PreMainframe):
             LastCom, dummy = du.ROB_send_list[len(du.ROB_send_list) - 1]
             if command.id <= LastCom.id:
                 command.id = LastCom.id + 1
+        
+        # error catching for previous function return
+        if isinstance(command, Exception):
+            print(f"Command generation failed, caused by {command}")
+            return
 
         # to-do: catch SC ID > ROB ID errors
         
