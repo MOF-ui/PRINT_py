@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1949</width>
-    <height>1135</height>
+    <width>1945</width>
+    <height>1126</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -8757,6 +8757,19 @@ color: #E1E5EE;</string>
        </property>
        <property name="text">
         <string>ROBOT ID   🡆  SCRIPT ID</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="SID_btt_scIdPlus1">
+       <property name="geometry">
+        <rect>
+         <x>611</x>
+         <y>80</y>
+         <width>101</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>+ 1</string>
        </property>
       </widget>
      </widget>

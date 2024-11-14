@@ -4173,6 +4173,9 @@ class Ui_MainWindow(object):
         self.SID_btt_robToProgID = QtWidgets.QPushButton(self.ICQ_frame)
         self.SID_btt_robToProgID.setGeometry(QtCore.QRect(950, 30, 201, 41))
         self.SID_btt_robToProgID.setObjectName("SID_btt_robToProgID")
+        self.SID_btt_scIdPlus1 = QtWidgets.QPushButton(self.ICQ_frame)
+        self.SID_btt_scIdPlus1.setGeometry(QtCore.QRect(611, 80, 101, 25))
+        self.SID_btt_scIdPlus1.setObjectName("SID_btt_scIdPlus1")
         self.ZERO_frame = QtWidgets.QFrame(self.MONITOR_tab)
         self.ZERO_frame.setGeometry(QtCore.QRect(1260, 20, 631, 621))
         self.ZERO_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -5233,6 +5236,7 @@ class Ui_MainWindow(object):
         self.SID_btt_robToProgID.setText(
             _translate("MainWindow", "ROBOT ID   🡆  SCRIPT ID")
         )
+        self.SID_btt_scIdPlus1.setText(_translate("MainWindow", "+ 1"))
         self.ZERO_0_frameLabel.setText(_translate("MainWindow", "ZERO POSITION"))
         self.ZERO_disp_z.setText(_translate("MainWindow", "0.0"))
         self.ZERO_lbl_y_disp.setText(_translate("MainWindow", "Y"))

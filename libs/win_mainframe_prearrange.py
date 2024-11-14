@@ -753,7 +753,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     #                      COMMAND QUEUE HELP FUNCTIONS                      #
     ##########################################################################
 
-    def reset_SC_id(self) -> None:
+    def reset_SC_id(self, incr=False) -> None:
         """synchronize SC and ROB ID with this, if program falls out of sync
         with the robot, should happen only with on-the-fly restarts,
         theoretically
@@ -761,11 +761,15 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         
         if du.DC_rob_moving:
             return
-        id_dist = (du.ROBTelem.id + 1) - du.SC_curr_comm_id
         
         GlobalMutex.lock()
-        du.SC_curr_comm_id = du.ROBTelem.id + 1
-        du.SCQueue.increment(id_dist)
+        if incr:
+            du.SC_curr_comm_id += 1
+            du.SCQueue.increment()
+        else:
+            id_dist = du.ROBTelem.id - 1 - du.SC_curr_comm_id
+            du.SC_curr_comm_id = du.ROBTelem.id - 1
+            du.SCQueue.increment(id_dist)
         GlobalMutex.unlock()
 
         self.label_update_on_receive(
@@ -973,7 +977,7 @@ class Watchdog(QObject):
         self._critical = operation_critical
         self._timer = QTimer()
         self._timer.setSingleShot(True)
-        self._timer.setInterval(10000)
+        self._timer.setInterval(du.DEF_WD_TIMEOUT) 
         self._timer.timeout.connect(self.bite)
 
 

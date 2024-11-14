@@ -8759,6 +8759,19 @@ color: #E1E5EE;</string>
         <string>ROBOT ID   🡆  SCRIPT ID</string>
        </property>
       </widget>
+      <widget class="QPushButton" name="SID_btt_scIdPlus1">
+       <property name="geometry">
+        <rect>
+         <x>611</x>
+         <y>80</y>
+         <width>101</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>+ 1</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QFrame" name="ZERO_frame">
       <property name="geometry">
