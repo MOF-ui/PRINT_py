@@ -116,7 +116,7 @@ def profile_mode(command=None, profile=None) -> float | None:
             QEntry-like object specifying next movement
         profile:
             pump profile for this movement in the struct of 
-            list[dict{"until": float, "base": str, "mode": str},...]
+            list[dict{'until': float, 'base': str, 'mode': str},...]
     """
     global preceeding_speed
 
