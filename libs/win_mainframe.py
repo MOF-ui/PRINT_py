@@ -93,27 +93,27 @@ class Mainframe(PreMainframe):
             return
 
         # INIT WATCHDOGS
-        self.log_entry('GNRL', "init watchdog...")
+        self.log_entry('GNRL', 'init watchdog...')
         self.connect_watchdogs()
 
         # CONNECTIONS SETUP
-        self.log_entry('GNRL', "connect to Robot...")
+        self.log_entry('GNRL', 'connect to Robot...')
         self.connect_tcp('ROB')
 
         if p_conn[0]:
-            self.log_entry("GNRL", "connect to pump1...")
-            self.connect_tcp("P1")
+            self.log_entry('GNRL', 'connect to pump1...')
+            self.connect_tcp('P1')
         if p_conn[1]:
-            self.log_entry("GNRL", "connect to pump2...")
-            self.connect_tcp("P2")
+            self.log_entry('GNRL', 'connect to pump2...')
+            self.connect_tcp('P2')
 
         # SENSOR ARRAY START-UP
         self._SensorArrThread.start()
-        self.log_entry("GNRL", "started sensor array.")
+        self.log_entry('GNRL', 'started sensor array.')
 
         # FINISH SETUP
-        self.log_entry("GNRL", "setup finished.")
-        self.log_entry("newline")
+        self.log_entry('GNRL', 'setup finished.')
+        self.log_entry('newline')
 
 
     def connect_main_signals(self) -> None:
@@ -130,14 +130,14 @@ class Mainframe(PreMainframe):
         self.ASC_btt_overwrSC.released.connect(self.amcon_script_overwrite)
 
         # DIRECT CONTROL
-        self.DC_btt_xPlus.pressed.connect(lambda: self.send_DC_command("X", "+"))
-        self.DC_btt_xMinus.pressed.connect(lambda: self.send_DC_command("X", "-"))
-        self.DC_btt_yPlus.pressed.connect(lambda: self.send_DC_command("Y", "+"))
-        self.DC_btt_yMinus.pressed.connect(lambda: self.send_DC_command("Y", "-"))
-        self.DC_btt_zPlus.pressed.connect(lambda: self.send_DC_command("Z", "+"))
-        self.DC_btt_zMinus.pressed.connect(lambda: self.send_DC_command("Z", "-"))
-        self.DC_btt_extPlus.pressed.connect(lambda: self.send_DC_command("EXT", "+"))
-        self.DC_btt_extMinus.pressed.connect(lambda: self.send_DC_command("EXT", "-"))
+        self.DC_btt_xPlus.pressed.connect(lambda: self.send_DC_command('X', '+'))
+        self.DC_btt_xMinus.pressed.connect(lambda: self.send_DC_command('X', '-'))
+        self.DC_btt_yPlus.pressed.connect(lambda: self.send_DC_command('Y', '+'))
+        self.DC_btt_yMinus.pressed.connect(lambda: self.send_DC_command('Y', '-'))
+        self.DC_btt_zPlus.pressed.connect(lambda: self.send_DC_command('Z', '+'))
+        self.DC_btt_zMinus.pressed.connect(lambda: self.send_DC_command('Z', '-'))
+        self.DC_btt_extPlus.pressed.connect(lambda: self.send_DC_command('EXT', '+'))
+        self.DC_btt_extMinus.pressed.connect(lambda: self.send_DC_command('EXT', '-'))
         self.DC_btt_xyzZero.pressed.connect(lambda: self.set_zero([1, 2, 3]))
         self.DC_btt_extZero.pressed.connect(lambda: self.set_zero([8]))
         self.DC_btt_home.pressed.connect(self.home_command)
@@ -175,19 +175,19 @@ class Mainframe(PreMainframe):
                 1 - (self.PUMP_sld_outputRatio.value() / 100.0)
             )
         )
-        self.SCTRL_num_liveAd_pump1.valueChanged.connect(lambda: self.pump_set_speed("c1"))
-        self.SCTRL_num_liveAd_pump2.valueChanged.connect(lambda: self.pump_set_speed("c2"))
-        self.PUMP_btt_setSpeedP1.pressed.connect(lambda: self.pump_set_speed("s1"))
-        self.PUMP_btt_setSpeedP2.pressed.connect(lambda: self.pump_set_speed("s2"))
-        self.PUMP_btt_plus1.pressed.connect(lambda: self.pump_set_speed("1"))
-        self.PUMP_btt_minus1.pressed.connect(lambda: self.pump_set_speed("-1"))
-        self.PUMP_btt_plus10.pressed.connect(lambda: self.pump_set_speed("10"))
-        self.PUMP_btt_minus10.pressed.connect(lambda: self.pump_set_speed("-10"))
-        self.PUMP_btt_plus25.pressed.connect(lambda: self.pump_set_speed("25"))
-        self.PUMP_btt_minus25.pressed.connect(lambda: self.pump_set_speed("-25"))
-        self.PUMP_btt_stop.pressed.connect(lambda: self.pump_set_speed("0"))
-        self.PUMP_btt_reverse.pressed.connect(lambda: self.pump_set_speed("r"))
-        self.PUMP_btt_ccToDefault.pressed.connect(lambda: self.pump_set_speed("def"))
+        self.SCTRL_num_liveAd_pump1.valueChanged.connect(lambda: self.pump_set_speed('c1'))
+        self.SCTRL_num_liveAd_pump2.valueChanged.connect(lambda: self.pump_set_speed('c2'))
+        self.PUMP_btt_setSpeedP1.pressed.connect(lambda: self.pump_set_speed('s1'))
+        self.PUMP_btt_setSpeedP2.pressed.connect(lambda: self.pump_set_speed('s2'))
+        self.PUMP_btt_plus1.pressed.connect(lambda: self.pump_set_speed('1'))
+        self.PUMP_btt_minus1.pressed.connect(lambda: self.pump_set_speed('-1'))
+        self.PUMP_btt_plus10.pressed.connect(lambda: self.pump_set_speed('10'))
+        self.PUMP_btt_minus10.pressed.connect(lambda: self.pump_set_speed('-10'))
+        self.PUMP_btt_plus25.pressed.connect(lambda: self.pump_set_speed('25'))
+        self.PUMP_btt_minus25.pressed.connect(lambda: self.pump_set_speed('-25'))
+        self.PUMP_btt_stop.pressed.connect(lambda: self.pump_set_speed('0'))
+        self.PUMP_btt_reverse.pressed.connect(lambda: self.pump_set_speed('r'))
+        self.PUMP_btt_ccToDefault.pressed.connect(lambda: self.pump_set_speed('def'))
         self.PUMP_btt_setSpeed.pressed.connect(self.pump_set_speed)
         self.PUMP_btt_scToDefault.pressed.connect(self.pump_script_overwrite)
         self.PUMP_btt_pinchValve.pressed.connect(self.pinch_valve_toggle)
@@ -249,14 +249,14 @@ class Mainframe(PreMainframe):
         self.SGLC_btt_rapidSglComm.pressed.connect(self.add_rapid_sgl)
 
         # CONNECTIONS
-        self.TCP_ROB_btt_reconn.pressed.connect(lambda: self.connect_tcp("ROB"))
-        self.TCP_PUMP1_btt_reconn.pressed.connect(lambda: self.connect_tcp("P1"))
-        self.TCP_PUMP2_btt_reconn.pressed.connect(lambda: self.connect_tcp("P2"))
-        self.TCP_MIXER_btt_reconn.pressed.connect(lambda: self.connect_tcp("MIX"))
-        self.TCP_ROB_btt_discon.pressed.connect(lambda: self.disconnect_tcp("ROB"))
-        self.TCP_PUMP1_btt_discon.pressed.connect(lambda: self.disconnect_tcp("P1"))
-        self.TCP_PUMP2_btt_discon.pressed.connect(lambda: self.disconnect_tcp("P2"))
-        self.TCP_MIXER_btt_discon.pressed.connect(lambda: self.disconnect_tcp("MIX"))
+        self.TCP_ROB_btt_reconn.pressed.connect(lambda: self.connect_tcp('ROB'))
+        self.TCP_PUMP1_btt_reconn.pressed.connect(lambda: self.connect_tcp('P1'))
+        self.TCP_PUMP2_btt_reconn.pressed.connect(lambda: self.connect_tcp('P2'))
+        self.TCP_MIXER_btt_reconn.pressed.connect(lambda: self.connect_tcp('MIX'))
+        self.TCP_ROB_btt_discon.pressed.connect(lambda: self.disconnect_tcp('ROB'))
+        self.TCP_PUMP1_btt_discon.pressed.connect(lambda: self.disconnect_tcp('P1'))
+        self.TCP_PUMP2_btt_discon.pressed.connect(lambda: self.disconnect_tcp('P2'))
+        self.TCP_MIXER_btt_discon.pressed.connect(lambda: self.disconnect_tcp('MIX'))
 
         # TERMINAL
         self.TERM_btt_gcodeInterp.pressed.connect(self.send_gcode_command)
@@ -272,25 +272,25 @@ class Mainframe(PreMainframe):
         """create shortcuts and connect them to slots"""
 
         # CREATE SIGNALS
-        self._ctrl_A = QShortcut("Ctrl+A", self)
-        self._ctrl_E = QShortcut("Ctrl+E", self)
-        self._ctrl_F = QShortcut("Ctrl+F", self)
-        self._ctrl_I = QShortcut("Ctrl+I", self)
-        self._ctrl_J = QShortcut("Ctrl+J", self)
-        self._ctrl_K = QShortcut("Ctrl+K", self)
-        self._ctrl_L = QShortcut("Ctrl+L", self)
-        self._ctrl_M = QShortcut("Ctrl+M", self)
-        self._ctrl_N = QShortcut("Ctrl+N", self)
-        self._ctrl_O = QShortcut("Ctrl+O", self)
-        self._ctrl_OE = QShortcut("Ctrl+Ö", self)
-        self._ctrl_P = QShortcut("Ctrl+P", self)
-        self._ctrl_Q = QShortcut("Ctrl+Q", self)
-        self._ctrl_R = QShortcut("Ctrl+R", self)
-        self._ctrl_alt_S = QShortcut("Ctrl+Alt+S", self)
-        self._ctrl_T = QShortcut("Ctrl+T", self)
-        self._ctrl_U = QShortcut("Ctrl+U", self)
-        self._ctrl_Raute = QShortcut("Ctrl+#", self)
-        self._ctrl_alt_I = QShortcut("Ctrl+Alt+I", self)
+        self._ctrl_A = QShortcut('Ctrl+A', self)
+        self._ctrl_E = QShortcut('Ctrl+E', self)
+        self._ctrl_F = QShortcut('Ctrl+F', self)
+        self._ctrl_I = QShortcut('Ctrl+I', self)
+        self._ctrl_J = QShortcut('Ctrl+J', self)
+        self._ctrl_K = QShortcut('Ctrl+K', self)
+        self._ctrl_L = QShortcut('Ctrl+L', self)
+        self._ctrl_M = QShortcut('Ctrl+M', self)
+        self._ctrl_N = QShortcut('Ctrl+N', self)
+        self._ctrl_O = QShortcut('Ctrl+O', self)
+        self._ctrl_OE = QShortcut('Ctrl+Ö', self)
+        self._ctrl_P = QShortcut('Ctrl+P', self)
+        self._ctrl_Q = QShortcut('Ctrl+Q', self)
+        self._ctrl_R = QShortcut('Ctrl+R', self)
+        self._ctrl_alt_S = QShortcut('Ctrl+Alt+S', self)
+        self._ctrl_T = QShortcut('Ctrl+T', self)
+        self._ctrl_U = QShortcut('Ctrl+U', self)
+        self._ctrl_Raute = QShortcut('Ctrl+#', self)
+        self._ctrl_alt_I = QShortcut('Ctrl+Alt+I', self)
 
         # SCRIPT CONTROL
         self._ctrl_alt_S.activated.connect(self.start_SCTRL_queue)
@@ -301,14 +301,14 @@ class Mainframe(PreMainframe):
         self._ctrl_alt_I.activated.connect(self.reset_SC_id)
 
         # DIRECT CONTROL
-        self._ctrl_U.activated.connect(lambda: self.send_DC_command("X", "+"))
-        self._ctrl_J.activated.connect(lambda: self.send_DC_command("X", "-"))
-        self._ctrl_I.activated.connect(lambda: self.send_DC_command("Y", "+"))
-        self._ctrl_K.activated.connect(lambda: self.send_DC_command("Y", "-"))
-        self._ctrl_O.activated.connect(lambda: self.send_DC_command("Z", "+"))
-        self._ctrl_L.activated.connect(lambda: self.send_DC_command("Z", "-"))
-        self._ctrl_P.activated.connect(lambda: self.send_DC_command("EXT", "+"))
-        self._ctrl_OE.activated.connect(lambda: self.send_DC_command("EXT", "-"))
+        self._ctrl_U.activated.connect(lambda: self.send_DC_command('X', '+'))
+        self._ctrl_J.activated.connect(lambda: self.send_DC_command('X', '-'))
+        self._ctrl_I.activated.connect(lambda: self.send_DC_command('Y', '+'))
+        self._ctrl_K.activated.connect(lambda: self.send_DC_command('Y', '-'))
+        self._ctrl_O.activated.connect(lambda: self.send_DC_command('Z', '+'))
+        self._ctrl_L.activated.connect(lambda: self.send_DC_command('Z', '-'))
+        self._ctrl_P.activated.connect(lambda: self.send_DC_command('EXT', '+'))
+        self._ctrl_OE.activated.connect(lambda: self.send_DC_command('EXT', '-'))
 
         # NUMERIC CONTROL
         self._ctrl_T.activated.connect(self.values_to_DC_spinbox)
@@ -318,8 +318,8 @@ class Mainframe(PreMainframe):
         self._ctrl_M.activated.connect(self.load_file)
 
         # PUMP CONTROL
-        self._ctrl_E.activated.connect(lambda: self.pump_set_speed("0"))
-        self._ctrl_R.activated.connect(lambda: self.pump_set_speed("-1"))
+        self._ctrl_E.activated.connect(lambda: self.pump_set_speed('0'))
+        self._ctrl_R.activated.connect(lambda: self.pump_set_speed('-1'))
 
 
     ##########################################################################
@@ -339,7 +339,7 @@ class Mainframe(PreMainframe):
         ) -> None:
             wd.start()
             self.log_entry('CONN', log_txt)
-            css = "border-radius: 25px; background-color: #00aaff;"
+            css = 'border-radius: 25px; background-color: #00aaff;'
             indi.setStyleSheet(css)
             for elem in elem_group:
                 elem.setEnabled(True)
@@ -364,12 +364,12 @@ class Mainframe(PreMainframe):
                     f"connected to {ip} at {port}.",
                 )
                 return True
-            
+
             else:
                 log_txt = f"failed to connect {ip}:{port} ({res})!"
                 self.log_entry('CONN', log_txt)
                 return False
-        
+
         # PUMP CONNECTION
         def pmp_connect(
                 serial:MtecMod,
@@ -379,8 +379,8 @@ class Mainframe(PreMainframe):
                 elem_group:list
         ) -> bool:
             if not 'COM' in port:
-                raise ConnectionError("TCP not supported, yet")
-            
+                raise ConnectionError('TCP not supported, yet')
+
             else:
                 if fu.connect_pump(slot):
                     if not self._PumpCommThread.isRunning():
@@ -401,7 +401,7 @@ class Mainframe(PreMainframe):
                 else:
                     self.log_entry('CONN', f"connection to {slot} failed!")
                     return False
-        
+
         # MIXER CONNECTION
         def mix_connect() -> bool:
             # mixer running as a http server for now, just ping to see
@@ -433,7 +433,7 @@ class Mainframe(PreMainframe):
                 log_txt = f"mixer controller not present at {ip}:{port}!"
                 self.log_entry('CONN', log_txt)
                 return False
-        
+
         # FUNCTION CALLS
         match slot:
             case 'ROB':
@@ -466,9 +466,9 @@ class Mainframe(PreMainframe):
         """
 
         if internal_call:
-            log_txt = "internal call to disconnect" 
+            log_txt = 'internal call to disconnect' 
         else:
-            log_txt = "user disconnected"
+            log_txt = 'user disconnected'
 
         def safe_reset_positions() -> None:
             self.log_entry('SAFE', f"Last robot positions:")
@@ -485,7 +485,7 @@ class Mainframe(PreMainframe):
         def action_on_success(wd:Watchdog, indi:object, elem_group:list) -> None:
             wd.kill()
             self.log_entry('CONN', f"{log_txt} {slot}.")
-            css = "border-radius: 25px; background-color: #4c4a48;"
+            css = 'border-radius: 25px; background-color: #4c4a48;'
             indi.setStyleSheet(css)
             for elem in elem_group:
                 elem.setEnabled(False)
@@ -494,9 +494,9 @@ class Mainframe(PreMainframe):
         def rob_disconnect() -> None:
             if not du.ROBTcp.connected:
                 return
-            
+
             # send stop command to robot; stop threading & watchdog
-            du.ROBTcp.send(du.QEntry(id=du.SC_curr_comm_id, mt="E"))
+            du.ROBTcp.send(du.QEntry(id=du.SC_curr_comm_id, mt='E'))
             action_on_success(
                 self._RobRecvWd,
                 self.TCP_ROB_indi_connected,
@@ -520,7 +520,7 @@ class Mainframe(PreMainframe):
             if not serial.connected:
                 return
             if not 'COM' in port:
-                raise ConnectionError("TCP not supported yet")
+                raise ConnectionError('TCP not supported yet')
             while du.PMP_comm_active: # finish communication first
                 time.sleep(0.005)
 
@@ -595,7 +595,7 @@ class Mainframe(PreMainframe):
             self._RoboCommWorker.dataReceived.connect(self.label_update_on_terminal_change)
             self._RoboCommWorker.endDcMoving.connect(lambda: self.switch_rob_moving(end=True))
             self._RoboCommWorker.queueEmtpy.connect(lambda: self.stop_SCTRL_queue(prep_end=True))
-        
+
         def pmp_thread_connector():
             # thread for communication with pumps & inline mixer
             self.log_entry('THRT', 'initializing PumpComm thread..')
@@ -611,7 +611,7 @@ class Mainframe(PreMainframe):
             self._PumpCommWorker.dataMixerRecv.connect(self.mixer_recv)
             self._PumpCommWorker.p1Active.connect(self._P1RecvWd.reset)
             self._PumpCommWorker.p2Active.connect(self._P2RecvWd.reset)
-        
+
         def other_threads_connector():
             # thread for file loading
             self.log_entry('THRT', 'initializing LoadFile thread..')
@@ -676,7 +676,7 @@ class Mainframe(PreMainframe):
         if testrun:
             file_path = testpath
         else:
-            f_dialog = file_dialog("select file to load")
+            f_dialog = file_dialog('select file to load')
             f_dialog.exec()
             file_path = (
                 Path(f_dialog.selectedFiles()[0])
@@ -685,30 +685,30 @@ class Mainframe(PreMainframe):
             )
 
         if not isinstance(file_path, Path):
-            self.IO_disp_filename.setText("no file selected")
+            self.IO_disp_filename.setText('no file selected')
             du.IO_curr_filepath = None
             return
-        file = open(file_path, "r")
+        file = open(file_path, 'r')
         txt = file.read()
         file.close()
 
         # get number of commands and filament length
-        if file_path.suffix == ".mod":
+        if file_path.suffix == '.mod':
             comm_num, filament_length, res = fu.pre_check_rapid_file(txt)
         else:
             comm_num, filament_length, res = fu.pre_check_gcode_file(txt)
 
         if isinstance(comm_num, Exception):
-            self.IO_disp_filename.setText("COULD NOT READ FILE!")
+            self.IO_disp_filename.setText('COULD NOT READ FILE!')
             self.log_entry(
-                "F-IO",
+                'F-IO',
                 f"Error while opening {file_path} file: {comm_num}"
             )
             du.IO_curr_filepath = None
             return
 
-        if res == "empty":
-            self.IO_disp_filename.setText("FILE EMPTY!")
+        if res == 'empty':
+            self.IO_disp_filename.setText('FILE EMPTY!')
             return
 
         # display data
@@ -719,7 +719,7 @@ class Mainframe(PreMainframe):
         self.IO_disp_estimVol.setText(str(filament_vol))
 
         self.log_entry(
-            "F-IO",
+            'F-IO',
             (
                 f"Opened new file at {file_path}:   {comm_num} commands,   "
                 f"{filament_length}m filament, {filament_vol}L"
@@ -742,14 +742,14 @@ class Mainframe(PreMainframe):
         fpath = du.IO_curr_filepath
 
         if fpath is None or not (
-                fpath.suffix == ".gcode" or fpath.suffix == ".mod"
+                fpath.suffix == '.gcode' or fpath.suffix == '.mod'
         ):
-            self.IO_lbl_loadFile.setText("... no valid file, not executed")
+            self.IO_lbl_loadFile.setText('... no valid file, not executed')
             return
 
-        self.IO_lbl_loadFile.setText("... conversion running ...")
+        self.IO_lbl_loadFile.setText('... conversion running ...')
         self.log_entry(
-            "F-IO",
+            'F-IO',
             (
                 f"started to load file from {fpath}, task passed to "
                 f"loadFileThread..."
@@ -767,7 +767,7 @@ class Mainframe(PreMainframe):
         if not testrun:
             self._LoadFileThread.start()
             self.IO_btt_loadFile.setStyleSheet(
-                "font-size: 16pt; background-color: #a28230;"
+                'font-size: 16pt; background-color: #a28230;'
             )
 
 
@@ -775,7 +775,7 @@ class Mainframe(PreMainframe):
         """handles convFailed emit from loadFileWorker"""
 
         self.IO_lbl_loadFile.setText(txt)
-        self.log_entry("F-IO", f"ERROR: file IO from aborted! {txt}")
+        self.log_entry('F-IO', f"ERROR: file IO from aborted! {txt}")
 
         # reset THREADS vars and exit
         GlobalMutex.lock()
@@ -784,7 +784,7 @@ class Mainframe(PreMainframe):
         workers.lfw_p_ctrl = False
         GlobalMutex.unlock()
 
-        self.IO_btt_loadFile.setStyleSheet("font-size: 16pt;")
+        self.IO_btt_loadFile.setStyleSheet('font-size: 16pt;')
         self._LoadFileThread.exit()
 
 
@@ -802,7 +802,7 @@ class Mainframe(PreMainframe):
         self.IO_num_addByID.setValue(line_id)
 
         if skips == 0:
-            self.IO_lbl_loadFile.setText("... conversion successful")
+            self.IO_lbl_loadFile.setText('... conversion successful')
         else:
             self.IO_lbl_loadFile.setText(
                 f"... {skips} command(s) skipped (syntax)"
@@ -816,7 +816,7 @@ class Mainframe(PreMainframe):
             log_text += f" starting fom {start_id}."
         else:
             log_text += f" at the end."
-        self.log_entry("F-IO", log_text)
+        self.log_entry('F-IO', log_text)
 
         # reset THREADS vars and exit
         GlobalMutex.lock()
@@ -825,9 +825,8 @@ class Mainframe(PreMainframe):
         workers.lfw_p_ctrl = False
         GlobalMutex.unlock()
 
-        self.IO_btt_loadFile.setStyleSheet("font-size: 16pt;")
+        self.IO_btt_loadFile.setStyleSheet('font-size: 16pt;')
         self._LoadFileThread.exit()
-
 
 
     ##########################################################################
@@ -868,8 +867,8 @@ class Mainframe(PreMainframe):
         # act according to GCode command
         Entry, command = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
 
-        if command != "G1" and command != "G28" and command != "G92":
-            if command == ";":
+        if command != 'G1' and command != 'G28' and command != 'G92':
+            if command == ';':
                 pan_txt = f"leading semicolon interpreted as comment:\n{txt}"
 
             elif Entry is None:
@@ -884,11 +883,11 @@ class Mainframe(PreMainframe):
                 self.SGLC_entry_gcodeSglComm.setText(pan_txt)
             return Entry, command
 
-        elif command == "G92":
+        elif command == 'G92':
             self.label_update_on_new_zero()
             return Entry, command
 
-        # set command ID if given, sorting is done later by "Queue" class
+        # set command ID if given, sorting is done later by 'Queue' class
         if at_id:
             Entry.id = id
 
@@ -903,7 +902,7 @@ class Mainframe(PreMainframe):
 
         if not from_file:
             self.log_entry(
-                "ComQ",
+                'ComQ',
                 f"single GCode command added -- "
                 f"ID: {Entry.id}  MT: {Entry.mt}  PT: {Entry.pt}"
                 f"  --  COOR_1: {Entry.Coor1}  --  COOR_2: {Entry.Coor2}"
@@ -948,7 +947,7 @@ class Mainframe(PreMainframe):
                 )
             return Entry
 
-        # set command ID if given, sorting is done later by "Queue" class
+        # set command ID if given, sorting is done later by 'Queue' class
         if at_id:
             Entry.id = id
 
@@ -963,7 +962,7 @@ class Mainframe(PreMainframe):
 
         if not from_file:
             self.log_entry(
-                "ComQ",
+                'ComQ',
                 f"single RAPID command added -- "
                 f"ID: {Entry.id}  MT: {Entry.mt}  PT: {Entry.pt}"
                 f"  --  COOR_1: {Entry.Coor1}  --  COOR_2: {Entry.Coor2}"
@@ -1004,7 +1003,7 @@ class Mainframe(PreMainframe):
         # entry is unnessecary as its added to queue by the addRapidSgl /
         # addGcodeSgl funcions already
         for row in rows:
-            if "Move" in row:
+            if 'Move' in row:
                 Entry = self.add_rapid_sgl(
                     at_id=True, id=line_id, from_file=True, file_txt=row
                 )
@@ -1027,7 +1026,7 @@ class Mainframe(PreMainframe):
                     at_id=True, id=line_id, from_file=True, file_txt=row
                 )
 
-                if (command == "G1") or (command == "G28"):
+                if (command == 'G1') or (command == 'G28'):
                     line_id += 1
                 else:
                     sib_entry[num].setText(f"COMMAND ERROR, ABORTED\n {txt}")
@@ -1042,9 +1041,9 @@ class Mainframe(PreMainframe):
 
         log_txt = f"{line_id - line_id_start} SIB lines added"
         if at_end:
-            log_txt += " at end of queue"
+            log_txt += ' at end of queue'
         else:
-            log_txt += " in front of queue"
+            log_txt += ' in front of queue'
         self.log_entry(f"SIB{num + 1}", log_txt)
         return True
 
@@ -1063,7 +1062,7 @@ class Mainframe(PreMainframe):
         self.switch_rob_moving()
 
         read_mt = self.DC_drpd_moveType.currentText()
-        mt = "L" if (read_mt == "LINEAR") else "J"
+        mt = 'L' if (read_mt == 'LINEAR') else 'J'
 
         Command = du.QEntry(
             id=du.SC_curr_comm_id,
@@ -1073,7 +1072,7 @@ class Mainframe(PreMainframe):
             z=0,
         )
 
-        self.log_entry("DCom", "sending DC home command...")
+        self.log_entry('DCom', 'sending DC home command...')
         return self.send_command(Command, dc=True)
 
 
@@ -1096,19 +1095,19 @@ class Mainframe(PreMainframe):
 
         NewPos = copy.deepcopy(du.ROBTelem.Coor)
         match axis:
-            case "X":
+            case 'X':
                 NewPos.x += step_width
-            case "Y":
+            case 'Y':
                 NewPos.y += step_width
-            case "Z":
+            case 'Z':
                 NewPos.z += step_width
-            case "EXT":
+            case 'EXT':
                 NewPos.ext += step_width
             case _:
                 raise ValueError(f"unknown axis {axis}!")
 
         read_mt = self.DC_drpd_moveType.currentText()
-        mt = "L" if (read_mt == "LINEAR") else "J"
+        mt = 'L' if (read_mt == 'LINEAR') else 'J'
         Command = du.QEntry(
             id=du.SC_curr_comm_id,
             mt=mt,
@@ -1117,7 +1116,7 @@ class Mainframe(PreMainframe):
             z=0,
         )
 
-        self.log_entry("DCom", f"sending DC command: ({Command})")
+        self.log_entry('DCom', f"sending DC command: ({Command})")
         return self.send_command(Command, dc=True)
 
 
@@ -1149,7 +1148,7 @@ class Mainframe(PreMainframe):
             NewPos.ext = float(self.NC_float_ext.value())
 
         read_mt = self.DC_drpd_moveType.currentText()
-        mt = "L" if (read_mt == "LINEAR") else "J"
+        mt = 'L' if (read_mt == 'LINEAR') else 'J'
         Command = du.QEntry(
             id=du.SC_curr_comm_id,
             mt=mt,
@@ -1158,7 +1157,7 @@ class Mainframe(PreMainframe):
             z=0,
         )
 
-        self.log_entry("DCom", f"sending NC command: ({NewPos})")
+        self.log_entry('DCom', f"sending NC command: ({NewPos})")
         return self.send_command(Command, dc=True)
 
 
@@ -1180,11 +1179,11 @@ class Mainframe(PreMainframe):
         # act according to GCode command
         Entry, command = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
 
-        if command == "G92":
+        if command == 'G92':
             self.label_update_on_new_zero()
 
-        elif command != "G1" and command != "G28":
-            if command == ";":
+        elif command != 'G1' and command != 'G28':
+            if command == ';':
                 pan_txt = f"leading semicolon interpreted as comment:\n{txt}"
             elif Entry is None:
                 pan_txt = f"SYNTAX ERROR:\n{txt}"
@@ -1196,13 +1195,13 @@ class Mainframe(PreMainframe):
 
         Entry.id = du.SC_curr_comm_id
 
-        self.log_entry("DCom", f"sending GCode DC command: ({Entry})")
+        self.log_entry('DCom', f"sending GCode DC command: ({Entry})")
         return self.send_command(Entry, dc=True)
 
 
     def send_rapid_command(self) -> None:
         """send the GCode interpreter line on the TERM panel to robot,
-        absolute coordinates or relative to "pHome" (DC_currZero)
+        absolute coordinates or relative to 'pHome' (DC_currZero)
         """
 
         if du.DC_rob_moving:
@@ -1218,7 +1217,7 @@ class Mainframe(PreMainframe):
 
         Entry.id = du.SC_curr_comm_id
 
-        self.log_entry("DCom", f"sending RAPID DC command: ({Entry})")
+        self.log_entry('DCom', f"sending RAPID DC command: ({Entry})")
         return self.send_command(Entry, dc=True)
 
 
@@ -1227,7 +1226,7 @@ class Mainframe(PreMainframe):
         the queue again), gives command  to the actual sendCommand function
         """
 
-        Command = du.QEntry(id=1, mt="S")
+        Command = du.QEntry(id=1, mt='S')
 
         if self._testrun:
             return self.send_command(Command, dc=True)
@@ -1235,7 +1234,7 @@ class Mainframe(PreMainframe):
             f"WARNING!\n\nRobot will stop after current movement! "
             f"OK to delete buffered commands on robot, "
             f"Cancel to continue queue processing.",
-            "FORCED STOP COMMIT",
+            'FORCED STOP COMMIT',
         )
         fs_warning.exec()
 
@@ -1246,7 +1245,7 @@ class Mainframe(PreMainframe):
             GlobalMutex.lock()
             LostBuf = copy.deepcopy(du.ROBCommQueue)
             for Entry in du.ROB_send_list:
-                if Entry[0].mt != "S":
+                if Entry[0].mt != 'S':
                     LostBuf.append(Entry[0])
             du.SC_curr_comm_id = du.ROBTelem.id
             du.SCQueue = LostBuf + du.SCQueue
@@ -1255,10 +1254,10 @@ class Mainframe(PreMainframe):
             GlobalMutex.unlock()
 
             self.label_update_on_queue_change()
-            self.log_entry("SysC", f"FORCED STOP (user committed).")
+            self.log_entry('SysC', f"FORCED STOP (user committed).")
 
         else:
-            self.log_entry("SysC", f"user denied FS-Dialog, continuing...")
+            self.log_entry('SysC', f"user denied FS-Dialog, continuing...")
 
 
     def robot_stop_command(self, directly=True) -> None:
@@ -1266,10 +1265,10 @@ class Mainframe(PreMainframe):
         the actual sendCommand function
         """
 
-        Command = du.QEntry(id=1, mt="E")
+        Command = du.QEntry(id=1, mt='E')
 
         if directly:
-            self.log_entry("SysC", "sending robot stop command directly")
+            self.log_entry('SysC', "sending robot stop command directly")
             if du.SC_q_processing:
                 self.stop_SCTRL_queue()
 
@@ -1282,7 +1281,7 @@ class Mainframe(PreMainframe):
         else:
             Command.id = 0
             du.SCQueue.add(Command)
-            self.log_entry("SysC", "added robot stop command to queue")
+            self.log_entry('SysC', 'added robot stop command to queue')
             return None
 
 
@@ -1316,42 +1315,42 @@ class Mainframe(PreMainframe):
     #                              PUMP CONTROL                              #
     ##########################################################################
 
-    def pump_set_speed(self, type="") -> None:
+    def pump_set_speed(self, type='') -> None:
         """handle user inputs regarding pump frequency"""
 
         GlobalMutex.lock()
         match type:
-            case "1":
+            case '1':
                 du.PMP_speed += 1
-            case "-1":
+            case '-1':
                 du.PMP_speed -= 1
-            case "10":
+            case '10':
                 du.PMP_speed += 10
-            case "-10":
+            case '-10':
                 du.PMP_speed -= 10
-            case "25":
+            case '25':
                 du.PMP_speed += 25
-            case "-25":
+            case '-25':
                 du.PMP_speed -= 25
-            case "0":
+            case '0':
                 du.PMP_speed = 0
-            case "r":
+            case 'r':
                 du.PMP_speed *= -1
-            case "c1":
+            case 'c1':
                 du.PMP1_live_ad = self.SCTRL_num_liveAd_pump1.value() / 100.0
-            case "c2":
+            case 'c2':
                 du.PMP2_live_ad = self.SCTRL_num_liveAd_pump2.value() / 100.0
-            case "s1":
+            case 's1':
                 du.PMP1_user_speed = self.PUMP_num_setSpeedP1.value()
-            case "s2":
+            case 's2':
                 du.PMP2_user_speed = self.PUMP_num_setSpeedP2.value()
-            case "def":
+            case 'def':
                 if len(du.ROBCommQueue) != 0:
                     du.PMP_speed = PU_def_mode(du.ROBCommQueue[0])
                 else:
                     userInfo = strd_dialog(
-                        "No current command!",
-                        "Action not possible"
+                        'No current command!',
+                        'Action not possible'
                     )
                     userInfo.exec()
 
@@ -1489,7 +1488,7 @@ class Mainframe(PreMainframe):
             return None
 
         Tool = self.adc_read_user_input('ASC')
-        if ".." in id_range:
+        if '..' in id_range:
             ids = re.findall('\d+', id_range)
             if len(ids) != 2:
                 user_info = strd_dialog(

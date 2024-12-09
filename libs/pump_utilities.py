@@ -101,7 +101,6 @@ def default_mode(command=None) -> float | None:
     )
     # [%] =      ( [mm/s]       * [L/m]           * [m/mm]/ [L/s])*100.0
     speed = float(Comm.Speed.ts * du.SC_vol_per_m * 0.001 / lps) * 100.0
-    last_def_command = copy.deepcopy(Comm)
 
     return speed
 
@@ -116,7 +115,7 @@ def profile_mode(command=None, profile=None) -> float | None:
             QEntry-like object specifying next movement
         profile:
             pump profile for this movement in the struct of 
-            list[dict{"until": float, "base": str, "mode": str},...]
+            list[dict{'until': float, 'base': str, 'mode': str},...]
     """
     global preceeding_speed
 

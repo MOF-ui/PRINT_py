@@ -32,7 +32,7 @@ class StandardDialog(QDialog, Ui_Dialog):
     and setable text
     """
 
-    def __init__(self, text="", title="default window", parent=None) -> None:
+    def __init__(self, text='', title='default window', parent=None) -> None:
 
         super().__init__(parent)
 
@@ -45,21 +45,21 @@ class StandardDialog(QDialog, Ui_Dialog):
 class FileDialog(QFileDialog, Ui_FileDialog):
     """file dialog for print file loading"""
 
-    def __init__(self, title="default window", parent=None) -> None:
+    def __init__(self, title='default window', parent=None) -> None:
 
         super().__init__(parent)
 
         self.setupUi(self)
         self.setWindowTitle(title)
-        self.setFileMode(1)  # enum for "ExistingFile"
+        self.setFileMode(1)  # enum for 'ExistingFile'
         self.setDirectory(r"C:\Users\Max\Desktop\MultiCarb3D\TCP_Robo\CAD2RAPID")
-        self.setNameFilters({"GCode files (*.gcode)", "RAPID files (*.mod)"})
-        self.selectNameFilter("GCode files (*.gcode)")
+        self.setNameFilters({'GCode files (*.gcode)', 'RAPID files (*.mod)'})
+        self.selectNameFilter('GCode files (*.gcode)')
 
         # uncomment here if you want a custom sidebar
         # self.setOption(QFileDialog.DontUseNativeDialog,on = True)
         # self.setSidebarUrls([
-        #     QUrl.fromLocalFile("/Users/Max/Desktop/MultiCarb3D/CAD2RAPID"),
+        #     QUrl.fromLocalFile('/Users/Max/Desktop/MultiCarb3D/CAD2RAPID'),
         #     QUrl.fromLocalFile(QStandardPaths.writableLocation(
         #         QStandardPaths.DesktopLocation
         #     )),
@@ -91,7 +91,7 @@ class ConnDialog(QDialog, Ui_ConnDialog):
 
     def __init__(
         self,
-        title="default window",
+        title='default window',
         rob_def=None,
         pump1_def=None,
         pump2_def=None,
@@ -114,23 +114,23 @@ class ConnDialog(QDialog, Ui_ConnDialog):
             self.buttonBox.accepted.connect(self.safe_settings)
 
     def set_default(self) -> None:
-        self.TCP_ROB_entry_ip.setText(str(self.def_rob_tcp["IP"]))
-        self.TCP_ROB_entry_port.setText(str(self.def_rob_tcp["PORT"]))
-        self.TCP_ROB_num_tio_conn.setValue(int(self.def_rob_tcp["C_TOUT"]))
-        self.TCP_ROB_num_bytesToRead.setValue(int(self.def_rob_tcp["R_BL"]))
-        self.TCP_ROB_num_tio_rw.setValue(int(self.def_rob_tcp["RW_TOUT"]))
+        self.TCP_ROB_entry_ip.setText(str(self.def_rob_tcp['IP']))
+        self.TCP_ROB_entry_port.setText(str(self.def_rob_tcp['PORT']))
+        self.TCP_ROB_num_tio_conn.setValue(int(self.def_rob_tcp['C_TOUT']))
+        self.TCP_ROB_num_bytesToRead.setValue(int(self.def_rob_tcp['R_BL']))
+        self.TCP_ROB_num_tio_rw.setValue(int(self.def_rob_tcp['RW_TOUT']))
 
-        self.TCP_PUMP1_entry_ip.setText(str(self.def_pump1_tcp["IP"]))
-        self.TCP_PUMP1_entry_port.setText(str(self.def_pump1_tcp["PORT"]))
-        self.TCP_PUMP1_num_tio_conn.setValue(int(self.def_pump1_tcp["C_TOUT"]))
-        self.TCP_PUMP1_num_bytesToRead.setValue(int(self.def_pump1_tcp["R_BL"]))
-        self.TCP_PUMP1_num_tio_rw.setValue(int(self.def_pump1_tcp["RW_TOUT"]))
+        self.TCP_PUMP1_entry_ip.setText(str(self.def_pump1_tcp['IP']))
+        self.TCP_PUMP1_entry_port.setText(str(self.def_pump1_tcp['PORT']))
+        self.TCP_PUMP1_num_tio_conn.setValue(int(self.def_pump1_tcp['C_TOUT']))
+        self.TCP_PUMP1_num_bytesToRead.setValue(int(self.def_pump1_tcp['R_BL']))
+        self.TCP_PUMP1_num_tio_rw.setValue(int(self.def_pump1_tcp['RW_TOUT']))
 
-        self.TCP_PUMP2_entry_ip.setText(str(self.def_pump2_tcp["IP"]))
-        self.TCP_PUMP2_entry_port.setText(str(self.def_pump2_tcp["PORT"]))
-        self.TCP_PUMP2_num_tio_conn.setValue(int(self.def_pump2_tcp["C_TOUT"]))
-        self.TCP_PUMP2_num_bytesToRead.setValue(int(self.def_pump2_tcp["R_BL"]))
-        self.TCP_PUMP2_num_tio_rw.setValue(int(self.def_pump2_tcp["RW_TOUT"]))
+        self.TCP_PUMP2_entry_ip.setText(str(self.def_pump2_tcp['IP']))
+        self.TCP_PUMP2_entry_port.setText(str(self.def_pump2_tcp['PORT']))
+        self.TCP_PUMP2_num_tio_conn.setValue(int(self.def_pump2_tcp['C_TOUT']))
+        self.TCP_PUMP2_num_bytesToRead.setValue(int(self.def_pump2_tcp['R_BL']))
+        self.TCP_PUMP2_num_tio_rw.setValue(int(self.def_pump2_tcp['RW_TOUT']))
 
     def safe_settings(self) -> None:
         self.set_rob_tcp = {}
@@ -140,26 +140,26 @@ class ConnDialog(QDialog, Ui_ConnDialog):
         self.set_p1_conn = self.TCP_PUMP1_connDef.isChecked()
         self.set_p2_conn = self.TCP_PUMP2_connDef.isChecked()
 
-        self.set_rob_tcp["IP"] = self.TCP_ROB_entry_ip.text()
-        self.set_rob_tcp["PORT"] = self.TCP_ROB_entry_port.text()
-        self.set_rob_tcp["C_TOUT"] = self.TCP_ROB_num_tio_conn.value() / 1000
-        self.set_rob_tcp["R_BL"] = self.TCP_ROB_num_bytesToRead.value()
-        self.set_rob_tcp["RW_TOUT"] = self.TCP_ROB_num_tio_rw.value() / 1000
-        self.set_rob_tcp["W_BL"] = self.def_rob_tcp["W_BL"]
+        self.set_rob_tcp['IP'] = self.TCP_ROB_entry_ip.text()
+        self.set_rob_tcp['PORT'] = self.TCP_ROB_entry_port.text()
+        self.set_rob_tcp['C_TOUT'] = self.TCP_ROB_num_tio_conn.value() / 1000
+        self.set_rob_tcp['R_BL'] = self.TCP_ROB_num_bytesToRead.value()
+        self.set_rob_tcp['RW_TOUT'] = self.TCP_ROB_num_tio_rw.value() / 1000
+        self.set_rob_tcp['W_BL'] = self.def_rob_tcp['W_BL']
 
-        self.set_pump1_tcp["IP"] = self.TCP_PUMP1_entry_ip.text()
-        self.set_pump1_tcp["PORT"] = self.TCP_PUMP1_entry_port.text()
-        self.set_pump1_tcp["C_TOUT"] = self.TCP_PUMP1_num_tio_conn.value() / 1000
-        self.set_pump1_tcp["R_BL"] = self.TCP_PUMP1_num_bytesToRead.value()
-        self.set_pump1_tcp["RW_TOUT"] = self.TCP_PUMP1_num_tio_rw.value() / 1000
-        self.set_pump1_tcp["W_BL"] = self.def_pump2_tcp["W_BL"]
+        self.set_pump1_tcp['IP'] = self.TCP_PUMP1_entry_ip.text()
+        self.set_pump1_tcp['PORT'] = self.TCP_PUMP1_entry_port.text()
+        self.set_pump1_tcp['C_TOUT'] = self.TCP_PUMP1_num_tio_conn.value() / 1000
+        self.set_pump1_tcp['R_BL'] = self.TCP_PUMP1_num_bytesToRead.value()
+        self.set_pump1_tcp['RW_TOUT'] = self.TCP_PUMP1_num_tio_rw.value() / 1000
+        self.set_pump1_tcp['W_BL'] = self.def_pump2_tcp['W_BL']
 
-        self.set_pump2_tcp["IP"] = self.TCP_PUMP2_entry_ip.text()
-        self.set_pump2_tcp["PORT"] = self.TCP_PUMP2_entry_port.text()
-        self.set_pump2_tcp["C_TOUT"] = self.TCP_PUMP2_num_tio_conn.value() / 1000
-        self.set_pump2_tcp["R_BL"] = self.TCP_PUMP2_num_bytesToRead.value()
-        self.set_pump2_tcp["RW_TOUT"] = self.TCP_PUMP2_num_tio_rw.value() / 1000
-        self.set_pump2_tcp["W_BL"] = self.def_pump2_tcp["W_BL"]
+        self.set_pump2_tcp['IP'] = self.TCP_PUMP2_entry_ip.text()
+        self.set_pump2_tcp['PORT'] = self.TCP_PUMP2_entry_port.text()
+        self.set_pump2_tcp['C_TOUT'] = self.TCP_PUMP2_num_tio_conn.value() / 1000
+        self.set_pump2_tcp['R_BL'] = self.TCP_PUMP2_num_bytesToRead.value()
+        self.set_pump2_tcp['RW_TOUT'] = self.TCP_PUMP2_num_tio_rw.value() / 1000
+        self.set_pump2_tcp['W_BL'] = self.def_pump2_tcp['W_BL']
 
 
 
@@ -167,8 +167,8 @@ class ConnDialog(QDialog, Ui_ConnDialog):
 #######################################   STRD DIALOG    #####################################################
 
 def strd_dialog(
-        usr_text="you forgot to set a text, dummy",
-        usr_title="default window",
+        usr_text='you forgot to set a text, dummy',
+        usr_title='default window',
         standalone=False,
 ) -> StandardDialog | int:
     """shows a dialog window, text and title can be set, returns the 
@@ -194,7 +194,7 @@ def strd_dialog(
 
 
 def file_dialog(
-        usr_title="default window",
+        usr_title='default window',
         standalone=False
 ) -> FileDialog | list[str]:
     """creates FileDialog and either shows it directly and then returns the
@@ -222,7 +222,7 @@ def conn_dialog(
         rob:dict,
         p1:dict,
         p2:dict,
-        title="default window",
+        title='default window',
         standalone=False
 ) -> ConnDialog | dict:
     """shows a dialog with robots and pumps connection setting, IPs, ports,

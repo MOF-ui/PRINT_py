@@ -39,7 +39,7 @@ bool curr_pinch = false;
 struct t_block TSensor[MAX_TEMP_SENSORS];
 String t_sensor_names[MAX_TEMP_SENSORS] = {"IN", "OUT"};
 u64_t last_temp_reading = 0;
-int temp_reading_freq = 500; // [ms]
+int temp_reading_freq = 1000; // [ms]
 
 /* -------------------------- FUNCTION DECLARATIONS ----------------------- */
 
@@ -123,12 +123,12 @@ void setup() {
 	// SI5351
 	Serial.println("CLKG:\tinit SI5351 clock generation..");
     clk_gen.init(SI5351_CRYSTAL_LOAD_10PF, 25000000, 0);    
-    clk_gen.set_ms_source(SI5351_CLK0, SI5351_PLLA);
+    clk_gen.set_ms_source(SI5351_CLK1, SI5351_PLLA);
     clk_gen.set_pll_input(SI5351_PLLA, SI5351_PLL_INPUT_XO);
 
 	// PINCH
 	pinMode(PINCH_PIN, OUTPUT);
-	digitalWrite(PINCH_PIN, LOW);
+	digitalWrite(PINCH_PIN, HIGH);
 
 	// TEMP_READOUT
 	Serial.println("TEMP:\tinit DS18B20..");
@@ -142,27 +142,29 @@ void setup() {
 void loop() {
 	// SI5351
 	float rps = g_motor_rpm / 60.0;
-	uint64_t freq_target = (uint64_t)(rps * steps_per_rot);
+	float freq_target = rps * steps_per_rot;
 
 	if (curr_freq != freq_target) {
 		if (freq_target == 0) {
-			clk_gen.output_enable(SI5351_CLK0, 0);
+			clk_gen.output_enable(SI5351_CLK1, 0);
 			curr_freq = 0;
 			clk_running = false;
 			Serial.println("CLKG:\tclk stopped.");
 		} else {
-			// use simple p-controller for acceleration ramp
-			curr_freq += P_CTRL_CONST * (freq_target - curr_freq);
-			clk_gen.set_freq(curr_freq * 100ULL, SI5351_CLK0);
+			// use simple p-controller with step cap for acceleration ramp
+			float freq_step = P_CTRL_CONST * (freq_target - curr_freq);
+			if (freq_step > P_CTRL_MAX_STEP) freq_step = P_CTRL_MAX_STEP;
+			curr_freq += freq_step;
+			if (abs(freq_target - curr_freq) < 1.0) curr_freq = freq_target;
+			clk_gen.set_freq(curr_freq * 100ULL, SI5351_CLK1);
 
 			if (!clk_running) {
-				clk_gen.output_enable(SI5351_CLK0, 1);
-				clk_gen.drive_strength(SI5351_CLK0, SI5351_DRIVE_2MA);
+				clk_gen.output_enable(SI5351_CLK1, 1);
+				clk_gen.drive_strength(SI5351_CLK1, SI5351_DRIVE_2MA);
 				clk_running = true;
 				Serial.println("CLKG:\tclk started.");
 			}
 		}
-		Serial.printf("CLKG:\tfreq set to %f\n", curr_freq);
 	}
 
 	// PINCH
@@ -174,19 +176,19 @@ void loop() {
 	}
 
 	// TEMP_READOUT
-	TickType_t uptimeTicks = xTaskGetTickCount() - g_ticks_last_req;
-	u64_t uptime = (u64_t)(uptimeTicks * portTICK_PERIOD_MS);
-	
-	if (uptime > (last_temp_reading + temp_reading_freq)) {
-		for (int i=0; i<MAX_TEMP_SENSORS; i++) {
-			TSensor[i].last_reading = DS18B20.getTempC(TSensor[i].addr);
+	if (g_num_temp_devices > 0) {
+		u64_t uptime = millis() - g_millis_last_req;
+		if (g_backlog_idx == 0) last_temp_reading = 0;
+		if (uptime > (last_temp_reading + temp_reading_freq)) {
+			for (int i=0; i<MAX_TEMP_SENSORS; i++) {
+				TSensor[i].last_reading = DS18B20.getTempC(TSensor[i].addr);
+			}
+			_copy_to_daqb(TSensor, &uptime);
+			last_temp_reading = uptime;
 		}
-		_copy_to_daqb(TSensor, &uptime);
-		last_temp_reading = uptime;
 	}
 
 	// SERVER
 	http_server.handleClient();
 	delay(5);
 }
-

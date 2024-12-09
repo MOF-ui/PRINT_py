@@ -32,9 +32,11 @@ following examples from
 #define POST_MAX_CONT_LEN   100
 #define IP_MAX_STR_LEN      64
 
-#define ONE_WIRE_PIN 		2
+#define ONE_WIRE_PIN 		0
+
 #define PINCH_PIN 			33
-#define P_CTRL_CONST        0.2    // 20 %
+#define P_CTRL_CONST        0.02    // 2 %
+#define P_CTRL_MAX_STEP     200
 
 /* --------------------------- VARIABLES & CLASSES ------------------------ */
 
@@ -52,7 +54,7 @@ struct daq_block
 
 extern const struct daq_block g_EMPTY_DAQ_BLOCK;
 extern struct daq_block g_measure_buff[BACKLOG_SIZE];
-extern TickType_t g_ticks_last_req;
+extern unsigned long g_millis_last_req;
 extern float g_motor_rpm;
 extern int g_backlog_idx;
 extern bool g_pinch_state;
@@ -67,6 +69,7 @@ struct t_block {
 	float last_reading;
 	bool is_connected;
 };
+extern uint8_t g_num_temp_devices;
 
 
 /* -------------------------------- FUNCTIONS ----------------------------- */
@@ -83,6 +86,7 @@ void data_request(void);
 void ping_request(void);
 void restart_post(void);
 void http_404_handler(void);
+void http_405_handler(void);
 
 /* ---------------------------- PRIVATE FUNCTIONS ------------------------- */
 
@@ -94,7 +98,7 @@ void _daq2str(
 );
 void _copy_to_daqb(const t_block* tb, u64_t* uptime);
 void _print_client_ip(const char* source);
-void _retrieve_post_body(char* recv_c);
+boolean _retrieve_post_body(char* recv_c);
 
 #ifdef __cplusplus
 }

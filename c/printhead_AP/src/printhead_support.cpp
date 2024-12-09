@@ -28,7 +28,7 @@ following examples from
 // ETH
 const struct daq_block g_EMPTY_DAQ_BLOCK = {0};
 struct daq_block g_measure_buff[BACKLOG_SIZE] = {0};
-TickType_t g_ticks_last_req = 0;
+unsigned long g_millis_last_req = 0;
 float g_motor_rpm = 0;
 int g_backlog_idx = 0;
 bool g_pinch_state = 0;
@@ -37,6 +37,9 @@ bool g_data_lost = false;
 // DS18B20
 OneWire OWB(ONE_WIRE_PIN);
 DallasTemperature DS18B20(&OWB);
+uint8_t g_num_temp_devices = 0;
+DeviceAddress t_sensor_addr0 = {0x28, 0x6C, 0x1C, 0x81, 0xE3, 0xE1, 0x3C, 0x24};
+DeviceAddress t_sensor_addr1 = {0x28, 0x42, 0x93, 0x81, 0xE3, 0xE1, 0x3C, 0x25};
 
 /* -------------------------------- FUNCTIONS ----------------------------- */
 
@@ -48,28 +51,43 @@ void init_DS18B20(
 {
 	DS18B20.begin();
 	Serial.println("TEMP:\tsearching for DS18B20..");
-	uint8_t num_temp_devices = DS18B20.getDeviceCount();
+	uint8_t num_devices_found = DS18B20.getDeviceCount();
 	Serial.printf(
 		"TEMP:\tfound: %d of %u.\n",
-		num_temp_devices,
+		num_devices_found,
 		MAX_TEMP_SENSORS
 	);
+    if (num_devices_found < 1) return;
 
-	// FIRST DEVICE ROM ADDRESS READING
-	Serial.print("TEMP:\tpre_lim addresses ");
-	for (int i=0; i<MAX_TEMP_SENSORS; i++) {
+    // name devices
+    for (int i=0; i<MAX_TEMP_SENSORS; i++) {
         for (int k=0; k<sizeof(t_sensor_names[i]); k++) {
 		    TSensor[i].name[k] = t_sensor_names[i][k];
         }
-		DS18B20.getAddress(TSensor[i].addr, i);
-		Serial.printf("-- Device %d ->", i);
-		for (int j=0; j<8; j++) {
-			Serial.printf("%d:", TSensor[i].addr[j]);
-		}
-	}
-	Serial.println();
-	// END OF: FIRST DEVICE ROM ADDRESS READING
+    }
 
+	// // FIRST DEVICE ROM ADDRESS READING
+	// Serial.print("TEMP:\tpre_lim addresses ");
+	// 
+    // for (int i=0; i<MAX_TEMP_SENSORS; i++) {
+	// 	DS18B20.getAddress(TSensor[i].addr, i);
+	// 	Serial.printf("-- Device %d ->", i);
+	// 	for (int j=0; j<8; j++) {
+	// 		Serial.printf("%d:", TSensor[i].addr[j]);
+	// 	}
+	// }
+	// Serial.println();
+	// // END OF: FIRST DEVICE ROM ADDRESS READING
+
+    // assign known sensors here
+	for (int j=0; j<8; j++) {
+        TSensor[0].addr[j] = t_sensor_addr0[j];
+    } 
+    for (int j=0; j<8; j++) {
+        TSensor[1].addr[j] = t_sensor_addr1[j];
+    } 
+
+    // check if they are there
 	for (int i=0; i<MAX_TEMP_SENSORS; i++) {
 		TSensor[i].is_connected = DS18B20.isConnected(TSensor[i].addr);
 		if (!TSensor[i].is_connected) {
@@ -77,6 +95,8 @@ void init_DS18B20(
 		}
 		else {
 			DS18B20.setResolution(TSensor[i].addr, 12); // setting to 12-bit res
+            Serial.printf("TEMP:\t%s DS18B20 set up.\n", TSensor[i].name);
+            g_num_temp_devices++;
 		}
 	}
 }
@@ -88,6 +108,7 @@ void init_uri()
     http_server.on("/", HTTP_GET, root_handler);
     http_server.on("/data", HTTP_GET, data_request);
     http_server.on("/ping", HTTP_GET, ping_request);
+    http_server.on("/motor", HTTP_GET, http_405_handler);
     http_server.on("/motor", HTTP_POST, freq_post);
     http_server.on("/pinch", HTTP_POST, pinch_post);
     http_server.on("/restart", HTTP_POST, restart_post);
@@ -119,8 +140,7 @@ void data_request()
         }
 
         // calc current uptime to get the age of each value in _daq2str
-        TickType_t curr_uptime_ticks = xTaskGetTickCount() - g_ticks_last_req;
-        u64_t curr_uptime = (u64_t)(curr_uptime_ticks * portTICK_PERIOD_MS);
+        u64_t curr_uptime = millis() - g_millis_last_req;
         u64_t curr_uptime_s = (u64_t)(curr_uptime / 1000);
 
         // build ans str
@@ -133,12 +153,12 @@ void data_request()
                 DAQB_STR_SIZE,
                 curr_uptime_s
             );
-            strlcpy(data_str, daqb_str, DAQB_STR_SIZE * BACKLOG_SIZE);
+            strlcat(data_str, daqb_str, DAQB_STR_SIZE * BACKLOG_SIZE);
             g_measure_buff[idx] = g_EMPTY_DAQ_BLOCK;
         }
         g_backlog_idx = 0;
         g_data_lost = false;
-        g_ticks_last_req = xTaskGetTickCount();
+        g_millis_last_req = millis();
     }
 
     // send answer
@@ -163,7 +183,7 @@ void freq_post()
     static char recv_c[POST_MAX_CONT_LEN] = {0};
     static char resp[POST_MAX_CONT_LEN + 6];
     _print_client_ip("freq");
-    _retrieve_post_body(recv_c);
+    if (!_retrieve_post_body(recv_c)) return;
 
     g_motor_rpm = atof(recv_c);
     if (g_motor_rpm < 0.0) g_motor_rpm = 0.0;
@@ -182,7 +202,7 @@ void pinch_post()
     static char recv_c[POST_MAX_CONT_LEN] = {0};
     static char resp[8];
     _print_client_ip("pinch");
-    _retrieve_post_body(recv_c);
+    if (!_retrieve_post_body(recv_c)) return;
 
     int msg_int = atoi(recv_c);
     if (msg_int == 0) g_pinch_state = false;
@@ -204,7 +224,7 @@ void restart_post()
     static char recv_c[POST_MAX_CONT_LEN] = {0};
     static const char* token = "always_look_on_the_bright_side_of_life";
     _print_client_ip("restart");
-    _retrieve_post_body(recv_c);
+    if (!_retrieve_post_body(recv_c)) return;
 
     if ( strcmp(recv_c, token) == 0 ) { //strcmp returns 0 on match
         Serial.println("HTTP:\tcorrect restart token.");
@@ -231,6 +251,12 @@ void http_404_handler(void)
     http_server.send(404, "text/plain", "no such ressource");
 }
 
+void http_405_handler(void)
+{
+    http_server.send(405, "text/plain", "POST only!");
+    Serial.println("non-POST request, returning 405.");
+}
+
 /* ---------------------------- PRIVATE FUNCTIONS ------------------------- */
 
 // short-hand function to construct string from daq_block list entry
@@ -251,7 +277,7 @@ void _daq2str(
         // build str
         char *count = (char *) malloc(5);
         snprintf(count, 5, "_T%d>", i);
-        strlcpy(sz_ret, count, buff_len);
+        strlcat(sz_ret, count, buff_len);
         strlcat(sz_ret, temp_char, buff_len);
         
         free(temp_char);
@@ -277,8 +303,7 @@ void _daq2str(
 void _copy_to_daqb(const t_block* tb, u64_t* uptime)
 {
     // save to the backlog, first check needed to avoid index error
-    if (g_backlog_idx != 0)
-    {
+    if (g_backlog_idx != 0) {
         for (int i=0; i<MAX_TEMP_SENSORS; i++) {
             g_measure_buff[g_backlog_idx].temp[i] = tb[i].last_reading;
         }
@@ -288,8 +313,7 @@ void _copy_to_daqb(const t_block* tb, u64_t* uptime)
 
         // check if the backlog is full
         // if so throw of the oldest measurement
-        if (g_backlog_idx >= (BACKLOG_SIZE - 1)) 
-        {
+        if (g_backlog_idx >= (BACKLOG_SIZE - 1)) {
             g_data_lost = true;
             for (int idx=1; idx < BACKLOG_SIZE; idx++) 
             {
@@ -307,6 +331,7 @@ void _copy_to_daqb(const t_block* tb, u64_t* uptime)
         g_measure_buff[g_backlog_idx].upt_s = (u16_t)(*uptime / 1000);
         g_backlog_idx++;
     }
+    Serial.println("New T entry!");
 }
 
 void _print_client_ip(const char* source)
@@ -329,19 +354,26 @@ void _print_client_ip(const char* source)
 
 // writes plain text body of POST request to recv_c buffer;
 // which have to have the minimum size of POST_MAX_CONT_LEN 
-void _retrieve_post_body(char* recv_c)
+boolean _retrieve_post_body(char* recv_c)
 {
     // read content; fight with the String again
-    String recv = http_server.arg("plain");
+    if (http_server.args() < 1) {
+        http_server.send(400, "text/plain", "POST body malformed!");
+        Serial.println("POST body malformed, returning 400.");
+        return false;
+    }
+
+    String recv = http_server.arg(0);
     int recv_len = recv.length();
     if (recv_len >= POST_MAX_CONT_LEN) {
         http_server.send(400, "text/plain", "body to large");
         Serial.printf("HTTP:\tFAILED. Body to large.\n");
-        return;
+        return false;
     }
     for (int i=0; i<recv.length(); i++) {
         recv_c[i] = recv[i];
     }
     recv_c[recv.length() + 1] = '\0';
     Serial.printf("HTTP:\treceived: %s\n", recv_c);
+    return true;
 }
