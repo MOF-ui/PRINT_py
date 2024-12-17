@@ -733,37 +733,41 @@ class IPCamWorker(QObject):
     imageCaptured = pyqtSignal(int, QImage)
     logEntry = pyqtSignal(str, str)
 
-    cam_stream = []
+    cam_streams = []
 
     def run(self) -> None:
         """create capture timer and fill active streams according to 
         given URLs"""
 
         for url in du.CAM_urls:
-            self.cam_stream.append(cv2.VideoCapture(url, cv2.CAP_FFMPEG))
+            self.cam_streams.append(cv2.VideoCapture(url, cv2.CAP_FFMPEG))
         
-        self.LoopTimer = QTimer()
-        self.LoopTimer.setInterval(100)
-        self.LoopTimer.timeout.connect(self.cam_cap)
-        self.LoopTimer.start()
+        self.CapTimer = QTimer()
+        self.CapTimer.setInterval(250)
+        self.CapTimer.timeout.connect(self.cam_cap)
+        self.CapTimer.start()
 
         self.logEntry.emit(
             'THRT',
-            f"IPCam Thread running with {len(self.cam_stream)} streams."
+            f"IPCam Thread running with {len(self.cam_streams)} streams."
         )
 
 
     def stop(self) -> None:
         """stop loop"""
 
-        self.LoopTimer.stop()
-        self.LoopTimer.deleteLater()
+        for cs in self.cam_streams:
+            if isinstance(cs, cv2.VideoCapture):
+                cs.release()
+
+        self.CapTimer.stop()
+        self.CapTimer.deleteLater()
 
     
     def cam_cap(self) -> None:
         """capture an image from all streams"""
 
-        for cam_num, cam in enumerate(self.cam_stream):
+        for cam_num, cam in enumerate(self.cam_streams):
             if not isinstance(cam, cv2.VideoCapture):
                 continue
             flag, frame = cam.read()
@@ -774,6 +778,8 @@ class IPCamWorker(QObject):
                 height, width, channels = frame.shape
                 bytes_per_line = width * channels
                 # image from BGR (cv2 default color format) to RGB (Qt default color format)
+                # '.copy()' is vital as the emitted qt_image is otherwise local and 
+                # slots accessing it will crash with segmentation fault
                 cv_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 qt_image = QImage(
                     cv_image.data,
@@ -781,7 +787,7 @@ class IPCamWorker(QObject):
                     height,
                     bytes_per_line,
                     QImage.Format_RGB888
-                )
+                ).copy()
                 self.imageCaptured.emit(cam_num, qt_image)
 
 

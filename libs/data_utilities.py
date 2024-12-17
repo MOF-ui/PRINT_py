@@ -1921,7 +1921,10 @@ ADC_knife_pos = DEF_AMC_KNIFE_POS
 ADC_knife = DEF_AMC_KNIFE
 ADC_fib_pnmtc = DEF_AMC_FIBER_PNMTC
 
-CAM_urls = []
+CAM_urls = [
+    "rtsp://admin:KameraNr4@192.168.178.51:554/ch1/main/av_stream",
+    "rtsp://admin:KameraNr1@192.168.178.38:554/ch1/main/av_stream",
+]
 
 DCCurrZero = Coordinate()
 DCSpeed = dcpy(DEF_DC_SPEED)

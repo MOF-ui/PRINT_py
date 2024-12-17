@@ -616,7 +616,7 @@ class Mainframe(PreMainframe):
             self._IPCamThread.finished.connect(self._IPCamWorker.stop)
             self._IPCamThread.destroyed.connect(self._IPCamWorker.deleteLater)
             self._IPCamWorker.logEntry.connect(self.log_entry)
-            self._IPCamWorker.imageCaptured.connect
+            self._IPCamWorker.imageCaptured.connect(self.CamCap.new_img)
 
 
         def other_threads_connector():
