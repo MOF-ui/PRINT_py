@@ -10,10 +10,11 @@
 
 # python standard libraries
 import os
+import cv2
 import sys
-import copy
 import math as m
 import requests
+from copy import deepcopy as dcpy
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -21,7 +22,8 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 # PyQt stuff
-from PyQt5.QtCore import QObject, QTimer, pyqtSignal
+from PyQt5.QtCore import QObject, QTimer, pyqtSignal, QMutexLocker
+from PyQt5.QtGui import QImage
 
 # import my own libs
 import libs.data_utilities as du
@@ -70,16 +72,12 @@ class PumpCommWorker(QObject):
         """extra function needed to set global indicator 'PMP_comm_active'
         which is checked in win_mainframe.disconnect_tcp"""
 
-        GlobalMutex.lock()
-        du.PMP_comm_active = True
-        GlobalMutex.unlock()
-
+        with QMutexLocker(GlobalMutex):
+            du.PMP_comm_active = True
         self.send()
         self.receive()
-        
-        GlobalMutex.lock()
-        du.PMP_comm_active = False
-        GlobalMutex.unlock()
+        with QMutexLocker(GlobalMutex):
+            du.PMP_comm_active = False
     
 
     def get_speed_settings() -> tuple[int, int, int]:
@@ -134,9 +132,8 @@ class PumpCommWorker(QObject):
                 res = serial.set_speed(int(speed * getattr(du, live_ad)))
                 
                 if res is not None:
-                    GlobalMutex.lock()
-                    setattr(du, speed_global, speed)
-                    GlobalMutex.unlock()
+                    with QMutexLocker(GlobalMutex):
+                        setattr(du, speed_global, speed)
                     print(f"{p_num}: {speed}")
                     self.dataSend.emit(speed, res[0], res[1], p_num)
 
@@ -155,9 +152,8 @@ class PumpCommWorker(QObject):
             post_resp = requests.post(post_url, data=f"{mixer_speed}")
 
             if post_resp.ok and post_resp.text == f"RECV{mixer_speed}":
-                GlobalMutex.lock()
-                du.MIX_last_speed = mixer_speed
-                GlobalMutex.unlock()
+                with QMutexLocker(GlobalMutex):
+                    du.MIX_last_speed = mixer_speed
                 print(f"MIX: {mixer_speed}")
                 self.dataMixerSend.emit(mixer_speed)
             
@@ -203,10 +199,9 @@ class PumpCommWorker(QObject):
                         Telem.freq *= -1
 
                     if Telem != getattr(du, last_telem):
-                        GlobalMutex.lock()
-                        setattr(du, last_telem, Telem)
-                        setattr(du.STTDataBlock, stt_attr, Telem)
-                        GlobalMutex.unlock()
+                        with QMutexLocker(GlobalMutex):
+                            setattr(du, last_telem, Telem)
+                            setattr(du.STTDataBlock, stt_attr, Telem)
                         self.dataRecv.emit(Telem, p_num)
 
         # RECEIVE FROM MIXER
@@ -265,56 +260,81 @@ class RoboCommWorker(QObject):
     def receive(self) -> None:
         """receive 36-byte data block, write to ROB vars"""
 
+        def err_handler(err_txt):
+            self.logEntry.emit('RTel', err_txt)
+            with QMutexLocker(GlobalMutex):
+                fu.add_to_comm_protocol(f"RECV:    {err_txt}")
+
         Telem, raw_data = du.ROBTcp.receive()
-        if not isinstance(Telem, Exception):
+        if isinstance(Telem, Exception):
+            # inform user if error occured in websocket connection (ignore timeouts)
+            if(
+                not isinstance(Telem, TimeoutError)
+                and not isinstance(Telem, WindowsError)
+            ):
+                err_handler(f"ERROR from ROBTcp ({Telem}), raw data: {raw_data}")
+
+        elif Telem.id < 0:
+            # handle robot internal error catching
+            try:
+                LastPos = du.ROBCommQueue[0].Coor1
+            except:
+                LastPos = None
+            err_handler(f"given position out of reach! last given pos: {LastPos}")
+
+        else:
+            # standard telemetry handler
             Telem = round(Telem, 1)
             self.dataReceived.emit()
 
-            GlobalMutex.lock()
-            fu.add_to_comm_protocol(
-                f"RECV:    ID {Telem.id},   {Telem.Coor}   "
-                f"TCP: {Telem.t_speed}"
-            )
+            with QMutexLocker(GlobalMutex):
+                fu.add_to_comm_protocol(
+                    f"RECV:    ID {Telem.id},   {Telem.Coor}   "
+                    f"TCP: {Telem.t_speed}"
+                )
 
-            # check for ID overflow, reduce SC_queue IDs 
-            if Telem.id < du.ROBLastTelem.id:
-                for x in du.SCQueue:
-                    x.id -= 3000
-                # and clear ROBCommQueue entries with IDs near 3000
+                # check for ID overflow, reduce SC_queue IDs 
+                if Telem.id < du.ROBLastTelem.id:
+                    for x in du.SCQueue:
+                        x.id -= du.DEF_ROB_BUFF_SIZE
+                    # and clear ROBCommQueue entries with IDs
+                    # near DEF_ROB_BUFF_SIZE
+                    try:
+                        while du.ROBCommQueue[0].id > Telem.id:
+                            du.ROBCommQueue.pop_first_item()
+                    except:
+                        pass
+
+                # delete all finished commands from ROB_commQueue
                 try:
-                    while du.ROBCommQueue[0].id > Telem.id:
+                    while du.ROBCommQueue[0].id < Telem.id:
                         du.ROBCommQueue.pop_first_item()
-                except Exception:
+                except AttributeError:
                     pass
 
-            # delete all finished commands from ROB_commQueue
-            try:
-                while du.ROBCommQueue[0].id < Telem.id:
-                    du.ROBCommQueue.pop_first_item()
-            except AttributeError:
-                pass
+                # refresh data only if new
+                if Telem != du.ROBLastTelem:
+                    # check if robot is processing a new command
+                    # (length check to skip in first loop)
+                    if (
+                            Telem.id != du.ROBLastTelem.id
+                            and len(du.ROBCommQueue) > 0
+                        ):
+                        du.ROBMovStartP = du.ROBMovEndP
+                        du.ROBMovEndP = dcpy(du.ROBCommQueue[0].Coor1)
 
-            # refresh data only if new
-            if Telem != du.ROBLastTelem:
-                # check if robot is processing a new command
-                # (length check to skip in first loop)
-                if (Telem.id != du.ROBLastTelem.id) and (len(du.ROBCommQueue) > 0):
-                    du.ROBMovStartP = du.ROBMovEndP
-                    du.ROBMovEndP = copy.deepcopy(du.ROBCommQueue[0].Coor1)
+                    # set new values to globals
+                    du.ROBTelem = dcpy(Telem)
+                    du.ROBLastTelem = dcpy(Telem)
 
-                # set new values to globals
-                du.ROBTelem = copy.deepcopy(Telem)
-                du.ROBLastTelem = copy.deepcopy(Telem)
-
-                # prep database entry
-                STTEntry = copy.deepcopy(Telem)
-                STTEntry.Coor -= du.DCCurrZero
-                du.STTDataBlock.Robo = copy.deepcopy(STTEntry) 
-                self.dataUpdated.emit(str(raw_data), Telem)
-                
-                # print
-                print(f"RECV:    {Telem}")
-            GlobalMutex.unlock()
+                    # prep database entry
+                    STTEntry = dcpy(Telem)
+                    STTEntry.Coor -= du.DCCurrZero
+                    du.STTDataBlock.Robo = dcpy(STTEntry) 
+                    self.dataUpdated.emit(str(raw_data), Telem)
+                    
+                    # print
+                    print(f"RECV:    {Telem}")
 
             # reset robMoving indicator if near end, skip if queue is processed
             if du.DC_rob_moving and not du.SC_q_processing:
@@ -322,17 +342,6 @@ class RoboCommWorker(QObject):
                 if check_dist is not None:
                     if check_dist < 1:
                         self.endDcMoving.emit()
-
-        # inform user if error occured in websocket connection (ignore timeouts)
-        elif (
-                not isinstance(Telem, TimeoutError)
-                and not isinstance(Telem, WindowsError)
-        ):
-            err_txt = f"ERROR from ROBTcp ({Telem}), raw data: {raw_data}"
-            self.logEntry.emit('RTel', err_txt)
-            GlobalMutex.lock()
-            fu.add_to_comm_protocol(f"RECV:    {err_txt}")
-            GlobalMutex.unlock()
 
 
     def check_queue(self) -> None:
@@ -357,14 +366,13 @@ class RoboCommWorker(QObject):
         # end qProcessing (immediately if ROB_commQueue is empty as well)
         elif du.SC_q_processing:
             if len_sc > 0:
-                GlobalMutex.lock()
-                try:
-                    while (rob_id + du.ROB_comm_fr) >= du.SCQueue[0].id:
-                        comm_tuple = (du.SCQueue.pop_first_item(), False)
-                        du.ROB_send_list.append(comm_tuple)
-                except AttributeError:
-                    pass
-                GlobalMutex.unlock()
+                with QMutexLocker(GlobalMutex):
+                    try:
+                        while (rob_id + du.ROB_comm_fr) >= du.SCQueue[0].id:
+                            comm_tuple = (du.SCQueue.pop_first_item(), False)
+                            du.ROB_send_list.append(comm_tuple)
+                    except AttributeError:
+                        pass
 
             else:
                 if len_rob == 0:
@@ -383,51 +391,54 @@ class RoboCommWorker(QObject):
         # send commands until send_list is empty
         while len(du.ROB_send_list) > 0:
             comm_tuple = du.ROB_send_list.pop(0)
-            Command = comm_tuple[0]
+            Comm = comm_tuple[0]
             direct_ctrl = comm_tuple[1]
 
             # check for type, ID overflow & live adjustments to tcp speed
-            if not isinstance(Command, du.QEntry):
-                err = ValueError(f"{Command} is not an instance of QEntry!")
-                self.sendElem.emit(Command, False, err, direct_ctrl)
+            if not isinstance(Comm, du.QEntry):
+                err = ValueError(f"{Comm} is not an instance of QEntry!")
+                self.sendElem.emit(Comm, False, err, direct_ctrl)
                 print(f"send error: {err}")
                 break
-            Command.Speed.ts = int(Command.Speed.ts * du.ROB_live_ad)
-            while Command.id > 3000:
-                Command.id -= 3000
+            # check for TCP speed overwrites
+            if du.ROB_speed_overwrite >= 0.0:
+                Comm.Speed.ts = du.ROB_speed_overwrite
+            else:
+                Comm.Speed.ts = int(Comm.Speed.ts * du.ROB_live_ad)
+            while Comm.id > du.DEF_ROB_BUFF_SIZE:
+                Comm.id -= du.DEF_ROB_BUFF_SIZE
 
             # if testrun, skip actually sending the message
             if testrun:
                 res, msg_len = True, 159
             else:
-                res, msg_len = du.ROBTcp.send(Command)
+                res, msg_len = du.ROBTcp.send(Comm)
 
             # see if sending was successful
             if res:
-                GlobalMutex.lock()
-                num_send += 1
-                du.ROBCommQueue.append(Command)
-                fu.add_to_comm_protocol(
-                    f"SEND:    ID: {Command.id}  MT: {Command.mt}  PT: {Command.pt} "
-                    f"\t|| COOR_1: {Command.Coor1}"
-                    f"\n\t\t\t|| COOR_2: {Command.Coor2}"
-                    f"\n\t\t\t|| SV:     {Command.Speed} \t|| SBT: {Command.sbt}   "
-                    f"SC: {Command.sc}   Z: {Command.z}"
-                    f"\n\t\t\t|| TOOL:   {Command.Tool}"
-                )
-                if direct_ctrl:
-                    du.SCQueue.increment()
-                GlobalMutex.unlock()
+                with QMutexLocker(GlobalMutex):
+                    num_send += 1
+                    du.ROBCommQueue.append(Comm)
+                    fu.add_to_comm_protocol(
+                        f"SEND:    ID: {Comm.id}  MT: {Comm.mt}  PT: {Comm.pt} "
+                        f"\t|| COOR_1: {Comm.Coor1}"
+                        f"\n\t\t\t|| COOR_2: {Comm.Coor2}"
+                        f"\n\t\t\t|| SV:     {Comm.Speed} \t|| SBT: {Comm.sbt}   "
+                        f"SC: {Comm.sc}   Z: {Comm.z}"
+                        f"\n\t\t\t|| TOOL:   {Comm.Tool}"
+                    )
+                    if direct_ctrl:
+                        du.SCQueue.increment()
 
-                self.logEntry.emit('ROBO', f"send: {Command}")
+                self.logEntry.emit('ROBO', f"send: {Comm}")
 
             else:
                 print(f" Message Error: {msg_len}")
-                self.sendElem.emit(Command, False, msg_len, direct_ctrl)
+                self.sendElem.emit(Comm, False, msg_len, direct_ctrl)
         
             # inform mainframe if command block was send successfully 
             if len(du.ROB_send_list) == 0:
-                self.sendElem.emit(Command, res, num_send, direct_ctrl)
+                self.sendElem.emit(Comm, res, num_send, direct_ctrl)
 
 
     def check_zero_dist(self) -> float | None:
@@ -437,11 +448,13 @@ class RoboCommWorker(QObject):
         """
 
         if len(du.ROBCommQueue) == 1:
+            CurrCommTarget = dcpy(du.ROBCommQueue[0].Coor1)
+            CurrCoor = dcpy(du.ROBTelem.Coor)
             return m.sqrt(
-                m.pow(du.ROBCommQueue[0].Coor1.x - du.ROBTelem.Coor.x, 2)
-                + m.pow(du.ROBCommQueue[0].Coor1.y - du.ROBTelem.Coor.y, 2)
-                + m.pow(du.ROBCommQueue[0].Coor1.z - du.ROBTelem.Coor.z, 2)
-                + m.pow(du.ROBCommQueue[0].Coor1.ext - du.ROBTelem.Coor.ext, 2)
+                m.pow(CurrCommTarget.x - CurrCoor.x, 2)
+                + m.pow(CurrCommTarget.y - CurrCoor.y, 2)
+                + m.pow(CurrCommTarget.z - CurrCoor.z, 2)
+                + m.pow(CurrCommTarget.ext - CurrCoor.ext, 2)
             )
         else:
             return None
@@ -500,9 +513,8 @@ class SensorCommWorker(QObject):
                         latest_data = data[len(data) - 1]
                         loc['err'] = False
 
-                        GlobalMutex.lock()
-                        du.STTDataBlock.store(latest_data, key, sub_key)
-                        GlobalMutex.unlock()
+                        with QMutexLocker(GlobalMutex):
+                            du.STTDataBlock.store(latest_data, key, sub_key)
 
                     elif data is not None:
                         # log recurring error from one location only once
@@ -531,7 +543,7 @@ class SensorCommWorker(QObject):
 
 class LoadFileWorker(QObject):
     """worker converts .gcode or .mod into QEntries, outsourced to worker as
-    these files can have more than 10000 lines"""
+    these files can have more than 50000 lines"""
 
     convFinished = pyqtSignal(int, int, int)
     convFailed = pyqtSignal(str)
@@ -624,7 +636,7 @@ class LoadFileWorker(QObject):
 
             # add a startvector with a speed of 1mm/s with pMode=start
             # (so X seconds of approach if length is X mm (lfw_pre_run_time))
-            StartVector = copy.deepcopy(self._CommList[0])
+            StartVector = dcpy(self._CommList[0])
             StartVector.id = start_id
             StartVector.Coor1.x += lfw_pre_run_time
             StartVector.Coor1.y += lfw_pre_run_time
@@ -650,12 +662,12 @@ class LoadFileWorker(QObject):
         """single line conversion from GCode"""
 
         # get text and position BEFORE PLANNED COMMAND EXECUTION
-        Speed = copy.deepcopy(du.PRINSpeed)
+        Speed = dcpy(du.PRINSpeed)
         try:
             if len(self._CommList) == 0:
-                Pos = copy.deepcopy(du.SCQueue.entry_before_id(id).Coor1)
+                Pos = dcpy(du.SCQueue.entry_before_id(id).Coor1)
             else:
-                Pos = copy.deepcopy(self._CommList.last_entry().Coor1)
+                Pos = dcpy(self._CommList.last_entry().Coor1)
         except AttributeError:
             Pos = du.DCCurrZero
 
@@ -695,7 +707,7 @@ class LoadFileWorker(QObject):
 
     #     try:
     #         um_dist = float(umd)
-    #     except Exception:
+    #     except:
     #         return f"UM-Mode failed reading {umd}"
 
     #     if um_dist < 0.0 or um_dist > 2000.0:
@@ -710,6 +722,67 @@ class LoadFileWorker(QObject):
     #         Entry.sbt = int(travel_time)
     #         Entry.Tool.time_time = int(travel_time)
     #     return None
+
+
+
+##########################     ROBO WORKER      ##############################
+
+class IPCamWorker(QObject):
+    """worker captures video streams from IP cams, displays them via signal"""
+
+    imageCaptured = pyqtSignal(int, QImage)
+    logEntry = pyqtSignal(str, str)
+
+    cam_stream = []
+
+    def run(self) -> None:
+        """create capture timer and fill active streams according to 
+        given URLs"""
+
+        for url in du.CAM_urls:
+            self.cam_stream.append(cv2.VideoCapture(url, cv2.CAP_FFMPEG))
+        
+        self.LoopTimer = QTimer()
+        self.LoopTimer.setInterval(100)
+        self.LoopTimer.timeout.connect(self.cam_cap)
+        self.LoopTimer.start()
+
+        self.logEntry.emit(
+            'THRT',
+            f"IPCam Thread running with {len(self.cam_stream)} streams."
+        )
+
+
+    def stop(self) -> None:
+        """stop loop"""
+
+        self.LoopTimer.stop()
+        self.LoopTimer.deleteLater()
+
+    
+    def cam_cap(self) -> None:
+        """capture an image from all streams"""
+
+        for cam_num, cam in enumerate(self.cam_stream):
+            if not isinstance(cam, cv2.VideoCapture):
+                continue
+            flag, frame = cam.read()
+            if flag:
+                # Following example from 
+                # https://github.com/god233012yamil/Streaming-IP-Cameras-Using-PyQt-and-OpenCV
+                # Get the frame height, width, channels, and bytes per line
+                height, width, channels = frame.shape
+                bytes_per_line = width * channels
+                # image from BGR (cv2 default color format) to RGB (Qt default color format)
+                cv_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                qt_image = QImage(
+                    cv_image.data,
+                    width,
+                    height,
+                    bytes_per_line,
+                    QImage.Format_RGB888
+                )
+                self.imageCaptured.emit(cam_num, qt_image)
 
 
 

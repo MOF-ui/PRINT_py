@@ -592,7 +592,7 @@ class MainframeWinTest(unittest.TestCase):
         global TestFrame
 
         TestHome = du.Coordinate(
-            x=1, y=2.2, z=3, rx=4, ry=5, rz=6, q=7, ext=8
+            x=1, y=2000, z=0, rx=4, ry=5, rz=6, q=0.5, ext=100
         )
         du.DCCurrZero = copy.deepcopy(TestHome)
         TestFrame.DC_drpd_moveType.setCurrentText('LINEAR')
@@ -756,8 +756,8 @@ class MainframeWinTest(unittest.TestCase):
             TestFrame.IO_disp_filename.text(), gcode_test_path.name
         )
         self.assertEqual(TestFrame.IO_disp_commNum.text(), '2')
-        self.assertEqual(TestFrame.IO_disp_estimLen.text(), '3.0')
-        self.assertEqual(TestFrame.IO_disp_estimVol.text(), '0.3')
+        self.assertEqual(TestFrame.IO_disp_estimLen.text(), '3.0 m')
+        self.assertEqual(TestFrame.IO_disp_estimVol.text(), '0.3 L')
 
         TestFrame.open_file(testrun=True, testpath=rapid_test_path)
         self.assertEqual(du.IO_curr_filepath, rapid_test_path)
@@ -765,8 +765,8 @@ class MainframeWinTest(unittest.TestCase):
             TestFrame.IO_disp_filename.text(), rapid_test_path.name
         )
         self.assertEqual(TestFrame.IO_disp_commNum.text(), '2')
-        self.assertEqual(TestFrame.IO_disp_estimLen.text(), '3.0')
-        self.assertEqual(TestFrame.IO_disp_estimVol.text(), '0.3')
+        self.assertEqual(TestFrame.IO_disp_estimLen.text(), '3.0 m')
+        self.assertEqual(TestFrame.IO_disp_estimVol.text(), '0.3 L')
 
         du.SC_vol_per_m = currSetting
 
@@ -827,13 +827,13 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.PUMP_num_setSpeed.setValue(5)
         du.ROBCommQueue.add(du.QEntry(Speed=du.SpeedVector(ts=123)))
 
-        TestFrame.pump_set_speed(type='1')
+        TestFrame.pump_set_speed(flag='1')
         self.assertEqual(du.PMP_speed, 11)
-        TestFrame.pump_set_speed(type='0')
+        TestFrame.pump_set_speed(flag='0')
         self.assertEqual(du.PMP_speed, 0)
-        TestFrame.pump_set_speed(type='-1')
+        TestFrame.pump_set_speed(flag='-1')
         self.assertEqual(du.PMP_speed, -1)
-        TestFrame.pump_set_speed(type='r')
+        TestFrame.pump_set_speed(flag='r')
         self.assertEqual(du.PMP_speed, 1)
         TestFrame.pump_set_speed()
         self.assertEqual(du.PMP_speed, 5)
@@ -946,18 +946,17 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.DC_sld_stepWidth.setValue(1)
         TestFrame.DC_drpd_moveType.setCurrentText('LINEAR')
 
+        du.ROBTelem.Coor = du.Coordinate(1, 2000, 0, 4, 5, 6, 0.5, 100)
+        TCoor = du.Coordinate(2, 2000, 0, 4, 5, 6, 0.5, 100)
         TestFrame.send_DC_command(axis='X', dir='+')
         command, dc_dummy = du.ROB_send_list[len(du.ROB_send_list) - 1]
-        self.assertEqual(
-            command,
-            du.QEntry(id=1, z=0, Coor1=du.Coordinate(x=1)),
-        )
+        self.assertEqual(command, du.QEntry(id=1, z=0, Coor1=TCoor))
 
         du.DC_rob_moving = False
         TestFrame.robo_send(command, True, 1, True)
         TestFrame.DC_sld_stepWidth.setValue(2)
         TestFrame.DC_drpd_moveType.setCurrentText('JOINT')
-        TCoor = du.Coordinate(y=-10)
+        TCoor = du.Coordinate(1, 1990, 0, 4, 5, 6, 0.5, 100)
         TestFrame.send_DC_command(axis='Y', dir='-')
         command, dc_dummy = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(command, du.QEntry(id=2, mt='J', z=0, Coor1=TCoor))
@@ -965,7 +964,7 @@ class MainframeWinTest(unittest.TestCase):
         du.DC_rob_moving = False
         TestFrame.robo_send(command, True, 1, True)
         TestFrame.DC_sld_stepWidth.setValue(3)
-        TCoor = du.Coordinate(z=100)
+        TCoor = du.Coordinate(1, 2000, 100, 4, 5, 6, 0.5, 100)
         TestFrame.send_DC_command(axis='Z', dir='+')
         command, dc_dummy = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(command, du.QEntry(id=3, mt='J', z=0, Coor1=TCoor))
@@ -988,6 +987,7 @@ class MainframeWinTest(unittest.TestCase):
 
         du.DC_rob_moving = False
         du.SC_curr_comm_id = 1
+        du.ROBTelem.Coor = du.Coordinate()
         du.ROB_send_list.clear()
 
 
@@ -1010,10 +1010,10 @@ class MainframeWinTest(unittest.TestCase):
     def test_send_gcode_command(self):
         global TestFrame
 
-        TestFrame.TERM_entry_gcodeInterp.setText('G1 Y2.2 TOOL')
-        du.ROBTelem.Coor = du.Coordinate(1, 1, 1, 1, 1, 1, 1, 1)
-        du.DCCurrZero = du.Coordinate(y=1)
-        TCoor = du.Coordinate(x=1, y=3.2, z=1, rx=1, ry=1, rz=1, q=1, ext=1)
+        TestFrame.TERM_entry_gcodeInterp.setText('G1 Y2.2 EXT100 TOOL')
+        du.ROBTelem.Coor = du.Coordinate(1, 1900, 1, 1, 1, 1, 1, 100)
+        du.DCCurrZero = du.Coordinate(y=2000, ext=100)
+        TCoor = du.Coordinate(x=1, y=2002.2, z=1, rx=1, ry=1, rz=1, q=1, ext=200)
         TestTool = du.ToolCommand(fib_deliv_steps=10, pnmtc_fiber_yn=True)
 
         TestFrame.send_gcode_command()
@@ -1023,11 +1023,11 @@ class MainframeWinTest(unittest.TestCase):
         du.DC_rob_moving = False
         TestFrame.robo_send(command, True, 1, True)
         TestFrame.TERM_entry_gcodeInterp.setText('G1 X1 Z3')
-        TCoor = du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
+        TCoor = du.Coordinate(1.1, 2002.2, 3.3, 4.4, 5.5, 6.6, 0.7, 108.8)
         du.ROBTelem.Coor = du.DCCurrZero = TCoor
 
         TestFrame.send_gcode_command()
-        TCoor = du.Coordinate(2.1, 2.2, 6.3, 4.4, 5.5, 6.6, 7.7, 8.8)
+        TCoor = du.Coordinate(2.1, 2002.2, 6.3, 4.4, 5.5, 6.6, 0.7, 108.8)
         command, dc_dummy = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(command, du.QEntry(id=2, Coor1=TCoor))
 
@@ -1042,29 +1042,30 @@ class MainframeWinTest(unittest.TestCase):
         self.maxDiff = 2000
         
         TestFrame.NC_float_x.setValue(1)
-        TestFrame.NC_float_y.setValue(2.2)
-        TestFrame.NC_float_z.setValue(3)
+        TestFrame.NC_float_y.setValue(2000)
+        TestFrame.NC_float_z.setValue(0)
         TestFrame.NC_float_xOrient.setValue(4)
         TestFrame.NC_float_yOrient.setValue(5)
         TestFrame.NC_float_zOrient.setValue(6)
-        TestFrame.NC_float_ext.setValue(7)
+        TestFrame.NC_float_ext.setValue(102)
         TestFrame.DC_drpd_moveType.setCurrentText('LINEAR')
 
         du.ROB_send_list.clear()
         du.SC_curr_comm_id = 1
+        du.ROBTelem.Coor = du.Coordinate(1, 1, 1, 0, 0, 0, 0, 100)
         TestFrame.send_NC_command([1, 2, 3])
         command, dc_dummy = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
             command,
-            du.QEntry(id=1, z=0, Coor1=du.Coordinate(x=1, y=2.2, z=3))
+            du.QEntry(id=1, z=0, Coor1=du.Coordinate(x=1, y=2000, z=0, ext=100))
         )
 
         du.DC_rob_moving = False
         TestFrame.robo_send(command, True, 1, True)
-        du.ROBTelem.Coor = du.Coordinate(1, 1, 1, 1, 1, 1, 0, 1)
+        du.ROBTelem.Coor = du.Coordinate(1, 2000, 1, 1, 1, 1, 0, 1)
         TestFrame.DC_drpd_moveType.setCurrentText('JOINT')
 
-        TCoor = du.Coordinate(x=1, y=1, z=1, rx=4, ry=5, rz=6, ext=7)
+        TCoor = du.Coordinate(x=1, y=2000, z=1, rx=4, ry=5, rz=6, ext=102)
         TestFrame.send_NC_command([4, 5, 6, 8])
         command, dc_dummy = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(command, du.QEntry(id=2, mt='J', z=0, Coor1=TCoor))
@@ -1079,10 +1080,10 @@ class MainframeWinTest(unittest.TestCase):
         global TestFrame
 
         TestFrame.TERM_entry_rapidInterp.setText(
-            f"MoveL [[1.0,2.0,3.0],[4.0,5.0,6.0,7.0]],[200,50,50,50],"
+            f"MoveL [[1.0,2000.0,3.0],[4.0,5.0,6.0,1.0]],[200,50,50,50],"
             f"z50,tool0  EXT600  TOOL"
         )
-        TCoor = du.Coordinate(x=1, y=2, z=3, rx=4, ry=5, rz=6, q=7, ext=600)
+        TCoor = du.Coordinate(x=1, y=2000, z=3, rx=4, ry=5, rz=6, q=1, ext=600)
         TestTool = du.ToolCommand(fib_deliv_steps=10, pnmtc_fiber_yn=True)
         TestFrame.send_rapid_command()
         command = du.ROB_send_list[len(du.ROB_send_list) - 1]
@@ -1114,7 +1115,7 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.ZERO_float_ry.setValue(5)
         TestFrame.ZERO_float_rz.setValue(6)
         TestFrame.ZERO_float_ext.setValue(7)
-        TestFrame.set_zero([1, 2, 3, 4, 5, 6, 8], from_sys_monitor=True)
+        TestFrame.set_zero([1, 2, 3, 4, 5, 6, 8], source='sys_monitor')
         self.assertEqual(du.DCCurrZero, du.Coordinate(1, 2, 3, 4, 5, 6, 7, 7))
 
         du.DCCurrZero = du.Coordinate()

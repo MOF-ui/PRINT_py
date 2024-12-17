@@ -11,9 +11,9 @@
 import re
 import os
 import sys
-import copy
 import math as m
 import requests
+from copy import deepcopy as dcpy
 
 from pathlib import Path
 from datetime import datetime
@@ -247,9 +247,9 @@ def gcode_to_qentry(
     """
 
     # handle mutuables here
-    pos = copy.deepcopy(mut_pos)
-    speed = copy.deepcopy(mut_speed)
-    zero = copy.deepcopy(du.DCCurrZero)
+    pos = dcpy(mut_pos)
+    speed = dcpy(mut_speed)
+    zero = dcpy(du.DCCurrZero)
 
     if not isinstance(pos, du.Coordinate):
         raise ValueError(f"{pos} is not an instance of Coordinate!")
@@ -450,23 +450,24 @@ def create_logfile() -> Path | None:
 
     try:
         desk = os.environ["USERPROFILE"]
-        logpath = desk / Path("Desktop/PRINT_py_log")
-        logpath.mkdir(parents=True, exist_ok=True)
+        log_path = desk / Path("Desktop/PRINT_py_log")
+        log_path.mkdir(parents=True, exist_ok=True)
+        du.LOG_safe_path = Path(log_path / Path("ZERO.zrf"))
 
         time = datetime.now().strftime("%Y-%m-%d_%H%M%S")
 
-        logpath = logpath / Path(f"{time}.txt")
+        log_path = log_path / Path(f"{time}.txt")
         text = f"{time}    [GNRL]:        program booting, starting GUI...\n"
 
-        logfile = open(logpath, "x")
+        logfile = open(log_path, "x")
         logfile.write(text)
         logfile.close()
 
-    except Exception as e:
-        print(f"Exception occured during log file creation: {e}")
+    except Exception as err:
+        print(f"Exception occured during log file creation: {err}")
         return None
 
-    return logpath
+    return log_path
 
 
 def add_to_comm_protocol(txt:str) -> None:
@@ -583,7 +584,7 @@ def sensor_req(
         datapoint = (float(data[0][1 :]), int(data[1][1 :])) #(val, uptime)
         try:
             val.append(datapoint)
-        except Exception:
+        except:
             break
 
         remain_str = remain_str[entry_pos+1 :]
