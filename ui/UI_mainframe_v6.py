@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\mainframe_v2.ui'
+# Form implementation generated from reading ui file '.\mainframe.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -15,7 +15,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
-        MainWindow.resize(1945, 1126)
+        MainWindow.resize(1945, 1095)
         MainWindow.setMinimumSize(QtCore.QSize(600, 400))
         MainWindow.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
@@ -550,7 +550,7 @@ class Ui_MainWindow(object):
         self.IO_chk_autoPCtrl.raise_()
         self.IO_chk_externalFllwBhvr.raise_()
         self.SGLC_frame = QtWidgets.QFrame(self.PRINT_tab)
-        self.SGLC_frame.setGeometry(QtCore.QRect(360, 20, 311, 911))
+        self.SGLC_frame.setGeometry(QtCore.QRect(360, 20, 291, 911))
         self.SGLC_frame.setMouseTracking(False)
         self.SGLC_frame.setStyleSheet("")
         self.SGLC_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -572,7 +572,7 @@ class Ui_MainWindow(object):
         self.SGLC_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.SGLC_0_frameLabel.setObjectName("SGLC_0_frameLabel")
         self.SGLC_lbl_gcodeSglComm = QtWidgets.QLabel(self.SGLC_frame)
-        self.SGLC_lbl_gcodeSglComm.setGeometry(QtCore.QRect(40, 240, 231, 31))
+        self.SGLC_lbl_gcodeSglComm.setGeometry(QtCore.QRect(30, 240, 231, 31))
         self.SGLC_lbl_gcodeSglComm.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -581,10 +581,10 @@ class Ui_MainWindow(object):
         )
         self.SGLC_lbl_gcodeSglComm.setObjectName("SGLC_lbl_gcodeSglComm")
         self.SGLC_btt_gcodeSglComm = QtWidgets.QPushButton(self.SGLC_frame)
-        self.SGLC_btt_gcodeSglComm.setGeometry(QtCore.QRect(40, 410, 231, 41))
+        self.SGLC_btt_gcodeSglComm.setGeometry(QtCore.QRect(30, 410, 231, 41))
         self.SGLC_btt_gcodeSglComm.setObjectName("SGLC_btt_gcodeSglComm")
         self.SGLC_btt_gcodeSglComm_addByID = QtWidgets.QPushButton(self.SGLC_frame)
-        self.SGLC_btt_gcodeSglComm_addByID.setGeometry(QtCore.QRect(230, 490, 41, 41))
+        self.SGLC_btt_gcodeSglComm_addByID.setGeometry(QtCore.QRect(220, 490, 41, 41))
         self.SGLC_btt_gcodeSglComm_addByID.setAutoFillBackground(False)
         self.SGLC_btt_gcodeSglComm_addByID.setStyleSheet(
             "image: url(:/images/right.png);"
@@ -594,7 +594,7 @@ class Ui_MainWindow(object):
             "SGLC_btt_gcodeSglComm_addByID"
         )
         self.SGLC_lbl_gcodeSglComm_addByID = QtWidgets.QLabel(self.SGLC_frame)
-        self.SGLC_lbl_gcodeSglComm_addByID.setGeometry(QtCore.QRect(40, 460, 171, 31))
+        self.SGLC_lbl_gcodeSglComm_addByID.setGeometry(QtCore.QRect(30, 460, 171, 31))
         self.SGLC_lbl_gcodeSglComm_addByID.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -608,7 +608,7 @@ class Ui_MainWindow(object):
             "SGLC_lbl_gcodeSglComm_addByID"
         )
         self.SGLC_btt_rapidSglComm_addByID = QtWidgets.QPushButton(self.SGLC_frame)
-        self.SGLC_btt_rapidSglComm_addByID.setGeometry(QtCore.QRect(230, 840, 41, 41))
+        self.SGLC_btt_rapidSglComm_addByID.setGeometry(QtCore.QRect(220, 840, 41, 41))
         self.SGLC_btt_rapidSglComm_addByID.setStyleSheet(
             "image: url(:/images/right.png);"
         )
@@ -617,10 +617,10 @@ class Ui_MainWindow(object):
             "SGLC_btt_rapidSglComm_addByID"
         )
         self.SGLC_btt_rapidSglComm = QtWidgets.QPushButton(self.SGLC_frame)
-        self.SGLC_btt_rapidSglComm.setGeometry(QtCore.QRect(40, 760, 231, 41))
+        self.SGLC_btt_rapidSglComm.setGeometry(QtCore.QRect(30, 760, 231, 41))
         self.SGLC_btt_rapidSglComm.setObjectName("SGLC_btt_rapidSglComm")
         self.SGLC_lbl_rapidSglComm = QtWidgets.QLabel(self.SGLC_frame)
-        self.SGLC_lbl_rapidSglComm.setGeometry(QtCore.QRect(40, 590, 231, 31))
+        self.SGLC_lbl_rapidSglComm.setGeometry(QtCore.QRect(30, 590, 231, 31))
         self.SGLC_lbl_rapidSglComm.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -629,7 +629,7 @@ class Ui_MainWindow(object):
         )
         self.SGLC_lbl_rapidSglComm.setObjectName("SGLC_lbl_rapidSglComm")
         self.SGLC_num_rapidSglComm_addByID = QtWidgets.QSpinBox(self.SGLC_frame)
-        self.SGLC_num_rapidSglComm_addByID.setGeometry(QtCore.QRect(40, 840, 181, 41))
+        self.SGLC_num_rapidSglComm_addByID.setGeometry(QtCore.QRect(30, 840, 181, 41))
         self.SGLC_num_rapidSglComm_addByID.setStyleSheet("font-size: 14pt")
         self.SGLC_num_rapidSglComm_addByID.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -639,7 +639,7 @@ class Ui_MainWindow(object):
             "SGLC_num_rapidSglComm_addByID"
         )
         self.SGLC_lbl_rapidSglComm_addByID = QtWidgets.QLabel(self.SGLC_frame)
-        self.SGLC_lbl_rapidSglComm_addByID.setGeometry(QtCore.QRect(40, 810, 161, 31))
+        self.SGLC_lbl_rapidSglComm_addByID.setGeometry(QtCore.QRect(30, 810, 161, 31))
         self.SGLC_lbl_rapidSglComm_addByID.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -653,18 +653,18 @@ class Ui_MainWindow(object):
             "SGLC_lbl_rapidSglComm_addByID"
         )
         self.SGLC_entry_gcodeSglComm = QtWidgets.QTextEdit(self.SGLC_frame)
-        self.SGLC_entry_gcodeSglComm.setGeometry(QtCore.QRect(40, 270, 231, 131))
+        self.SGLC_entry_gcodeSglComm.setGeometry(QtCore.QRect(30, 270, 231, 131))
         self.SGLC_entry_gcodeSglComm.setStyleSheet("border: 0px;")
         self.SGLC_entry_gcodeSglComm.setAcceptRichText(False)
         self.SGLC_entry_gcodeSglComm.setObjectName("SGLC_entry_gcodeSglComm")
         self.SGLC_entry_rapidSglComm = QtWidgets.QTextEdit(self.SGLC_frame)
-        self.SGLC_entry_rapidSglComm.setGeometry(QtCore.QRect(40, 620, 231, 131))
+        self.SGLC_entry_rapidSglComm.setGeometry(QtCore.QRect(30, 620, 231, 131))
         self.SGLC_entry_rapidSglComm.setStyleSheet("border: 0px;")
         self.SGLC_entry_rapidSglComm.setOverwriteMode(False)
         self.SGLC_entry_rapidSglComm.setAcceptRichText(False)
         self.SGLC_entry_rapidSglComm.setObjectName("SGLC_entry_rapidSglComm")
         self.SGLC_num_gcodeSglComm_addByID = QtWidgets.QSpinBox(self.SGLC_frame)
-        self.SGLC_num_gcodeSglComm_addByID.setGeometry(QtCore.QRect(40, 490, 181, 41))
+        self.SGLC_num_gcodeSglComm_addByID.setGeometry(QtCore.QRect(30, 490, 181, 41))
         self.SGLC_num_gcodeSglComm_addByID.setStyleSheet("font-size: 14pt")
         self.SGLC_num_gcodeSglComm_addByID.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -675,7 +675,7 @@ class Ui_MainWindow(object):
             "SGLC_num_gcodeSglComm_addByID"
         )
         self.SGLC_btt_sendFirstQComm = QtWidgets.QPushButton(self.SGLC_frame)
-        self.SGLC_btt_sendFirstQComm.setGeometry(QtCore.QRect(40, 130, 231, 51))
+        self.SGLC_btt_sendFirstQComm.setGeometry(QtCore.QRect(30, 130, 231, 51))
         self.SGLC_btt_sendFirstQComm.setStyleSheet("padding-bottom: 3px")
         self.SGLC_btt_sendFirstQComm.setObjectName("SGLC_btt_sendFirstQComm")
         self.SGLC_lbl_rapidSglComm_addByID.raise_()
@@ -693,7 +693,7 @@ class Ui_MainWindow(object):
         self.SGLC_num_gcodeSglComm_addByID.raise_()
         self.SGLC_btt_sendFirstQComm.raise_()
         self.SCRTL_frame = QtWidgets.QFrame(self.PRINT_tab)
-        self.SCRTL_frame.setGeometry(QtCore.QRect(690, 20, 1191, 911))
+        self.SCRTL_frame.setGeometry(QtCore.QRect(670, 20, 1241, 911))
         self.SCRTL_frame.setStyleSheet("")
         self.SCRTL_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.SCRTL_frame.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -715,16 +715,16 @@ class Ui_MainWindow(object):
         self.SCRTL_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.SCRTL_0_frameLabel.setObjectName("SCRTL_0_frameLabel")
         self.SCTRL_btt_startQProcessing = QtWidgets.QPushButton(self.SCRTL_frame)
-        self.SCTRL_btt_startQProcessing.setGeometry(QtCore.QRect(60, 130, 171, 51))
+        self.SCTRL_btt_startQProcessing.setGeometry(QtCore.QRect(50, 130, 251, 51))
         self.SCTRL_btt_startQProcessing.setStyleSheet("padding-bottom: 3px")
         self.SCTRL_btt_startQProcessing.setObjectName("SCTRL_btt_startQProcessing")
         self.SCTRL_btt_holdQProcessing = QtWidgets.QPushButton(self.SCRTL_frame)
-        self.SCTRL_btt_holdQProcessing.setGeometry(QtCore.QRect(60, 190, 171, 51))
+        self.SCTRL_btt_holdQProcessing.setGeometry(QtCore.QRect(50, 190, 251, 51))
         self.SCTRL_btt_holdQProcessing.setStyleSheet("padding-bottom: 3px")
         self.SCTRL_btt_holdQProcessing.setCheckable(False)
         self.SCTRL_btt_holdQProcessing.setObjectName("SCTRL_btt_holdQProcessing")
         self.SCTRL_lbl_robCommID = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_robCommID.setGeometry(QtCore.QRect(56, 290, 91, 31))
+        self.SCTRL_lbl_robCommID.setGeometry(QtCore.QRect(95, 283, 91, 31))
         self.SCTRL_lbl_robCommID.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -733,13 +733,13 @@ class Ui_MainWindow(object):
         )
         self.SCTRL_lbl_robCommID.setObjectName("SCTRL_lbl_robCommID")
         self.SCTRL_disp_robCommID = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_disp_robCommID.setGeometry(QtCore.QRect(150, 280, 81, 41))
+        self.SCTRL_disp_robCommID.setGeometry(QtCore.QRect(189, 273, 111, 41))
         self.SCTRL_disp_robCommID.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.SCTRL_disp_robCommID.setObjectName("SCTRL_disp_robCommID")
         self.SCTRL_lbl_progCommID = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_progCommID.setGeometry(QtCore.QRect(26, 340, 121, 31))
+        self.SCTRL_lbl_progCommID.setGeometry(QtCore.QRect(65, 333, 121, 31))
         self.SCTRL_lbl_progCommID.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -748,19 +748,19 @@ class Ui_MainWindow(object):
         )
         self.SCTRL_lbl_progCommID.setObjectName("SCTRL_lbl_progCommID")
         self.SCTRL_disp_progCommID = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_disp_progCommID.setGeometry(QtCore.QRect(150, 330, 81, 41))
+        self.SCTRL_disp_progCommID.setGeometry(QtCore.QRect(189, 323, 111, 41))
         self.SCTRL_disp_progCommID.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.SCTRL_disp_progCommID.setObjectName("SCTRL_disp_progCommID")
         self.SCTRL_btt_clrQ = QtWidgets.QPushButton(self.SCRTL_frame)
-        self.SCTRL_btt_clrQ.setGeometry(QtCore.QRect(60, 840, 171, 41))
+        self.SCTRL_btt_clrQ.setGeometry(QtCore.QRect(40, 840, 261, 41))
         self.SCTRL_btt_clrQ.setObjectName("SCTRL_btt_clrQ")
         self.SCTRL_entry_clrByID = QtWidgets.QLineEdit(self.SCRTL_frame)
-        self.SCTRL_entry_clrByID.setGeometry(QtCore.QRect(60, 790, 121, 41))
+        self.SCTRL_entry_clrByID.setGeometry(QtCore.QRect(140, 790, 111, 41))
         self.SCTRL_entry_clrByID.setObjectName("SCTRL_entry_clrByID")
         self.SCTRL_lbl_clrByID = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_clrByID.setGeometry(QtCore.QRect(60, 760, 131, 31))
+        self.SCTRL_lbl_clrByID.setGeometry(QtCore.QRect(37, 799, 101, 31))
         self.SCTRL_lbl_clrByID.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -772,26 +772,26 @@ class Ui_MainWindow(object):
         )
         self.SCTRL_lbl_clrByID.setObjectName("SCTRL_lbl_clrByID")
         self.SCTRL_btt_clrByID = QtWidgets.QPushButton(self.SCRTL_frame)
-        self.SCTRL_btt_clrByID.setGeometry(QtCore.QRect(190, 790, 41, 41))
+        self.SCTRL_btt_clrByID.setGeometry(QtCore.QRect(260, 790, 41, 41))
         self.SCTRL_btt_clrByID.setStyleSheet(
             "image: url(:/images/delete.png);\n" "background-color: #ffba00;"
         )
         self.SCTRL_btt_clrByID.setText("")
         self.SCTRL_btt_clrByID.setObjectName("SCTRL_btt_clrByID")
         self.SCTRL_btt_addSIB2_atFront = QtWidgets.QPushButton(self.SCRTL_frame)
-        self.SCTRL_btt_addSIB2_atFront.setGeometry(QtCore.QRect(60, 660, 101, 31))
+        self.SCTRL_btt_addSIB2_atFront.setGeometry(QtCore.QRect(190, 680, 51, 31))
         self.SCTRL_btt_addSIB2_atFront.setObjectName("SCTRL_btt_addSIB2_atFront")
         self.SCTRL_btt_addSIB2_atEnd = QtWidgets.QPushButton(self.SCRTL_frame)
-        self.SCTRL_btt_addSIB2_atEnd.setGeometry(QtCore.QRect(170, 660, 61, 31))
+        self.SCTRL_btt_addSIB2_atEnd.setGeometry(QtCore.QRect(190, 720, 51, 31))
         self.SCTRL_btt_addSIB2_atEnd.setObjectName("SCTRL_btt_addSIB2_atEnd")
         self.SCTRL_btt_addSIB1_atEnd = QtWidgets.QPushButton(self.SCRTL_frame)
-        self.SCTRL_btt_addSIB1_atEnd.setGeometry(QtCore.QRect(170, 620, 61, 31))
+        self.SCTRL_btt_addSIB1_atEnd.setGeometry(QtCore.QRect(130, 720, 51, 31))
         self.SCTRL_btt_addSIB1_atEnd.setObjectName("SCTRL_btt_addSIB1_atEnd")
         self.SCTRL_btt_addSIB1_atFront = QtWidgets.QPushButton(self.SCRTL_frame)
-        self.SCTRL_btt_addSIB1_atFront.setGeometry(QtCore.QRect(60, 620, 101, 31))
+        self.SCTRL_btt_addSIB1_atFront.setGeometry(QtCore.QRect(130, 680, 51, 31))
         self.SCTRL_btt_addSIB1_atFront.setObjectName("SCTRL_btt_addSIB1_atFront")
         self.SCRTL_lbl_queue = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCRTL_lbl_queue.setGeometry(QtCore.QRect(310, 110, 231, 31))
+        self.SCRTL_lbl_queue.setGeometry(QtCore.QRect(362, 110, 231, 31))
         self.SCRTL_lbl_queue.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -800,18 +800,18 @@ class Ui_MainWindow(object):
         )
         self.SCRTL_lbl_queue.setObjectName("SCRTL_lbl_queue")
         self.SCTRL_btt_forcedStop = QtWidgets.QPushButton(self.SCRTL_frame)
-        self.SCTRL_btt_forcedStop.setGeometry(QtCore.QRect(680, 60, 131, 41))
+        self.SCTRL_btt_forcedStop.setGeometry(QtCore.QRect(780, 60, 131, 41))
         self.SCTRL_btt_forcedStop.setStyleSheet("background-color: rgb(255, 70, 73);")
         self.SCTRL_btt_forcedStop.setObjectName("SCTRL_btt_forcedStop")
         self.SCTRL_indi_qProcessing = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_indi_qProcessing.setGeometry(QtCore.QRect(610, 60, 41, 41))
+        self.SCTRL_indi_qProcessing.setGeometry(QtCore.QRect(710, 60, 41, 41))
         self.SCTRL_indi_qProcessing.setStyleSheet(
             "border-radius: 20px;\n" "background-color: #4c4a48;"
         )
         self.SCTRL_indi_qProcessing.setText("")
         self.SCTRL_indi_qProcessing.setObjectName("SCTRL_indi_qProcessing")
         self.SCTRL_lbl_qProcessing = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_qProcessing.setGeometry(QtCore.QRect(470, 54, 131, 51))
+        self.SCTRL_lbl_qProcessing.setGeometry(QtCore.QRect(570, 54, 131, 51))
         self.SCTRL_lbl_qProcessing.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -823,19 +823,19 @@ class Ui_MainWindow(object):
         )
         self.SCTRL_lbl_qProcessing.setObjectName("SCTRL_lbl_qProcessing")
         self.SCTRL_disp_buffComms = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_disp_buffComms.setGeometry(QtCore.QRect(830, 60, 131, 41))
+        self.SCTRL_disp_buffComms.setGeometry(QtCore.QRect(930, 60, 131, 41))
         self.SCTRL_disp_buffComms.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.SCTRL_disp_buffComms.setObjectName("SCTRL_disp_buffComms")
         self.SCTRL_disp_elemInQ = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_disp_elemInQ.setGeometry(QtCore.QRect(980, 60, 131, 41))
+        self.SCTRL_disp_elemInQ.setGeometry(QtCore.QRect(1080, 60, 131, 41))
         self.SCTRL_disp_elemInQ.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.SCTRL_disp_elemInQ.setObjectName("SCTRL_disp_elemInQ")
         self.SCTRL_lbl_buffComms = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_buffComms.setGeometry(QtCore.QRect(830, 20, 151, 41))
+        self.SCTRL_lbl_buffComms.setGeometry(QtCore.QRect(920, 20, 151, 41))
         self.SCTRL_lbl_buffComms.setStyleSheet(
             "border: 0px;\n"
             "font-size: 11pt;\n"
@@ -848,7 +848,7 @@ class Ui_MainWindow(object):
         )
         self.SCTRL_lbl_buffComms.setObjectName("SCTRL_lbl_buffComms")
         self.SCTRL_lbl_elemInQ = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_elemInQ.setGeometry(QtCore.QRect(980, 20, 141, 41))
+        self.SCTRL_lbl_elemInQ.setGeometry(QtCore.QRect(1070, 20, 141, 41))
         self.SCTRL_lbl_elemInQ.setStyleSheet(
             "border: 0px;\n"
             "font-size: 11pt;\n"
@@ -861,12 +861,16 @@ class Ui_MainWindow(object):
         )
         self.SCTRL_lbl_elemInQ.setObjectName("SCTRL_lbl_elemInQ")
         self.SCTRL_arr_queue = QtWidgets.QListWidget(self.SCRTL_frame)
-        self.SCTRL_arr_queue.setGeometry(QtCore.QRect(310, 140, 801, 741))
+        self.SCTRL_arr_queue.setGeometry(QtCore.QRect(360, 140, 851, 741))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(12)
+        self.SCTRL_arr_queue.setFont(font)
         self.SCTRL_arr_queue.setObjectName("SCTRL_arr_queue")
         item = QtWidgets.QListWidgetItem()
         self.SCTRL_arr_queue.addItem(item)
         self.SCTRL_lbl_liveAd_robot = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_liveAd_robot.setGeometry(QtCore.QRect(16, 424, 111, 31))
+        self.SCTRL_lbl_liveAd_robot.setGeometry(QtCore.QRect(20, 504, 141, 31))
         self.SCTRL_lbl_liveAd_robot.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -878,7 +882,7 @@ class Ui_MainWindow(object):
         )
         self.SCTRL_lbl_liveAd_robot.setObjectName("SCTRL_lbl_liveAd_robot")
         self.SCTRL_lbl_liveAd_pump1 = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_liveAd_pump1.setGeometry(QtCore.QRect(36, 475, 91, 31))
+        self.SCTRL_lbl_liveAd_pump1.setGeometry(QtCore.QRect(40, 555, 121, 31))
         self.SCTRL_lbl_liveAd_pump1.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -890,7 +894,7 @@ class Ui_MainWindow(object):
         )
         self.SCTRL_lbl_liveAd_pump1.setObjectName("SCTRL_lbl_liveAd_pump1")
         self.SCTRL_num_liveAd_robot = QtWidgets.QSpinBox(self.SCRTL_frame)
-        self.SCTRL_num_liveAd_robot.setGeometry(QtCore.QRect(130, 420, 101, 41))
+        self.SCTRL_num_liveAd_robot.setGeometry(QtCore.QRect(180, 500, 121, 41))
         self.SCTRL_num_liveAd_robot.setStyleSheet("font-size: 14pt;")
         self.SCTRL_num_liveAd_robot.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -899,7 +903,7 @@ class Ui_MainWindow(object):
         self.SCTRL_num_liveAd_robot.setProperty("value", 100)
         self.SCTRL_num_liveAd_robot.setObjectName("SCTRL_num_liveAd_robot")
         self.SCTRL_num_liveAd_pump1 = QtWidgets.QSpinBox(self.SCRTL_frame)
-        self.SCTRL_num_liveAd_pump1.setGeometry(QtCore.QRect(130, 470, 101, 41))
+        self.SCTRL_num_liveAd_pump1.setGeometry(QtCore.QRect(180, 550, 121, 41))
         self.SCTRL_num_liveAd_pump1.setStyleSheet("font-size: 14pt;\n" "")
         self.SCTRL_num_liveAd_pump1.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -908,20 +912,20 @@ class Ui_MainWindow(object):
         self.SCTRL_num_liveAd_pump1.setProperty("value", 100)
         self.SCTRL_num_liveAd_pump1.setObjectName("SCTRL_num_liveAd_pump1")
         self.SCTRL_btt_addSIB3_atEnd = QtWidgets.QPushButton(self.SCRTL_frame)
-        self.SCTRL_btt_addSIB3_atEnd.setGeometry(QtCore.QRect(170, 700, 61, 31))
+        self.SCTRL_btt_addSIB3_atEnd.setGeometry(QtCore.QRect(250, 720, 51, 31))
         self.SCTRL_btt_addSIB3_atEnd.setObjectName("SCTRL_btt_addSIB3_atEnd")
         self.SCTRL_btt_addSIB3_atFront = QtWidgets.QPushButton(self.SCRTL_frame)
-        self.SCTRL_btt_addSIB3_atFront.setGeometry(QtCore.QRect(60, 700, 101, 31))
+        self.SCTRL_btt_addSIB3_atFront.setGeometry(QtCore.QRect(250, 680, 51, 31))
         self.SCTRL_btt_addSIB3_atFront.setObjectName("SCTRL_btt_addSIB3_atFront")
         self.SCTRL_chk_autoScroll = QtWidgets.QCheckBox(self.SCRTL_frame)
-        self.SCTRL_chk_autoScroll.setGeometry(QtCore.QRect(950, 115, 161, 20))
+        self.SCTRL_chk_autoScroll.setGeometry(QtCore.QRect(1050, 115, 161, 20))
         self.SCTRL_chk_autoScroll.setStyleSheet(
             "background-color: #5d707f;\n" "font-size: 12pt;\n" "color: #f2f4f3;\n" ""
         )
         self.SCTRL_chk_autoScroll.setChecked(False)
         self.SCTRL_chk_autoScroll.setObjectName("SCTRL_chk_autoScroll")
         self.SCTRL_lbl_liveAd_pump2 = QtWidgets.QLabel(self.SCRTL_frame)
-        self.SCTRL_lbl_liveAd_pump2.setGeometry(QtCore.QRect(36, 525, 91, 31))
+        self.SCTRL_lbl_liveAd_pump2.setGeometry(QtCore.QRect(40, 605, 121, 31))
         self.SCTRL_lbl_liveAd_pump2.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -933,7 +937,7 @@ class Ui_MainWindow(object):
         )
         self.SCTRL_lbl_liveAd_pump2.setObjectName("SCTRL_lbl_liveAd_pump2")
         self.SCTRL_num_liveAd_pump2 = QtWidgets.QSpinBox(self.SCRTL_frame)
-        self.SCTRL_num_liveAd_pump2.setGeometry(QtCore.QRect(130, 520, 101, 41))
+        self.SCTRL_num_liveAd_pump2.setGeometry(QtCore.QRect(180, 600, 121, 41))
         self.SCTRL_num_liveAd_pump2.setStyleSheet("font-size: 14pt;\n" "")
         self.SCTRL_num_liveAd_pump2.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -941,6 +945,79 @@ class Ui_MainWindow(object):
         self.SCTRL_num_liveAd_pump2.setMaximum(300)
         self.SCTRL_num_liveAd_pump2.setProperty("value", 100)
         self.SCTRL_num_liveAd_pump2.setObjectName("SCTRL_num_liveAd_pump2")
+        self.SCTRL_num_mmsOverwrite = QtWidgets.QSpinBox(self.SCRTL_frame)
+        self.SCTRL_num_mmsOverwrite.setGeometry(QtCore.QRect(50, 419, 151, 41))
+        self.SCTRL_num_mmsOverwrite.setStyleSheet("font-size: 14pt;")
+        self.SCTRL_num_mmsOverwrite.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.SCTRL_num_mmsOverwrite.setMaximum(300)
+        self.SCTRL_num_mmsOverwrite.setProperty("value", 100)
+        self.SCTRL_num_mmsOverwrite.setObjectName("SCTRL_num_mmsOverwrite")
+        self.SCTRL_btt_mmsOverwrite = QtWidgets.QPushButton(self.SCRTL_frame)
+        self.SCTRL_btt_mmsOverwrite.setGeometry(QtCore.QRect(210, 420, 91, 41))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(12)
+        self.SCTRL_btt_mmsOverwrite.setFont(font)
+        self.SCTRL_btt_mmsOverwrite.setStyleSheet(
+            "QPushButton {\n"
+            "    background-color: #40a6a8;\n"
+            "    font-size: 12pt;\n"
+            "}\n"
+            "\n"
+            "QPushButton:checked {\n"
+            "    background-color: #61fcff;\n"
+            "}\n"
+            "\n"
+            "QPushButton:hover {\n"
+            "    border: 2px solid #abfbff;\n"
+            "}\n"
+            "\n"
+            "QPushButton:checked:hover {\n"
+            "    border: 2px solid #40a6a8;\n"
+            "}"
+        )
+        self.SCTRL_btt_mmsOverwrite.setCheckable(True)
+        self.SCTRL_btt_mmsOverwrite.setChecked(False)
+        self.SCTRL_btt_mmsOverwrite.setObjectName("SCTRL_btt_mmsOverwrite")
+        self.SCTRL_lbl_addSIB = QtWidgets.QLabel(self.SCRTL_frame)
+        self.SCTRL_lbl_addSIB.setGeometry(QtCore.QRect(25, 680, 101, 31))
+        self.SCTRL_lbl_addSIB.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.SCTRL_lbl_addSIB.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
+        self.SCTRL_lbl_addSIB.setObjectName("SCTRL_lbl_addSIB")
+        self.SCTRL_lbl_addSIBAtEnd = QtWidgets.QLabel(self.SCRTL_frame)
+        self.SCTRL_lbl_addSIBAtEnd.setGeometry(QtCore.QRect(24, 720, 101, 31))
+        self.SCTRL_lbl_addSIBAtEnd.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.SCTRL_lbl_addSIBAtEnd.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
+        self.SCTRL_lbl_addSIBAtEnd.setObjectName("SCTRL_lbl_addSIBAtEnd")
+        self.SCTRL_lbl_addSIBAtEnd_2 = QtWidgets.QLabel(self.SCRTL_frame)
+        self.SCTRL_lbl_addSIBAtEnd_2.setGeometry(QtCore.QRect(40, 387, 181, 31))
+        self.SCTRL_lbl_addSIBAtEnd_2.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.SCTRL_lbl_addSIBAtEnd_2.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
+        self.SCTRL_lbl_addSIBAtEnd_2.setObjectName("SCTRL_lbl_addSIBAtEnd_2")
+        self.SCTRL_lbl_addSIBAtEnd_2.raise_()
         self.SCTRL_lbl_elemInQ.raise_()
         self.SCTRL_lbl_buffComms.raise_()
         self.SCRTL_lbl_queue.raise_()
@@ -974,6 +1051,10 @@ class Ui_MainWindow(object):
         self.SCTRL_chk_autoScroll.raise_()
         self.SCTRL_lbl_liveAd_pump2.raise_()
         self.SCTRL_num_liveAd_pump2.raise_()
+        self.SCTRL_num_mmsOverwrite.raise_()
+        self.SCTRL_btt_mmsOverwrite.raise_()
+        self.SCTRL_lbl_addSIB.raise_()
+        self.SCTRL_lbl_addSIBAtEnd.raise_()
         self.SGLC_frame.raise_()
         self.SCRTL_frame.raise_()
         self.IO_frame.raise_()
@@ -4197,13 +4278,13 @@ class Ui_MainWindow(object):
         self.ZERO_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.ZERO_0_frameLabel.setObjectName("ZERO_0_frameLabel")
         self.ZERO_disp_z = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_z.setGeometry(QtCore.QRect(140, 260, 161, 41))
+        self.ZERO_disp_z.setGeometry(QtCore.QRect(140, 240, 161, 41))
         self.ZERO_disp_z.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.ZERO_disp_z.setObjectName("ZERO_disp_z")
         self.ZERO_lbl_y_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_y_disp.setGeometry(QtCore.QRect(80, 190, 51, 41))
+        self.ZERO_lbl_y_disp.setGeometry(QtCore.QRect(80, 180, 51, 41))
         self.ZERO_lbl_y_disp.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -4212,7 +4293,7 @@ class Ui_MainWindow(object):
         )
         self.ZERO_lbl_y_disp.setObjectName("ZERO_lbl_y_disp")
         self.ZERO_lbl_yOrient_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_yOrient_disp.setGeometry(QtCore.QRect(80, 470, 51, 41))
+        self.ZERO_lbl_yOrient_disp.setGeometry(QtCore.QRect(80, 420, 51, 41))
         self.ZERO_lbl_yOrient_disp.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -4221,13 +4302,13 @@ class Ui_MainWindow(object):
         )
         self.ZERO_lbl_yOrient_disp.setObjectName("ZERO_lbl_yOrient_disp")
         self.ZERO_disp_zOrient = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_zOrient.setGeometry(QtCore.QRect(140, 540, 161, 41))
+        self.ZERO_disp_zOrient.setGeometry(QtCore.QRect(140, 480, 161, 41))
         self.ZERO_disp_zOrient.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.ZERO_disp_zOrient.setObjectName("ZERO_disp_zOrient")
         self.ZERO_lbl_zOrient_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_zOrient_disp.setGeometry(QtCore.QRect(80, 540, 51, 41))
+        self.ZERO_lbl_zOrient_disp.setGeometry(QtCore.QRect(80, 480, 51, 41))
         self.ZERO_lbl_zOrient_disp.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -4236,7 +4317,7 @@ class Ui_MainWindow(object):
         )
         self.ZERO_lbl_zOrient_disp.setObjectName("ZERO_lbl_zOrient_disp")
         self.ZERO_lbl_xOrient_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_xOrient_disp.setGeometry(QtCore.QRect(70, 400, 61, 41))
+        self.ZERO_lbl_xOrient_disp.setGeometry(QtCore.QRect(70, 360, 61, 41))
         self.ZERO_lbl_xOrient_disp.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -4245,7 +4326,7 @@ class Ui_MainWindow(object):
         )
         self.ZERO_lbl_xOrient_disp.setObjectName("ZERO_lbl_xOrient_disp")
         self.ZERO_lbl_ext_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_ext_disp.setGeometry(QtCore.QRect(80, 330, 51, 41))
+        self.ZERO_lbl_ext_disp.setGeometry(QtCore.QRect(80, 300, 51, 41))
         self.ZERO_lbl_ext_disp.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -4254,13 +4335,13 @@ class Ui_MainWindow(object):
         )
         self.ZERO_lbl_ext_disp.setObjectName("ZERO_lbl_ext_disp")
         self.ZERO_disp_yOrient = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_yOrient.setGeometry(QtCore.QRect(140, 470, 161, 41))
+        self.ZERO_disp_yOrient.setGeometry(QtCore.QRect(140, 420, 161, 41))
         self.ZERO_disp_yOrient.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.ZERO_disp_yOrient.setObjectName("ZERO_disp_yOrient")
         self.ZERO_disp_ext = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_ext.setGeometry(QtCore.QRect(140, 330, 161, 41))
+        self.ZERO_disp_ext.setGeometry(QtCore.QRect(140, 300, 161, 41))
         self.ZERO_disp_ext.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
@@ -4275,13 +4356,13 @@ class Ui_MainWindow(object):
         )
         self.ZERO_lbl_x_disp.setObjectName("ZERO_lbl_x_disp")
         self.ZERO_disp_xOrient = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_xOrient.setGeometry(QtCore.QRect(140, 400, 161, 41))
+        self.ZERO_disp_xOrient.setGeometry(QtCore.QRect(140, 360, 161, 41))
         self.ZERO_disp_xOrient.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.ZERO_disp_xOrient.setObjectName("ZERO_disp_xOrient")
         self.ZERO_lbl_z_disp = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_lbl_z_disp.setGeometry(QtCore.QRect(90, 260, 41, 41))
+        self.ZERO_lbl_z_disp.setGeometry(QtCore.QRect(90, 240, 41, 41))
         self.ZERO_lbl_z_disp.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -4296,7 +4377,7 @@ class Ui_MainWindow(object):
         )
         self.ZERO_disp_x.setObjectName("ZERO_disp_x")
         self.ZERO_disp_y = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_disp_y.setGeometry(QtCore.QRect(140, 190, 161, 41))
+        self.ZERO_disp_y.setGeometry(QtCore.QRect(140, 180, 161, 41))
         self.ZERO_disp_y.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
@@ -4312,7 +4393,7 @@ class Ui_MainWindow(object):
         self.ZERO_float_x.setSingleStep(10.0)
         self.ZERO_float_x.setObjectName("ZERO_float_x")
         self.ZERO_float_y = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
-        self.ZERO_float_y.setGeometry(QtCore.QRect(380, 190, 171, 41))
+        self.ZERO_float_y.setGeometry(QtCore.QRect(380, 180, 171, 41))
         self.ZERO_float_y.setStyleSheet("font-size: 14pt;")
         self.ZERO_float_y.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -4322,7 +4403,7 @@ class Ui_MainWindow(object):
         self.ZERO_float_y.setSingleStep(10.0)
         self.ZERO_float_y.setObjectName("ZERO_float_y")
         self.ZERO_float_z = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
-        self.ZERO_float_z.setGeometry(QtCore.QRect(380, 260, 171, 41))
+        self.ZERO_float_z.setGeometry(QtCore.QRect(380, 240, 171, 41))
         self.ZERO_float_z.setStyleSheet("font-size: 14pt;")
         self.ZERO_float_z.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -4332,7 +4413,7 @@ class Ui_MainWindow(object):
         self.ZERO_float_z.setSingleStep(10.0)
         self.ZERO_float_z.setObjectName("ZERO_float_z")
         self.ZERO_float_ext = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
-        self.ZERO_float_ext.setGeometry(QtCore.QRect(380, 330, 171, 41))
+        self.ZERO_float_ext.setGeometry(QtCore.QRect(380, 300, 171, 41))
         self.ZERO_float_ext.setStyleSheet("font-size: 14pt;")
         self.ZERO_float_ext.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -4342,7 +4423,7 @@ class Ui_MainWindow(object):
         self.ZERO_float_ext.setSingleStep(10.0)
         self.ZERO_float_ext.setObjectName("ZERO_float_ext")
         self.ZERO_float_rx = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
-        self.ZERO_float_rx.setGeometry(QtCore.QRect(380, 400, 171, 41))
+        self.ZERO_float_rx.setGeometry(QtCore.QRect(380, 360, 171, 41))
         self.ZERO_float_rx.setStyleSheet("font-size: 14pt;")
         self.ZERO_float_rx.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -4352,7 +4433,7 @@ class Ui_MainWindow(object):
         self.ZERO_float_rx.setSingleStep(10.0)
         self.ZERO_float_rx.setObjectName("ZERO_float_rx")
         self.ZERO_float_ry = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
-        self.ZERO_float_ry.setGeometry(QtCore.QRect(380, 470, 171, 41))
+        self.ZERO_float_ry.setGeometry(QtCore.QRect(380, 420, 171, 41))
         self.ZERO_float_ry.setStyleSheet("font-size: 14pt;")
         self.ZERO_float_ry.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -4362,7 +4443,7 @@ class Ui_MainWindow(object):
         self.ZERO_float_ry.setSingleStep(10.0)
         self.ZERO_float_ry.setObjectName("ZERO_float_ry")
         self.ZERO_float_rz = QtWidgets.QDoubleSpinBox(self.ZERO_frame)
-        self.ZERO_float_rz.setGeometry(QtCore.QRect(380, 540, 171, 41))
+        self.ZERO_float_rz.setGeometry(QtCore.QRect(380, 480, 171, 41))
         self.ZERO_float_rz.setStyleSheet("font-size: 14pt;")
         self.ZERO_float_rz.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -4372,8 +4453,71 @@ class Ui_MainWindow(object):
         self.ZERO_float_rz.setSingleStep(10.0)
         self.ZERO_float_rz.setObjectName("ZERO_float_rz")
         self.ZERO_btt_newZero = QtWidgets.QPushButton(self.ZERO_frame)
-        self.ZERO_btt_newZero.setGeometry(QtCore.QRect(380, 57, 181, 41))
+        self.ZERO_btt_newZero.setGeometry(QtCore.QRect(380, 57, 171, 41))
         self.ZERO_btt_newZero.setObjectName("ZERO_btt_newZero")
+        self.ZERO_btt_loadZeroFile = QtWidgets.QPushButton(self.ZERO_frame)
+        self.ZERO_btt_loadZeroFile.setGeometry(QtCore.QRect(140, 550, 161, 41))
+        self.ZERO_btt_loadZeroFile.setObjectName("ZERO_btt_loadZeroFile")
+        self.ZERO_0_notice = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_0_notice.setGeometry(QtCore.QRect(320, 550, 241, 41))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(11)
+        self.ZERO_0_notice.setFont(font)
+        self.ZERO_0_notice.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ZERO_0_notice.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
+        self.ZERO_0_notice.setObjectName("ZERO_0_notice")
+        self.ZERO_0_notice_2 = QtWidgets.QLabel(self.ZERO_frame)
+        self.ZERO_0_notice_2.setGeometry(QtCore.QRect(140, 80, 151, 41))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(11)
+        self.ZERO_0_notice_2.setFont(font)
+        self.ZERO_0_notice_2.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.ZERO_0_notice_2.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
+        self.ZERO_0_notice_2.setObjectName("ZERO_0_notice_2")
+        self.ZERO_0_notice_2.raise_()
+        self.ZERO_0_frameLabel.raise_()
+        self.ZERO_disp_z.raise_()
+        self.ZERO_lbl_y_disp.raise_()
+        self.ZERO_lbl_yOrient_disp.raise_()
+        self.ZERO_disp_zOrient.raise_()
+        self.ZERO_lbl_zOrient_disp.raise_()
+        self.ZERO_lbl_xOrient_disp.raise_()
+        self.ZERO_lbl_ext_disp.raise_()
+        self.ZERO_disp_yOrient.raise_()
+        self.ZERO_disp_ext.raise_()
+        self.ZERO_lbl_x_disp.raise_()
+        self.ZERO_disp_xOrient.raise_()
+        self.ZERO_lbl_z_disp.raise_()
+        self.ZERO_disp_x.raise_()
+        self.ZERO_disp_y.raise_()
+        self.ZERO_float_x.raise_()
+        self.ZERO_float_y.raise_()
+        self.ZERO_float_z.raise_()
+        self.ZERO_float_ext.raise_()
+        self.ZERO_float_rx.raise_()
+        self.ZERO_float_ry.raise_()
+        self.ZERO_float_rz.raise_()
+        self.ZERO_btt_newZero.raise_()
+        self.ZERO_btt_loadZeroFile.raise_()
+        self.ZERO_0_notice.raise_()
         self.TRANS_frame = QtWidgets.QFrame(self.MONITOR_tab)
         self.TRANS_frame.setGeometry(QtCore.QRect(1260, 680, 631, 251))
         self.TRANS_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -4687,14 +4831,12 @@ class Ui_MainWindow(object):
         self.IO_disp_estimLen.setText(_translate("MainWindow", "0.0"))
         self.IO_disp_estimVol.setText(_translate("MainWindow", "0.0"))
         self.IO_lbl_commNum.setText(
-            _translate("MainWindow", "number of \n" "commands found:")
+            _translate("MainWindow", "number of \n" "commands:")
         )
         self.IO_lbl_estimLen.setText(
-            _translate("MainWindow", "estimated printing  \n" "length [m]:")
+            _translate("MainWindow", "estimated  \n" "length:")
         )
-        self.IO_lbl_estimVol.setText(
-            _translate("MainWindow", "estimated printing\n" "volume [L]:")
-        )
+        self.IO_lbl_estimVol.setText(_translate("MainWindow", "estimated \n" "volume:"))
         self.IO_btt_xyzextZero.setText(_translate("MainWindow", "XYZ && EXT 🡆 ZERO"))
         self.IO_btt_orientZero.setText(_translate("MainWindow", "ORIENTATION 🡆 ZERO"))
         self.IO_lbl_addByID.setText(_translate("MainWindow", "add at\n" "specific ID:"))
@@ -4729,7 +4871,7 @@ class Ui_MainWindow(object):
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
                 "</style></head><body style=\" font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">G1 X2.3 Y4.56 Z7.8 F900</p></body></html>',
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">G1 X-400 Y0 Z500 EXT0 F3500</p></body></html>',
             )
         )
         self.SGLC_entry_rapidSglComm.setHtml(
@@ -4739,7 +4881,7 @@ class Ui_MainWindow(object):
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
                 "</style></head><body style=\" font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveL [[1.2,3.45,6.7],[0.0,0.0,0.0,0.0]],[80,90,80,90],z100,tool0 EXT600</p></body></html>',
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveL [[0.0,2000.0,300.0],[0.00344,0.72283,0.69100,0.00380]],[200,100,100,100],z10,tool0 EXT100</p></body></html>',
             )
         )
         self.SGLC_btt_sendFirstQComm.setText(
@@ -4758,10 +4900,10 @@ class Ui_MainWindow(object):
         self.SCTRL_disp_progCommID.setText(_translate("MainWindow", "0"))
         self.SCTRL_btt_clrQ.setText(_translate("MainWindow", "❌ clear queue"))
         self.SCTRL_lbl_clrByID.setText(_translate("MainWindow", "clear by ID:"))
-        self.SCTRL_btt_addSIB2_atFront.setText(_translate("MainWindow", "add SIB2"))
-        self.SCTRL_btt_addSIB2_atEnd.setText(_translate("MainWindow", "at end"))
-        self.SCTRL_btt_addSIB1_atEnd.setText(_translate("MainWindow", "at end"))
-        self.SCTRL_btt_addSIB1_atFront.setText(_translate("MainWindow", "add SIB1"))
+        self.SCTRL_btt_addSIB2_atFront.setText(_translate("MainWindow", "2"))
+        self.SCTRL_btt_addSIB2_atEnd.setText(_translate("MainWindow", "2"))
+        self.SCTRL_btt_addSIB1_atEnd.setText(_translate("MainWindow", "1"))
+        self.SCTRL_btt_addSIB1_atFront.setText(_translate("MainWindow", "1"))
         self.SCRTL_lbl_queue.setText(_translate("MainWindow", "QUEUE:"))
         self.SCTRL_btt_forcedStop.setText(_translate("MainWindow", "&FORCED STOP"))
         self.SCTRL_lbl_qProcessing.setText(
@@ -4776,17 +4918,24 @@ class Ui_MainWindow(object):
         item = self.SCTRL_arr_queue.item(0)
         item.setText(_translate("MainWindow", "Queue is empty!"))
         self.SCTRL_arr_queue.setSortingEnabled(__sortingEnabled)
-        self.SCTRL_lbl_liveAd_robot.setText(_translate("MainWindow", "LA: robot"))
-        self.SCTRL_lbl_liveAd_pump1.setText(_translate("MainWindow", "LA: P1"))
+        self.SCTRL_lbl_liveAd_robot.setText(_translate("MainWindow", "LA: ROBOT"))
+        self.SCTRL_lbl_liveAd_pump1.setText(_translate("MainWindow", "LA: PUMP 1"))
         self.SCTRL_num_liveAd_robot.setSuffix(_translate("MainWindow", "%"))
         self.SCTRL_num_liveAd_pump1.setSuffix(_translate("MainWindow", "%"))
-        self.SCTRL_btt_addSIB3_atEnd.setText(_translate("MainWindow", "at end"))
-        self.SCTRL_btt_addSIB3_atFront.setText(_translate("MainWindow", "add SIB3"))
+        self.SCTRL_btt_addSIB3_atEnd.setText(_translate("MainWindow", "3"))
+        self.SCTRL_btt_addSIB3_atFront.setText(_translate("MainWindow", "3"))
         self.SCTRL_chk_autoScroll.setText(
             _translate("MainWindow", "enable auto scroll")
         )
-        self.SCTRL_lbl_liveAd_pump2.setText(_translate("MainWindow", "LA: P2"))
+        self.SCTRL_lbl_liveAd_pump2.setText(_translate("MainWindow", "LA: PUMP 2"))
         self.SCTRL_num_liveAd_pump2.setSuffix(_translate("MainWindow", "%"))
+        self.SCTRL_num_mmsOverwrite.setSuffix(_translate("MainWindow", " mm/s"))
+        self.SCTRL_btt_mmsOverwrite.setText(_translate("MainWindow", "overwrite"))
+        self.SCTRL_lbl_addSIB.setText(_translate("MainWindow", "add SIB:"))
+        self.SCTRL_lbl_addSIBAtEnd.setText(_translate("MainWindow", "at end:"))
+        self.SCTRL_lbl_addSIBAtEnd_2.setText(
+            _translate("MainWindow", "TCP speed overwrite")
+        )
         self.tab.setTabText(
             self.tab.indexOf(self.PRINT_tab),
             _translate("MainWindow", "     PRINTING     "),
@@ -5117,8 +5266,8 @@ class Ui_MainWindow(object):
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
                 "</style></head><body style=\" font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1400.0,1500.0,1900.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT1900</p>\n'
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1400.0,1500.0,1600.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT1900</p></body></html>',
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1400.0,1800.0,500.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[200,100,200,200],z50,tool0 EXT1200</p>\n'
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1400.0,1800.0,100.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[200,100,200,200],z0,tool0 EXT1200</p></body></html>',
             )
         )
         self.SIB_lbl_sib2.setText(
@@ -5131,8 +5280,8 @@ class Ui_MainWindow(object):
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
                 "</style></head><body style=\" font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[-340.0,2060.0,1400.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z50,tool0 EXT200</p>\n'
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[-340.0,2060.0,800.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[100,50,50,50],z0,tool0 EXT200</p></body></html>',
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[-340.0,2060.0,1400.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[300,100,200,200],z100,tool0 EXT200</p>\n'
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[-340.0,2060.0,800.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[300,100,200,200],z0,tool0 EXT200</p></body></html>',
             )
         )
         self.SIB_entry_sib3.setHtml(
@@ -5142,7 +5291,7 @@ class Ui_MainWindow(object):
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
                 "</style></head><body style=\" font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1153.4,3945.6,1297.05],[0.70620,0.02032,0.70771,0.00352],[,,,,,]],[100,50,50,50],z0,tool0 EXT1900</p></body></html>',
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">MoveJ [[1153.4,3945.6,1297.05],[0.70620,0.02032,0.70771,0.00352],[,,,,,]],[100,50,50,50],z0,tool0 EXT0</p></body></html>',
             )
         )
         self.SIB_lbl_sib3.setText(
@@ -5253,6 +5402,15 @@ class Ui_MainWindow(object):
         self.ZERO_disp_x.setText(_translate("MainWindow", "0.0"))
         self.ZERO_disp_y.setText(_translate("MainWindow", "0.0"))
         self.ZERO_btt_newZero.setText(_translate("MainWindow", "SET NEW ZERO"))
+        self.ZERO_btt_loadZeroFile.setText(_translate("MainWindow", "LOAD FROM FILE"))
+        self.ZERO_0_notice.setText(
+            _translate(
+                "MainWindow",
+                "overwrites positions immediatly,\n"
+                "check loaded values before continuing!",
+            )
+        )
+        self.ZERO_0_notice_2.setText(_translate("MainWindow", "currently active:"))
         self.TRANS_0_frameLabel.setText(_translate("MainWindow", "CURRENT TRANSITION"))
         self.TRANS_disp_xStart.setText(_translate("MainWindow", "0.0"))
         self.TRANS_lbl_x.setText(_translate("MainWindow", "X :"))

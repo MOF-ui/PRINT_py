@@ -11,8 +11,8 @@
 # python standard libraries
 import os
 import sys
-import copy
 from datetime import datetime
+from copy import deepcopy as dcpy
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -23,7 +23,7 @@ sys.path.append(parent_dir)
 # PyQt stuff
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, QThread
-from PyQt5.QtCore import QObject, QTimer, QMutex, pyqtSignal
+from PyQt5.QtCore import QObject, QTimer, QMutex, QMutexLocker, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
 
@@ -33,6 +33,7 @@ from ui.UI_mainframe_v6 import Ui_MainWindow
 
 # import my own libs
 from libs.win_daq import daq_window
+from libs.win_cam_cap import cam_cap_window
 from libs.win_dialogs import strd_dialog
 import libs.data_utilities as du
 import libs.func_utilities as fu
@@ -56,9 +57,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     _LastP1Telem = None
     _LastP2Telem = None
 
-    _RoboCommWorker = None
-    _PumpCommWorker = None
+    _IPCamWorker = None
     _LoadFileWorker = None
+    _PumpCommWorker = None
+    _RoboCommWorker = None
     _SensorArrWorker = None
 
     _RobRecvWd = None
@@ -84,9 +86,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         )
 
         # INIT THREADS
-        self._RoboCommThread = QThread()
+        self._IPCamThread = QThread()
         self._LoadFileThread = QThread()
         self._PumpCommThread = QThread()
+        self._RoboCommThread = QThread()
         self._SensorArrThread = QThread()
 
         # INIT WATCHDOGS
@@ -118,12 +121,15 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self._logpath = lpath
             self.log_entry('GNRL', 'main GUI running.')
 
-        # DAQ SETUP
+        # SIDE WINDOW SETUP
         self.Daq = daq_window()
-        self.Daq.logEntry.connect(self.log_entry)
-        if not testrun:
-            self.Daq.show()
-        self.log_entry('GNRL', 'DAQ GUI running.')
+        self.CamCap = cam_cap_window()
+        for side_win in [self.Daq, self.CamCap]:
+            side_win.logEntry.connect(self.log_entry)
+            if not testrun:
+                side_win.show()
+        self.log_entry('GNRL', 'side windows running.')
+
     
 
     def group_elems(self) -> None:
@@ -250,45 +256,61 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             text = f"{time}    [{source}]:        {text}\n"
 
         try:
-            logfile = open(self._logpath, 'a')
-        except FileExistsError:
-            pass
+            with open(self._logpath, 'a') as log_file:
+                log_file.write(text)
+            self.SET_disp_logEntry.setText(text)
+        except:
+            self.SET_disp_logEntry.setText('LOG FILE ERROR!')
 
-        self.SET_disp_logEntry.setText(text)
-        logfile.write(text)
-        logfile.close()
 
 
     ##########################################################################
     #                                SETTINGS                                #
     ##########################################################################
 
-    def mutex_setattr(self, obj, attr, val) -> None:
+    def mutex_setattr(self, flag:str) -> None:
         """reduce the Mutex lock/unlock game to a single line,
         but makes refactoring a little more tedious
         """
 
-        GlobalMutex.lock()
-        setattr(obj, attr, val)
-        GlobalMutex.unlock()
+        with QMutexLocker(GlobalMutex):
+            match flag:
+                case 'robot_live_ad':
+                    new_val = self.SCTRL_num_liveAd_robot.value() / 100.0
+                    du.ROB_live_ad = new_val
+                case 'robot_comm_fr':
+                    du.ROB_comm_fr = self.TCP_num_commForerun.value()
+                case 'mixer_act_w_pump':
+                    new_val = not self.MIX_btt_actWithPump.isChecked()
+                    du.MIX_act_with_pump = new_val
+                case 'pmp_out_ratio':
+                    new_val = 1 - (self.PUMP_sld_outputRatio.value() / 100.0)
+                    du.PMP_output_ratio = new_val
+                case 'mms_overwrite':
+                    if self.SCTRL_btt_mmsOverwrite.isChecked():
+                        new_val = self.SCTRL_num_mmsOverwrite.value()
+                    else:
+                        new_val = -1
+                    du.ROB_speed_overwrite = new_val
+                case _:
+                    raise KeyError(f"'{flag}' is not a defined flag")
 
 
     def apply_settings(self) -> None:
         """load default settings to settings display"""
 
-        GlobalMutex.lock()
-        du.SC_vol_per_m = self.SET_float_volPerMM.value()
-        du.IO_fr_to_ts = self.SET_float_frToMms.value()
-        du.IO_zone = self.SET_num_zone.value()
-        du.DCSpeed.ts = self.SET_num_transSpeed_dc.value()
-        du.DCSpeed.ors = self.SET_num_orientSpeed_dc.value()
-        du.DCSpeed.acr = self.SET_num_accelRamp_dc.value()
-        du.DCSpeed.dcr = self.SET_num_decelRamp_dc.value()
-        du.PRINSpeed.ts = self.SET_num_transSpeed_print.value()
-        du.PRINSpeed.ors = self.SET_num_orientSpeed_print.value()
-        du.PRINSpeed.acr = self.SET_num_accelRamp_print.value()
-        du.PRINSpeed.dcr = self.SET_num_decelRamp_print.value()
-        GlobalMutex.unlock()
+        with QMutexLocker(GlobalMutex):
+            du.SC_vol_per_m = self.SET_float_volPerMM.value()
+            du.IO_fr_to_ts = self.SET_float_frToMms.value()
+            du.IO_zone = self.SET_num_zone.value()
+            du.DCSpeed.ts = self.SET_num_transSpeed_dc.value()
+            du.DCSpeed.ors = self.SET_num_orientSpeed_dc.value()
+            du.DCSpeed.acr = self.SET_num_accelRamp_dc.value()
+            du.DCSpeed.dcr = self.SET_num_decelRamp_dc.value()
+            du.PRINSpeed.ts = self.SET_num_transSpeed_print.value()
+            du.PRINSpeed.ors = self.SET_num_orientSpeed_print.value()
+            du.PRINSpeed.acr = self.SET_num_accelRamp_print.value()
+            du.PRINSpeed.dcr = self.SET_num_decelRamp_print.value()
 
         self.log_entry(
             'SETS',
@@ -304,15 +326,14 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     def apply_TE_settings(self) -> None:
         """load default settings to settings display"""
 
-        GlobalMutex.lock()
-        du.SC_ext_fllw_bhvr = (
-            self.SET_TE_num_fllwBhvrInterv.value(),
-            self.SET_TE_num_fllwBhvrSkip.value(),
-        )
-        du.PMP_retract_speed = self.SET_TE_num_retractSpeed.value()
-        du.PMP1_liter_per_s = self.SET_TE_float_p1VolFlow.value()
-        du.PMP2_liter_per_s = self.SET_TE_float_p2VolFlow.value()
-        GlobalMutex.unlock()
+        with QMutexLocker(GlobalMutex):
+            du.SC_ext_fllw_bhvr = (
+                self.SET_TE_num_fllwBhvrInterv.value(),
+                self.SET_TE_num_fllwBhvrSkip.value(),
+            )
+            du.PMP_retract_speed = self.SET_TE_num_retractSpeed.value()
+            du.PMP1_liter_per_s = self.SET_TE_float_p1VolFlow.value()
+            du.PMP2_liter_per_s = self.SET_TE_float_p2VolFlow.value()
 
         self.log_entry(
             'SETS',
@@ -408,10 +429,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             write_buffer = command.print_short()
             du.SC_curr_comm_id += num_send
 
-            if du.SC_curr_comm_id > 3000:
-                GlobalMutex.lock()
-                du.SC_curr_comm_id -= 3000
-                GlobalMutex.unlock()
+            if du.SC_curr_comm_id > du.DEF_ROB_BUFF_SIZE:
+                with QMutexLocker(GlobalMutex):
+                    du.SC_curr_comm_id -= du.DEF_ROB_BUFF_SIZE
 
             log_txt = 'DC' if dc else 'SC'
             log_txt = f"{num_send} {log_txt} command(s) send"
@@ -438,8 +458,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         # set the fist given position to zero as this is usually the standard
         # position for Rob2, take current ID
         if self._first_pos:
-            du.ROBMovStartP = copy.deepcopy(du.ROBTelem.Coor)
-            du.ROBMovEndP = copy.deepcopy(du.ROBTelem.Coor)
+            du.ROBMovStartP = dcpy(du.ROBTelem.Coor)
+            du.ROBMovEndP = dcpy(du.ROBTelem.Coor)
             self.set_zero([1, 2, 3, 4, 5, 6, 8])
             self._first_pos = False
 
@@ -505,11 +525,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             curr_total, p1_ratio = fu.calc_pump_ratio(
                 du.PMP1_speed, du.PMP2_speed
             )
-
-            GlobalMutex.lock()
-            du.PMP_speed = curr_total
-            du.PMP_output_ratio = p1_ratio
-            GlobalMutex.unlock()
+            with QMutexLocker(GlobalMutex):
+                du.PMP_speed = curr_total
+                du.PMP_output_ratio = p1_ratio
 
         else:
             curr_total = new_speed
@@ -762,15 +780,14 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         if du.DC_rob_moving:
             return
         
-        GlobalMutex.lock()
-        if incr:
-            du.SC_curr_comm_id += 1
-            du.SCQueue.increment()
-        else:
-            id_dist = du.ROBTelem.id - 1 - du.SC_curr_comm_id
-            du.SC_curr_comm_id = du.ROBTelem.id - 1
-            du.SCQueue.increment(id_dist)
-        GlobalMutex.unlock()
+        with QMutexLocker(GlobalMutex):
+            if incr:
+                du.SC_curr_comm_id += 1
+                du.SCQueue.increment()
+            else:
+                id_dist = du.ROBTelem.id - 1 - du.SC_curr_comm_id
+                du.SC_curr_comm_id = du.ROBTelem.id - 1
+                du.SCQueue.increment(id_dist)
 
         self.label_update_on_receive(
             data_string=self.TCP_ROB_disp_readBuffer.text()
@@ -784,10 +801,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         """
 
         # set parameters
-        GlobalMutex.lock()
-        du.SC_q_processing = True
-        du.SC_q_prep_end = False
-        GlobalMutex.unlock()
+        with QMutexLocker(GlobalMutex):
+            du.SC_q_processing = True
+            du.SC_q_prep_end = False
         self.log_entry("ComQ", "queue processing started")
 
         # update GUI
@@ -811,11 +827,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             du.SC_q_prep_end = True
 
         else:
-            GlobalMutex.lock()
-            du.PMP_speed = 0
-            du.SC_q_prep_end = False
-            du.SC_q_processing = False
-            GlobalMutex.unlock()
+            with QMutexLocker(GlobalMutex):
+                du.PMP_speed = 0
+                du.SC_q_prep_end = False
+                du.SC_q_processing = False
             self.log_entry("ComQ", "queue processing stopped")
 
             self.label_update_on_queue_change()
@@ -834,12 +849,11 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     def clr_queue(self, partial=False) -> None:
         """delete specific or all items from queue"""
 
-        GlobalMutex.lock()
-        if partial:
-            du.SCQueue.clear(all=False, id=self.SCTRL_entry_clrByID.text())
-        else:
-            du.SCQueue.clear(all=True)
-        GlobalMutex.unlock()
+        with QMutexLocker(GlobalMutex):
+            if partial:
+                du.SCQueue.clear(all=False, id=self.SCTRL_entry_clrByID.text())
+            else:
+                du.SCQueue.clear(all=True)
 
         if not partial:
             self.log_entry("ComQ", "queue emptied by user")
@@ -873,31 +887,30 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     def switch_rob_moving(self, end=False) -> None:
         """change UTIL.DC_robMoving"""
 
-        GlobalMutex.lock()
-        if end:
-            du.DC_rob_moving = False
-            button_toggle = True
-            self.DC_indi_robotMoving.setStyleSheet(
-                "border-radius: 25px; background-color: #4c4a48;"
-            )
-            self.ADC_indi_robotMoving.setStyleSheet(
-                "border-radius: 20px; background-color: #4c4a48;"
-            )
-        else:
-            du.DC_rob_moving = True
-            button_toggle = False
-            self.DC_indi_robotMoving.setStyleSheet(
-                "border-radius: 25px; background-color: #00aaff;"
-            )
-            self.ADC_indi_robotMoving.setStyleSheet(
-                "border-radius: 20px; background-color: #00aaff;"
-            )
+        with QMutexLocker(GlobalMutex):
+            if end:
+                du.DC_rob_moving = False
+                button_toggle = True
+                self.DC_indi_robotMoving.setStyleSheet(
+                    "border-radius: 25px; background-color: #4c4a48;"
+                )
+                self.ADC_indi_robotMoving.setStyleSheet(
+                    "border-radius: 20px; background-color: #4c4a48;"
+                )
+            else:
+                du.DC_rob_moving = True
+                button_toggle = False
+                self.DC_indi_robotMoving.setStyleSheet(
+                    "border-radius: 25px; background-color: #00aaff;"
+                )
+                self.ADC_indi_robotMoving.setStyleSheet(
+                    "border-radius: 20px; background-color: #00aaff;"
+                )
 
-        for widget in self.ADC_group: widget.setEnabled(button_toggle)
-        for widget in self.DC_group: widget.setEnabled(button_toggle)
-        for widget in self.NC_group: widget.setEnabled(button_toggle)
-        for widget in self.TERM_group: widget.setEnabled(button_toggle)
-        GlobalMutex.unlock()
+            for widget in self.ADC_group: widget.setEnabled(button_toggle)
+            for widget in self.DC_group: widget.setEnabled(button_toggle)
+            for widget in self.NC_group: widget.setEnabled(button_toggle)
+            for widget in self.TERM_group: widget.setEnabled(button_toggle)
 
 
     ##########################################################################
@@ -905,14 +918,14 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     ##########################################################################
 
 
-    def set_zero(self, axis:list, from_sys_monitor=False) -> None:
+    def set_zero(self, axis:list, source='') -> None:
         """overwrite DC_curr_zero, uses deepcopy to avoid large mutual
         exclusion blocks
         """
 
-        NewZero = copy.deepcopy(du.DCCurrZero)
-        if from_sys_monitor:
-            CurrPos = du.Coordinate(
+        NewZero = dcpy(du.DCCurrZero)
+        if source == 'sys_monitor':
+            ZeroOverwrite = du.Coordinate(
                 x=self.ZERO_float_x.value(),
                 y=self.ZERO_float_y.value(),
                 z=self.ZERO_float_z.value(),
@@ -921,31 +934,43 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                 rz=self.ZERO_float_rz.value(),
                 ext=self.ZERO_float_ext.value(),
             )
+        elif source == 'file':
+            try:
+                with open(du.LOG_safe_path, 'r') as save_file:
+                    zero_vals = save_file.read().split('_')
+                    ZeroOverwrite = du.Coordinate(zero_vals)
+            except Exception as e:
+                self.log_entry(
+                    'ZERO',
+                    f"failed to load ZERO data from {du.LOG_safe_path} due to {e}!"
+                )
+                return
         else:
-            CurrPos = copy.deepcopy(du.ROBTelem.Coor)
+            ZeroOverwrite = dcpy(du.ROBTelem.Coor)
 
         if axis:
             # 7 is a placeholder for Q, which can not be set by hand
             if 1 in axis:
-                NewZero.x = CurrPos.x
+                NewZero.x = ZeroOverwrite.x
             if 2 in axis:
-                NewZero.y = CurrPos.y
+                NewZero.y = ZeroOverwrite.y
             if 3 in axis:
-                NewZero.z = CurrPos.z
+                NewZero.z = ZeroOverwrite.z
             if 4 in axis:
-                NewZero.rx = CurrPos.rx
+                NewZero.rx = ZeroOverwrite.rx
             if 5 in axis:
-                NewZero.ry = CurrPos.ry
+                NewZero.ry = ZeroOverwrite.ry
             if 6 in axis:
-                NewZero.rz = CurrPos.rz
+                NewZero.rz = ZeroOverwrite.rz
             if 8 in axis:
-                NewZero.ext = CurrPos.ext
+                NewZero.ext = ZeroOverwrite.ext
 
-            self.mutex_setattr(du, 'DCCurrZero', NewZero)
+            with QMutexLocker(GlobalMutex):
+                du.DCCurrZero = NewZero
 
         self.label_update_on_new_zero()
         self.log_entry(
-            "ZERO",
+            'ZERO',
             f"current zero position updated: ({du.DCCurrZero})"
         )
 

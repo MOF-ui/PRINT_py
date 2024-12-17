@@ -55,7 +55,7 @@ class MtecMod:
             try:
                 if self.frequency is None:
                     return False
-            except Exception:
+            except:
                 return False
 
             return True

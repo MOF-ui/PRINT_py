@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1958</width>
+    <height>1080</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>400</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <family>Bahnschrift</family>
+    <pointsize>12</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background: #4c4a48;</string>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonIconOnly</enum>
+  </property>
+  <property name="animated">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="mainframe">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="font">
+    <font>
+     <family>Bahnschrift</family>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">/* leave here to be overwritten by anything more specific */
+
+QWidget {
+	font-family: &quot;Bahnschrift&quot;;
+}
+
+
+
+/* alphabetical from here */
+
+QCheckBox::indicator {
+	top: 2 px;
+    width: 13px;
+    height: 13px;
+    background-color: #f2f4f3;
+    border-radius: 2px;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #ffba00;
+    image: url(:/images/down.png);
+}
+
+
+
+
+QComboBox {
+    border-radius: 5px;
+    padding-left: 10px;
+    min-width: 6em;
+	background: #F2F4F3;
+	font-family: &quot;Bahnschrift&quot;;
+}
+
+QComboBox:on { /* shift the text when the popup opens */
+	border: 2px sold #F2F4F3;
+}
+
+QComboBox::drop-down {
+	width: 25px;
+	background-color: #FFBA00;
+}
+
+QComboBox::down-arrow {
+	border-image: url(:/images/down.png);
+}
+
+QComboBox::drop-down::hover {
+	background-color: #FFC300;
+}
+
+QComboBox::drop-down::pressed {
+	background-color: #88AB75;
+}
+
+QComboBox QAbstractItemView {
+    selection-background-color: #FFBA00;
+}
+
+
+
+
+QListView {
+    padding: 2px;
+	background: #F2F4F3;
+	border-radius: 5px;
+}
+
+
+
+
+QLabel, QLineEdit {
+	border: 2px solid #F2F4F3;
+	border-radius: 5px;
+	font-size: 14pt;
+	padding: 2px;
+	padding-left: 5px;
+	background-color: #F2F4F3;
+}
+
+
+
+
+QTextEdit, QListWidget {
+	border: 0px;
+	border-radius: 5px;
+	font-size: 12pt;
+	padding: 2px;
+	padding-left: 5px;
+	background-color: #F2F4F3;
+}
+
+
+
+QPushButton {
+	background-color: #FFBA00;
+	border-radius: 5px;
+	font-size: 14pt;
+}
+
+QPushButton:hover {
+	background-color: #FFC300;
+}
+
+QPushButton:pressed {
+	background-color: #ab7b00;
+}
+
+
+
+QSlider {
+	background: #5d707f;
+}
+
+QSlider::handle:horizontal, QSlider::handle:vertical {
+	background-color: #FFBA00;
+}
+
+
+
+
+QSpinBox, QDoubleSpinBox {
+	border: 2px solid #F2F4F3;
+	border-radius: 5px;
+    border-width: 3px;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	font-size: 12pt;
+	padding: 2px;
+	padding-left: 5px;
+	padding-right: 5px;
+	background-color: #F2F4F3;
+}
+
+QSpinBox::up-button, QDoubleSpinBox::up-button { 
+	subcontrol-origin: padding;
+	subcontrol-position: top right; /* position at the top right corner */
+	width: 30 px;
+}
+
+QSpinBox::down-button, QDoubleSpinBox::down-button { 
+	subcontrol-origin: padding;
+	subcontrol-position: bottom right; /* position at the top right corner */
+	width: 30 px;
+	top: 1px;
+}
+
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+	image: url(:/images/up.png);
+}
+
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+	image: url(:/images/down.png);;
+}
+
+
+
+
+QScrollBar:vertical {  
+	border: None;
+    background:#f2f4f3;
+    width: 10px;
+}
+
+QScrollBar::handle:vertical {
+	background:#ffba00;
+	border-radius: 4px;
+    min-height: 20px;
+}
+
+QScrollBar:horizontal {  
+    background:#f2f4f3;
+    height: 15px;
+}
+
+QScrollBar::handle:horizontal {
+	background:#ffba00;
+	border-radius: 4px;
+    min-width: 20px;
+}
+
+
+
+QTextEdit {
+	border: 2px solid #909cc2
+}
+
+QTextEdit:selected {
+	border-color: #aab9e6
+}</string>
+   </property>
+   <widget class="QLabel" name="CAM_disp_1">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>20</y>
+      <width>861</width>
+      <height>451</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="CAM_disp_2">
+    <property name="geometry">
+     <rect>
+      <x>910</x>
+      <y>20</y>
+      <width>901</width>
+      <height>451</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="CAM_disp_3">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>490</y>
+      <width>581</width>
+      <height>451</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>910</x>
+      <y>490</y>
+      <width>581</width>
+      <height>451</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

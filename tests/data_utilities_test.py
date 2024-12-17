@@ -378,8 +378,7 @@ class DataLibTest(unittest.TestCase):
         self.assertEqual(TestQueue.display(), ['Queue is empty!'])
 
         # pop_first_item
-        with self.assertRaises(IndexError):
-            EmptyQueue.pop_first_item()
+        self.assertIsInstance(EmptyQueue.pop_first_item(), BufferError)
         TestQueue.add(du.QEntry())
         TestQueue.add(du.QEntry(id=3, Coor1=TestCoor))
         self.assertEqual(TestQueue.pop_first_item(), du.QEntry(id=1))

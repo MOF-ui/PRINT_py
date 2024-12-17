@@ -11,12 +11,12 @@
 import re
 import os
 import sys
-import copy
 import serial
 import socket
 import struct
-
+from pathlib import Path
 from datetime import datetime, timedelta
+from copy import deepcopy as dcpy
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -32,7 +32,8 @@ from mtec.mtec_mod import MtecMod
 
 class Coordinate:
     """standard 7-axis coordinate block (8 attributes, as quaterion
-    positioning is possible)
+    positioning is possible); initialization by value list is also possible
+    in form of 'du.Coordinate([x, y, z, rx, ry, rz, q, ext])'
 
     ATTRIBUTES:
         x, y, z:
@@ -48,6 +49,9 @@ class Coordinate:
         __init__, __str__, __add__, __sub__, __round__, __eq__, __ne__
     """
 
+    _iter_value = 0
+    _attr_names = ['x', 'y', 'z', 'rx', 'ry', 'rz', 'q', 'ext']
+
     def __init__(
             self,
             x=0.0,
@@ -59,6 +63,14 @@ class Coordinate:
             q=0.0,
             ext=0.0
     ) -> None:
+        
+        if isinstance(x, list):
+            if len(x) != 8:
+                raise ValueError(f"length of {x} does not fit attribute list")
+            else:
+                ext, q, rz, ry, rx = x[7], x[6], x[5], x[4], x[3]
+                y, z = x[2], x[1]
+                x = x[0]
 
         self.x = float(x)
         self.y = float(y)
@@ -111,6 +123,23 @@ class Coordinate:
             return round(res, 2)
 
 
+    def __iter__(self) -> 'Coordinate':
+        
+        self._iter_val = 0
+        return self
+    
+
+    def __next__(self) -> float:
+        
+        val = self._iter_value
+
+        if val >= len(self._attr_names):
+            raise StopIteration
+        
+        self._iter_value = val + 1
+        return getattr(self, self._attr_names[val])
+    
+    
     def __sub__(self, subtrahend) -> 'Coordinate':
         """round everything to 2 digits because less than 10µm accuracy is
         just pointless with a meter-large robot
@@ -204,6 +233,11 @@ class Coordinate:
             )
 
         return False
+    
+
+    @property
+    def attr_names(self):
+        return self._attr_names
 
 
 
@@ -845,7 +879,7 @@ class Queue:
         the first ID to be 0
         """
 
-        new_entry = copy.deepcopy(entry)
+        new_entry = dcpy(entry)
         last_item = len(self) - 1
         if not isinstance(new_entry, QEntry):
             return ValueError('entry is not an instance of QEntry')
@@ -889,7 +923,7 @@ class Queue:
         with self.add
         """
 
-        new_list = copy.deepcopy(add_queue)
+        new_list = dcpy(add_queue)
         if not isinstance(new_list, Queue):
             return ValueError(f"{new_list} is not an instance of 'Queue'!")
         try:
@@ -932,7 +966,7 @@ class Queue:
         to its ID
         """
 
-        new_entry = copy.deepcopy(entry)
+        new_entry = dcpy(entry)
         self._queue.append(new_entry)
         return None
 
@@ -1858,6 +1892,11 @@ DEF_PUMP_CLASS1 = 75.0
 DEF_PUMP_CLASS2 = 50.0
 
 DEF_ROB_COMM_FR = 10
+DEF_ROB_BUFF_SIZE = 3000
+DEF_ROB_COOR_CHK_RANGE = ( # to-do: better mapping
+    Coordinate(-1600.0, 1200.0, -80.0, 0.0, 0.0, 0.0, 0.0, 10.0),
+    Coordinate(3500.0, 2600.0, 2000.0, 360.0, 360.0, 360.0, 1.0, 3000.0),
+)
 
 DEF_SC_VOL_PER_M = 0.4  # [L/m] calculated for 1m of 4cm x 1cm high filament
 DEF_SC_MAX_LINES = 400
@@ -1870,7 +1909,7 @@ DEF_TERM_MAX_LINES = 300
 DEF_TOOL_FIB_STPS = 10
 DEF_TOOL_FIB_RATIO = 1.0
 
-DEF_WD_TIMEOUT = 1000 # [ms]
+DEF_WD_TIMEOUT = 10000 # [ms]
 
 
 ##########################     GLOBALS VARS     ##############################
@@ -1882,8 +1921,10 @@ ADC_knife_pos = DEF_AMC_KNIFE_POS
 ADC_knife = DEF_AMC_KNIFE
 ADC_fib_pnmtc = DEF_AMC_FIBER_PNMTC
 
+CAM_urls = []
+
 DCCurrZero = Coordinate()
-DCSpeed = copy.deepcopy(DEF_DC_SPEED)
+DCSpeed = dcpy(DEF_DC_SPEED)
 DC_rob_moving = False
 
 DB_session = "not set"
@@ -1895,6 +1936,8 @@ DB_log_interval = 10
 IO_curr_filepath = None
 IO_fr_to_ts = DEF_IO_FR_TO_TS
 IO_zone = DEF_IO_ZONE
+
+LOG_safe_path = Path()
 
 MIX_last_speed = 0.0
 MIX_max_speed = 540.0 # [rpm]
@@ -1911,7 +1954,7 @@ MIX_connected = False
 #     DEF_TCP_MIXER["W_BL"],
 # )
 
-PRINSpeed = copy.deepcopy(DEF_PRIN_SPEED)
+PRINSpeed = dcpy(DEF_PRIN_SPEED)
 
 PMP_retract_speed = DEF_PUMP_RETR_SPEED
 PMP_output_ratio = DEF_PUMP_OUTP_RATIO
@@ -1959,6 +2002,7 @@ ROBMovStartP = Coordinate()
 ROBMovEndP = Coordinate()
 ROB_send_list = []
 ROB_live_ad = 1.0
+ROB_speed_overwrite = -1
 ROBTcp = RobConnection(
     DEF_TCP_ROB["IP"],
     DEF_TCP_ROB["PORT"],
