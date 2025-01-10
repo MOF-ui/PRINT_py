@@ -23,7 +23,7 @@ sys.path.append(parent_dir)
 
 # PyQt stuff
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal, QMutexLocker
-from PyQt5.QtGui import QImage
+from PyQt5.QtGui import QImage, QPixmap
 
 # import my own libs
 import libs.data_utilities as du
@@ -730,9 +730,8 @@ class LoadFileWorker(QObject):
 class IPCamWorker(QObject):
     """worker captures video streams from IP cams, displays them via signal"""
 
-    imageCaptured = pyqtSignal(int, QImage)
+    imageCaptured = pyqtSignal(int, QPixmap)
     logEntry = pyqtSignal(str, str)
-
     cam_streams = []
 
     def run(self) -> None:
@@ -788,7 +787,7 @@ class IPCamWorker(QObject):
                     bytes_per_line,
                     QImage.Format_RGB888
                 ).copy()
-                self.imageCaptured.emit(cam_num, qt_image)
+                self.imageCaptured.emit(cam_num, QPixmap.fromImage(qt_image))
 
 
 
