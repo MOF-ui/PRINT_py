@@ -53,9 +53,9 @@ def change_keep_alive():
 def keep_alive_routine():
     global keep_alive_end
 
-    pump.keepAlive()
-    keepAliveTmr = Timer(0.25, keep_alive_routine)
     if not keep_alive_end:
+        pump.keepAlive()
+        keepAliveTmr = Timer(0.25, keep_alive_routine)
         keepAliveTmr.start()
 
 
