@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1945</width>
-    <height>1095</height>
+    <width>1949</width>
+    <height>1104</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -516,7 +516,7 @@ border-bottom-right-radius: 0px;</string>
       <widget class="QLabel" name="IO_lbl_commNum">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>0</x>
          <y>200</y>
          <width>151</width>
          <height>51</height>
@@ -539,7 +539,7 @@ commands:</string>
       <widget class="QLabel" name="IO_lbl_estimLen">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>0</x>
          <y>270</y>
          <width>151</width>
          <height>51</height>
@@ -562,7 +562,7 @@ length:</string>
       <widget class="QLabel" name="IO_lbl_estimVol">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>0</x>
          <y>340</y>
          <width>151</width>
          <height>51</height>
@@ -841,7 +841,7 @@ QWidget {
       <widget class="QLabel" name="SGLC_0_frameLabel">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>10</y>
          <width>271</width>
          <height>51</height>

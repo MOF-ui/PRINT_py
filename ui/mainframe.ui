@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1958</width>
-    <height>1080</height>
+    <width>1962</width>
+    <height>1089</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -426,7 +426,7 @@ QTabBar::tab:!selected:hover {
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout" stretch="10,1,10,30,25,25,25,10,25,25,50,10,10,20,30,30">
+            <layout class="QVBoxLayout" name="verticalLayout" stretch="10,1,10,30,25,25,25,10,25,25,50,1,1,1,30,1,1">
              <property name="spacing">
               <number>10</number>
              </property>
@@ -912,28 +912,22 @@ padding-right: 0px;</string>
                </property>
               </widget>
              </item>
+             <item>
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
             </layout>
            </item>
           </layout>
-          <zorder>IO_lbl_newFile</zorder>
-          <zorder>IO_lbl_loadFile</zorder>
-          <zorder>IO_0_frameLabel</zorder>
-          <zorder>IO_btt_newFile</zorder>
-          <zorder>IO_disp_filename</zorder>
-          <zorder>IO_disp_commNum</zorder>
-          <zorder>IO_disp_estimLen</zorder>
-          <zorder>IO_disp_estimVol</zorder>
-          <zorder>IO_lbl_commNum</zorder>
-          <zorder>IO_lbl_estimLen</zorder>
-          <zorder>IO_lbl_estimVol</zorder>
-          <zorder>IO_btt_xyzextZero</zorder>
-          <zorder>IO_btt_orientZero</zorder>
-          <zorder>IO_num_addByID</zorder>
-          <zorder>IO_lbl_addByID</zorder>
-          <zorder>IO_btt_addByID</zorder>
-          <zorder>IO_btt_loadFile</zorder>
-          <zorder>IO_chk_autoPCtrl</zorder>
-          <zorder>IO_chk_externalFllwBhvr</zorder>
          </widget>
         </item>
         <item>
@@ -956,289 +950,325 @@ padding-right: 0px;</string>
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <widget class="QLabel" name="SGLC_0_frameLabel">
-           <property name="geometry">
-            <rect>
-             <x>20</x>
-             <y>10</y>
-             <width>271</width>
-             <height>51</height>
-            </rect>
-           </property>
-           <property name="font">
-            <font>
-             <family>Bahnschrift</family>
-             <pointsize>22</pointsize>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 0px;
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,8,5,1,5,25,5,3,5,0,5,25,5,5,1,9">
+             <item>
+              <widget class="QLabel" name="SGLC_0_frameLabel">
+               <property name="font">
+                <font>
+                 <family>Bahnschrift</family>
+                 <pointsize>22</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">border: 0px;
 font-size: 22pt;
 padding: 0px;
 background-color: #5D707F;
 color: #E1E5EE;</string>
-           </property>
-           <property name="text">
-            <string>SINGLE COMMAND</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-          <widget class="QLabel" name="SGLC_lbl_gcodeSglComm">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>240</y>
-             <width>231</width>
-             <height>31</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 0px;
+               </property>
+               <property name="text">
+                <string>SINGLE COMMAND</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="SGLC_btt_sendFirstQComm">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">padding-bottom: 3px</string>
+               </property>
+               <property name="text">
+                <string>send first
+queue command</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="SGLC_lbl_gcodeSglComm">
+               <property name="styleSheet">
+                <string notr="true">border: 0px;
 background-color: #5D707F;
 color: #E1E5EE;</string>
-           </property>
-           <property name="text">
-            <string>GCode single command</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="SGLC_btt_gcodeSglComm">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>410</y>
-             <width>231</width>
-             <height>41</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>add to queue</string>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="SGLC_btt_gcodeSglComm_addByID">
-           <property name="geometry">
-            <rect>
-             <x>220</x>
-             <y>490</y>
-             <width>41</width>
-             <height>41</height>
-            </rect>
-           </property>
-           <property name="autoFillBackground">
-            <bool>false</bool>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">image: url(:/images/right.png);</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-          <widget class="QLabel" name="SGLC_lbl_gcodeSglComm_addByID">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>460</y>
-             <width>171</width>
-             <height>31</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5D707F;
-color: #E1E5EE;</string>
-           </property>
-           <property name="text">
-            <string>add at specific ID:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="SGLC_btt_rapidSglComm_addByID">
-           <property name="geometry">
-            <rect>
-             <x>220</x>
-             <y>840</y>
-             <width>41</width>
-             <height>41</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">image: url(:/images/right.png);</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="SGLC_btt_rapidSglComm">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>760</y>
-             <width>231</width>
-             <height>41</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>add to queue</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="SGLC_lbl_rapidSglComm">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>590</y>
-             <width>231</width>
-             <height>31</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 0px;
-background-color: #5D707F;
-color: #E1E5EE;</string>
-           </property>
-           <property name="text">
-            <string>RAPID single command</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-           </property>
-          </widget>
-          <widget class="QSpinBox" name="SGLC_num_rapidSglComm_addByID">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>840</y>
-             <width>181</width>
-             <height>41</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">font-size: 14pt</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-           <property name="maximum">
-            <number>99999</number>
-           </property>
-          </widget>
-          <widget class="QLabel" name="SGLC_lbl_rapidSglComm_addByID">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>810</y>
-             <width>161</width>
-             <height>31</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5D707F;
-color: #E1E5EE;</string>
-           </property>
-           <property name="text">
-            <string>add at specific ID:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-           </property>
-          </widget>
-          <widget class="QTextEdit" name="SGLC_entry_gcodeSglComm">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>270</y>
-             <width>231</width>
-             <height>131</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 0px;</string>
-           </property>
-           <property name="html">
-            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+               </property>
+               <property name="text">
+                <string>GCode single command</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QTextEdit" name="SGLC_entry_gcodeSglComm">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">border: 0px;</string>
+               </property>
+               <property name="html">
+                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;G1 X-400 Y0 Z500 EXT0 F3500&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="acceptRichText">
-            <bool>false</bool>
-           </property>
-          </widget>
-          <widget class="QTextEdit" name="SGLC_entry_rapidSglComm">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>620</y>
-             <width>231</width>
-             <height>131</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: 0px;</string>
-           </property>
-           <property name="html">
-            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+               </property>
+               <property name="acceptRichText">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="SGLC_btt_gcodeSglComm">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>add to queue</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="SGLC_lbl_gcodeSglComm_addByID">
+               <property name="styleSheet">
+                <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+               </property>
+               <property name="text">
+                <string>add at specific ID:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="5,2">
+               <item>
+                <widget class="QSpinBox" name="SGLC_num_gcodeSglComm_addByID">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>6</horstretch>
+                   <verstretch>5</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">font-size: 14pt</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                 <property name="maximum">
+                  <number>99999</number>
+                 </property>
+                 <property name="displayIntegerBase">
+                  <number>10</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="SGLC_btt_gcodeSglComm_addByID">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>6</horstretch>
+                   <verstretch>4</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="autoFillBackground">
+                  <bool>false</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">image: url(:/images/right.png);</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="SGLC_lbl_rapidSglComm">
+               <property name="styleSheet">
+                <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+               </property>
+               <property name="text">
+                <string>RAPID single command</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QTextEdit" name="SGLC_entry_rapidSglComm">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">border: 0px;</string>
+               </property>
+               <property name="html">
+                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveL [[0.0,2000.0,300.0],[0.00344,0.72283,0.69100,0.00380]],[200,100,100,100],z10,tool0 EXT100&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="overwriteMode">
-            <bool>false</bool>
-           </property>
-           <property name="acceptRichText">
-            <bool>false</bool>
-           </property>
-          </widget>
-          <widget class="QSpinBox" name="SGLC_num_gcodeSglComm_addByID">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>490</y>
-             <width>181</width>
-             <height>41</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">font-size: 14pt</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-           <property name="maximum">
-            <number>99999</number>
-           </property>
-           <property name="displayIntegerBase">
-            <number>10</number>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="SGLC_btt_sendFirstQComm">
-           <property name="geometry">
-            <rect>
-             <x>30</x>
-             <y>130</y>
-             <width>231</width>
-             <height>51</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">padding-bottom: 3px</string>
-           </property>
-           <property name="text">
-            <string>send first
-queue command</string>
-           </property>
-          </widget>
+               </property>
+               <property name="overwriteMode">
+                <bool>false</bool>
+               </property>
+               <property name="acceptRichText">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="SGLC_btt_rapidSglComm">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>add to queue</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="SGLC_lbl_rapidSglComm_addByID">
+               <property name="styleSheet">
+                <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+               </property>
+               <property name="text">
+                <string>add at specific ID:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,2">
+               <item>
+                <widget class="QSpinBox" name="SGLC_num_rapidSglComm_addByID">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">font-size: 14pt</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                 <property name="maximum">
+                  <number>99999</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="SGLC_btt_rapidSglComm_addByID">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">image: url(:/images/right.png);</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
           <zorder>SGLC_lbl_rapidSglComm_addByID</zorder>
           <zorder>SGLC_lbl_gcodeSglComm_addByID</zorder>
           <zorder>SGLC_lbl_gcodeSglComm</zorder>
