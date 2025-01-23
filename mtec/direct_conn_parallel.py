@@ -2,7 +2,6 @@
 ############################     IMPORTS     ################################
 import os
 import sys
-import time
 
 from mtec_mod import MtecMod
 from threading import Timer
@@ -40,6 +39,8 @@ def stop(pmp=None):
 
 
 def change_speed_1(new_speed):
+    global pmp1_speed
+
     pmp1_speed = int(new_speed)
     if pmp1_speed >= -100 and pmp1_speed <= 100:
         ans = Pmp1.set_speed(pmp1_speed)
@@ -48,6 +49,8 @@ def change_speed_1(new_speed):
         raise KeyError()
     
 def change_speed_2(new_speed):
+    global pmp2_speed
+    
     pmp2_speed = int(new_speed)
     if pmp2_speed >= -100 and pmp2_speed <= 100:
         ans = Pmp2.set_speed(pmp2_speed)
