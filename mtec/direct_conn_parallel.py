@@ -76,11 +76,11 @@ def keep_alive_routine():
 import tkinter
 
 SerialBus = du.serial.Serial(
-    baudrate=du.DEF_SERIAL_PUMP["BR"],
-    parity=du.DEF_SERIAL_PUMP["P"],
-    stopbits=du.DEF_SERIAL_PUMP["SB"],
-    bytesize=du.DEF_SERIAL_PUMP["BS"],
-    port=du.DEF_SERIAL_PUMP["PORT"],
+    baudrate=du.DEF_PUMP_SERIAL["BR"],
+    parity=du.DEF_PUMP_SERIAL["P"],
+    stopbits=du.DEF_PUMP_SERIAL["SB"],
+    bytesize=du.DEF_PUMP_SERIAL["BS"],
+    port=du.DEF_PUMP_SERIAL["PORT"],
 )
 Pmp1 = MtecMod(SerialBus, "01")
 Pmp2 = MtecMod(SerialBus, "02")

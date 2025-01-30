@@ -1153,7 +1153,7 @@ class MainframeWinTest(unittest.TestCase):
         du.ROBTcp.connected = False
         du.PMP1Serial.connected = False
         du.PMP2Serial.connected = False
-        du.MIX_connected = False
+        du.PRH_connected = False
         TestFrame.close()
 
         du.ROBTcp.close(end=True)

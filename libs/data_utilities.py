@@ -376,7 +376,7 @@ class ToolCommand:
             current time in milli seconds at EE
 
     FUNCTIONS:
-        __def__, __str__, __eq__
+        __def__, __str__, __eq__, __ne__
     """
 
 
@@ -1833,16 +1833,9 @@ class RobConnection(TCPIP):
 # defaut connection settings (the byte length for writing to the robot
 # wont be user setable for safety reasons, it can only be changed here, but 
 # only if you know what your doing!)
-DEF_TCP_MIXER = {
-    "IP": "192.168.178.36",
-    "PORT": "17",
-    "C_TOUT": 0,
-    "RW_TOUT": 0,
-    "R_BL": 0,
-    "W_BL": 0,
-} # mixer is a http server for now, using this structure to store parameters
 
-DEF_TCP_PUMP = {
+# MTEC P20 DEFAULT SETTINGS
+DEF_PUMP_TCP = {
     "IP": "",
     "PORT": "COM3",
     "C_TOUT": 0,
@@ -1850,16 +1843,21 @@ DEF_TCP_PUMP = {
     "R_BL": 0,
     "W_BL": 0,
 } # pumps are run via COM interface, using this structure to store parameters
-
-DEF_SERIAL_PUMP = {
+DEF_PUMP_SERIAL = {
     "BR": 19200,
     "P": serial.PARITY_NONE,
     "SB": serial.STOPBITS_TWO,
     "BS": serial.EIGHTBITS,
     "PORT": "COM3",
 }
+DEF_PUMP_LPS = 0.5
+DEF_PUMP_RETR_SPEED = -50.0 # [%]
+DEF_PUMP_OUTP_RATIO = 1.0
+DEF_PUMP_CLASS1 = 75.0
+DEF_PUMP_CLASS2 = 50.0
 
-DEF_TCP_ROB = {
+# ROBOT DEFAULT SETTINGS
+DEF_ROB_TCP = {
     "IP": "192.168.125.1",
     "PORT": 10001,
     "C_TOUT": 60000,
@@ -1867,30 +1865,6 @@ DEF_TCP_ROB = {
     "R_BL": 36,
     "W_BL": 159,
 }
-
-# default user settings
-DEF_AMC_PANNING = 0
-DEF_AMC_FIB_DELIV = 100
-DEF_AMC_CLAMP = False
-DEF_AMC_KNIFE_POS = False
-DEF_AMC_KNIFE = False
-DEF_AMC_FIBER_PNMTC = False
-
-DEF_DC_SPEED = SpeedVector()
-
-DEF_IO_ZONE = 10 # [mm]
-DEF_IO_FR_TO_TS = 0.1
-
-DEF_ICQ_MAX_LINES = 200
-
-DEF_PRIN_SPEED = SpeedVector()
-
-DEF_PUMP_LPS = 0.5
-DEF_PUMP_RETR_SPEED = -50.0 # [%]
-DEF_PUMP_OUTP_RATIO = 1.0
-DEF_PUMP_CLASS1 = 75.0
-DEF_PUMP_CLASS2 = 50.0
-
 DEF_ROB_COMM_FR = 10
 DEF_ROB_BUFF_SIZE = 3000
 DEF_ROB_COOR_CHK_RANGE = ( # to-do: better mapping
@@ -1898,105 +1872,113 @@ DEF_ROB_COOR_CHK_RANGE = ( # to-do: better mapping
     Coordinate(3500.0, 2600.0, 2000.0, 360.0, 360.0, 360.0, 1.0, 3000.0),
 )
 
+# GENERAL DEFAULT SETTINGS
+DEF_AMC_PANNING = 0
+DEF_AMC_FIB_DELIV = 100
+DEF_AMC_CLAMP = False
+DEF_AMC_KNIFE_POS = False
+DEF_AMC_KNIFE = False
+DEF_AMC_FIBER_PNMTC = False
+DEF_DC_SPEED = SpeedVector()
+DEF_IO_ZONE = 10 # [mm]
+DEF_IO_FR_TO_TS = 0.1
+DEF_ICQ_MAX_LINES = 200
+DEF_PRIN_SPEED = SpeedVector()
 DEF_SC_VOL_PER_M = 0.4  # [L/m] calculated for 1m of 4cm x 1cm high filament
 DEF_SC_MAX_LINES = 400
 DEF_SC_EXT_FLLW_BHVR = (5, 2) # [mm]
-
 DEF_STT_VALID_TIME = 60 # [seconds]
-
 DEF_TERM_MAX_LINES = 300
-
 DEF_TOOL_FIB_STPS = 10
 DEF_TOOL_FIB_RATIO = 1.0
-
 DEF_WD_TIMEOUT = 10000 # [ms]
 
 
 ##########################     GLOBALS VARS     ##############################
 
+# GENERAL SETTINGS
 ADC_panning = DEF_AMC_PANNING
 ADC_fib_deliv = DEF_AMC_FIB_DELIV
 ADC_clamp = DEF_AMC_CLAMP
 ADC_knife_pos = DEF_AMC_KNIFE_POS
 ADC_knife = DEF_AMC_KNIFE
 ADC_fib_pnmtc = DEF_AMC_FIBER_PNMTC
-
 CAM_urls = [
-    "rtsp://admin:KameraNr4@192.168.178.51:554/ch1/main/av_stream",
-    "rtsp://admin:KameraNr1@192.168.178.38:554/ch1/main/av_stream",
+    'rtsp://admin:KameraNr4@192.168.178.51:554/ch1/main/av_stream',
+    'rtsp://admin:KameraNr1@192.168.178.38:554/ch1/main/av_stream',
 ]
-
 DCCurrZero = Coordinate()
 DCSpeed = dcpy(DEF_DC_SPEED)
 DC_rob_moving = False
-
-DB_session = "not set"
-DB_org = "MC3DB"
-DB_token = None
-DB_url = "192.168.178.50:8086"
-DB_log_interval = 10
-
 IO_curr_filepath = None
 IO_fr_to_ts = DEF_IO_FR_TO_TS
 IO_zone = DEF_IO_ZONE
-
 LOG_safe_path = Path()
+PRINSpeed = dcpy(DEF_PRIN_SPEED)
+SCQueue = Queue()
+SCBreakPoint = Coordinate() # to-do: write routine to stop at predefined point during SC using this Coordinate + decide if useful
+SC_vol_per_m = DEF_SC_VOL_PER_M
+SC_curr_comm_id = 1
+SC_q_processing = False
+SC_q_prep_end = False
+SC_ext_fllw_bhvr = DEF_SC_EXT_FLLW_BHVR
+STTDataBlock = DaqBlock()
+TERM_log = []
+TOOL_fib_ratio = DEF_TOOL_FIB_RATIO
 
+# DATABASE SETTINGS
+DB_session = 'not set'
+DB_org = 'MC3DB'
+DB_token = None
+DB_url = 'http://192.168.178.50:8086'
+DB_log_interval = 10
+
+# PRINTHEAD SETTINGS
 MIX_last_speed = 0.0
-MIX_max_speed = 540.0 # [rpm]
+MIX_max_speed = 300.0 # [rpm]
 MIX_speed = 0.0
 MIX_act_with_pump = False
-MIX_connected = False
-# use this structure if mixer is ever upgraded to websocket
-# MIXTcp = TCPIP(
-#     DEF_TCP_MIXER["IP"],
-#     DEF_TCP_MIXER["PORT"],
-#     DEF_TCP_MIXER["C_TOUT"],
-#     DEF_TCP_MIXER["RW_TOUT"],
-#     DEF_TCP_MIXER["R_BL"],
-#     DEF_TCP_MIXER["W_BL"],
-# )
+PRH_connected = False
+PRH_url = 'http://192.168.178.58:17'
 
-PRINSpeed = dcpy(DEF_PRIN_SPEED)
-
+# MTEC P20 SETTINGS
 PMP_retract_speed = DEF_PUMP_RETR_SPEED
 PMP_output_ratio = DEF_PUMP_OUTP_RATIO
 PMP_serial_def_bus = None  # is created after user input in win_mainframe
 PMP_comm_active = False
 PMP_speed = 0
-
 PMP1LastTelem = PumpTelemetry()
 PMP1_liter_per_s = DEF_PUMP_LPS
 PMP1_live_ad = 1.0
 PMP1_speed = 0
-PMP1Serial = MtecMod(None, "01")
+PMP1Serial = MtecMod(None, '01')
 PMP1_user_speed = -999
 PMP1Tcp = TCPIP(
-    DEF_TCP_PUMP["IP"],
-    DEF_TCP_PUMP["PORT"],
-    DEF_TCP_PUMP["C_TOUT"],
-    DEF_TCP_PUMP["RW_TOUT"],
-    DEF_TCP_PUMP["R_BL"],
-    DEF_TCP_PUMP["W_BL"],
+    DEF_PUMP_TCP['IP'],
+    DEF_PUMP_TCP['PORT'],
+    DEF_PUMP_TCP['C_TOUT'],
+    DEF_PUMP_TCP['RW_TOUT'],
+    DEF_PUMP_TCP['R_BL'],
+    DEF_PUMP_TCP['W_BL'],
 ) # pumps are run via COM interface, using this structure to store parameters
 # to-do: skip creating an unused socket object
-
 PMP2LastTelem = PumpTelemetry()
 PMP2_liter_per_s = DEF_PUMP_LPS
 PMP2_live_ad = 1.0
 PMP2_speed = 0
-PMP2Serial = MtecMod(None, "02")
+PMP2Serial = MtecMod(None, '02')
 PMP2_user_speed = -999
 PMP2Tcp = TCPIP(
-    DEF_TCP_PUMP["IP"],
-    DEF_TCP_PUMP["PORT"],
-    DEF_TCP_PUMP["C_TOUT"],
-    DEF_TCP_PUMP["RW_TOUT"],
-    DEF_TCP_PUMP["R_BL"],
-    DEF_TCP_PUMP["W_BL"],
+    DEF_PUMP_TCP['IP'],
+    DEF_PUMP_TCP['PORT'],
+    DEF_PUMP_TCP['C_TOUT'],
+    DEF_PUMP_TCP['RW_TOUT'],
+    DEF_PUMP_TCP['R_BL'],
+    DEF_PUMP_TCP['W_BL'],
 ) # pumps are run via COM interface, using this structure to store parameters
 # to-do: skip creating an unused socket object
 
+# ROBOT SETTINGS
 ROB_comm_fr = DEF_ROB_COMM_FR
 ROBCommQueue = Queue()
 ROBLastTelem = RoboTelemetry()
@@ -2007,22 +1989,15 @@ ROB_send_list = []
 ROB_live_ad = 1.0
 ROB_speed_overwrite = -1
 ROBTcp = RobConnection(
-    DEF_TCP_ROB["IP"],
-    DEF_TCP_ROB["PORT"],
-    DEF_TCP_ROB["C_TOUT"],
-    DEF_TCP_ROB["RW_TOUT"],
-    DEF_TCP_ROB["R_BL"],
-    DEF_TCP_ROB["W_BL"],
+    DEF_ROB_TCP['IP'],
+    DEF_ROB_TCP['PORT'],
+    DEF_ROB_TCP['C_TOUT'],
+    DEF_ROB_TCP['RW_TOUT'],
+    DEF_ROB_TCP['R_BL'],
+    DEF_ROB_TCP['W_BL'],
 )
 
-SC_vol_per_m = DEF_SC_VOL_PER_M
-SC_curr_comm_id = 1
-SCQueue = Queue()
-SC_q_processing = False
-SC_q_prep_end = False
-SC_ext_fllw_bhvr = DEF_SC_EXT_FLLW_BHVR
-SCBreakPoint = Coordinate() # write routine to stop at predefined point during SC using this Coordinate
-
+# SENSOR ARRAY SETTINGS
 SEN_timeout = 0.5
 SEN_dict = { # add available datasources here
     'amb': { # AMBient
@@ -2064,9 +2039,3 @@ SEN_dict = { # add available datasources here
         'edist': False
     }
 }
-
-STTDataBlock = DaqBlock()
-
-TERM_log = []
-
-TOOL_fib_ratio = DEF_TOOL_FIB_RATIO

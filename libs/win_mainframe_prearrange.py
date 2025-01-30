@@ -66,7 +66,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     _RobRecvWd = None
     _P1RecvWd = None
     _P2RecvWd = None
-    _MixRecvWd = None
+    _PRHRecvWd = None
 
     #########################################################################
     #                                  SETUP                                #
@@ -96,7 +96,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self._RobRecvWd = Watchdog(True, 'Robot', 'ROBTcp', 'ROB')
         self._P1RecvWd = Watchdog(True, 'Pump 1', 'PMP1Serial', 'P1')
         self._P2RecvWd = Watchdog(True, 'Pump 2', 'PMP2Serial', 'P2')
-        self._MixRecvWd = Watchdog(True, 'Pump 1', 'MIX_connected', 'MIX')
+        self._PRHRecvWd = Watchdog(True, 'Printhead', 'PRH_connected', 'PRH')
 
         # GROUP PANEL ELEMENTS
         self.group_elems()
@@ -169,14 +169,15 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self.DC_lbl_ext,
         ]
 
-        self.MIX_group = [
+        self.PRH_group = [
             self.MIX_btt_actWithPump,
             self.MIX_btt_setSpeed,
             self.MIX_disp_currSpeed,
             self.MIX_num_setSpeed,
             self.MIX_sld_speed,
+            self.PUMP_btt_pinchValve
         ]
-        for elem in self.MIX_group:
+        for elem in self.PRH_group:
             elem.setEnabled(False)
 
         self.NC_group = [
@@ -232,7 +233,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self._RobRecvWd,
             self._P1RecvWd,
             self._P2RecvWd,
-            self._MixRecvWd
+            self._PRHRecvWd
         ]
 
 
@@ -545,6 +546,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         def p_recv(display:list, stt_data:du.PumpTelemetry, dump:str) -> None:
             # display & log
+            # to-do: display recv and recv length
             display[0].setText(f"{stt_data.freq}%")
             display[1].setText(f"{stt_data.volt} V")
             display[2].setText(f"{stt_data.amps} A")            
@@ -582,13 +584,6 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.TCP_MIXER_disp_writeBuffer.setText(str(mixer_speed))
         self.TCP_MIXER_disp_bytesWritten.setText(str(len(mixer_speed)))
         self.log_entry("MIXR", f"speed set to {mixer_speed}")
-
-
-    def mixer_recv(self, mixerSpeed:int) -> None:
-        """display mixer communication"""
-
-        self.MIX_disp_currSpeed.setText(f"{mixerSpeed}%")
-        self.log_entry("MTel", f"current speed at {mixerSpeed}%")
 
 
     ##########################################################################
@@ -821,6 +816,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
     def stop_SCTRL_queue(self, prep_end=False) -> None:
         """set UI indicators, turn off threads"""
+        # to-do: stop pumps
 
         if prep_end:
             css = "border-radius: 20px; background-color: #ffda1e;"

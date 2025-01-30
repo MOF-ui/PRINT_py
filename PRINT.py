@@ -19,7 +19,17 @@
 #   license.
 #
 ##############################################################################
-
+# to-do:
+#   work with reconnects in automatic modes (open cell inbetween)
+#   test automatic pump control
+#   debug mixer protocoll 
+#   integrate pinch valve
+#   check if PRH WD has to be critical
+#   debug temperature readout at printhead
+#   new EE protocol
+#   wait times in EE protocol
+#   implement new 'S' behaviour (movement finished, list emptied, stop pumping, pinch)
+#   rework UI
 
 ###############################    IMPORTS    ################################
 
@@ -68,9 +78,9 @@ if arg1 != 'local' and arg1 != 'overwrite':
     # ask user if default TCP (or USB) connection parameters are to be used,
     # otherwise set new ones
     cd_ret = conn_dialog(
-        du.DEF_TCP_ROB,
-        du.DEF_TCP_PUMP,
-        du.DEF_TCP_PUMP,
+        du.DEF_ROB_TCP,
+        du.DEF_PUMP_TCP,
+        du.DEF_PUMP_TCP,
         title="Welcome to PRINT_py  --  Connection setup",
         standalone=True,
     )

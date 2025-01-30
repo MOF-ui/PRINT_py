@@ -43,7 +43,7 @@ class PumpCommWorker(QObject):
     p1Active = pyqtSignal()
     p2Active = pyqtSignal()
     dataRecv = pyqtSignal(du.PumpTelemetry, str)
-    dataMixerRecv = pyqtSignal(int)
+    PRHDisconnect = pyqtSignal(int)
     dataSend = pyqtSignal(int, str, int, str)
     dataMixerSend = pyqtSignal(float)
     logEntry = pyqtSignal(str, str)
@@ -80,7 +80,7 @@ class PumpCommWorker(QObject):
             du.PMP_comm_active = False
     
 
-    def get_speed_settings() -> tuple[int, int, int]:
+    def get_speed_settings(self) -> tuple[int, int, int]:
         """see if pump settings have been scripted, otherwise use user 
         input; interpret total_speed as combined maximum possible flow,
         if both pumps are connected; pump values are capped at 100, e.g.
@@ -88,7 +88,6 @@ class PumpCommWorker(QObject):
         1.0, pump1_speed would otherwise be 200.
         """
 
-        # SEND TO PUMPS
         p_ratio = du.PMP_output_ratio
         if du.SC_q_processing:
             total_speed, p_ratio = pu.calc_speed()
@@ -140,25 +139,20 @@ class PumpCommWorker(QObject):
                 serial.keepAlive()
 
         # SEND TO MIXER
-        if du.MIX_connected and du.MIX_last_speed != du.MIX_speed:
+        if du.PRH_connected and du.MIX_last_speed != du.MIX_speed:
             if du.MIX_act_with_pump:
                 mixer_speed = pmp_speed * du.MIX_max_speed / 100.0
             else:
                 mixer_speed = du.MIX_speed
             
-            ip = du.DEF_TCP_MIXER['IP']
-            port = du.DEF_TCP_MIXER['PORT']
-            post_url = f"http://{ip}:{port}/motor"
-            post_resp = requests.post(post_url, data=f"{mixer_speed}")
+            post_url = f"http://{du.PRH_url}/motor"
+            post_resp = requests.post(post_url, data=f"s={mixer_speed}")
 
             if post_resp.ok and post_resp.text == f"RECV{mixer_speed}":
                 with QMutexLocker(GlobalMutex):
                     du.MIX_last_speed = mixer_speed
                 print(f"MIX: {mixer_speed}")
-                self.dataMixerSend.emit(mixer_speed)
-            
-
-            
+                self.dataMixerSend.emit(mixer_speed)            
 
 
     def receive(self) -> None:
@@ -204,9 +198,16 @@ class PumpCommWorker(QObject):
                             setattr(du.STTDataBlock, stt_attr, Telem)
                         self.dataRecv.emit(Telem, p_num)
 
-        # RECEIVE FROM MIXER
-        if du.MIX_connected:
-            pass # to-do
+        # RECEIVE FROM PRINTHEAD (just ping to check)
+        if du.PRH_connected:
+            ping_resp = requests.get(f"{du.PRH_url}/ping")
+            if not ping_resp.ok or ping_resp.text != 'ack':
+                # retry
+                for i in range(3):
+                    ping_resp = requests.get(f"{du.PRH_url}/ping")
+                    if ping_resp.ok and ping_resp.text == 'ack':
+                        return
+                self.PRHDisconnect.emit()
 
 
 
@@ -264,6 +265,10 @@ class RoboCommWorker(QObject):
             self.logEntry.emit('RTel', err_txt)
             with QMutexLocker(GlobalMutex):
                 fu.add_to_comm_protocol(f"RECV:    {err_txt}")
+            if du.SC_q_processing:
+                self.endProcessing.emit()
+            else:
+                self.endDcMoving.emit()
 
         Telem, raw_data = du.ROBTcp.receive()
         if isinstance(Telem, Exception):
@@ -279,7 +284,7 @@ class RoboCommWorker(QObject):
             try:
                 LastPos = du.ROBCommQueue[0].Coor1
             except:
-                LastPos = None
+                LastPos = 'POSITION NOT RETRIEVABLE'
             err_handler(f"given position out of reach! last given pos: {LastPos}")
 
         else:

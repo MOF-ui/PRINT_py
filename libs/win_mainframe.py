@@ -44,7 +44,7 @@ from mtec.mtec_mod import MtecMod
 
 
 
-####################### MAINFRAME CLASS  #####################################
+########################## MAINFRAME CLASS ###################################
 # to-do: 
 # - ID after restart/reconnect to 1 (maybe do that on the robot side)
 # - load saved ZERO
@@ -104,14 +104,14 @@ class Mainframe(PreMainframe):
 
         # CONNECTIONS SETUP
         self.log_entry('GNRL', 'connect to Robot...')
-        self.connect_tcp('ROB')
+        self.connect_device('ROB')
 
         if p_conn[0]:
             self.log_entry('GNRL', 'connect to pump1...')
-            self.connect_tcp('P1')
+            self.connect_device('P1')
         if p_conn[1]:
             self.log_entry('GNRL', 'connect to pump2...')
-            self.connect_tcp('P2')
+            self.connect_device('P2')
 
         # SENSOR & CAM ARRAY START-UP
         self._SensorArrThread.start()
@@ -233,14 +233,14 @@ class Mainframe(PreMainframe):
         self.SGLC_btt_rapidSglComm.pressed.connect(self.add_rapid_sgl)
 
         # CONNECTIONS
-        self.TCP_ROB_btt_reconn.pressed.connect(lambda: self.connect_tcp('ROB'))
-        self.TCP_PUMP1_btt_reconn.pressed.connect(lambda: self.connect_tcp('P1'))
-        self.TCP_PUMP2_btt_reconn.pressed.connect(lambda: self.connect_tcp('P2'))
-        self.TCP_MIXER_btt_reconn.pressed.connect(lambda: self.connect_tcp('MIX'))
-        self.TCP_ROB_btt_discon.pressed.connect(lambda: self.disconnect_tcp('ROB'))
-        self.TCP_PUMP1_btt_discon.pressed.connect(lambda: self.disconnect_tcp('P1'))
-        self.TCP_PUMP2_btt_discon.pressed.connect(lambda: self.disconnect_tcp('P2'))
-        self.TCP_MIXER_btt_discon.pressed.connect(lambda: self.disconnect_tcp('MIX'))
+        self.TCP_ROB_btt_reconn.pressed.connect(lambda: self.connect_device('ROB'))
+        self.TCP_PUMP1_btt_reconn.pressed.connect(lambda: self.connect_device('P1'))
+        self.TCP_PUMP2_btt_reconn.pressed.connect(lambda: self.connect_device('P2'))
+        self.TCP_MIXER_btt_reconn.pressed.connect(lambda: self.connect_device('PRH'))
+        self.TCP_ROB_btt_discon.pressed.connect(lambda: self.disconnect_device('ROB'))
+        self.TCP_PUMP1_btt_discon.pressed.connect(lambda: self.disconnect_device('P1'))
+        self.TCP_PUMP2_btt_discon.pressed.connect(lambda: self.disconnect_device('P2'))
+        self.TCP_MIXER_btt_discon.pressed.connect(lambda: self.disconnect_device('PRH'))
 
         # TERMINAL
         self.TERM_btt_gcodeInterp.pressed.connect(self.send_gcode_command)
@@ -313,7 +313,7 @@ class Mainframe(PreMainframe):
     #                             CONNECTIONS                                #
     ##########################################################################
 
-    def connect_tcp(self, slot='') -> bool:
+    def connect_device(self, slot='') -> bool:
         """slot-wise connection management, mostly to shrink code length,
         maybe more functionality later
         """
@@ -389,34 +389,30 @@ class Mainframe(PreMainframe):
                     self.log_entry('CONN', f"connection to {slot} failed!")
                     return False
 
-        # MIXER CONNECTION
-        def mix_connect() -> bool:
+        # PRINTHEAD CONNECTION
+        def prh_connect() -> bool:
             # mixer running as a http server for now, just ping to see
             # if the microcontroller is running
-            ip = du.DEF_TCP_MIXER['IP']
-            port = du.DEF_TCP_MIXER['PORT']
-            ping_url = f"http://{ip}:{port}/ping"
-            ping_resp = requests.get(ping_url)
-
             # if request is valid, consider it "connected"
+            ping_resp = requests.get(f"{du.PRH_url}/ping")
             if ping_resp.ok and ping_resp.text == 'ack':
                 with QMutexLocker(GlobalMutex):
-                    du.MIX_connected = True
+                    du.PRH_connected = True
                 if not self._PumpCommThread.isRunning():
                     # restart if necessary; if so reconnect threads
                     self.connect_threads('PMP')
                     self._PumpCommThread.start()
 
                 action_on_success(
-                    self._MixRecvWd,
+                    self._PRHRecvWd,
                     self.TCP_MIXER_indi_connected,
-                    self.MIX_group,
-                    f"mixer controller found at {ip}:{port}",
+                    self.PRH_group,
+                    f"mixer controller found at {du.PRH_url}",
                 )
                 return True
 
             else:
-                log_txt = f"mixer controller not present at {ip}:{port}!"
+                log_txt = f"mixer controller not present at {du.PRH_url}!"
                 self.log_entry('CONN', log_txt)
                 return False
 
@@ -440,13 +436,13 @@ class Mainframe(PreMainframe):
                     self.TCP_PUMP2_indi_connected,
                     self.PMP2_group
                 )
-            case 'MIX':
-                return mix_connect()                    
+            case 'PRH':
+                return prh_connect()                    
             case _:
                 return False
 
 
-    def disconnect_tcp(self, slot='', internal_call=False) -> None:
+    def disconnect_device(self, slot='', internal_call=False) -> None:
         """disconnect works, reconnect crashes the app, problem probably lies
         here should also send E command to robot on disconnect
         """
@@ -523,18 +519,18 @@ class Mainframe(PreMainframe):
             action_on_success(wd, indi, elem_group)
             serial.disconnect()
         
-        # MIXER DISCONNECT
-        def mix_disconnect() -> None:
-            if not du.MIX_connected:
+        # PRH DISCONNECT
+        def prh_disconnect() -> None:
+            if not du.PRH_connected:
                 return
             
             # no need to inform the server, just switch global toggle
             with QMutexLocker(GlobalMutex):
-                du.MIX_connected = False
+                du.PRH_connected = False
             action_on_success(
-                self._MixRecvWd,
+                self._PRHRecvWd,
                 self.TCP_MIXER_indi_connected,
-                self.MIX_group
+                self.PRH_group
             )
 
         # FUNCTION CALLS
@@ -557,8 +553,8 @@ class Mainframe(PreMainframe):
                     self.TCP_PUMP2_indi_connected,
                     self.PMP2_group
                 )
-            case 'MIX':
-                mix_disconnect()
+            case 'PRH':
+                prh_disconnect()
             case _:
                 pass
 
@@ -603,7 +599,7 @@ class Mainframe(PreMainframe):
             self._PumpCommWorker.dataSend.connect(self.pump_send)
             self._PumpCommWorker.dataRecv.connect(self.pump_recv)
             self._PumpCommWorker.dataMixerSend.connect(self.mixer_send)
-            self._PumpCommWorker.dataMixerRecv.connect(self.mixer_recv)
+            self._PumpCommWorker.PRHDisconnect.connect(lambda: self.disconnect_device('PRH'))
             self._PumpCommWorker.p1Active.connect(self._P1RecvWd.reset)
             self._PumpCommWorker.p2Active.connect(self._P2RecvWd.reset)
         
@@ -668,7 +664,7 @@ class Mainframe(PreMainframe):
             wd.logEntry.connect(self.log_entry)
             wd.criticalBite.connect(self.forced_stop_command)
             wd.criticalBite.connect(self.stop_SCTRL_queue)
-            wd.disconnectDevice.connect(self.disconnect_tcp)
+            wd.disconnectDevice.connect(self.disconnect_device)
             wd.closeMainframe.connect(self.close)
 
 
@@ -1414,10 +1410,8 @@ class Mainframe(PreMainframe):
     def pinch_valve_toggle(self) -> None:
         """not implemented yet"""
 
-        usr_info = strd_dialog(
-            'Pinch valve not supported, yet!', 'Process does not exist'
-        )
-        usr_info.exec()
+        pinch_state = self.PUMP_btt_pinchValve.isChecked()
+        requests.post(f"{du.PRH_url}\pinch", f"s={pinch_state}")
 
 
     ##########################################################################
@@ -1587,10 +1581,10 @@ class Mainframe(PreMainframe):
             self._IPCamThread.wait()
 
         # disconnect everything
-        self.disconnect_tcp('ROB', internal_call=True)
-        self.disconnect_tcp('P1', internal_call=True)
-        self.disconnect_tcp('P2', internal_call=True)
-        self.disconnect_tcp('MIX', internal_call=True)
+        self.disconnect_device('ROB', internal_call=True)
+        self.disconnect_device('P1', internal_call=True)
+        self.disconnect_device('P2', internal_call=True)
+        self.disconnect_device('PRH', internal_call=True)
 
         # delete threads
         self.log_entry('GNRL', 'stop threading...')
