@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>566</width>
-    <height>392</height>
+    <width>877</width>
+    <height>441</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,8 +25,8 @@ color: #f2f4f3;</string>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>331</y>
+     <x>490</x>
+     <y>350</y>
      <width>341</width>
      <height>51</height>
     </rect>
@@ -66,10 +66,10 @@ QPushButton:pressed {
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>521</width>
-     <height>291</height>
+     <x>50</x>
+     <y>50</y>
+     <width>771</width>
+     <height>261</height>
     </rect>
    </property>
    <property name="styleSheet">

@@ -169,22 +169,20 @@ while toggle:
 
                 z = struct.unpack("<i", data[91:95])[0]
 
-                m1_id = struct.unpack("<i", data[95:99])[0]
-                m1_steps = struct.unpack("<i", data[99:103])[0]
-                m2_id = struct.unpack("<i", data[103:107])[0]
-                m2_steps = struct.unpack("<i", data[107:111])[0]
-                m3_id = struct.unpack("<i", data[111:115])[0]
-                m3_steps = struct.unpack("<i", data[115:119])[0]
-                pnmtcClamp_id = struct.unpack("<i", data[119:123])[0]
-                pnmtcClamp_yn = struct.unpack("<i", data[123:127])[0]
-                knife_id = struct.unpack("<i", data[127:131])[0]
-                knife_yn = struct.unpack("<i", data[131:135])[0]
-                m4_id = struct.unpack("<i", data[135:139])[0]
-                m4_steps = struct.unpack("<i", data[139:143])[0]
-                pnmtcFiber_id = struct.unpack("<i", data[143:147])[0]
-                pnmtcFiber_yn = struct.unpack("<i", data[147:151])[0]
-                time_id = struct.unpack("<i", data[151:155])[0]
-                time_time = struct.unpack("<i", data[155:159])[0]
+                trolley_id = struct.unpack("<i", data[95:99])[0]
+                trolley_steps = struct.unpack("<i", data[99:103])[0]
+                cutter_id = struct.unpack("<i", data[103:107])[0]
+                cutter_yn = struct.unpack("<i", data[107:111])[0]
+                cut_id = struct.unpack("<i", data[111:115])[0]
+                cut_yn = struct.unpack("<i", data[115:119])[0]
+                load_spring_id = struct.unpack("<i", data[119:123])[0]
+                load_spring_yn = struct.unpack("<i", data[123:127])[0]
+                place_spring_id = struct.unpack("<i", data[127:131])[0]
+                place_spring_yn = struct.unpack("<i", data[131:135])[0]
+                clamp_id = struct.unpack("<i", data[135:139])[0]
+                clamp_steps = struct.unpack("<i", data[139:143])[0]
+                wait_id = struct.unpack("<i", data[143:147])[0]
+                wait_ms = struct.unpack("<i", data[147:151])[0]
 
                 print(
                     f"ID: {id}\nMT: {mt}\nPT: {pt}"
@@ -196,12 +194,12 @@ while toggle:
                     f"Ext2: {ext2}"
                     f"\nACR: {acr} DCR: {dcr} TS: {ts} OS: {ors} "
                     f"T: {t} SC: {sc} Z: {z}"
-                    f"\nM1_ID: {m1_id} M1_ST: {m1_steps} M2_ID: {m2_id} "
-                    f"M2_ST: {m2_steps} M3_ID: {m3_id} M3_ST: {m3_steps} "
-                    f"PC_ID: {pnmtcClamp_id} PC_YN: {pnmtcClamp_yn} "
-                    f"K_ID: {knife_id} K_YN: {knife_yn} M4_ID: {m4_id} "
-                    f"M4_ST: {m4_steps} PF_ID: {pnmtcFiber_id} "
-                    f"PF_YN: {pnmtcFiber_yn} T_ID: {time_id} T_T: {time_time}"
+                    f"\nT_ID: {trolley_id} T_ST: {trolley_steps} CUTTER_ID: {cutter_id} "
+                    f"CUTTER: {cutter_yn} CU_ID: {cut_id} CU: {cut_yn} "
+                    f"LS_ID: {load_spring_id} LS_YN: {load_spring_yn} "
+                    f"PS_ID: {place_spring_id} PS_YN: {place_spring_yn} C_ID: {clamp_id} "
+                    f"C: {clamp_steps} W_ID: {wait_id} "
+                    f"W: {wait_ms}"
                 )
 
     a = input("Connection closed...  Wait for reconnect? Y/N\n")

@@ -697,11 +697,11 @@ class DataLibTest(unittest.TestCase):
         TestTCPIP = du.TCPIP()
         InitTestTCPIP = du.TCPIP(
             ip="1.1.1.1",
-            PORT=2222,
-            C_TOUT=3.3,
-            RW_TOUT=4.4,
-            R_BL=5.5,
-            W_BL=6.6
+            port=2222,
+            c_tout=3.3,
+            rw_tout=4.4,
+            r_bl=5.5,
+            w_bl=6.6
         )
         self.assertEqual(
             str(InitTestTCPIP),

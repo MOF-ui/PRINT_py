@@ -76,14 +76,14 @@ def keep_alive_routine():
 import tkinter
 
 SerialBus = du.serial.Serial(
-    baudrate=du.DEF_PUMP_SERIAL["BR"],
-    parity=du.DEF_PUMP_SERIAL["P"],
-    stopbits=du.DEF_PUMP_SERIAL["SB"],
-    bytesize=du.DEF_PUMP_SERIAL["BS"],
-    port=du.DEF_PUMP_SERIAL["PORT"],
+    baudrate=du.DEF_PUMP_SERIAL['baud'],
+    parity=du.DEF_PUMP_SERIAL['par'],
+    stopbits=du.DEF_PUMP_SERIAL['stop'],
+    bytesize=du.DEF_PUMP_SERIAL['size'],
+    port=du.DEF_PUMP_SERIAL['port'],
 )
-Pmp1 = MtecMod(SerialBus, "01")
-Pmp2 = MtecMod(SerialBus, "02")
+Pmp1 = MtecMod(SerialBus, '01')
+Pmp2 = MtecMod(SerialBus, '02')
 pmp1_speed = 0
 pmp2_speed = 0
 
@@ -92,9 +92,9 @@ KeepAliveTmr = Timer(0.25, keep_alive_routine)
 
 master = tkinter.Tk()
 
-connectButton = tkinter.Button(master, text="Connect 1", command=connect)
-stopButton1 = tkinter.Button(master, text="Stop Motor 1", command=(lambda:stop(1)))
-stopButton2 = tkinter.Button(master, text="Stop Motor 2", command=(lambda:stop(2)))
+connectButton = tkinter.Button(master, text='Connect 1', command=connect)
+stopButton1 = tkinter.Button(master, text='Stop Motor 1', command=(lambda:stop(1)))
+stopButton2 = tkinter.Button(master, text='Stop Motor 2', command=(lambda:stop(2)))
 connectButton.pack()
 stopButton1.pack()
 stopButton2.pack()
@@ -105,7 +105,7 @@ slider_1 = tkinter.Scale(
     to=100,
     orient=tkinter.HORIZONTAL,
     command=change_speed_1,
-    label="Input 1: ",
+    label='Input 1: ',
 )
 slider_2 = tkinter.Scale(
     master,
@@ -113,7 +113,7 @@ slider_2 = tkinter.Scale(
     to=100,
     orient=tkinter.HORIZONTAL,
     command=change_speed_2,
-    label="Input 2: ",
+    label='Input 2: ',
 )
 slider_1.pack()
 slider_2.pack()
@@ -123,7 +123,7 @@ tkinter.mainloop()
 KeepAliveTmr.cancel()
 keep_alive_end = True
 
-print("waiting for KATmr..")
+print('waiting for KATmr..')
 while not KeepAliveTmr.finished:
     pass
 

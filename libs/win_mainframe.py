@@ -69,7 +69,7 @@ class Mainframe(PreMainframe):
     def __init__(
             self,
             lpath=None,
-            p_conn=(False, False),
+            dev_avail=False,
             testrun=False,
             parent=None
         ) -> None:
@@ -77,7 +77,6 @@ class Mainframe(PreMainframe):
 
         # getting all prearranged UI functions from PreMainframe
         super().__init__(lpath, testrun, parent)
-        self._testrun = testrun
 
         # LOAD THREADS, SIGNALS & DEFAULT SETTINGS
         self.log_entry('GNRL', 'connecting signals...')
@@ -103,19 +102,21 @@ class Mainframe(PreMainframe):
         self.connect_watchdogs()
 
         # CONNECTIONS SETUP
-        self.log_entry('GNRL', 'connect to Robot...')
-        self.connect_device('ROB')
-
-        if p_conn[0]:
-            self.log_entry('GNRL', 'connect to pump1...')
-            self.connect_device('P1')
-        if p_conn[1]:
-            self.log_entry('GNRL', 'connect to pump2...')
-            self.connect_device('P2')
+        self.init_connection_settings()
+        self.log_entry('GNRL', f"connection setup is {bin(dev_avail)}")
+        for bit, dev in [
+            (4, 'ROB'),
+            (3, 'P1'),
+            (2, 'P2'),
+            (1, 'PRH'),
+        ]:
+            if (dev_avail>>bit)&1:
+                self.log_entry('GNRL', f"connect to {dev}...")
+                self.connect_device(dev)
 
         # SENSOR & CAM ARRAY START-UP
         self._SensorArrThread.start()
-        self._IPCamThread.start()
+        # self._IPCamThread.start()
 
         # FINISH SETUP
         self.log_entry('GNRL', 'setup finished.')
@@ -127,12 +128,10 @@ class Mainframe(PreMainframe):
 
         # AMCON CONTROL
         self.ADC_btt_resetAll.pressed.connect(lambda: self.load_ADC_defaults(send_changes=True))
-        self.ADC_num_panning.valueChanged.connect(self.adc_user_change)
-        self.ADC_num_fibDeliv.valueChanged.connect(self.adc_user_change)
+        self.ADC_num_trolley.valueChanged.connect(self.adc_user_change)
         self.ADC_btt_clamp.released.connect(self.adc_user_change)
-        self.ADC_btt_knifePos.released.connect(self.adc_user_change)
-        self.ADC_btt_knife.released.connect(self.adc_user_change)
-        self.ADC_btt_fiberPnmtc.released.connect(self.adc_user_change)
+        self.ADC_btt_cut.released.connect(self.adc_user_change)
+        self.ADC_btt_placeSpring.released.connect(self.adc_user_change)
         self.ASC_btt_overwrSC.released.connect(self.amcon_script_overwrite)
 
         # DIRECT CONTROL
@@ -156,10 +155,11 @@ class Mainframe(PreMainframe):
         self.IO_btt_orientZero.pressed.connect(lambda: self.set_zero([4, 5, 6]))
 
         # MIXER CONTROL
-        self.MIX_btt_actWithPump.pressed.connect(lambda: self.mutex_setattr('mixer_act_w_pump'))
-        self.MIX_btt_setSpeed.pressed.connect(self.mixer_set_speed)
-        self.MIX_btt_stop.pressed.connect(lambda: self.mixer_set_speed('0'))
-        self.MIX_sld_speed.sliderMoved.connect(lambda: self.mixer_set_speed('sld'))
+        self.PRH_btt_actWithPump.pressed.connect(lambda: self.mutex_setattr('mixer_act_w_pump'))
+        self.PRH_btt_pinchValve.pressed.connect(self.pinch_valve_toggle)
+        self.PRH_btt_setSpeed.pressed.connect(self.mixer_set_speed)
+        self.PRH_btt_stop.pressed.connect(lambda: self.mixer_set_speed('0'))
+        self.PRH_sld_speed.sliderMoved.connect(lambda: self.mixer_set_speed('sld'))
 
         # NUMERIC CONTROL
         self.NC_btt_getValues.pressed.connect(self.values_to_DC_spinbox)
@@ -185,7 +185,6 @@ class Mainframe(PreMainframe):
         self.PUMP_btt_ccToDefault.pressed.connect(lambda: self.pump_set_speed('def'))
         self.PUMP_btt_setSpeed.pressed.connect(self.pump_set_speed)
         self.PUMP_btt_scToDefault.pressed.connect(self.pump_script_overwrite)
-        self.PUMP_btt_pinchValve.pressed.connect(self.pinch_valve_toggle)
 
         # SCRIPT CONTROL
         self.SCTRL_num_liveAd_robot.valueChanged.connect(lambda: self.mutex_setattr('robot_live_ad'))
@@ -205,13 +204,12 @@ class Mainframe(PreMainframe):
         self.SCTRL_btt_clrByID.pressed.connect(lambda: self.clr_queue(partial=True))
 
         # SETTINGS
-        self.TCP_num_commForerun.valueChanged.connect(lambda: self.mutex_setattr('robot_comm_fr'))
+        self.CONN_num_commForerun.valueChanged.connect(lambda: self.mutex_setattr('robot_comm_fr'))
         self.SET_btt_apply.pressed.connect(self.apply_settings)
         self.SET_btt_default.pressed.connect(self.load_defaults)
         self.SET_TE_btt_apply.pressed.connect(self.apply_TE_settings)
         self.SET_TE_btt_default.pressed.connect(self.load_TE_defaults)
-        self.SID_btt_robToProgID.pressed.connect(self.reset_SC_id)
-        self.SID_btt_scIdPlus1.pressed.connect(lambda: self.reset_SC_id(True))
+        self.SID_btt_overwrite.pressed.connect(self.sc_id_overwrite)
 
         # SINGLE COMMAND
         self.SGLC_btt_gcodeSglComm_addByID.pressed.connect(
@@ -233,14 +231,14 @@ class Mainframe(PreMainframe):
         self.SGLC_btt_rapidSglComm.pressed.connect(self.add_rapid_sgl)
 
         # CONNECTIONS
-        self.TCP_ROB_btt_reconn.pressed.connect(lambda: self.connect_device('ROB'))
-        self.TCP_PUMP1_btt_reconn.pressed.connect(lambda: self.connect_device('P1'))
-        self.TCP_PUMP2_btt_reconn.pressed.connect(lambda: self.connect_device('P2'))
-        self.TCP_MIXER_btt_reconn.pressed.connect(lambda: self.connect_device('PRH'))
-        self.TCP_ROB_btt_discon.pressed.connect(lambda: self.disconnect_device('ROB'))
-        self.TCP_PUMP1_btt_discon.pressed.connect(lambda: self.disconnect_device('P1'))
-        self.TCP_PUMP2_btt_discon.pressed.connect(lambda: self.disconnect_device('P2'))
-        self.TCP_MIXER_btt_discon.pressed.connect(lambda: self.disconnect_device('PRH'))
+        self.CONN_ROB_btt_reconn.pressed.connect(lambda: self.connect_device('ROB'))
+        self.CONN_PUMP1_btt_reconn.pressed.connect(lambda: self.connect_device('P1'))
+        self.CONN_PUMP2_btt_reconn.pressed.connect(lambda: self.connect_device('P2'))
+        self.CONN_PRH_btt_reconn.pressed.connect(lambda: self.connect_device('PRH'))
+        self.CONN_ROB_btt_discon.pressed.connect(lambda: self.disconnect_device('ROB'))
+        self.CONN_PUMP1_btt_discon.pressed.connect(lambda: self.disconnect_device('P1'))
+        self.CONN_PUMP2_btt_discon.pressed.connect(lambda: self.disconnect_device('P2'))
+        self.CONN_PRH_btt_discon.pressed.connect(lambda: self.disconnect_device('PRH'))
 
         # TERMINAL
         self.TERM_btt_gcodeInterp.pressed.connect(self.send_gcode_command)
@@ -285,7 +283,7 @@ class Mainframe(PreMainframe):
         self._ctrl_F.activated.connect(lambda: self.send_command(du.SCQueue.pop_first_item()))
         self._ctrl_Raute.activated.connect(lambda: self.clr_queue(partial=False))
         self._ctrl_Q.activated.connect(self.forced_stop_command)
-        self._ctrl_alt_I.activated.connect(self.reset_SC_id)
+        self._ctrl_alt_I.activated.connect(self.sc_id_overwrite)
 
         # DIRECT CONTROL
         self._ctrl_U.activated.connect(lambda: self.send_DC_command('X', '+'))
@@ -318,7 +316,7 @@ class Mainframe(PreMainframe):
         maybe more functionality later
         """
 
-        def action_on_success(
+        def _action_on_success(
                 wd:Watchdog,
                 indi:object,
                 elem_group:list,
@@ -344,9 +342,9 @@ class Mainframe(PreMainframe):
                     self.connect_threads(slot)
                     self._RoboCommThread.start()
 
-                action_on_success(
+                _action_on_success(
                     self._RobRecvWd,
-                    self.TCP_ROB_indi_connected,
+                    self.CONN_ROB_indi_connected,
                     self.ROB_group,
                     f"connected to {ip} at {port}.",
                 )
@@ -360,12 +358,11 @@ class Mainframe(PreMainframe):
         # PUMP CONNECTION
         def pmp_connect(
                 serial:MtecMod,
-                port:str,
                 wd:Watchdog,
                 indi,
                 elem_group:list
         ) -> bool:
-            if not 'COM' in port:
+            if not 'COM' in du.PMP_port:
                 raise ConnectionError('TCP not supported, yet')
 
             else:
@@ -376,12 +373,12 @@ class Mainframe(PreMainframe):
                         self._PumpCommThread.start()
 
                     self._P1RecvWd.start()
-                    action_on_success(
+                    _action_on_success(
                         wd,
                         indi,
                         elem_group,
                         f"connected to {slot} as inverter "
-                        f"{serial.settings_inverter_id} at {port}",
+                        f"{serial.settings_inverter_id} at {du.PMP_port}",
                     )
                     return True
 
@@ -403,9 +400,9 @@ class Mainframe(PreMainframe):
                     self.connect_threads('PMP')
                     self._PumpCommThread.start()
 
-                action_on_success(
+                _action_on_success(
                     self._PRHRecvWd,
-                    self.TCP_MIXER_indi_connected,
+                    self.CONN_PRH_indi_connected,
                     self.PRH_group,
                     f"mixer controller found at {du.PRH_url}",
                 )
@@ -423,17 +420,15 @@ class Mainframe(PreMainframe):
             case 'P1':
                 return pmp_connect(
                     du.PMP1Serial,
-                    du.PMP1Tcp.port,
                     self._P1RecvWd,
-                    self.TCP_PUMP1_indi_connected,
+                    self.CONN_PUMP1_indi_connected,
                     self.PMP1_group
                 )
             case 'P2':
                 return pmp_connect(
                     du.PMP2Serial,
-                    du.PMP2Tcp.port,
                     self._P2RecvWd,
-                    self.TCP_PUMP2_indi_connected,
+                    self.CONN_PUMP2_indi_connected,
                     self.PMP2_group
                 )
             case 'PRH':
@@ -453,7 +448,7 @@ class Mainframe(PreMainframe):
             log_txt = 'user disconnected'
 
         # save current settings to file
-        def save_reset_positions() -> None:
+        def _save_reset_positions() -> None:
             Zero = dcpy(du.DCCurrZero)
             self.log_entry('SAFE', f"Last robot positions:")
             self.log_entry('SAFE', f"zero: {Zero}")
@@ -474,7 +469,7 @@ class Mainframe(PreMainframe):
                 pass
 
         # shut down watchdogs, log, indicate to user
-        def action_on_success(wd:Watchdog, indi:object, elem_group:list) -> None:
+        def _action_on_success(wd:Watchdog, indi:object, elem_group:list) -> None:
             wd.kill()
             self.log_entry('CONN', f"{log_txt} {slot}.")
             css = 'border-radius: 25px; background-color: #4c4a48;'
@@ -489,34 +484,33 @@ class Mainframe(PreMainframe):
 
             # send stop command to robot; stop threading & watchdog
             du.ROBTcp.send(du.QEntry(id=du.SC_curr_comm_id, mt='E'))
-            action_on_success(
+            _action_on_success(
                 self._RobRecvWd,
-                self.TCP_ROB_indi_connected,
+                self.CONN_ROB_indi_connected,
                 self.ROB_group
             )
             self._RoboCommThread.quit()
             du.ROBTcp.close()
 
             # safe data & wait for thread:
-            save_reset_positions()
+            _save_reset_positions()
             self._RoboCommThread.wait()
 
         # PUMP DISCONNECT
         def pmp_disconnect(
                 serial:MtecMod,
-                port:str,
                 wd:Watchdog,
                 indi,
                 elem_group:list
         ) -> None:
             if not serial.connected:
                 return
-            if not 'COM' in port:
+            if not 'COM' in du.PMP_port:
                 raise ConnectionError('TCP not supported yet')
             while du.PMP_comm_active: # finish communication first
                 time.sleep(0.005)
 
-            action_on_success(wd, indi, elem_group)
+            _action_on_success(wd, indi, elem_group)
             serial.disconnect()
         
         # PRH DISCONNECT
@@ -527,9 +521,9 @@ class Mainframe(PreMainframe):
             # no need to inform the server, just switch global toggle
             with QMutexLocker(GlobalMutex):
                 du.PRH_connected = False
-            action_on_success(
+            _action_on_success(
                 self._PRHRecvWd,
-                self.TCP_MIXER_indi_connected,
+                self.CONN_PRH_indi_connected,
                 self.PRH_group
             )
 
@@ -540,17 +534,15 @@ class Mainframe(PreMainframe):
             case 'P1':
                 pmp_disconnect(
                     du.PMP1Serial,
-                    du.PMP1Tcp.port,
                     self._P1RecvWd,
-                    self.TCP_PUMP1_indi_connected,
+                    self.CONN_PUMP1_indi_connected,
                     self.PMP1_group
                 )
             case 'P2':
                 pmp_disconnect(
                     du.PMP2Serial,
-                    du.PMP2Tcp.port,
                     self._P2RecvWd,
-                    self.TCP_PUMP2_indi_connected,
+                    self.CONN_PUMP2_indi_connected,
                     self.PMP2_group
                 )
             case 'PRH':
@@ -598,7 +590,7 @@ class Mainframe(PreMainframe):
             self._PumpCommWorker.logEntry.connect(self.log_entry)
             self._PumpCommWorker.dataSend.connect(self.pump_send)
             self._PumpCommWorker.dataRecv.connect(self.pump_recv)
-            self._PumpCommWorker.dataMixerSend.connect(self.mixer_send)
+            self._PumpCommWorker.dataMixerSend.connect(self.prh_send)
             self._PumpCommWorker.PRHDisconnect.connect(lambda: self.disconnect_device('PRH'))
             self._PumpCommWorker.p1Active.connect(self._P1RecvWd.reset)
             self._PumpCommWorker.p2Active.connect(self._P2RecvWd.reset)
@@ -1273,6 +1265,9 @@ class Mainframe(PreMainframe):
         if fs_warning.result():
             self.stop_SCTRL_queue()
             du.ROBTcp.send(Command) # bypass all queued commands
+            # to-do: stop pum, pinch
+            self.pump_set_speed('0')
+            self.pinch_valve_toggle(internal=True, )
 
             with QMutexLocker(GlobalMutex):
                 LostBuf = dcpy(du.ROBCommQueue)
@@ -1326,7 +1321,7 @@ class Mainframe(PreMainframe):
             if command.id <= LastCom.id:
                 command.id = LastCom.id + 1
         
-        # error catching for previous function return
+        # error catching for previous function returns
         if isinstance(command, Exception):
             print(f"Command generation failed, caused by {command}")
             return
@@ -1407,10 +1402,13 @@ class Mainframe(PreMainframe):
         return
 
 
-    def pinch_valve_toggle(self) -> None:
+    def pinch_valve_toggle(self, internal=False, val=0.0) -> None:
         """not implemented yet"""
 
-        pinch_state = self.PUMP_btt_pinchValve.isChecked()
+        if not internal:
+            pinch_state = self.PUMP_btt_pinchValve.isChecked()
+        else:
+            pinch_state = val
         requests.post(f"{du.PRH_url}\pinch", f"s={pinch_state}")
 
 
@@ -1437,28 +1435,26 @@ class Mainframe(PreMainframe):
     #                              AMCON CONTROL                             #
     ##########################################################################
 
-    def adc_read_user_input(self, panel) -> du.ToolCommand:
+    def prh_read_user_input(self, panel) -> du.ToolCommand:
         """short-hand to get user input"""
         
         RetTool = du.ToolCommand()
         group = self.ADC_group if (panel=='ADC') else self.ASC_group
-        RetTool.pnmtc_clamp_yn = group[0].isChecked()
-        RetTool.knife_pos_yn = group[1].isChecked()
-        RetTool.knife_yn = group[2].isChecked()
-        RetTool.pnmtc_fiber_yn = group[3].isChecked()
-        RetTool.pan_steps = group[4].value()
-        RetTool.fib_deliv_steps = group[5].value()
+        RetTool.trolley_steps = group[0].value()
+        RetTool.clamp = group[1].isChecked()
+        RetTool.cut = group[2].isChecked()
+        RetTool.place_spring = group[3].isChecked()
         return RetTool
 
 
     def adc_user_change(self) -> None:
-        """send changes to Amcon, if user commit them"""
+        """send changes to Amcon, if user commits them"""
 
         if du.DC_rob_moving:
             return None
 
         Pos = dcpy(du.ROBTelem.Coor)
-        Tool = self.adc_read_user_input('ADC')
+        Tool = self.prh_read_user_input('ADC')
         Command = du.QEntry(
             id=du.SC_curr_comm_id,
             Coor1=Pos,
@@ -1468,7 +1464,29 @@ class Mainframe(PreMainframe):
         )
 
         self.log_entry('ACON', f"updating tool status by user: ({Tool})")
-        return self.send_command(Command, dc=True)
+        ans = self.send_command(Command, dc=True)
+        if Command.Tool.place_spring:
+            # if spring is placed, reload it
+            for widget in self.ADC_group:
+                widget.setEnabled(False)
+            self.log_entry('ACON', f"reloading..")
+            time.sleep(0.5)
+            Command.Tool.place_spring = False
+            Command.id += 1
+            self.send_command(Command, dc=True)
+            time.sleep(0.5)
+            Command.Tool.load_spring = True
+            Command.id += 1
+            self.send_command(Command, dc=True)
+            time.sleep(0.5)
+            Command.Tool.load_spring = False
+            Command.id += 1
+            ans = self.send_command(Command, dc=True)
+            for widget in self.ADC_group:
+                widget.setEnabled(True)
+        
+        return ans
+            
 
 
     def amcon_script_overwrite(self) -> None:
@@ -1479,13 +1497,10 @@ class Mainframe(PreMainframe):
                 j = du.SCQueue.id_pos(i + id_start)
             except AttributeError:
                 return False
-
-            du.SCQueue[j].Tool.pan_steps = tool.pan_steps
-            du.SCQueue[j].Tool.fib_deliv_steps = tool.fib_deliv_steps
-            du.SCQueue[j].Tool.pnmtc_clamp_yn= tool.pnmtc_clamp_yn
-            du.SCQueue[j].Tool.knife_pos_yn = tool.knife_pos_yn
-            du.SCQueue[j].Tool.knife_yn = tool.knife_yn
-            du.SCQueue[j].Tool.pnmtc_fiber_yn = tool.pnmtc_fiber_yn
+            du.SCQueue[j].Tool.trolley_steps = tool.trolley_steps
+            du.SCQueue[j].Tool.clamp = tool.clamp
+            du.SCQueue[j].Tool.cut = tool.cut
+            du.SCQueue[j].Tool.place_spring = tool.place_spring
             return True
 
 
@@ -1513,7 +1528,7 @@ class Mainframe(PreMainframe):
             user_info.exec()
             return None
 
-        Tool = self.adc_read_user_input('ASC')
+        Tool = self.prh_read_user_input('ASC')
         if '..' in id_range:
             ids = re.findall('\d+', id_range)
             if len(ids) != 2:

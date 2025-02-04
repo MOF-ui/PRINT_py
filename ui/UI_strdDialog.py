@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(566, 392)
+        Dialog.resize(877, 441)
         Dialog.setStyleSheet(
             "border-radius: 5px;\n"
             'font-family: "Bahnschrift";\n'
@@ -25,7 +25,7 @@ class Ui_Dialog(object):
             "color: #f2f4f3;"
         )
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
-        self.buttonBox.setGeometry(QtCore.QRect(210, 331, 341, 51))
+        self.buttonBox.setGeometry(QtCore.QRect(490, 350, 341, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(14)
@@ -55,7 +55,7 @@ class Ui_Dialog(object):
         )
         self.buttonBox.setObjectName("buttonBox")
         self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(20, 20, 521, 291))
+        self.label.setGeometry(QtCore.QRect(50, 50, 771, 261))
         self.label.setStyleSheet(
             "border-radius: 5px;\n"
             'font-family: "Bahnschrift";\n'

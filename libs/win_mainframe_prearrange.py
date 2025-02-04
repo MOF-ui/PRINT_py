@@ -72,9 +72,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     #                                  SETUP                                #
     #########################################################################
 
-    def __init__(self, lpath, testrun, parent=None) -> None:
+    def __init__(self, lpath, testrun=False, parent=None) -> None:
 
         super().__init__(parent)
+        self._testrun = testrun
 
         # UI SETUP
         self.setupUi(self)
@@ -136,21 +137,17 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         """build groups for enable/disable actions"""
 
         self.ADC_group = [
+            self.ADC_num_trolley,
             self.ADC_btt_clamp,
-            self.ADC_btt_knifePos,
-            self.ADC_btt_knife,
-            self.ADC_btt_fiberPnmtc,
-            self.ADC_num_panning,
-            self.ADC_num_fibDeliv,
+            self.ADC_btt_cut,
+            self.ADC_btt_placeSpring,
         ]
 
         self.ASC_group = [
+            self.ASC_num_trolley,
             self.ASC_btt_clamp,
-            self.ASC_btt_knifePos,
-            self.ASC_btt_knife,
-            self.ASC_btt_fiberPnmtc,
-            self.ASC_num_panning,
-            self.ASC_num_fibDeliv,
+            self.ASC_btt_cut,
+            self.ASC_btt_placeSpring,
         ]
 
         self.DC_group = [
@@ -170,12 +167,12 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         ]
 
         self.PRH_group = [
-            self.MIX_btt_actWithPump,
-            self.MIX_btt_setSpeed,
-            self.MIX_disp_currSpeed,
-            self.MIX_num_setSpeed,
-            self.MIX_sld_speed,
-            self.PUMP_btt_pinchValve
+            self.PRH_btt_actWithPump,
+            self.PRH_btt_setSpeed,
+            self.PRH_disp_currSpeed,
+            self.PRH_num_setSpeed,
+            self.PRH_sld_speed,
+            self.PRH_btt_pinchValve
         ]
         for elem in self.PRH_group:
             elem.setEnabled(False)
@@ -216,11 +213,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self.TERM_btt_gcodeInterp,
             self.TERM_btt_rapidInterp,
             self.ADC_btt_clamp,
-            self.ADC_btt_knifePos,
-            self.ADC_btt_knife,
-            self.ADC_btt_fiberPnmtc,
-            self.ADC_num_panning,
-            self.ADC_num_fibDeliv,
+            self.ADC_btt_cut,
+            self.ADC_btt_placeSpring,
+            self.ADC_num_trolley,
         ]
         self.ROB_group += self.DC_group
         self.ROB_group += self.NC_group
@@ -280,10 +275,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     new_val = self.SCTRL_num_liveAd_robot.value() / 100.0
                     du.ROB_live_ad = new_val
                 case 'robot_comm_fr':
-                    du.ROB_comm_fr = self.TCP_num_commForerun.value()
+                    du.ROB_comm_fr = self.CONN_num_commForerun.value()
                 case 'mixer_act_w_pump':
-                    new_val = not self.MIX_btt_actWithPump.isChecked()
-                    du.MIX_act_with_pump = new_val
+                    new_val = not self.PRH_btt_actWithPump.isChecked()
+                    du.PRH_act_with_pump = new_val
                 case 'pmp_out_ratio':
                     new_val = 1 - (self.PUMP_sld_outputRatio.value() / 100.0)
                     du.PMP_output_ratio = new_val
@@ -367,15 +362,13 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             )
         else:
             self.load_TE_defaults(setup=True)
-            self.TCP_num_commForerun.setValue(du.DEF_ROB_COMM_FR)
+            self.CONN_num_commForerun.setValue(du.DEF_ROB_COMM_FR)
 
             self.load_ADC_defaults()
-            self.ASC_num_panning.setValue(du.DEF_AMC_PANNING)
-            self.ASC_num_fibDeliv.setValue(du.DEF_AMC_FIB_DELIV)
-            self.ASC_btt_clamp.setChecked(du.DEF_AMC_CLAMP)
-            self.ASC_btt_knifePos.setChecked(du.DEF_AMC_KNIFE_POS)
-            self.ASC_btt_knife.setChecked(du.DEF_AMC_KNIFE)
-            self.ASC_btt_fiberPnmtc.setChecked(du.DEF_AMC_FIBER_PNMTC)
+            self.ASC_num_trolley.setValue(du.DEF_PRH_TROLLEY)
+            self.ASC_btt_clamp.setChecked(du.DEF_PRH_CLAMP)
+            self.ASC_btt_cut.setChecked(du.DEF_PRH_CUT)
+            self.ASC_btt_placeSpring.setChecked(du.DEF_PRH_PLACE_SPR)
 
 
     def load_TE_defaults(self, setup=False) -> None:
@@ -398,17 +391,44 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         for widget in self.ADC_group:
             widget.blockSignals(True)
 
-        self.ADC_num_panning.setValue(du.DEF_AMC_PANNING)
-        self.ADC_num_fibDeliv.setValue(du.DEF_AMC_FIB_DELIV)
-        self.ADC_btt_clamp.setChecked(du.DEF_AMC_CLAMP)
-        self.ADC_btt_knifePos.setChecked(du.DEF_AMC_KNIFE_POS)
-        self.ADC_btt_knife.setChecked(du.DEF_AMC_KNIFE)
-        self.ADC_btt_fiberPnmtc.setChecked(du.DEF_AMC_FIBER_PNMTC)
+        self.ADC_num_trolley.setValue(du.DEF_PRH_TROLLEY)
+        self.ADC_btt_clamp.setChecked(du.DEF_PRH_CLAMP)
+        self.ADC_btt_cut.setChecked(du.DEF_PRH_CUT)
+        self.ADC_btt_placeSpring.setChecked(du.DEF_PRH_PLACE_SPR)
         if send_changes:
             self.adc_user_change()
 
         for widget in self.ADC_group:
             widget.blockSignals(False)
+    
+
+    def adc_user_change(self):
+        raise NotImplementedError(
+            f"This method was not overwritten by child class, "
+            f"but overwite is mandatory!"
+        )
+    
+
+    def init_connection_settings(self):
+        """load connection settings once from data_utilities for the
+        user to see, should not change during runtime"""
+
+        # ROBOT
+        self.CONN_ROB_disp_ip.setText(du.ROBTcp.ip)
+        self.CONN_ROB_disp_port.setText(str(du.ROBTcp.port))
+        self.CONN_ROB_disp_rwTo.setText(str(du.ROBTcp.rw_tout))
+        self.CONN_ROB_disp_connTo.setText(str(du.ROBTcp.c_tout))
+        self.CONN_ROB_disp_bytesToRead.setText(str(du.ROBTcp.r_bl))
+        # P1
+        self.CONN_PUMP1_disp_port.setText(du.PMP_port)
+        self.CONN_PUMP1_disp_modbId.setText(du.PMP1_modbus_id)
+        # P2
+        self.CONN_PUMP2_disp_port.setText(du.PMP_port)
+        self.CONN_PUMP2_disp_modbId.setText(du.PMP2_modbus_id)
+        # PRH
+        ip, port = du.PRH_url.split(':')
+        self.CONN_PRH_disp_ip.setText(ip)
+        self.CONN_PRH_disp_port.setText(port)
 
 
 
@@ -448,8 +468,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     f"in sendCommand!"
                 ),
             )
-        self.TCP_ROB_disp_writeBuffer.setText(write_buffer)
-        self.TCP_ROB_disp_bytesWritten.setText(str(num_send))
+        self.CONN_ROB_disp_writeBuffer.setText(write_buffer)
+        self.CONN_ROB_disp_bytesWritten.setText(str(num_send))
 
 
     def robo_recv(self, raw_data_string:str, telem:du.RoboTelemetry) -> None:
@@ -494,6 +514,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             displays[0].setText(str(command))
             displays[1].setText(str(len(command)))
             displays[2].setText(str(ans))
+            displays[3].setText(str(len(ans)))
 
             self.log_entry(
                 f"PMP{p_num}", f"speed set to {speed}, command: {command}"
@@ -502,17 +523,19 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         match source:
             case 'P1':
                 displays = [
-                    self.TCP_PUMP1_disp_writeBuffer,
-                    self.TCP_PUMP1_disp_bytesWritten,
-                    self.TCP_PUMP1_disp_readBuffer
+                    self.CONN_PUMP1_disp_writeBuffer,
+                    self.CONN_PUMP1_disp_bytesWritten,
+                    self.CONN_PUMP1_disp_readBuffer,
+                    self.CONN_PUMP1_disp_bytesToRead,
                 ]
                 p_send(displays, du.PMP1_speed, 1)
 
             case 'P2':
                 displays = [
-                    self.TCP_PUMP2_disp_writeBuffer,
-                    self.TCP_PUMP2_disp_bytesWritten,
-                    self.TCP_PUMP2_disp_readBuffer
+                    self.CONN_PUMP2_disp_writeBuffer,
+                    self.CONN_PUMP2_disp_bytesWritten,
+                    self.CONN_PUMP2_disp_readBuffer,
+                    self.CONN_PUMP2_disp_bytesToRead,
                 ]
                 p_send(displays, du.PMP2_speed, 2)
 
@@ -578,12 +601,12 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                 )
 
 
-    def mixer_send(self, mixer_speed:float) -> None:
-        """display mixer communication"""
+    def prh_send(self, mixer_speed:float) -> None:
+        """display printhead communication"""
 
-        self.TCP_MIXER_disp_writeBuffer.setText(str(mixer_speed))
-        self.TCP_MIXER_disp_bytesWritten.setText(str(len(mixer_speed)))
-        self.log_entry("MIXR", f"speed set to {mixer_speed}")
+        self.CONN_PRH_disp_writeBuffer.setText(str(mixer_speed))
+        self.CONN_PRH_disp_bytesWritten.setText(str(len(mixer_speed)))
+        self.log_entry('PRTH', f"speed set to {mixer_speed}")
 
 
     ##########################################################################
@@ -607,7 +630,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             prog_id = com_id
 
         # SCRIPT  CONTROL
-        self.TCP_ROB_disp_readBuffer.setText(data_string)
+        self.CONN_ROB_disp_readBuffer.setText(data_string)
         self.SCTRL_disp_buffComms.setText(str(prog_id - rob_id))
         self.SCTRL_disp_robCommID.setText(str(rob_id))
         self.SCTRL_disp_progCommID.setText(str(prog_id))
@@ -678,18 +701,14 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         for widget in self.ADC_group: widget.blockSignals(True)
         for widget in self.ASC_group: widget.blockSignals(True)
 
-        self.ADC_num_panning.setValue(entry.Tool.pan_steps)
-        self.ASC_num_panning.setValue(entry.Tool.pan_steps)
-        self.ADC_num_fibDeliv.setValue(entry.Tool.fib_deliv_steps)
-        self.ASC_num_fibDeliv.setValue(entry.Tool.fib_deliv_steps)
-        self.ADC_btt_clamp.setChecked(entry.Tool.pnmtc_clamp_yn)
-        self.ASC_btt_clamp.setChecked(entry.Tool.pnmtc_clamp_yn)
-        self.ADC_btt_knifePos.setChecked(entry.Tool.knife_pos_yn)
-        self.ASC_btt_knifePos.setChecked(entry.Tool.knife_pos_yn)
-        self.ADC_btt_knife.setChecked(entry.Tool.knife_yn)
-        self.ASC_btt_knife.setChecked(entry.Tool.knife_yn)
-        self.ADC_btt_fiberPnmtc.setChecked(entry.Tool.pnmtc_fiber_yn)
-        self.ASC_btt_fiberPnmtc.setChecked(entry.Tool.pnmtc_fiber_yn)
+        self.ADC_num_trolley.setValue(entry.Tool.trolley_steps)
+        self.ASC_num_trolley.setValue(entry.Tool.trolley_steps)
+        self.ADC_btt_clamp.setChecked(entry.Tool.clamp)
+        self.ASC_btt_clamp.setChecked(entry.Tool.clamp)
+        self.ADC_btt_cut.setChecked(entry.Tool.cut)
+        self.ASC_btt_cut.setChecked(entry.Tool.cut)
+        self.ADC_btt_placeSpring.setChecked(entry.Tool.place_spring)
+        self.ASC_btt_placeSpring.setChecked(entry.Tool.place_spring)
 
         for widget in self.ADC_group: widget.blockSignals(False)
         for widget in self.ASC_group: widget.blockSignals(False)
@@ -766,7 +785,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     #                      COMMAND QUEUE HELP FUNCTIONS                      #
     ##########################################################################
 
-    def reset_SC_id(self, incr=False) -> None:
+    def sc_id_overwrite(self) -> None:
         """synchronize SC and ROB ID with this, if program falls out of sync
         with the robot, should happen only with on-the-fly restarts,
         theoretically
@@ -775,18 +794,14 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         if du.DC_rob_moving:
             return
         
+        new_sc_id = self.SID_num_overwrite.value()
         with QMutexLocker(GlobalMutex):
-            if incr:
-                du.SC_curr_comm_id += 1
-                du.SCQueue.increment()
-            else:
-                id_dist = du.ROBTelem.id - 1 - du.SC_curr_comm_id
-                du.SC_curr_comm_id = du.ROBTelem.id - 1
-                du.SCQueue.increment(id_dist)
+            id_dist = new_sc_id - du.SC_curr_comm_id
+            du.SC_curr_comm_id = new_sc_id
+            du.SCQueue.increment(id_dist)
+            last_rob_update = self.CONN_ROB_disp_readBuffer.text()
 
-        self.label_update_on_receive(
-            data_string=self.TCP_ROB_disp_readBuffer.text()
-        )
+        self.label_update_on_receive(data_string=last_rob_update)
         self.log_entry('GNRL', f"User overwrote current comm ID to {du.SC_curr_comm_id}.")
 
 
@@ -804,7 +819,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         # update GUI
         css = "border-radius: 20px; background-color: #00aaff;"
         self.SCTRL_indi_qProcessing.setStyleSheet(css)
-        self.TCP_indi_qProcessing.setStyleSheet(css)
+        self.CONN_indi_qProcessing.setStyleSheet(css)
         self.ASC_indi_qProcessing.setStyleSheet(css)
 
         for widget in self.ASC_group:
@@ -838,7 +853,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         # update GUI
         self.SCTRL_indi_qProcessing.setStyleSheet(css)
-        self.TCP_indi_qProcessing.setStyleSheet(css)
+        self.CONN_indi_qProcessing.setStyleSheet(css)
         self.ASC_indi_qProcessing.setStyleSheet(css)
     
 

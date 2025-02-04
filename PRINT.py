@@ -46,25 +46,27 @@ from libs.win_dialogs import strd_dialog, conn_dialog
 from libs.win_mainframe import Mainframe
 import libs.data_utilities as du
 import libs.func_utilities as fu
+import tests.all_test as full_test
 
 
 #######################    COMMAND LINE ARGUMENTS    #########################
 
-test_arg = False
 arg_len = len(sys.argv)
 arg1 = ''
 
 if arg_len == 2:
     arg1 = sys.argv[1]
-    
     match arg1:
-        case 'test': test_arg = True
+        case 'test':
+            full_test()
+            exit()
         case 'local':
             du.ROBTcp.ip = 'localhost'
-            p_connect = (None, None)
+            dev_avail = True<<4
         case 'overwrite':
             du.ROBTcp.ip = '192.168.125.1'
-            p_connect = (None, None)
+            du.ROBTcp.port = '10001'
+            dev_avail = True<<4
         case _: 
             raise KeyError(f"{arg1} is not a valid argument for PRINT.py!")
 
@@ -77,22 +79,18 @@ elif arg_len > 2:
 if arg1 != 'local' and arg1 != 'overwrite':
     # ask user if default TCP (or USB) connection parameters are to be used,
     # otherwise set new ones
-    cd_ret = conn_dialog(
-        du.DEF_ROB_TCP,
-        du.DEF_PUMP_TCP,
-        du.DEF_PUMP_TCP,
+    ret, dev_avail, rob_set, p_port, prh_url, db_url = conn_dialog(
         title="Welcome to PRINT_py  --  Connection setup",
         standalone=True,
     )
-
-    if not cd_ret['result']:
+    if not ret:
         print(f"User choose to abort setup! Exiting..")
         exit()
     else:
-        du.ROBTcp.set_params(cd_ret['rob_tcp'])
-        du.PMP1Tcp.set_params(cd_ret['p1_tcp'])
-        du.PMP2Tcp.set_params(cd_ret['p2_tcp'])
-        p_connect = (cd_ret['p1_connect'], cd_ret['p2_connect'])
+        du.ROBTcp.set_params(rob_set)
+        du.PMP_port = p_port
+        du.PRH_url = prh_url
+        du.DB_url = db_url
 
 
     # get the go from user
@@ -101,13 +99,12 @@ if arg1 != 'local' and arg1 != 'overwrite':
         f"a TCP connection with the robot at {du.ROBTcp.ip}.\n"
         f"This can take up to {du.ROBTcp.c_tout} s. You may begin.\n\n"
     )
-
-    welc_choice = strd_dialog(
+    ret = strd_dialog(
         welc_text,
         "Welcome to PRINT_py",
         standalone=True
     )
-    if not welc_choice:
+    if not ret:
         print(f"User choose to abort setup! Exiting..")
         exit()
 
@@ -116,7 +113,6 @@ if arg1 != 'local' and arg1 != 'overwrite':
 
 # create logfile and get path
 logpath = fu.create_logfile()
-
 print(
     f"PRINT_py started.\n"
     f"Writing log at {logpath}.\n"
@@ -129,7 +125,7 @@ print(
 app = 0  
 win = 0
 app = QApplication(sys.argv)
-win = Mainframe(lpath=logpath, p_conn=p_connect, testrun=test_arg)
+win = Mainframe(logpath, dev_avail)
 win.show()
 app.exec()
 # sys.exit(app.exec())

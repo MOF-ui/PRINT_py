@@ -71,12 +71,6 @@ class CamCapWindow(QWidget, Ui_CamCapWindow):
         """exit timer"""
 
 
-        for cs in self.cam_streams:
-            if isinstance(cs, cv2.VideoCapture):
-                cs.release()
-
-        self.CapTimer.stop()
-        self.CapTimer.deleteLater()
         event.accept()
 
 

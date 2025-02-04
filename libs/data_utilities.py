@@ -14,6 +14,7 @@ import sys
 import serial
 import socket
 import struct
+import math as m
 from pathlib import Path
 from datetime import datetime, timedelta
 from copy import deepcopy as dcpy
@@ -45,7 +46,7 @@ class Coordinate:
         ext:
             external axis position
 
-    FUNCTIONS:
+    METHODS:
         __init__, __str__, __add__, __sub__, __round__, __eq__, __ne__
     """
 
@@ -254,7 +255,7 @@ class SpeedVector:
         os:
             orientation speed
 
-    FUNCTIONS:
+    METHODS:
         __init__, __str__, __mul__, __rmul__, __eq__, __ne__
     """
 
@@ -340,95 +341,51 @@ class ToolCommand:
     """standard tool command according to Jonas' protocol
 
     ATTRIBUTES:
-        pan_id:
-            motor 1 ID (fiber pivoting)
-        pan_steps:
-            motor 1 steps/position
-        fib_deliv_id:
-            motor 2 ID (fiber delivery)
-        fib_deliv_steps:
-            motor 2 steps/position
-            used as [%] when move type is 'V'
-            used as motor steps when move type is 'T'
-        mor_pump_id:
-            motor 3 ID (mortar pump)
-        mor_pump_steps:
-            motor 3 steps/position
-        pnmtc_clamp_id:
-            pneumatic fiber clamp ID
-        pnmtc_clamp_yn:
-            pneumatic fiber clamp on/off
-        knife_pos_id:
-            knife delivery ID
-        knife_pos_yn:
-            knife delivery on/off
-        knife_id:
-            motor 4 ID (rotation knife)
-        knife_yn:
-            motor 4 on/off
-        pnmtc_fiber_id:
-            pneumatic fiber conveyer ID
-        pnmtc_fiber_yn:
-            pneumatic fiber conveyer on/off
-        time_id:
-            time ID
-        time_time:
-            current time in milli seconds at EE
+        trolley_steps:
+            motor 1 steps as abolsute position relative to reference
+        clamp:
+            0: released, 1: engaged
+        cut:
+            0: cutter off, 1: cutter on
+            invokes corresponding command 'cutter_position'
+            (0: to rest prosition, 1: to cutting position)
+        place_spring:
+            place a spring from barrel onto fiber;
+        load_spring:
+            load a new spring from pre-position into barrel
+        wait:
+            0: robot not stopping
+            >0: robot stops for >0 seconds
 
-    FUNCTIONS:
+    METHODS:
         __def__, __str__, __eq__, __ne__
     """
 
 
     def __init__(
         self,
-        pan_id=0,
-        pan_steps=0,
-        fib_deliv_id=0,
-        fib_deliv_steps=0,
-        mor_pump_id=0,
-        mor_pump_steps=0,
-        pnmtc_clamp_id=0,
-        pnmtc_clamp_yn=0,
-        knife_pos_id=0,
-        knife_pos_yn=0,
-        knife_id=0,
-        knife_yn=0,
-        pnmtc_fiber_id=0,
-        pnmtc_fiber_yn=0,
-        time_id=0,
-        time_time=0,
+        trolley_steps=0,
+        clamp=False,
+        cut=False,
+        place_spring=False,
+        load_spring=False,
+        wait=0,
     ) -> None:
 
-        self.pan_id = int(pan_id)  # pivoting value
-        self.pan_steps = int(pan_steps)
-        self.fib_deliv_id = int(fib_deliv_id)  # fiber value
-        self.fib_deliv_steps = int(fib_deliv_steps)
-        self.mor_pump_id = int(mor_pump_id)  # mortar pump
-        self.mor_pump_steps = int(mor_pump_steps)
-        self.pnmtc_clamp_id = int(pnmtc_clamp_id)
-        self.pnmtc_clamp_yn = bool(pnmtc_clamp_yn)
-        self.knife_pos_id = int(knife_pos_id)
-        self.knife_pos_yn = bool(knife_pos_yn)
-        self.knife_id = int(knife_id)
-        self.knife_yn = bool(knife_yn)
-        self.pnmtc_fiber_id = int(pnmtc_fiber_id)
-        self.pnmtc_fiber_yn = bool(pnmtc_fiber_yn)
-        self.time_id = int(time_id)
-        self.time_time = int(time_time)
+        self.trolley_steps = int(trolley_steps)
+        self.clamp = bool(clamp)
+        self.cut = bool(cut)
+        self.place_spring = bool(place_spring)
+        self.load_spring = bool(load_spring)
+        self.wait = int(wait)
 
 
     def __str__(self) -> str:
 
         return (
-            f"PAN: {self.pan_id}, {self.pan_steps}   "
-            f"FB: {self.fib_deliv_id}, {self.fib_deliv_steps}   "
-            f"MP: {self.mor_pump_id}, {self.mor_pump_steps}   "
-            f"PC: {self.pnmtc_clamp_id}, {self.pnmtc_clamp_yn}   "
-            f"KP: {self.knife_pos_id}, {self.knife_pos_yn}   "
-            f"K: {self.knife_id}, {self.knife_yn}   "
-            f"PF: {self.pnmtc_fiber_id}, {self.pnmtc_fiber_yn}   "
-            f"TIME: {self.time_id}, {self.time_time}"
+            f"TRL: {self.trolley_steps}   PS: {self.place_spring}   "
+            f"LS: {self.load_spring}  CUT: {self.cut}   CL: {self.clamp}   "
+            f"W: {self.wait}"
         )
 
 
@@ -436,22 +393,12 @@ class ToolCommand:
 
         if isinstance(other, ToolCommand):
             if (
-                self.pan_id == other.pan_id
-                and self.pan_steps == other.pan_steps
-                and self.fib_deliv_id == other.fib_deliv_id
-                and self.fib_deliv_steps == other.fib_deliv_steps
-                and self.mor_pump_id == other.mor_pump_id
-                and self.mor_pump_steps == other.mor_pump_steps
-                and self.pnmtc_clamp_id == other.pnmtc_clamp_id
-                and self.pnmtc_clamp_yn == other.pnmtc_clamp_yn
-                and self.knife_pos_id == other.knife_pos_id
-                and self.knife_pos_yn == other.knife_pos_yn
-                and self.knife_id == other.knife_id
-                and self.knife_yn == other.knife_yn
-                and self.pnmtc_fiber_id == other.pnmtc_fiber_id
-                and self.pnmtc_fiber_yn == other.pnmtc_fiber_yn
-                and self.time_id == other.time_id
-                and self.time_time == other.time_time
+                self.trolley_steps == other.trolley_steps
+                and self.clamp == other.clamp
+                and self.cut == other.cut
+                and self.place_spring == other.place_spring
+                and self.load_spring == other.load_spring
+                and self.wait == other.wait
             ):
                 return True
 
@@ -470,22 +417,12 @@ class ToolCommand:
         
         elif isinstance(other, ToolCommand):
             if (
-                self.pan_id != other.pan_id
-                or self.pan_steps != other.pan_steps
-                or self.fib_deliv_id != other.fib_deliv_id
-                or self.fib_deliv_steps != other.fib_deliv_steps
-                or self.mor_pump_id != other.mor_pump_id
-                or self.mor_pump_steps != other.mor_pump_steps
-                or self.pnmtc_clamp_id != other.pnmtc_clamp_id
-                or self.pnmtc_clamp_yn != other.pnmtc_clamp_yn
-                or self.knife_pos_id != other.knife_pos_id
-                or self.knife_pos_yn != other.knife_pos_yn
-                or self.knife_id != other.knife_id
-                or self.knife_yn != other.knife_yn
-                or self.pnmtc_fiber_id != other.pnmtc_fiber_id
-                or self.pnmtc_fiber_yn != other.pnmtc_fiber_yn
-                or self.time_id != other.time_id
-                or self.time_time != other.time_time
+                self.trolley_steps != other.trolley_steps
+                or self.clamp != other.clamp
+                or self.cut != other.cut
+                or self.place_spring != other.place_spring
+                or self.load_spring != other.load_spring
+                or self.wait != other.wait
             ):
                 return True
 
@@ -532,7 +469,7 @@ class QEntry:
         p_ratio:
             option for dual pump printing
 
-    FUNCTIONS:
+    METHODS:
         __init__, __str__, __eq__, __ne__
 
         print_short:
@@ -543,13 +480,13 @@ class QEntry:
     def __init__(
         self,
         id=0,
-        mt="L",
-        pt="E",
+        mt='L',
+        pt='E',
         Coor1=None,
         Coor2=None,
         Speed=None,
         sbt=0,
-        sc="V",
+        sc='V',
         z=10,
         Tool=None,
         p_mode=None,
@@ -661,7 +598,7 @@ class Queue:
             a list of QEntry elements, careful: list index does not match
             QEntry.id
 
-    FUNCTIONS:
+    METHODS:
         __add__, __init__, __iter__, __getitem__, __len__, __next__,
         __str__, __eq__
 
@@ -1044,7 +981,7 @@ class Queue:
 
         if len(self) <= 0:
             return BufferError('Queue empty!')
-        
+
         entry = self[0]
         self._queue.__delitem__(0)
         return entry
@@ -1063,7 +1000,7 @@ class RoboTelemetry:
         Coor:
             current coordinate of the TCP, see Coordinates class
 
-    FUNCTIONS:
+    METHODS:
         __init__, __str__, __round__, __eq__
     """
 
@@ -1147,7 +1084,7 @@ class PumpTelemetry:
         torq:
             torque, probably in Nm
 
-    FUNCTIONS:
+    METHODS:
         __init__, __str__, __round__, __eq__
     """
 
@@ -1231,7 +1168,7 @@ class TSData:
         valid_time:
             user_defined time, the value remains valid
 
-    FUNCTIONS:
+    METHODS:
         __init__, __get__, __set__, __eq__, __ne__, __str__
     """
 
@@ -1341,7 +1278,7 @@ class DaqBlock:
             PHC = print head controller; deposition layer distance behind
             the nozzle
 
-    FUNCTIONS:
+    METHODS:
         __init__, __str__, __eq__,
 
         store:
@@ -1569,20 +1506,20 @@ class TCPIP:
     the connection
 
     ATTRIBUTES:
-        IP:
+        ip:
             endpoint IP address
-        PORT:
+        port:
             endpoint port nummber
-        C_TOUT:
+        c_tout:
             timeout for connection attempts to endpoint
-        RW_TOUT:
+        rw_tout:
             timeout for reading from or writing to endpoint
-        R_BL:
+        r_bl:
             data block length to read
-        W_BL:
+        w_bl:
             data block length to write
 
-    FUNCTIONS:
+    METHODS:
         __init__, __str__
 
         connect:
@@ -1599,20 +1536,20 @@ class TCPIP:
 
     def __init__(
             self,
-            ip="",
-            PORT=0,
-            C_TOUT=1.0,
-            RW_TOUT=1,
-            R_BL=0,
-            W_BL=0
+            ip='',
+            port=0,
+            c_tout=1.0,
+            rw_tout=1,
+            r_bl=0,
+            w_bl=0
     ) -> None:
 
         self.ip = str(ip)
-        self.port = str(PORT)
-        self.c_tout = float(C_TOUT)
-        self.rw_tout = float(RW_TOUT)
-        self.r_bl = int(R_BL)
-        self.w_bl = int(W_BL)
+        self.port = str(port)
+        self.c_tout = float(c_tout)
+        self.rw_tout = float(rw_tout)
+        self.r_bl = int(r_bl)
+        self.w_bl = int(w_bl)
 
         self.connected = False
         self._Socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -1631,15 +1568,15 @@ class TCPIP:
 
         if self.connected:
             raise PermissionError(
-                "params not changeable while connected to server!"
+                'params not changeable while connected to server!'
             )
 
-        self.ip = str(param_dict["IP"])
-        self.port = str(param_dict["PORT"])
-        self.c_tout = float(param_dict["C_TOUT"])
-        self.rw_tout = float(param_dict["RW_TOUT"])
-        self.r_bl = int(param_dict["R_BL"])
-        self.w_bl = int(param_dict["W_BL"])
+        self.ip = str(param_dict['ip'])
+        self.port = str(param_dict['port'])
+        self.c_tout = float(param_dict['c_tout'])
+        self.rw_tout = float(param_dict['rw_tout'])
+        self.r_bl = int(param_dict['r_bl'])
+        self.w_bl = int(param_dict['w_bl'])
 
 
     def connect(self) -> tuple[str, int] | Exception:
@@ -1672,7 +1609,7 @@ class TCPIP:
         if not self.connected:
             return False, ConnectionError(f"no active connection")
         if len(data) != self.w_bl:
-            return False, ValueError("wrong message length")
+            return False, ValueError('wrong message length')
 
         try:
             self._Socket.sendall(data)
@@ -1685,14 +1622,14 @@ class TCPIP:
     def receive(self) -> tuple[bool, bytes | Exception]:
         """receive according to class attributes"""
 
-        data = ""
+        data = ''
 
         try:
             while len(data) < self.r_bl:
                 data = self._Socket.recv(self.r_bl)
 
             if len(data) != self.r_bl:
-                raise ValueError("wrong server answer length")
+                raise ValueError('wrong server answer length')
 
         except Exception as err:
             return False, err
@@ -1716,9 +1653,9 @@ class RobConnection(TCPIP):
     overwrites send & receive functions
 
     ATTRIBUTES:
-        inherited from TCPIP class
+        inherited from ~TCPIP class
 
-    FUNCTIONS:
+    METHODS (redefinition of ~TCPIP methods):
         send:
             sends a QEntry object to server, packing according to robots
             protocol
@@ -1741,10 +1678,10 @@ class RobConnection(TCPIP):
                 raise ValueError(f"{entry} is not an instance of 'QEntry'!")
 
             message = struct.pack(
-                "<iccffffffffffffffffiiiiiciiiiiiiiiiiiiiiii",
+                '<iccffffffffffffffffiiiiiciiiiiiiiiiiiiii',
                 entry.id,
-                bytes(entry.mt, "utf-8"),
-                bytes(entry.pt, "utf-8"),
+                bytes(entry.mt, 'utf-8'),
+                bytes(entry.pt, 'utf-8'),
                 entry.Coor1.x,
                 entry.Coor1.y,
                 entry.Coor1.z,
@@ -1766,28 +1703,28 @@ class RobConnection(TCPIP):
                 entry.Speed.ts,
                 entry.Speed.ors,
                 entry.sbt,
-                bytes(entry.sc, "utf-8"),
+                bytes(entry.sc, 'utf-8'),
                 entry.z,
-                entry.Tool.pan_id,
-                entry.Tool.pan_steps,
-                entry.Tool.fib_deliv_id,
-                entry.Tool.fib_deliv_steps,
-                entry.Tool.mor_pump_id,
-                entry.Tool.mor_pump_steps,
-                entry.Tool.pnmtc_clamp_id,
-                entry.Tool.pnmtc_clamp_yn,
-                entry.Tool.knife_pos_id,
-                entry.Tool.knife_pos_yn,
-                entry.Tool.knife_id,
-                entry.Tool.knife_yn,
-                entry.Tool.pnmtc_fiber_id,
-                entry.Tool.pnmtc_fiber_yn,
-                entry.Tool.time_id,
-                entry.Tool.time_time,
+                0, # ID int, always 0
+                entry.Tool.trolley_steps,
+                0,
+                # byte for cutter position, but simply coupled to cutting here 
+                # as no other usage makes sense
+                entry.Tool.cut,
+                0,
+                entry.Tool.cut,
+                0,
+                entry.Tool.load_spring,
+                0,
+                entry.Tool.place_spring,
+                0,
+                entry.Tool.clamp,
+                0,
+                entry.Tool.wait,
             )
 
             if len(message) != self.w_bl:
-                raise ValueError("wrong message length")
+                raise ValueError('wrong message length')
 
             self._Socket.sendall(message)
 
@@ -1814,15 +1751,15 @@ class RobConnection(TCPIP):
         except Exception as err:
             return err, data
 
-        Telem.t_speed = struct.unpack("<f", data[0:4])[0]
-        Telem.id = struct.unpack("<i", data[4:8])[0]
-        Telem.Coor.x = struct.unpack("<f", data[8:12])[0]
-        Telem.Coor.y = struct.unpack("<f", data[12:16])[0]
-        Telem.Coor.z = struct.unpack("<f", data[16:20])[0]
-        Telem.Coor.rx = struct.unpack("<f", data[20:24])[0]
-        Telem.Coor.ry = struct.unpack("<f", data[24:28])[0]
-        Telem.Coor.rz = struct.unpack("<f", data[28:32])[0]
-        Telem.Coor.ext = struct.unpack("<f", data[32:36])[0]
+        Telem.t_speed = struct.unpack('<f', data[0:4])[0]
+        Telem.id = struct.unpack('<i', data[4:8])[0]
+        Telem.Coor.x = struct.unpack('<f', data[8:12])[0]
+        Telem.Coor.y = struct.unpack('<f', data[12:16])[0]
+        Telem.Coor.z = struct.unpack('<f', data[16:20])[0]
+        Telem.Coor.rx = struct.unpack('<f', data[20:24])[0]
+        Telem.Coor.ry = struct.unpack('<f', data[24:28])[0]
+        Telem.Coor.rz = struct.unpack('<f', data[28:32])[0]
+        Telem.Coor.ext = struct.unpack('<f', data[32:36])[0]
         return Telem, data
 
 
@@ -1835,196 +1772,166 @@ class RobConnection(TCPIP):
 # only if you know what your doing!)
 
 # MTEC P20 DEFAULT SETTINGS
-DEF_PUMP_TCP = {
-    "IP": "",
-    "PORT": "COM3",
-    "C_TOUT": 0,
-    "RW_TOUT": 0,
-    "R_BL": 0,
-    "W_BL": 0,
-} # pumps are run via COM interface, using this structure to store parameters
-DEF_PUMP_SERIAL = {
-    "BR": 19200,
-    "P": serial.PARITY_NONE,
-    "SB": serial.STOPBITS_TWO,
-    "BS": serial.EIGHTBITS,
-    "PORT": "COM3",
-}
-DEF_PUMP_LPS = 0.5
-DEF_PUMP_RETR_SPEED = -50.0 # [%]
-DEF_PUMP_OUTP_RATIO = 1.0
 DEF_PUMP_CLASS1 = 75.0
 DEF_PUMP_CLASS2 = 50.0
+DEF_PUMP_LPS = 0.5
+DEF_PUMP_RETR_SPEED = -50.0 # [%]
+DEF_PUMP_SERIAL = {
+    'baud': 19200,
+    'par': serial.PARITY_NONE,
+    'stop': serial.STOPBITS_TWO,
+    'size': serial.EIGHTBITS,
+    'port': 'COM3',
+}
+DEF_PUMP_OUTP_RATIO = 1.0
 
 # ROBOT DEFAULT SETTINGS
-DEF_ROB_TCP = {
-    "IP": "192.168.125.1",
-    "PORT": 10001,
-    "C_TOUT": 60000,
-    "RW_TOUT": 5,
-    "R_BL": 36,
-    "W_BL": 159,
-}
-DEF_ROB_COMM_FR = 10
 DEF_ROB_BUFF_SIZE = 3000
+DEF_ROB_COMM_FR = 10
 DEF_ROB_COOR_CHK_RANGE = ( # to-do: better mapping
     Coordinate(-1600.0, 1200.0, -80.0, 0.0, 0.0, 0.0, 0.0, 10.0),
     Coordinate(3500.0, 2600.0, 2000.0, 360.0, 360.0, 360.0, 1.0, 3000.0),
 )
+DEF_ROB_TCP = {
+    'ip': '192.168.125.1',
+    'port': 10001,
+    'c_tout': 60000,
+    'rw_tout': 5,
+    'r_bl': 36,
+    'w_bl': 151,
+}
 
 # GENERAL DEFAULT SETTINGS
-DEF_AMC_PANNING = 0
-DEF_AMC_FIB_DELIV = 100
-DEF_AMC_CLAMP = False
-DEF_AMC_KNIFE_POS = False
-DEF_AMC_KNIFE = False
-DEF_AMC_FIBER_PNMTC = False
 DEF_DC_SPEED = SpeedVector()
-DEF_IO_ZONE = 10 # [mm]
-DEF_IO_FR_TO_TS = 0.1
 DEF_ICQ_MAX_LINES = 200
+DEF_IO_FR_TO_TS = 0.1
+DEF_IO_ZONE = 10 # [mm]
+DEF_PRH_CLAMP = False
+DEF_PRH_CUT = False
+DEF_PRH_PLACE_SPR = False
+DEF_PRH_TROLLEY = 0
+DEF_PRH_WAIT = 0
 DEF_PRIN_SPEED = SpeedVector()
-DEF_SC_VOL_PER_M = 0.4  # [L/m] calculated for 1m of 4cm x 1cm high filament
-DEF_SC_MAX_LINES = 400
 DEF_SC_EXT_FLLW_BHVR = (5, 2) # [mm]
+DEF_SC_MAX_LINES = 400
+DEF_SC_VOL_PER_M = 0.4  # [L/m] calculated for 1m of 4cm x 1cm high filament
 DEF_STT_VALID_TIME = 60 # [seconds]
 DEF_TERM_MAX_LINES = 300
-DEF_TOOL_FIB_STPS = 10
 DEF_TOOL_FIB_RATIO = 1.0
+DEF_TOOL_FIB_STPS = 10
 DEF_WD_TIMEOUT = 10000 # [ms]
 
 
 ##########################     GLOBALS VARS     ##############################
 
 # GENERAL SETTINGS
-ADC_panning = DEF_AMC_PANNING
-ADC_fib_deliv = DEF_AMC_FIB_DELIV
-ADC_clamp = DEF_AMC_CLAMP
-ADC_knife_pos = DEF_AMC_KNIFE_POS
-ADC_knife = DEF_AMC_KNIFE
-ADC_fib_pnmtc = DEF_AMC_FIBER_PNMTC
 CAM_urls = [
     'rtsp://admin:KameraNr4@192.168.178.51:554/ch1/main/av_stream',
     'rtsp://admin:KameraNr1@192.168.178.38:554/ch1/main/av_stream',
 ]
+DC_rob_moving = False
 DCCurrZero = Coordinate()
 DCSpeed = dcpy(DEF_DC_SPEED)
-DC_rob_moving = False
 IO_curr_filepath = None
 IO_fr_to_ts = DEF_IO_FR_TO_TS
 IO_zone = DEF_IO_ZONE
 LOG_safe_path = Path()
 PRINSpeed = dcpy(DEF_PRIN_SPEED)
-SCQueue = Queue()
-SCBreakPoint = Coordinate() # to-do: write routine to stop at predefined point during SC using this Coordinate + decide if useful
-SC_vol_per_m = DEF_SC_VOL_PER_M
 SC_curr_comm_id = 1
-SC_q_processing = False
-SC_q_prep_end = False
 SC_ext_fllw_bhvr = DEF_SC_EXT_FLLW_BHVR
+SC_q_prep_end = False
+SC_q_processing = False
+SC_vol_per_m = DEF_SC_VOL_PER_M
+SCBreakPoint = Coordinate() # to-do: write routine to stop at predefined point during SC using this Coordinate + decide if useful
+SCQueue = Queue()
 STTDataBlock = DaqBlock()
 TERM_log = []
 TOOL_fib_ratio = DEF_TOOL_FIB_RATIO
 
 # DATABASE SETTINGS
-DB_session = 'not set'
-DB_org = 'MC3DB'
-DB_token = None
-DB_url = 'http://192.168.178.50:8086'
 DB_log_interval = 10
+DB_org = 'MC3DB'
+DB_session = 'not set'
+DB_token = None
+DB_url = '192.168.178.50:8086'
 
 # PRINTHEAD SETTINGS
+PRH_act_with_pump = False
 MIX_last_speed = 0.0
 MIX_max_speed = 300.0 # [rpm]
 MIX_speed = 0.0
-MIX_act_with_pump = False
 PRH_connected = False
-PRH_url = 'http://192.168.178.58:17'
+PRH_url = '192.168.178.58:17'
 
 # MTEC P20 SETTINGS
-PMP_retract_speed = DEF_PUMP_RETR_SPEED
-PMP_output_ratio = DEF_PUMP_OUTP_RATIO
-PMP_serial_def_bus = None  # is created after user input in win_mainframe
 PMP_comm_active = False
+PMP_output_ratio = DEF_PUMP_OUTP_RATIO
+PMP_port = DEF_PUMP_SERIAL['port']
+PMP_retract_speed = DEF_PUMP_RETR_SPEED
+PMP_serial_def_bus = None  # is created after user input in win_mainframe
 PMP_speed = 0
-PMP1LastTelem = PumpTelemetry()
 PMP1_liter_per_s = DEF_PUMP_LPS
 PMP1_live_ad = 1.0
+PMP1_modbus_id = '01'
 PMP1_speed = 0
-PMP1Serial = MtecMod(None, '01')
 PMP1_user_speed = -999
-PMP1Tcp = TCPIP(
-    DEF_PUMP_TCP['IP'],
-    DEF_PUMP_TCP['PORT'],
-    DEF_PUMP_TCP['C_TOUT'],
-    DEF_PUMP_TCP['RW_TOUT'],
-    DEF_PUMP_TCP['R_BL'],
-    DEF_PUMP_TCP['W_BL'],
-) # pumps are run via COM interface, using this structure to store parameters
-# to-do: skip creating an unused socket object
-PMP2LastTelem = PumpTelemetry()
+PMP1LastTelem = PumpTelemetry()
+PMP1Serial = MtecMod(None, PMP1_modbus_id)
 PMP2_liter_per_s = DEF_PUMP_LPS
 PMP2_live_ad = 1.0
+PMP2_modbus_id = '02'
 PMP2_speed = 0
-PMP2Serial = MtecMod(None, '02')
 PMP2_user_speed = -999
-PMP2Tcp = TCPIP(
-    DEF_PUMP_TCP['IP'],
-    DEF_PUMP_TCP['PORT'],
-    DEF_PUMP_TCP['C_TOUT'],
-    DEF_PUMP_TCP['RW_TOUT'],
-    DEF_PUMP_TCP['R_BL'],
-    DEF_PUMP_TCP['W_BL'],
-) # pumps are run via COM interface, using this structure to store parameters
-# to-do: skip creating an unused socket object
+PMP2LastTelem = PumpTelemetry()
+PMP2Serial = MtecMod(None, PMP2_modbus_id)
 
 # ROBOT SETTINGS
 ROB_comm_fr = DEF_ROB_COMM_FR
+ROB_live_ad = 1.0
+ROB_send_list = []
+ROB_speed_overwrite = -1
 ROBCommQueue = Queue()
 ROBLastTelem = RoboTelemetry()
-ROBTelem = RoboTelemetry()
 ROBMovStartP = Coordinate()
 ROBMovEndP = Coordinate()
-ROB_send_list = []
-ROB_live_ad = 1.0
-ROB_speed_overwrite = -1
+ROBTelem = RoboTelemetry()
 ROBTcp = RobConnection(
-    DEF_ROB_TCP['IP'],
-    DEF_ROB_TCP['PORT'],
-    DEF_ROB_TCP['C_TOUT'],
-    DEF_ROB_TCP['RW_TOUT'],
-    DEF_ROB_TCP['R_BL'],
-    DEF_ROB_TCP['W_BL'],
+    DEF_ROB_TCP['ip'],
+    DEF_ROB_TCP['port'],
+    DEF_ROB_TCP['c_tout'],
+    DEF_ROB_TCP['rw_tout'],
+    DEF_ROB_TCP['r_bl'],
+    DEF_ROB_TCP['w_bl'],
 )
 
 # SENSOR ARRAY SETTINGS
 SEN_timeout = 0.5
 SEN_dict = { # add available datasources here
     'amb': { # AMBient
-        'ip': "192.168.178.36:17",
+        'ip': '192.168.178.36:17',
         'err': False,
         'temp': False,
         'humid': False,
     },
     'asp': { # Admixture Supply Pump
-        'ip': "",
+        'ip': '',
         'err': False,
         'freq': False,
         'amps': False,
     },
     'rb': { # Robot Base
-        'ip': "",
+        'ip': '',
         'err': False,
         'temp': False,
     },
     'msp': { # Main Supply Pump
-        'ip': "192.168.178.36:17",
+        'ip': '192.168.178.36:17',
         'err': False,
         'temp': True,
         'pressure': False,
     },
     'imp': { # Inline Mixing Pump
-        'ip': "",
+        'ip': '',
         'err': False,
         'temp': False,
         'pressure': False,
@@ -2032,7 +1939,7 @@ SEN_dict = { # add available datasources here
         'amps': False
     },
     'phc': { # Print Head Controller
-        'ip': "",
+        'ip': '',
         'err': False,
         'aircon': False,
         'fdist': False,

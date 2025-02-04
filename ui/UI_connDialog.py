@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\connSetup.ui'
+# Form implementation generated from reading ui file '.\connSetup_v2.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -11,11 +11,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(789, 643)
-        Dialog.setStyleSheet(
+class Ui_CONN(object):
+    def setupUi(self, CONN):
+        CONN.setObjectName("CONN")
+        CONN.resize(880, 787)
+        CONN.setStyleSheet(
             "/* leave here to be overwritten by anything more specific */\n"
             "QObject {\n"
             "    background: #4c4a48;\n"
@@ -30,11 +30,10 @@ class Ui_Dialog(object):
             "/* alphabetical from here */\n"
             "\n"
             "QCheckBox::indicator {\n"
-            "    top: -1 px;\n"
-            "    width: 13px;\n"
-            "    height: 13px;\n"
+            "    width: 20px;\n"
+            "    height: 20px;\n"
             "    background-color: #f2f4f3;\n"
-            "    border-radius: 2px;\n"
+            "    border-radius: 5px;\n"
             "}\n"
             "\n"
             "QCheckBox::indicator:checked {\n"
@@ -210,9 +209,9 @@ class Ui_Dialog(object):
             "    border-color: #aab9e6\n"
             "}"
         )
-        self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
-        self.buttonBox.setGeometry(QtCore.QRect(170, 560, 571, 51))
-        self.buttonBox.setStyleSheet(
+        self.CONN_bttbox = QtWidgets.QDialogButtonBox(CONN)
+        self.CONN_bttbox.setGeometry(QtCore.QRect(260, 710, 571, 51))
+        self.CONN_bttbox.setStyleSheet(
             "QPushButton {\n"
             "    background-color: #FFBA00;\n"
             "    color: #000000;\n"
@@ -230,333 +229,366 @@ class Ui_Dialog(object):
             "    background-color: #88AB75;\n"
             "}"
         )
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(
+        self.CONN_bttbox.setOrientation(QtCore.Qt.Horizontal)
+        self.CONN_bttbox.setStandardButtons(
             QtWidgets.QDialogButtonBox.Abort | QtWidgets.QDialogButtonBox.Ok
         )
-        self.buttonBox.setCenterButtons(False)
-        self.buttonBox.setObjectName("buttonBox")
-        self.TCP_ROB_lbl_tio_conn = QtWidgets.QLabel(Dialog)
-        self.TCP_ROB_lbl_tio_conn.setGeometry(QtCore.QRect(80, 290, 131, 30))
-        self.TCP_ROB_lbl_tio_conn.setStyleSheet(
+        self.CONN_bttbox.setCenterButtons(False)
+        self.CONN_bttbox.setObjectName("CONN_bttbox")
+        self.ROB_lbl_connTo = QtWidgets.QLabel(CONN)
+        self.ROB_lbl_connTo.setGeometry(QtCore.QRect(500, 150, 151, 30))
+        self.ROB_lbl_connTo.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_tio_conn.setAlignment(
+        self.ROB_lbl_connTo.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_tio_conn.setObjectName("TCP_ROB_lbl_tio_conn")
-        self.TCP_ROB_lbl_bytesToRead = QtWidgets.QLabel(Dialog)
-        self.TCP_ROB_lbl_bytesToRead.setGeometry(QtCore.QRect(80, 370, 131, 30))
-        self.TCP_ROB_lbl_bytesToRead.setStyleSheet(
+        self.ROB_lbl_connTo.setObjectName("ROB_lbl_connTo")
+        self.ROB_lbl_port = QtWidgets.QLabel(CONN)
+        self.ROB_lbl_port.setGeometry(QtCore.QRect(700, 50, 131, 30))
+        self.ROB_lbl_port.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_bytesToRead.setAlignment(
+        self.ROB_lbl_port.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_bytesToRead.setObjectName("TCP_ROB_lbl_bytesToRead")
-        self.TCP_ROB_lbl_port = QtWidgets.QLabel(Dialog)
-        self.TCP_ROB_lbl_port.setGeometry(QtCore.QRect(80, 210, 131, 30))
-        self.TCP_ROB_lbl_port.setStyleSheet(
+        self.ROB_lbl_port.setObjectName("ROB_lbl_port")
+        self.ROB_lbl_rwTo = QtWidgets.QLabel(CONN)
+        self.ROB_lbl_rwTo.setGeometry(QtCore.QRect(690, 150, 141, 30))
+        self.ROB_lbl_rwTo.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_port.setAlignment(
+        self.ROB_lbl_rwTo.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_port.setObjectName("TCP_ROB_lbl_port")
-        self.TCP_ROB_lbl_tio_rw = QtWidgets.QLabel(Dialog)
-        self.TCP_ROB_lbl_tio_rw.setGeometry(QtCore.QRect(80, 450, 131, 30))
-        self.TCP_ROB_lbl_tio_rw.setStyleSheet(
+        self.ROB_lbl_rwTo.setObjectName("ROB_lbl_rwTo")
+        self.ROB_lbl_ip = QtWidgets.QLabel(CONN)
+        self.ROB_lbl_ip.setGeometry(QtCore.QRect(450, 50, 131, 30))
+        self.ROB_lbl_ip.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_tio_rw.setAlignment(
+        self.ROB_lbl_ip.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_tio_rw.setObjectName("TCP_ROB_lbl_tio_rw")
-        self.TCP_ROB_lbl_ip = QtWidgets.QLabel(Dialog)
-        self.TCP_ROB_lbl_ip.setGeometry(QtCore.QRect(80, 130, 131, 30))
-        self.TCP_ROB_lbl_ip.setStyleSheet(
+        self.ROB_lbl_ip.setObjectName("ROB_lbl_ip")
+        self.ROB_lbl = QtWidgets.QLabel(CONN)
+        self.ROB_lbl.setGeometry(QtCore.QRect(70, 80, 161, 51))
+        self.ROB_lbl.setStyleSheet(
+            "background: #5d707f;\n" "color: #f2f4f3;\n" "font-size: 20pt;"
+        )
+        self.ROB_lbl.setAlignment(QtCore.Qt.AlignCenter)
+        self.ROB_lbl.setObjectName("ROB_lbl")
+        self.P1_lbl = QtWidgets.QLabel(CONN)
+        self.P1_lbl.setGeometry(QtCore.QRect(70, 280, 161, 51))
+        self.P1_lbl.setStyleSheet(
+            "background: #5d707f;\n" "color: #f2f4f3;\n" "font-size: 20pt;"
+        )
+        self.P1_lbl.setAlignment(QtCore.Qt.AlignCenter)
+        self.P1_lbl.setObjectName("P1_lbl")
+        self.P1_lbl_port = QtWidgets.QLabel(CONN)
+        self.P1_lbl_port.setGeometry(QtCore.QRect(606, 295, 91, 30))
+        self.P1_lbl_port.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_ip.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        self.P1_lbl_port.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
-        self.TCP_ROB_lbl_ip.setObjectName("TCP_ROB_lbl_ip")
-        self.TCP_ROB_lbl_0 = QtWidgets.QLabel(Dialog)
-        self.TCP_ROB_lbl_0.setGeometry(QtCore.QRect(90, 40, 111, 41))
-        self.TCP_ROB_lbl_0.setStyleSheet("background: #5d707f;\n" "color: #f2f4f3;")
-        self.TCP_ROB_lbl_0.setAlignment(QtCore.Qt.AlignCenter)
-        self.TCP_ROB_lbl_0.setObjectName("TCP_ROB_lbl_0")
-        self.TCP_PUMP1_lbl_0 = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP1_lbl_0.setGeometry(QtCore.QRect(330, 40, 111, 41))
-        self.TCP_PUMP1_lbl_0.setStyleSheet("background: #5d707f;\n" "color: #f2f4f3;")
-        self.TCP_PUMP1_lbl_0.setAlignment(QtCore.Qt.AlignCenter)
-        self.TCP_PUMP1_lbl_0.setObjectName("TCP_PUMP1_lbl_0")
-        self.TCP_PUMP2_lbl_0 = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP2_lbl_0.setGeometry(QtCore.QRect(560, 40, 111, 41))
-        self.TCP_PUMP2_lbl_0.setStyleSheet("background: #5d707f;\n" "color: #f2f4f3;")
-        self.TCP_PUMP2_lbl_0.setAlignment(QtCore.Qt.AlignCenter)
-        self.TCP_PUMP2_lbl_0.setObjectName("TCP_PUMP2_lbl_0")
-        self.TCP_PUMP1_lbl_ip = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP1_lbl_ip.setGeometry(QtCore.QRect(320, 130, 131, 30))
-        self.TCP_PUMP1_lbl_ip.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_ip.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP1_lbl_ip.setObjectName("TCP_PUMP1_lbl_ip")
-        self.TCP_PUMP1_lbl_tio_conn = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP1_lbl_tio_conn.setGeometry(QtCore.QRect(320, 290, 131, 30))
-        self.TCP_PUMP1_lbl_tio_conn.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_tio_conn.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP1_lbl_tio_conn.setObjectName("TCP_PUMP1_lbl_tio_conn")
-        self.TCP_PUMP1_lbl_bytesToRead = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP1_lbl_bytesToRead.setGeometry(QtCore.QRect(320, 370, 131, 30))
-        self.TCP_PUMP1_lbl_bytesToRead.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_bytesToRead.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP1_lbl_bytesToRead.setObjectName("TCP_PUMP1_lbl_bytesToRead")
-        self.TCP_PUMP1_lbl_port = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP1_lbl_port.setGeometry(QtCore.QRect(320, 210, 131, 30))
-        self.TCP_PUMP1_lbl_port.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_port.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP1_lbl_port.setObjectName("TCP_PUMP1_lbl_port")
-        self.TCP_PUMP1_lbl_tio_rw = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP1_lbl_tio_rw.setGeometry(QtCore.QRect(320, 450, 131, 30))
-        self.TCP_PUMP1_lbl_tio_rw.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_tio_rw.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP1_lbl_tio_rw.setObjectName("TCP_PUMP1_lbl_tio_rw")
-        self.TCP_PUMP2_lbl_tio_rw = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP2_lbl_tio_rw.setGeometry(QtCore.QRect(550, 450, 131, 30))
-        self.TCP_PUMP2_lbl_tio_rw.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_tio_rw.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_tio_rw.setObjectName("TCP_PUMP2_lbl_tio_rw")
-        self.TCP_PUMP2_lbl_port = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP2_lbl_port.setGeometry(QtCore.QRect(550, 210, 131, 30))
-        self.TCP_PUMP2_lbl_port.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_port.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_port.setObjectName("TCP_PUMP2_lbl_port")
-        self.TCP_PUMP2_lbl_bytesToRead = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP2_lbl_bytesToRead.setGeometry(QtCore.QRect(550, 370, 131, 30))
-        self.TCP_PUMP2_lbl_bytesToRead.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_bytesToRead.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_bytesToRead.setObjectName("TCP_PUMP2_lbl_bytesToRead")
-        self.TCP_PUMP2_lbl_ip = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP2_lbl_ip.setGeometry(QtCore.QRect(550, 130, 131, 30))
-        self.TCP_PUMP2_lbl_ip.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_ip.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_ip.setObjectName("TCP_PUMP2_lbl_ip")
-        self.TCP_PUMP2_lbl_tio_conn = QtWidgets.QLabel(Dialog)
-        self.TCP_PUMP2_lbl_tio_conn.setGeometry(QtCore.QRect(550, 290, 131, 30))
-        self.TCP_PUMP2_lbl_tio_conn.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_tio_conn.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_tio_conn.setObjectName("TCP_PUMP2_lbl_tio_conn")
-        self.TCP_ROB_entry_ip = QtWidgets.QLineEdit(Dialog)
-        self.TCP_ROB_entry_ip.setGeometry(QtCore.QRect(80, 160, 131, 41))
-        self.TCP_ROB_entry_ip.setObjectName("TCP_ROB_entry_ip")
-        self.TCP_ROB_entry_port = QtWidgets.QLineEdit(Dialog)
-        self.TCP_ROB_entry_port.setGeometry(QtCore.QRect(80, 240, 131, 41))
-        self.TCP_ROB_entry_port.setObjectName("TCP_ROB_entry_port")
-        self.TCP_PUMP1_entry_port = QtWidgets.QLineEdit(Dialog)
-        self.TCP_PUMP1_entry_port.setGeometry(QtCore.QRect(320, 240, 131, 41))
-        self.TCP_PUMP1_entry_port.setObjectName("TCP_PUMP1_entry_port")
-        self.TCP_PUMP1_entry_ip = QtWidgets.QLineEdit(Dialog)
-        self.TCP_PUMP1_entry_ip.setGeometry(QtCore.QRect(320, 160, 131, 41))
-        self.TCP_PUMP1_entry_ip.setObjectName("TCP_PUMP1_entry_ip")
-        self.TCP_PUMP2_entry_port = QtWidgets.QLineEdit(Dialog)
-        self.TCP_PUMP2_entry_port.setGeometry(QtCore.QRect(550, 240, 131, 41))
-        self.TCP_PUMP2_entry_port.setObjectName("TCP_PUMP2_entry_port")
-        self.TCP_PUMP2_entry_ip = QtWidgets.QLineEdit(Dialog)
-        self.TCP_PUMP2_entry_ip.setGeometry(QtCore.QRect(550, 160, 131, 41))
-        self.TCP_PUMP2_entry_ip.setObjectName("TCP_PUMP2_entry_ip")
-        self.TCP_ROB_num_tio_rw = QtWidgets.QSpinBox(Dialog)
-        self.TCP_ROB_num_tio_rw.setGeometry(QtCore.QRect(80, 480, 131, 41))
-        self.TCP_ROB_num_tio_rw.setAlignment(
+        self.P1_lbl_port.setObjectName("P1_lbl_port")
+        self.ROB_entry_ip = QtWidgets.QLineEdit(CONN)
+        self.ROB_entry_ip.setGeometry(QtCore.QRect(450, 80, 231, 51))
+        self.ROB_entry_ip.setStyleSheet("font-size: 18pt;")
+        self.ROB_entry_ip.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_ROB_num_tio_rw.setMaximum(99999)
-        self.TCP_ROB_num_tio_rw.setObjectName("TCP_ROB_num_tio_rw")
-        self.TCP_ROB_num_bytesToRead = QtWidgets.QSpinBox(Dialog)
-        self.TCP_ROB_num_bytesToRead.setGeometry(QtCore.QRect(80, 400, 131, 41))
-        self.TCP_ROB_num_bytesToRead.setAlignment(
+        self.ROB_entry_ip.setObjectName("ROB_entry_ip")
+        self.ROB_entry_port = QtWidgets.QLineEdit(CONN)
+        self.ROB_entry_port.setGeometry(QtCore.QRect(700, 80, 131, 51))
+        self.ROB_entry_port.setStyleSheet("font-size: 18pt;")
+        self.ROB_entry_port.setObjectName("ROB_entry_port")
+        self.P1_entry_port = QtWidgets.QLineEdit(CONN)
+        self.P1_entry_port.setGeometry(QtCore.QRect(700, 280, 131, 51))
+        self.P1_entry_port.setStyleSheet("font-size: 18pt;\n" "")
+        self.P1_entry_port.setObjectName("P1_entry_port")
+        self.ROB_num_rwTo = QtWidgets.QSpinBox(CONN)
+        self.ROB_num_rwTo.setGeometry(QtCore.QRect(690, 180, 141, 41))
+        self.ROB_num_rwTo.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_ROB_num_bytesToRead.setMaximum(99999)
-        self.TCP_ROB_num_bytesToRead.setObjectName("TCP_ROB_num_bytesToRead")
-        self.TCP_ROB_num_tio_conn = QtWidgets.QSpinBox(Dialog)
-        self.TCP_ROB_num_tio_conn.setGeometry(QtCore.QRect(80, 320, 131, 41))
-        self.TCP_ROB_num_tio_conn.setAlignment(
+        self.ROB_num_rwTo.setMaximum(99999)
+        self.ROB_num_rwTo.setObjectName("ROB_num_rwTo")
+        self.ROB_num_connTo = QtWidgets.QSpinBox(CONN)
+        self.ROB_num_connTo.setGeometry(QtCore.QRect(500, 180, 151, 41))
+        self.ROB_num_connTo.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_ROB_num_tio_conn.setMaximum(99999)
-        self.TCP_ROB_num_tio_conn.setObjectName("TCP_ROB_num_tio_conn")
-        self.TCP_PUMP1_num_tio_rw = QtWidgets.QSpinBox(Dialog)
-        self.TCP_PUMP1_num_tio_rw.setGeometry(QtCore.QRect(320, 480, 131, 41))
-        self.TCP_PUMP1_num_tio_rw.setAlignment(
+        self.ROB_num_connTo.setMaximum(99999)
+        self.ROB_num_connTo.setObjectName("ROB_num_connTo")
+        self.P1_chk_available = QtWidgets.QCheckBox(CONN)
+        self.P1_chk_available.setGeometry(QtCore.QRect(260, 300, 131, 20))
+        self.P1_chk_available.setStyleSheet(
+            "QCheckBox {\n" "    color: #f2f4f3;\n" "    font-size: 14pt;\n" "}\n" ""
+        )
+        self.P1_chk_available.setObjectName("P1_chk_available")
+        self.CONN_btt_default = QtWidgets.QPushButton(CONN)
+        self.CONN_btt_default.setGeometry(QtCore.QRect(70, 720, 211, 35))
+        self.CONN_btt_default.setObjectName("CONN_btt_default")
+        self.ROB_lbl_colon = QtWidgets.QLabel(CONN)
+        self.ROB_lbl_colon.setGeometry(QtCore.QRect(679, 88, 21, 30))
+        self.ROB_lbl_colon.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 14pt;\n"
+            "font: bold;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.ROB_lbl_colon.setAlignment(QtCore.Qt.AlignCenter)
+        self.ROB_lbl_colon.setObjectName("ROB_lbl_colon")
+        self.P2_lbl_port = QtWidgets.QLabel(CONN)
+        self.P2_lbl_port.setGeometry(QtCore.QRect(606, 395, 91, 30))
+        self.P2_lbl_port.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.P2_lbl_port.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
+        self.P2_lbl_port.setObjectName("P2_lbl_port")
+        self.P2_lbl = QtWidgets.QLabel(CONN)
+        self.P2_lbl.setGeometry(QtCore.QRect(73, 380, 161, 51))
+        self.P2_lbl.setStyleSheet(
+            "background: #5d707f;\n" "color: #f2f4f3;\n" "font-size: 20pt;"
+        )
+        self.P2_lbl.setAlignment(QtCore.Qt.AlignCenter)
+        self.P2_lbl.setObjectName("P2_lbl")
+        self.P2_entry_port = QtWidgets.QLineEdit(CONN)
+        self.P2_entry_port.setGeometry(QtCore.QRect(700, 380, 131, 51))
+        self.P2_entry_port.setStyleSheet("font-size: 18pt;")
+        self.P2_entry_port.setObjectName("P2_entry_port")
+        self.P2_chk_available = QtWidgets.QCheckBox(CONN)
+        self.P2_chk_available.setGeometry(QtCore.QRect(260, 400, 131, 20))
+        self.P2_chk_available.setStyleSheet(
+            "QCheckBox {\n" "    color: #f2f4f3;\n" "    font-size: 14pt;\n" "}\n" ""
+        )
+        self.P2_chk_available.setObjectName("P2_chk_available")
+        self.PRH_lbl = QtWidgets.QLabel(CONN)
+        self.PRH_lbl.setGeometry(QtCore.QRect(70, 490, 161, 51))
+        self.PRH_lbl.setStyleSheet(
+            "background: #5d707f;\n" "color: #f2f4f3;\n" "font-size: 20pt;"
+        )
+        self.PRH_lbl.setAlignment(QtCore.Qt.AlignCenter)
+        self.PRH_lbl.setObjectName("PRH_lbl")
+        self.PRH_lbl_port = QtWidgets.QLabel(CONN)
+        self.PRH_lbl_port.setGeometry(QtCore.QRect(700, 460, 131, 30))
+        self.PRH_lbl_port.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.PRH_lbl_port.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.PRH_lbl_port.setObjectName("PRH_lbl_port")
+        self.PRH_lbl_ip = QtWidgets.QLabel(CONN)
+        self.PRH_lbl_ip.setGeometry(QtCore.QRect(450, 460, 131, 30))
+        self.PRH_lbl_ip.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.PRH_lbl_ip.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.PRH_lbl_ip.setObjectName("PRH_lbl_ip")
+        self.PRH_entry_ip = QtWidgets.QLineEdit(CONN)
+        self.PRH_entry_ip.setGeometry(QtCore.QRect(450, 490, 231, 51))
+        self.PRH_entry_ip.setStyleSheet("font-size: 18pt;")
+        self.PRH_entry_ip.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_PUMP1_num_tio_rw.setMaximum(99999)
-        self.TCP_PUMP1_num_tio_rw.setObjectName("TCP_PUMP1_num_tio_rw")
-        self.TCP_PUMP1_num_bytesToRead = QtWidgets.QSpinBox(Dialog)
-        self.TCP_PUMP1_num_bytesToRead.setGeometry(QtCore.QRect(320, 400, 131, 41))
-        self.TCP_PUMP1_num_bytesToRead.setAlignment(
+        self.PRH_entry_ip.setObjectName("PRH_entry_ip")
+        self.PRH_lbl_colon = QtWidgets.QLabel(CONN)
+        self.PRH_lbl_colon.setGeometry(QtCore.QRect(679, 498, 21, 30))
+        self.PRH_lbl_colon.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 14pt;\n"
+            "font: bold;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.PRH_lbl_colon.setAlignment(QtCore.Qt.AlignCenter)
+        self.PRH_lbl_colon.setObjectName("PRH_lbl_colon")
+        self.PRH_entry_port = QtWidgets.QLineEdit(CONN)
+        self.PRH_entry_port.setGeometry(QtCore.QRect(700, 490, 131, 51))
+        self.PRH_entry_port.setStyleSheet("font-size: 18pt;")
+        self.PRH_entry_port.setObjectName("PRH_entry_port")
+        self.DB_lbl_ip = QtWidgets.QLabel(CONN)
+        self.DB_lbl_ip.setGeometry(QtCore.QRect(450, 560, 131, 30))
+        self.DB_lbl_ip.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.DB_lbl_ip.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.DB_lbl_ip.setObjectName("DB_lbl_ip")
+        self.DB_lbl_colon = QtWidgets.QLabel(CONN)
+        self.DB_lbl_colon.setGeometry(QtCore.QRect(679, 598, 21, 30))
+        self.DB_lbl_colon.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 14pt;\n"
+            "font: bold;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.DB_lbl_colon.setAlignment(QtCore.Qt.AlignCenter)
+        self.DB_lbl_colon.setObjectName("DB_lbl_colon")
+        self.DB_lbl_port = QtWidgets.QLabel(CONN)
+        self.DB_lbl_port.setGeometry(QtCore.QRect(700, 560, 131, 30))
+        self.DB_lbl_port.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.DB_lbl_port.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.DB_lbl_port.setObjectName("DB_lbl_port")
+        self.DB_entry_port = QtWidgets.QLineEdit(CONN)
+        self.DB_entry_port.setGeometry(QtCore.QRect(700, 590, 131, 51))
+        self.DB_entry_port.setStyleSheet("font-size: 18pt;")
+        self.DB_entry_port.setObjectName("DB_entry_port")
+        self.DB_lbl = QtWidgets.QLabel(CONN)
+        self.DB_lbl.setGeometry(QtCore.QRect(70, 590, 161, 51))
+        self.DB_lbl.setStyleSheet(
+            "background: #5d707f;\n" "color: #f2f4f3;\n" "font-size: 20pt;"
+        )
+        self.DB_lbl.setAlignment(QtCore.Qt.AlignCenter)
+        self.DB_lbl.setObjectName("DB_lbl")
+        self.DB_entry_ip = QtWidgets.QLineEdit(CONN)
+        self.DB_entry_ip.setGeometry(QtCore.QRect(450, 590, 231, 51))
+        self.DB_entry_ip.setStyleSheet("font-size: 18pt;")
+        self.DB_entry_ip.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_PUMP1_num_bytesToRead.setMaximum(99999)
-        self.TCP_PUMP1_num_bytesToRead.setObjectName("TCP_PUMP1_num_bytesToRead")
-        self.TCP_PUMP1_num_tio_conn = QtWidgets.QSpinBox(Dialog)
-        self.TCP_PUMP1_num_tio_conn.setGeometry(QtCore.QRect(320, 320, 131, 41))
-        self.TCP_PUMP1_num_tio_conn.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        self.DB_entry_ip.setObjectName("DB_entry_ip")
+        self.ROB_chk_available = QtWidgets.QCheckBox(CONN)
+        self.ROB_chk_available.setGeometry(QtCore.QRect(260, 100, 131, 20))
+        self.ROB_chk_available.setStyleSheet(
+            "QCheckBox {\n" "    color: #f2f4f3;\n" "    font-size: 14pt;\n" "}\n" ""
         )
-        self.TCP_PUMP1_num_tio_conn.setMaximum(99999)
-        self.TCP_PUMP1_num_tio_conn.setObjectName("TCP_PUMP1_num_tio_conn")
-        self.TCP_PUMP2_num_tio_rw = QtWidgets.QSpinBox(Dialog)
-        self.TCP_PUMP2_num_tio_rw.setGeometry(QtCore.QRect(550, 480, 131, 41))
-        self.TCP_PUMP2_num_tio_rw.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        self.ROB_chk_available.setObjectName("ROB_chk_available")
+        self.PRH_chk_available = QtWidgets.QCheckBox(CONN)
+        self.PRH_chk_available.setGeometry(QtCore.QRect(260, 510, 131, 20))
+        self.PRH_chk_available.setStyleSheet(
+            "QCheckBox {\n" "    color: #f2f4f3;\n" "    font-size: 14pt;\n" "}\n" ""
         )
-        self.TCP_PUMP2_num_tio_rw.setMaximum(99999)
-        self.TCP_PUMP2_num_tio_rw.setObjectName("TCP_PUMP2_num_tio_rw")
-        self.TCP_PUMP2_num_tio_conn = QtWidgets.QSpinBox(Dialog)
-        self.TCP_PUMP2_num_tio_conn.setGeometry(QtCore.QRect(550, 320, 131, 41))
-        self.TCP_PUMP2_num_tio_conn.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        self.PRH_chk_available.setObjectName("PRH_chk_available")
+        self.DB_chk_available = QtWidgets.QCheckBox(CONN)
+        self.DB_chk_available.setEnabled(False)
+        self.DB_chk_available.setGeometry(QtCore.QRect(260, 610, 131, 20))
+        self.DB_chk_available.setStyleSheet(
+            "QCheckBox {\n" "    color: #c2c4c3;\n" "    font-size: 14pt;\n" "}\n" ""
         )
-        self.TCP_PUMP2_num_tio_conn.setMaximum(99999)
-        self.TCP_PUMP2_num_tio_conn.setObjectName("TCP_PUMP2_num_tio_conn")
-        self.TCP_PUMP2_num_bytesToRead = QtWidgets.QSpinBox(Dialog)
-        self.TCP_PUMP2_num_bytesToRead.setGeometry(QtCore.QRect(550, 400, 131, 41))
-        self.TCP_PUMP2_num_bytesToRead.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP2_num_bytesToRead.setMaximum(99999)
-        self.TCP_PUMP2_num_bytesToRead.setObjectName("TCP_PUMP2_num_bytesToRead")
-        self.TCP_PUMP1_connDef = QtWidgets.QCheckBox(Dialog)
-        self.TCP_PUMP1_connDef.setGeometry(QtCore.QRect(327, 100, 131, 20))
-        self.TCP_PUMP1_connDef.setStyleSheet(
-            "QCheckBox {\n" "    color: #f2f4f3;\n" "    font-size: 10pt;\n" "}\n" ""
-        )
-        self.TCP_PUMP1_connDef.setObjectName("TCP_PUMP1_connDef")
-        self.TCP_PUMP2_connDef = QtWidgets.QCheckBox(Dialog)
-        self.TCP_PUMP2_connDef.setGeometry(QtCore.QRect(560, 100, 131, 20))
-        self.TCP_PUMP2_connDef.setStyleSheet(
-            "QCheckBox {\n" "    color: #f2f4f3;\n" "    font-size: 10pt;\n" "}\n" ""
-        )
-        self.TCP_PUMP2_connDef.setObjectName("TCP_PUMP2_connDef")
-        self.TCP_btt_default = QtWidgets.QPushButton(Dialog)
-        self.TCP_btt_default.setGeometry(QtCore.QRect(50, 568, 141, 35))
-        self.TCP_btt_default.setObjectName("TCP_btt_default")
+        self.DB_chk_available.setChecked(True)
+        self.DB_chk_available.setObjectName("DB_chk_available")
+        self.PRH_lbl_colon.raise_()
+        self.ROB_lbl_colon.raise_()
+        self.CONN_bttbox.raise_()
+        self.ROB_lbl_connTo.raise_()
+        self.ROB_lbl_port.raise_()
+        self.ROB_lbl_rwTo.raise_()
+        self.ROB_lbl_ip.raise_()
+        self.ROB_lbl.raise_()
+        self.P1_lbl.raise_()
+        self.P1_lbl_port.raise_()
+        self.ROB_entry_ip.raise_()
+        self.ROB_entry_port.raise_()
+        self.P1_entry_port.raise_()
+        self.ROB_num_rwTo.raise_()
+        self.ROB_num_connTo.raise_()
+        self.P1_chk_available.raise_()
+        self.CONN_btt_default.raise_()
+        self.P2_lbl_port.raise_()
+        self.P2_lbl.raise_()
+        self.P2_entry_port.raise_()
+        self.P2_chk_available.raise_()
+        self.PRH_lbl.raise_()
+        self.PRH_lbl_port.raise_()
+        self.PRH_lbl_ip.raise_()
+        self.PRH_entry_ip.raise_()
+        self.PRH_entry_port.raise_()
+        self.DB_lbl_ip.raise_()
+        self.DB_lbl_colon.raise_()
+        self.DB_lbl_port.raise_()
+        self.DB_entry_port.raise_()
+        self.DB_lbl.raise_()
+        self.DB_entry_ip.raise_()
+        self.ROB_chk_available.raise_()
+        self.PRH_chk_available.raise_()
+        self.DB_chk_available.raise_()
 
-        self.retranslateUi(Dialog)
-        self.buttonBox.accepted.connect(Dialog.accept)  # type: ignore
-        self.buttonBox.rejected.connect(Dialog.reject)  # type: ignore
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        self.retranslateUi(CONN)
+        self.CONN_bttbox.accepted.connect(CONN.accept)  # type: ignore
+        self.CONN_bttbox.rejected.connect(CONN.reject)  # type: ignore
+        QtCore.QMetaObject.connectSlotsByName(CONN)
 
-    def retranslateUi(self, Dialog):
+    def retranslateUi(self, CONN):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.TCP_ROB_lbl_tio_conn.setText(_translate("Dialog", "conn timeout [ms]"))
-        self.TCP_ROB_lbl_bytesToRead.setText(_translate("Dialog", "bytes to read"))
-        self.TCP_ROB_lbl_port.setText(_translate("Dialog", "port"))
-        self.TCP_ROB_lbl_tio_rw.setText(_translate("Dialog", "r/w timeout [ms]"))
-        self.TCP_ROB_lbl_ip.setText(_translate("Dialog", "IP"))
-        self.TCP_ROB_lbl_0.setText(_translate("Dialog", "ROBOT"))
-        self.TCP_PUMP1_lbl_0.setText(_translate("Dialog", "PUMP 1"))
-        self.TCP_PUMP2_lbl_0.setText(_translate("Dialog", "PUMP 2"))
-        self.TCP_PUMP1_lbl_ip.setText(_translate("Dialog", "IP"))
-        self.TCP_PUMP1_lbl_tio_conn.setText(_translate("Dialog", "conn timeout [ms]"))
-        self.TCP_PUMP1_lbl_bytesToRead.setText(_translate("Dialog", "bytes to read"))
-        self.TCP_PUMP1_lbl_port.setText(_translate("Dialog", "port"))
-        self.TCP_PUMP1_lbl_tio_rw.setText(_translate("Dialog", "r/w timeout [ms]"))
-        self.TCP_PUMP2_lbl_tio_rw.setText(_translate("Dialog", "r/w timeout [ms]"))
-        self.TCP_PUMP2_lbl_port.setText(_translate("Dialog", "port"))
-        self.TCP_PUMP2_lbl_bytesToRead.setText(_translate("Dialog", "bytes to read"))
-        self.TCP_PUMP2_lbl_ip.setText(_translate("Dialog", "IP"))
-        self.TCP_PUMP2_lbl_tio_conn.setText(_translate("Dialog", "conn timeout [ms]"))
-        self.TCP_PUMP1_connDef.setText(_translate("Dialog", "connect on start"))
-        self.TCP_PUMP2_connDef.setText(_translate("Dialog", "connect on start"))
-        self.TCP_btt_default.setText(_translate("Dialog", "Voreinstellungen"))
+        CONN.setWindowTitle(_translate("CONN", "Dialog"))
+        self.ROB_lbl_connTo.setText(_translate("CONN", "conn timeout [ms]"))
+        self.ROB_lbl_port.setText(_translate("CONN", "port"))
+        self.ROB_lbl_rwTo.setText(_translate("CONN", "r/w timeout [ms]"))
+        self.ROB_lbl_ip.setText(_translate("CONN", "IP"))
+        self.ROB_lbl.setText(_translate("CONN", "ROBOT"))
+        self.P1_lbl.setText(_translate("CONN", "PUMP 1"))
+        self.P1_lbl_port.setText(_translate("CONN", "COM port"))
+        self.ROB_entry_ip.setText(_translate("CONN", "192.168.178.125"))
+        self.ROB_entry_port.setText(_translate("CONN", "10001"))
+        self.P1_entry_port.setText(_translate("CONN", "COM3"))
+        self.P1_chk_available.setText(_translate("CONN", "available"))
+        self.CONN_btt_default.setText(_translate("CONN", "Voreinstellungen"))
+        self.ROB_lbl_colon.setText(_translate("CONN", ":"))
+        self.P2_lbl_port.setText(_translate("CONN", "COM port"))
+        self.P2_lbl.setText(_translate("CONN", "PUMP 2"))
+        self.P2_entry_port.setText(_translate("CONN", "COM3"))
+        self.P2_chk_available.setText(_translate("CONN", "available"))
+        self.PRH_lbl.setText(_translate("CONN", "PRINTHEAD"))
+        self.PRH_lbl_port.setText(_translate("CONN", "port"))
+        self.PRH_lbl_ip.setText(_translate("CONN", "IP"))
+        self.PRH_entry_ip.setText(_translate("CONN", "192.168.178.58"))
+        self.PRH_lbl_colon.setText(_translate("CONN", ":"))
+        self.PRH_entry_port.setText(_translate("CONN", "17"))
+        self.DB_lbl_ip.setText(_translate("CONN", "IP"))
+        self.DB_lbl_colon.setText(_translate("CONN", ":"))
+        self.DB_lbl_port.setText(_translate("CONN", "port"))
+        self.DB_entry_port.setText(_translate("CONN", "8086"))
+        self.DB_lbl.setText(_translate("CONN", "DATABASE"))
+        self.DB_entry_ip.setText(_translate("CONN", "192.168.178.56"))
+        self.ROB_chk_available.setText(_translate("CONN", "available"))
+        self.PRH_chk_available.setText(_translate("CONN", "available"))
+        self.DB_chk_available.setText(_translate("CONN", "available"))
 
 
 import resources

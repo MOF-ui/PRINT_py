@@ -1,0 +1,1003 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CONN</class>
+ <widget class="QDialog" name="CONN">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>880</width>
+    <height>787</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/* leave here to be overwritten by anything more specific */
+QObject {
+	background: #4c4a48;
+}
+
+QWidget {
+	font-family: &quot;Bahnschrift&quot;;
+}
+
+
+
+/* alphabetical from here */
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+    background-color: #f2f4f3;
+    border-radius: 5px;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #ffba00;
+    image: url(:/images/right.png);
+}
+
+
+
+
+QComboBox {
+    border-radius: 5px;
+    padding-left: 10px;
+    min-width: 6em;
+	background: #F2F4F3;
+	font-family: &quot;Bahnschrift&quot;;
+}
+
+QComboBox:on { /* shift the text when the popup opens */
+	border: 2px sold #F2F4F3;
+}
+
+QComboBox::drop-down {
+	width: 25px;
+	background-color: #FFBA00;
+}
+
+QComboBox::down-arrow {
+	border-image: url(:/images/down.png);
+}
+
+QComboBox::drop-down::hover {
+	background-color: #FFC300;
+}
+
+QComboBox::drop-down::pressed {
+	background-color: #88AB75;
+}
+
+QComboBox QAbstractItemView {
+    selection-background-color: #FFBA00;
+}
+
+
+
+
+QListView {
+    padding: 2px;
+	background: #F2F4F3;
+	border-radius: 5px;
+}
+
+
+
+
+QLabel, QLineEdit {
+	border: 2px solid #F2F4F3;
+	border-radius: 5px;
+	font-size: 14pt;
+	padding: 2px;
+	padding-left: 5px;
+	background-color: #F2F4F3;
+}
+
+
+
+
+QTextEdit, QListWidget {
+	border: 0px;
+	border-radius: 5px;
+	font-size: 12pt;
+	padding: 2px;
+	padding-left: 5px;
+	background-color: #F2F4F3;
+}
+
+
+
+QPushButton {
+	background-color: #FFBA00;
+	border-radius: 5px;
+	font-size: 14pt;
+}
+
+QPushButton:hover {
+	background-color: #FFC300;
+}
+
+QPushButton:pressed {
+	background-color: #88AB75;
+}
+
+
+
+QSlider {
+	background: #5d707f;
+}
+
+QSlider::handle:horizontal, QSlider::handle:vertical {
+	background-color: #FFBA00;
+}
+
+
+
+
+QSpinBox, QDoubleSpinBox {
+	border: 2px solid #F2F4F3;
+	border-radius: 5px;
+    border-width: 3px;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	font-size: 12pt;
+	padding: 2px;
+	padding-left: 5px;
+	padding-right: 5px;
+	background-color: #F2F4F3;
+}
+
+QSpinBox::up-button, QDoubleSpinBox::up-button { 
+	subcontrol-origin: padding;
+	subcontrol-position: top right; /* position at the top right corner */
+	width: 30 px;
+}
+
+QSpinBox::down-button, QDoubleSpinBox::down-button { 
+	subcontrol-origin: padding;
+	subcontrol-position: bottom right; /* position at the top right corner */
+	width: 30 px;
+	top: 1px;
+}
+
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+	image: url(:/images/up.png);
+}
+
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+	image: url(:/images/down.png);;
+}
+
+
+
+
+QScrollBar:vertical {  
+	border: None;
+    background:#f2f4f3;
+    width: 10px;
+}
+
+QScrollBar::handle:vertical {
+	background:#ffba00;
+	border-radius: 4px;
+    min-height: 20px;
+}
+
+QScrollBar:horizontal {  
+    background:#f2f4f3;
+    height: 15px;
+}
+
+QScrollBar::handle:horizontal {
+	background:#ffba00;
+	border-radius: 4px;
+    min-width: 20px;
+}
+
+
+
+QTextEdit {
+	border: 2px solid #909cc2
+}
+
+QTextEdit:selected {
+	border-color: #aab9e6
+}</string>
+  </property>
+  <widget class="QDialogButtonBox" name="CONN_bttbox">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>710</y>
+     <width>571</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+	background-color: #FFBA00;
+	color: #000000;
+	border-radius: 5px;
+	font-size: 14pt;
+	width: 5em;
+	height: 35px;
+}
+
+QPushButton:hover {
+	background-color: #FFC300;
+}
+
+QPushButton:pressed {
+	background-color: #88AB75;
+}</string>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Abort|QDialogButtonBox::Ok</set>
+   </property>
+   <property name="centerButtons">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ROB_lbl_connTo">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>150</y>
+     <width>151</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>conn timeout [ms]</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ROB_lbl_port">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>50</y>
+     <width>131</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>port</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ROB_lbl_rwTo">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>150</y>
+     <width>141</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>r/w timeout [ms]</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ROB_lbl_ip">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>50</y>
+     <width>131</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>IP</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ROB_lbl">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>80</y>
+     <width>161</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: #5d707f;
+color: #f2f4f3;
+font-size: 20pt;</string>
+   </property>
+   <property name="text">
+    <string>ROBOT</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="P1_lbl">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>280</y>
+     <width>161</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: #5d707f;
+color: #f2f4f3;
+font-size: 20pt;</string>
+   </property>
+   <property name="text">
+    <string>PUMP 1</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="P1_lbl_port">
+   <property name="geometry">
+    <rect>
+     <x>606</x>
+     <y>295</y>
+     <width>91</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>COM port</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="ROB_entry_ip">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>80</y>
+     <width>231</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 18pt;</string>
+   </property>
+   <property name="text">
+    <string>192.168.178.125</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="ROB_entry_port">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>80</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 18pt;</string>
+   </property>
+   <property name="text">
+    <string>10001</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="P1_entry_port">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>280</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 18pt;
+</string>
+   </property>
+   <property name="text">
+    <string>COM3</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="ROB_num_rwTo">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>180</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+   <property name="maximum">
+    <number>99999</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="ROB_num_connTo">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>180</y>
+     <width>151</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+   <property name="maximum">
+    <number>99999</number>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="P1_chk_available">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>300</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QCheckBox {
+	color: #f2f4f3;
+	font-size: 14pt;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>available</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="CONN_btt_default">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>720</y>
+     <width>211</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Voreinstellungen</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ROB_lbl_colon">
+   <property name="geometry">
+    <rect>
+     <x>679</x>
+     <y>88</y>
+     <width>21</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 14pt;
+font: bold;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="P2_lbl_port">
+   <property name="geometry">
+    <rect>
+     <x>606</x>
+     <y>395</y>
+     <width>91</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>COM port</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="P2_lbl">
+   <property name="geometry">
+    <rect>
+     <x>73</x>
+     <y>380</y>
+     <width>161</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: #5d707f;
+color: #f2f4f3;
+font-size: 20pt;</string>
+   </property>
+   <property name="text">
+    <string>PUMP 2</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="P2_entry_port">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>380</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 18pt;</string>
+   </property>
+   <property name="text">
+    <string>COM3</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="P2_chk_available">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>400</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QCheckBox {
+	color: #f2f4f3;
+	font-size: 14pt;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>available</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="PRH_lbl">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>490</y>
+     <width>161</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: #5d707f;
+color: #f2f4f3;
+font-size: 20pt;</string>
+   </property>
+   <property name="text">
+    <string>PRINTHEAD</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="PRH_lbl_port">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>460</y>
+     <width>131</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>port</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="PRH_lbl_ip">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>460</y>
+     <width>131</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>IP</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="PRH_entry_ip">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>490</y>
+     <width>231</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 18pt;</string>
+   </property>
+   <property name="text">
+    <string>192.168.178.58</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="PRH_lbl_colon">
+   <property name="geometry">
+    <rect>
+     <x>679</x>
+     <y>498</y>
+     <width>21</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 14pt;
+font: bold;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="PRH_entry_port">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>490</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 18pt;</string>
+   </property>
+   <property name="text">
+    <string>17</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="DB_lbl_ip">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>560</y>
+     <width>131</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>IP</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="DB_lbl_colon">
+   <property name="geometry">
+    <rect>
+     <x>679</x>
+     <y>598</y>
+     <width>21</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 14pt;
+font: bold;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="DB_lbl_port">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>560</y>
+     <width>131</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+   </property>
+   <property name="text">
+    <string>port</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="DB_entry_port">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>590</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 18pt;</string>
+   </property>
+   <property name="text">
+    <string>8086</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="DB_lbl">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>590</y>
+     <width>161</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: #5d707f;
+color: #f2f4f3;
+font-size: 20pt;</string>
+   </property>
+   <property name="text">
+    <string>DATABASE</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="DB_entry_ip">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>590</y>
+     <width>231</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 18pt;</string>
+   </property>
+   <property name="text">
+    <string>192.168.178.56</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="ROB_chk_available">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>100</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QCheckBox {
+	color: #f2f4f3;
+	font-size: 14pt;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>available</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="PRH_chk_available">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>510</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QCheckBox {
+	color: #f2f4f3;
+	font-size: 14pt;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>available</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="DB_chk_available">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>610</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QCheckBox {
+	color: #c2c4c3;
+	font-size: 14pt;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>available</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <zorder>PRH_lbl_colon</zorder>
+  <zorder>ROB_lbl_colon</zorder>
+  <zorder>CONN_bttbox</zorder>
+  <zorder>ROB_lbl_connTo</zorder>
+  <zorder>ROB_lbl_port</zorder>
+  <zorder>ROB_lbl_rwTo</zorder>
+  <zorder>ROB_lbl_ip</zorder>
+  <zorder>ROB_lbl</zorder>
+  <zorder>P1_lbl</zorder>
+  <zorder>P1_lbl_port</zorder>
+  <zorder>ROB_entry_ip</zorder>
+  <zorder>ROB_entry_port</zorder>
+  <zorder>P1_entry_port</zorder>
+  <zorder>ROB_num_rwTo</zorder>
+  <zorder>ROB_num_connTo</zorder>
+  <zorder>P1_chk_available</zorder>
+  <zorder>CONN_btt_default</zorder>
+  <zorder>P2_lbl_port</zorder>
+  <zorder>P2_lbl</zorder>
+  <zorder>P2_entry_port</zorder>
+  <zorder>P2_chk_available</zorder>
+  <zorder>PRH_lbl</zorder>
+  <zorder>PRH_lbl_port</zorder>
+  <zorder>PRH_lbl_ip</zorder>
+  <zorder>PRH_entry_ip</zorder>
+  <zorder>PRH_entry_port</zorder>
+  <zorder>DB_lbl_ip</zorder>
+  <zorder>DB_lbl_colon</zorder>
+  <zorder>DB_lbl_port</zorder>
+  <zorder>DB_entry_port</zorder>
+  <zorder>DB_lbl</zorder>
+  <zorder>DB_entry_ip</zorder>
+  <zorder>ROB_chk_available</zorder>
+  <zorder>PRH_chk_available</zorder>
+  <zorder>DB_chk_available</zorder>
+ </widget>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>CONN_bttbox</sender>
+   <signal>accepted()</signal>
+   <receiver>CONN</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>CONN_bttbox</sender>
+   <signal>rejected()</signal>
+   <receiver>CONN</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

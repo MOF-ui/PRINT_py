@@ -277,7 +277,7 @@ QFrame#ASC_frame,
 QFrame#DC_frame,
 QFrame#ICQ_frame,
 QFrame#IO_frame,
-QFrame#MIX_frame,
+QFrame#PRH_frame,
 QFrame#NC_frame,
 QFrame#PUMP_frame,
 QFrame#SCRTL_frame,
@@ -376,7 +376,7 @@ QTabBar::tab:!selected:hover {
 }</string>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="PRINT_tab">
      <property name="styleSheet">
@@ -1440,7 +1440,7 @@ color: #E1E5EE;</string>
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 70, 73);</string>
+        <string notr="true">background-color: rgb(255, 120, 60);</string>
        </property>
        <property name="text">
         <string>&amp;FORCED STOP</string>
@@ -2140,6 +2140,9 @@ background-color: #4c4a48;</string>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBelow</enum>
        </property>
       </widget>
       <widget class="QPushButton" name="DC_btt_xPlus">
@@ -3717,7 +3720,7 @@ color: #f2f4f3;
       <bool>false</bool>
      </property>
      <attribute name="title">
-      <string>     AMCON &amp;&amp; PUMP     </string>
+      <string>     PRINTHEAD &amp;&amp; PUMP     </string>
      </attribute>
      <widget class="QFrame" name="ADC_frame">
       <property name="geometry">
@@ -3763,12 +3766,12 @@ color: #E1E5EE;</string>
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="ADC_lbl_panning">
+      <widget class="QLabel" name="ADC_lbl_trolley">
        <property name="geometry">
         <rect>
-         <x>70</x>
-         <y>290</y>
-         <width>161</width>
+         <x>40</x>
+         <y>170</y>
+         <width>191</width>
          <height>31</height>
         </rect>
        </property>
@@ -3785,11 +3788,11 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
-      <widget class="QPushButton" name="ADC_btt_knifePos">
+      <widget class="QPushButton" name="ADC_btt_clamp">
        <property name="geometry">
         <rect>
          <x>50</x>
-         <y>170</y>
+         <y>250</y>
          <width>181</width>
          <height>31</height>
         </rect>
@@ -3828,11 +3831,11 @@ QPushButton:checked:hover {
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="ADC_btt_knife">
+      <widget class="QPushButton" name="ADC_btt_cut">
        <property name="geometry">
         <rect>
          <x>50</x>
-         <y>210</y>
+         <y>290</y>
          <width>181</width>
          <height>31</height>
         </rect>
@@ -3871,11 +3874,11 @@ QPushButton:checked:hover {
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="ADC_btt_fiberPnmtc">
+      <widget class="QPushButton" name="ADC_btt_placeSpring">
        <property name="geometry">
         <rect>
          <x>50</x>
-         <y>250</y>
+         <y>330</y>
          <width>181</width>
          <height>31</height>
         </rect>
@@ -3966,11 +3969,11 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QSpinBox" name="ADC_num_panning">
+      <widget class="QSpinBox" name="ADC_num_trolley">
        <property name="geometry">
         <rect>
          <x>50</x>
-         <y>320</y>
+         <y>200</y>
          <width>181</width>
          <height>41</height>
         </rect>
@@ -4034,7 +4037,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>50</x>
-         <y>170</y>
+         <y>250</y>
          <width>181</width>
          <height>31</height>
         </rect>
@@ -4066,11 +4069,11 @@ QPushButton:checked:hover {
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="ASC_btt_knifePos">
+      <widget class="QPushButton" name="ASC_btt_cut">
        <property name="geometry">
         <rect>
          <x>50</x>
-         <y>210</y>
+         <y>290</y>
          <width>181</width>
          <height>31</height>
         </rect>
@@ -4109,11 +4112,11 @@ QPushButton:checked:hover {
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="ASC_btt_knife">
+      <widget class="QPushButton" name="ASC_btt_placeSpring">
        <property name="geometry">
         <rect>
          <x>50</x>
-         <y>250</y>
+         <y>330</y>
          <width>181</width>
          <height>31</height>
         </rect>
@@ -4218,11 +4221,11 @@ PROCESSING</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QSpinBox" name="ASC_num_panning">
+      <widget class="QSpinBox" name="ASC_num_trolley">
        <property name="geometry">
         <rect>
          <x>50</x>
-         <y>320</y>
+         <y>200</y>
          <width>181</width>
          <height>41</height>
         </rect>
@@ -4240,9 +4243,9 @@ PROCESSING</string>
       <widget class="QLabel" name="ADC_lbl_panning_2">
        <property name="geometry">
         <rect>
-         <x>70</x>
-         <y>290</y>
-         <width>161</width>
+         <x>40</x>
+         <y>170</y>
+         <width>191</width>
          <height>31</height>
         </rect>
        </property>
@@ -4262,13 +4265,13 @@ color: #E1E5EE;</string>
       <zorder>ADC_lbl_panning_2</zorder>
       <zorder>ASC_0_framelabel</zorder>
       <zorder>ASC_btt_clamp</zorder>
-      <zorder>ASC_btt_knifePos</zorder>
-      <zorder>ASC_btt_knife</zorder>
+      <zorder>ASC_btt_cut</zorder>
+      <zorder>ASC_btt_placeSpring</zorder>
       <zorder>ASC_btt_overwrSC</zorder>
       <zorder>ASC_indi_qProcessing</zorder>
       <zorder>ASC_lbl_qProcessing</zorder>
       <zorder>ASC_entry_SCLines</zorder>
-      <zorder>ASC_num_panning</zorder>
+      <zorder>ASC_num_trolley</zorder>
      </widget>
      <widget class="QFrame" name="PUMP_frame">
       <property name="geometry">
@@ -4304,9 +4307,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="PUMP_lbl_freq">
        <property name="geometry">
         <rect>
-         <x>120</x>
+         <x>100</x>
          <y>590</y>
-         <width>121</width>
+         <width>141</width>
          <height>31</height>
         </rect>
        </property>
@@ -4326,9 +4329,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="PUMP_lbl_volt">
        <property name="geometry">
         <rect>
-         <x>280</x>
+         <x>270</x>
          <y>590</y>
-         <width>91</width>
+         <width>101</width>
          <height>31</height>
         </rect>
        </property>
@@ -4396,9 +4399,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="PUMP_lbl_amps">
        <property name="geometry">
         <rect>
-         <x>410</x>
+         <x>400</x>
          <y>590</y>
-         <width>91</width>
+         <width>101</width>
          <height>31</height>
         </rect>
        </property>
@@ -4418,9 +4421,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="PUMP_lbl_torq">
        <property name="geometry">
         <rect>
-         <x>540</x>
+         <x>520</x>
          <y>590</y>
-         <width>91</width>
+         <width>111</width>
          <height>31</height>
         </rect>
        </property>
@@ -4559,7 +4562,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>20</x>
          <y>20</y>
-         <width>161</width>
+         <width>241</width>
          <height>51</height>
         </rect>
        </property>
@@ -4577,10 +4580,10 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>PUMP CTRL</string>
+        <string>PUMP CONTROL</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignCenter</set>
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QPushButton" name="PUMP_btt_minus10">
@@ -4891,9 +4894,9 @@ font-size: 12pt;</string>
       <widget class="QLabel" name="PUMP_lbl_currSpeed">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>30</x>
          <y>110</y>
-         <width>181</width>
+         <width>221</width>
          <height>51</height>
         </rect>
        </property>
@@ -5112,7 +5115,7 @@ color: #E1E5EE;</string>
       <zorder>PUMP_num_setSpeedP2</zorder>
       <zorder>PUMP_sld_outputRatio</zorder>
      </widget>
-     <widget class="QFrame" name="MIX_frame">
+     <widget class="QFrame" name="PRH_frame">
       <property name="geometry">
        <rect>
         <x>30</x>
@@ -5127,7 +5130,7 @@ color: #E1E5EE;</string>
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QLabel" name="MIX_0_frameLabel_2">
+      <widget class="QLabel" name="PRH_0_frameLabel">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -5156,7 +5159,7 @@ color: #E1E5EE;</string>
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QPushButton" name="MIX_btt_stop">
+      <widget class="QPushButton" name="PRH_btt_stop">
        <property name="geometry">
         <rect>
          <x>350</x>
@@ -5169,7 +5172,7 @@ color: #E1E5EE;</string>
         <string>⛔ STOP</string>
        </property>
       </widget>
-      <widget class="QLabel" name="MIX_disp_currSpeed">
+      <widget class="QLabel" name="PRH_disp_currSpeed">
        <property name="geometry">
         <rect>
          <x>350</x>
@@ -5188,7 +5191,7 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QSpinBox" name="MIX_num_setSpeed">
+      <widget class="QSpinBox" name="PRH_num_setSpeed">
        <property name="geometry">
         <rect>
          <x>161</x>
@@ -5207,7 +5210,7 @@ color: #E1E5EE;</string>
         <string>%</string>
        </property>
       </widget>
-      <widget class="QLabel" name="MIX_lbl_currSpeed">
+      <widget class="QLabel" name="PRH_lbl_currSpeed">
        <property name="geometry">
         <rect>
          <x>350</x>
@@ -5228,7 +5231,7 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
-      <widget class="QLabel" name="MIX_lbl_setSpeed">
+      <widget class="QLabel" name="PRH_lbl_setSpeed">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -5249,7 +5252,7 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
-      <widget class="QSlider" name="MIX_sld_speed">
+      <widget class="QSlider" name="PRH_sld_speed">
        <property name="geometry">
         <rect>
          <x>61</x>
@@ -5267,8 +5270,11 @@ color: #E1E5EE;</string>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBelow</enum>
+       </property>
       </widget>
-      <widget class="QPushButton" name="MIX_btt_setSpeed">
+      <widget class="QPushButton" name="PRH_btt_setSpeed">
        <property name="geometry">
         <rect>
          <x>280</x>
@@ -5281,7 +5287,7 @@ color: #E1E5EE;</string>
         <string>SET</string>
        </property>
       </widget>
-      <widget class="QLabel" name="MIX_lbl_step0">
+      <widget class="QLabel" name="PRH_lbl_step0">
        <property name="geometry">
         <rect>
          <x>54</x>
@@ -5303,7 +5309,7 @@ font-size: 10pt;</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
-      <widget class="QLabel" name="MIX_lbl_step100">
+      <widget class="QLabel" name="PRH_lbl_step100">
        <property name="geometry">
         <rect>
          <x>270</x>
@@ -5325,7 +5331,7 @@ font-size: 10pt;</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
-      <widget class="QLabel" name="MIX_lbl_step50">
+      <widget class="QLabel" name="PRH_lbl_step50">
        <property name="geometry">
         <rect>
          <x>174</x>
@@ -5347,7 +5353,7 @@ font-size: 10pt;</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
-      <widget class="QPushButton" name="MIX_btt_actWithPump">
+      <widget class="QPushButton" name="PRH_btt_actWithPump">
        <property name="geometry">
         <rect>
          <x>60</x>
@@ -5383,7 +5389,7 @@ QPushButton:checked:hover {
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="PUMP_btt_pinchValve">
+      <widget class="QPushButton" name="PRH_btt_pinchValve">
        <property name="geometry">
         <rect>
          <x>350</x>
@@ -5419,19 +5425,19 @@ QPushButton:checked:hover {
         <bool>false</bool>
        </property>
       </widget>
-      <zorder>MIX_0_frameLabel_2</zorder>
-      <zorder>MIX_btt_stop</zorder>
-      <zorder>MIX_num_setSpeed</zorder>
-      <zorder>MIX_lbl_currSpeed</zorder>
-      <zorder>MIX_lbl_setSpeed</zorder>
-      <zorder>MIX_sld_speed</zorder>
-      <zorder>MIX_btt_setSpeed</zorder>
-      <zorder>MIX_lbl_step0</zorder>
-      <zorder>MIX_lbl_step100</zorder>
-      <zorder>MIX_lbl_step50</zorder>
-      <zorder>MIX_disp_currSpeed</zorder>
-      <zorder>MIX_btt_actWithPump</zorder>
-      <zorder>PUMP_btt_pinchValve</zorder>
+      <zorder>PRH_0_frameLabel</zorder>
+      <zorder>PRH_btt_stop</zorder>
+      <zorder>PRH_num_setSpeed</zorder>
+      <zorder>PRH_lbl_currSpeed</zorder>
+      <zorder>PRH_lbl_setSpeed</zorder>
+      <zorder>PRH_sld_speed</zorder>
+      <zorder>PRH_btt_setSpeed</zorder>
+      <zorder>PRH_lbl_step0</zorder>
+      <zorder>PRH_lbl_step100</zorder>
+      <zorder>PRH_lbl_step50</zorder>
+      <zorder>PRH_disp_currSpeed</zorder>
+      <zorder>PRH_btt_actWithPump</zorder>
+      <zorder>PRH_btt_pinchValve</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="SET_tab">
@@ -5456,12 +5462,12 @@ QPushButton:checked:hover {
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QLabel" name="TCP_0_frameLabel">
+      <widget class="QLabel" name="CONN_0_frameLabel">
        <property name="geometry">
         <rect>
          <x>20</x>
          <y>20</y>
-         <width>291</width>
+         <width>341</width>
          <height>51</height>
         </rect>
        </property>
@@ -5485,7 +5491,7 @@ color: #E1E5EE;</string>
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QTabWidget" name="TCP_tab">
+      <widget class="QTabWidget" name="CONN_tab">
        <property name="geometry">
         <rect>
          <x>40</x>
@@ -5519,15 +5525,15 @@ QTabBar::tab:selected {
        <property name="currentIndex">
         <number>3</number>
        </property>
-       <widget class="QWidget" name="TCP_ROB_tab">
+       <widget class="QWidget" name="CONN_ROB_tab">
         <attribute name="title">
          <string>    ROBOT    </string>
         </attribute>
-        <widget class="QLabel" name="TCP_ROB_lbl_bytesToRead">
+        <widget class="QLabel" name="CONN_ROB_lbl_bytesToRead">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>340</y>
+           <y>330</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -5545,11 +5551,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_bytesWritten">
+        <widget class="QLabel" name="CONN_ROB_disp_bytesWritten">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>270</y>
+           <y>260</y>
            <width>131</width>
            <height>41</height>
           </rect>
@@ -5561,11 +5567,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_bytesWritten">
+        <widget class="QLabel" name="CONN_ROB_lbl_bytesWritten">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>240</y>
+           <y>230</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -5583,11 +5589,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_ip">
+        <widget class="QLabel" name="CONN_ROB_lbl_ip">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>130</y>
+           <y>120</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -5605,11 +5611,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_port">
+        <widget class="QLabel" name="CONN_ROB_lbl_port">
          <property name="geometry">
           <rect>
            <x>260</x>
-           <y>130</y>
+           <y>120</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -5627,12 +5633,12 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_tio_conn">
+        <widget class="QLabel" name="CONN_ROB_lbl_connTo">
          <property name="geometry">
           <rect>
            <x>630</x>
-           <y>130</y>
-           <width>131</width>
+           <y>120</y>
+           <width>141</width>
            <height>31</height>
           </rect>
          </property>
@@ -5649,11 +5655,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_writeBuffer">
+        <widget class="QLabel" name="CONN_ROB_lbl_writeBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>220</y>
+           <y>210</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -5671,11 +5677,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_readBuffer">
+        <widget class="QLabel" name="CONN_ROB_lbl_readBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>320</y>
+           <y>310</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -5693,11 +5699,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_writeBuffer">
+        <widget class="QLabel" name="CONN_ROB_disp_writeBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>250</y>
+           <y>240</y>
            <width>561</width>
            <height>61</height>
           </rect>
@@ -5721,11 +5727,11 @@ color: #E1E5EE;</string>
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_readBuffer">
+        <widget class="QLabel" name="CONN_ROB_disp_readBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>350</y>
+           <y>340</y>
            <width>561</width>
            <height>61</height>
           </rect>
@@ -5743,11 +5749,11 @@ color: #E1E5EE;</string>
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_tio_rw">
+        <widget class="QLabel" name="CONN_ROB_lbl_rwTo">
          <property name="geometry">
           <rect>
            <x>480</x>
-           <y>130</y>
+           <y>120</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -5765,11 +5771,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_indi_connected">
+        <widget class="QLabel" name="CONN_ROB_indi_connected">
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>55</y>
+           <y>45</y>
            <width>51</width>
            <height>51</height>
           </rect>
@@ -5782,11 +5788,11 @@ background-color: #4c4a48;</string>
           <string/>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_connected">
+        <widget class="QLabel" name="CONN_ROB_lbl_connected">
          <property name="geometry">
           <rect>
            <x>130</x>
-           <y>53</y>
+           <y>43</y>
            <width>131</width>
            <height>51</height>
           </rect>
@@ -5805,11 +5811,11 @@ ESTABLISHED</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QPushButton" name="TCP_ROB_btt_discon">
+        <widget class="QPushButton" name="CONN_ROB_btt_discon">
          <property name="geometry">
           <rect>
            <x>570</x>
-           <y>60</y>
+           <y>50</y>
            <width>181</width>
            <height>41</height>
           </rect>
@@ -5818,11 +5824,11 @@ ESTABLISHED</string>
           <string>DISCONNECT</string>
          </property>
         </widget>
-        <widget class="QPushButton" name="TCP_ROB_btt_reconn">
+        <widget class="QPushButton" name="CONN_ROB_btt_reconn">
          <property name="geometry">
           <rect>
            <x>360</x>
-           <y>60</y>
+           <y>50</y>
            <width>181</width>
            <height>41</height>
           </rect>
@@ -5831,11 +5837,11 @@ ESTABLISHED</string>
           <string>RECONNECT</string>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_ip">
+        <widget class="QLabel" name="CONN_ROB_disp_ip">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>160</y>
+           <y>150</y>
            <width>201</width>
            <height>41</height>
           </rect>
@@ -5847,11 +5853,11 @@ ESTABLISHED</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_port">
+        <widget class="QLabel" name="CONN_ROB_disp_port">
          <property name="geometry">
           <rect>
            <x>260</x>
-           <y>160</y>
+           <y>150</y>
            <width>131</width>
            <height>41</height>
           </rect>
@@ -5863,11 +5869,11 @@ ESTABLISHED</string>
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_tio_rw">
+        <widget class="QLabel" name="CONN_ROB_disp_rwTo">
          <property name="geometry">
           <rect>
            <x>480</x>
-           <y>160</y>
+           <y>150</y>
            <width>121</width>
            <height>41</height>
           </rect>
@@ -5879,11 +5885,11 @@ ESTABLISHED</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_tio_conn">
+        <widget class="QLabel" name="CONN_ROB_disp_connTo">
          <property name="geometry">
           <rect>
            <x>630</x>
-           <y>160</y>
+           <y>150</y>
            <width>121</width>
            <height>41</height>
           </rect>
@@ -5895,11 +5901,11 @@ ESTABLISHED</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_bytesToRead">
+        <widget class="QLabel" name="CONN_ROB_disp_bytesToRead">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>370</y>
+           <y>360</y>
            <width>131</width>
            <height>41</height>
           </rect>
@@ -5911,11 +5917,11 @@ ESTABLISHED</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_port_4">
+        <widget class="QLabel" name="CONN_ROB_lbl_colon">
          <property name="geometry">
           <rect>
            <x>239</x>
-           <y>158</y>
+           <y>148</y>
            <width>21</width>
            <height>41</height>
           </rect>
@@ -5933,59 +5939,37 @@ color: #E1E5EE;</string>
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-        <zorder>TCP_ROB_lbl_port_4</zorder>
-        <zorder>TCP_ROB_lbl_bytesToRead</zorder>
-        <zorder>TCP_ROB_lbl_bytesWritten</zorder>
-        <zorder>TCP_ROB_lbl_port</zorder>
-        <zorder>TCP_ROB_lbl_tio_conn</zorder>
-        <zorder>TCP_ROB_lbl_ip</zorder>
-        <zorder>TCP_ROB_lbl_writeBuffer</zorder>
-        <zorder>TCP_ROB_lbl_readBuffer</zorder>
-        <zorder>TCP_ROB_disp_bytesWritten</zorder>
-        <zorder>TCP_ROB_disp_writeBuffer</zorder>
-        <zorder>TCP_ROB_disp_readBuffer</zorder>
-        <zorder>TCP_ROB_lbl_tio_rw</zorder>
-        <zorder>TCP_ROB_indi_connected</zorder>
-        <zorder>TCP_ROB_lbl_connected</zorder>
-        <zorder>TCP_ROB_btt_discon</zorder>
-        <zorder>TCP_ROB_btt_reconn</zorder>
-        <zorder>TCP_ROB_disp_ip</zorder>
-        <zorder>TCP_ROB_disp_port</zorder>
-        <zorder>TCP_ROB_disp_tio_rw</zorder>
-        <zorder>TCP_ROB_disp_tio_conn</zorder>
-        <zorder>TCP_ROB_disp_bytesToRead</zorder>
+        <zorder>CONN_ROB_lbl_colon</zorder>
+        <zorder>CONN_ROB_lbl_bytesToRead</zorder>
+        <zorder>CONN_ROB_lbl_bytesWritten</zorder>
+        <zorder>CONN_ROB_lbl_port</zorder>
+        <zorder>CONN_ROB_lbl_connTo</zorder>
+        <zorder>CONN_ROB_lbl_ip</zorder>
+        <zorder>CONN_ROB_lbl_writeBuffer</zorder>
+        <zorder>CONN_ROB_lbl_readBuffer</zorder>
+        <zorder>CONN_ROB_disp_bytesWritten</zorder>
+        <zorder>CONN_ROB_disp_writeBuffer</zorder>
+        <zorder>CONN_ROB_disp_readBuffer</zorder>
+        <zorder>CONN_ROB_lbl_rwTo</zorder>
+        <zorder>CONN_ROB_indi_connected</zorder>
+        <zorder>CONN_ROB_lbl_connected</zorder>
+        <zorder>CONN_ROB_btt_discon</zorder>
+        <zorder>CONN_ROB_btt_reconn</zorder>
+        <zorder>CONN_ROB_disp_ip</zorder>
+        <zorder>CONN_ROB_disp_port</zorder>
+        <zorder>CONN_ROB_disp_rwTo</zorder>
+        <zorder>CONN_ROB_disp_connTo</zorder>
+        <zorder>CONN_ROB_disp_bytesToRead</zorder>
        </widget>
-       <widget class="QWidget" name="TCP_PUMP1_tab">
+       <widget class="QWidget" name="CONN_PUMP1_tab">
         <attribute name="title">
          <string>    PUMP 1    </string>
         </attribute>
-        <widget class="QLabel" name="TCP_PUMP1_disp_readBuffer">
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>350</y>
-           <width>711</width>
-           <height>61</height>
-          </rect>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font-size: 10pt</string>
-         </property>
-         <property name="text">
-          <string>nothing received, yet..</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="TCP_PUMP1_btt_reconn">
+        <widget class="QPushButton" name="CONN_PUMP1_btt_reconn">
          <property name="geometry">
           <rect>
            <x>360</x>
-           <y>60</y>
+           <y>50</y>
            <width>181</width>
            <height>41</height>
           </rect>
@@ -5994,11 +5978,11 @@ color: #E1E5EE;</string>
           <string>RECONNECT</string>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_PUMP1_lbl_writeBuffer">
+        <widget class="QLabel" name="CONN_PUMP1_lbl_writeBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>220</y>
+           <y>210</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -6016,11 +6000,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_PUMP1_indi_connected">
+        <widget class="QLabel" name="CONN_PUMP1_indi_connected">
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>55</y>
+           <y>45</y>
            <width>51</width>
            <height>51</height>
           </rect>
@@ -6033,12 +6017,228 @@ background-color: #4c4a48;</string>
           <string/>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_PUMP1_disp_writeBuffer">
+        <widget class="QPushButton" name="CONN_PUMP1_btt_discon">
+         <property name="geometry">
+          <rect>
+           <x>570</x>
+           <y>50</y>
+           <width>181</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>DISCONNECT</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="CONN_PUMP1_lbl_readBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>250</y>
-           <width>711</width>
+           <y>310</y>
+           <width>131</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+         </property>
+         <property name="text">
+          <string>received</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="CONN_PUMP1_lbl_connected">
+         <property name="geometry">
+          <rect>
+           <x>130</x>
+           <y>43</y>
+           <width>131</width>
+           <height>51</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+         </property>
+         <property name="text">
+          <string>CONNECTION
+ESTABLISHED</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="CONN_PUMP1_disp_modbId">
+         <property name="geometry">
+          <rect>
+           <x>620</x>
+           <y>150</y>
+           <width>131</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="CONN_PUMP1_disp_port">
+         <property name="geometry">
+          <rect>
+           <x>320</x>
+           <y>150</y>
+           <width>131</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="CONN_PUMP1_lbl_port">
+         <property name="geometry">
+          <rect>
+           <x>220</x>
+           <y>150</y>
+           <width>91</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+         </property>
+         <property name="text">
+          <string>COM port:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="CONN_PUMP1_lbl_modbId">
+         <property name="geometry">
+          <rect>
+           <x>500</x>
+           <y>150</y>
+           <width>111</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+         </property>
+         <property name="text">
+          <string>Modbus ID:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="CONN_PUMP1_disp_readBuffer">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>340</y>
+           <width>561</width>
+           <height>61</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font-size: 10pt</string>
+         </property>
+         <property name="text">
+          <string>nothing received, yet..</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLabel" name="CONN_PUMP1_lbl_bytesWritten">
+         <property name="geometry">
+          <rect>
+           <x>620</x>
+           <y>230</y>
+           <width>131</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+         </property>
+         <property name="text">
+          <string>bytes written</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="CONN_PUMP1_lbl_bytesToRead">
+         <property name="geometry">
+          <rect>
+           <x>620</x>
+           <y>330</y>
+           <width>131</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+         </property>
+         <property name="text">
+          <string>bytes to read</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="CONN_PUMP1_disp_bytesToRead">
+         <property name="geometry">
+          <rect>
+           <x>620</x>
+           <y>360</y>
+           <width>131</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="CONN_PUMP1_disp_writeBuffer">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>240</y>
+           <width>561</width>
            <height>61</height>
           </rect>
          </property>
@@ -6061,69 +6261,11 @@ background-color: #4c4a48;</string>
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QPushButton" name="TCP_PUMP1_btt_discon">
-         <property name="geometry">
-          <rect>
-           <x>570</x>
-           <y>60</y>
-           <width>181</width>
-           <height>41</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>DISCONNECT</string>
-         </property>
-        </widget>
-        <widget class="QLabel" name="TCP_PUMP1_lbl_readBuffer">
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>320</y>
-           <width>131</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #4c4a48;
-color: #E1E5EE;</string>
-         </property>
-         <property name="text">
-          <string>received</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-         </property>
-        </widget>
-        <widget class="QLabel" name="TCP_PUMP1_lbl_connected">
-         <property name="geometry">
-          <rect>
-           <x>130</x>
-           <y>53</y>
-           <width>131</width>
-           <height>51</height>
-          </rect>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #4c4a48;
-color: #E1E5EE;</string>
-         </property>
-         <property name="text">
-          <string>CONNECTION
-ESTABLISHED</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_port_2">
+        <widget class="QLabel" name="CONN_PUMP1_disp_bytesWritten">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>160</y>
+           <y>260</y>
            <width>131</width>
            <height>41</height>
           </rect>
@@ -6135,88 +6277,32 @@ ESTABLISHED</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_ip_2">
-         <property name="geometry">
-          <rect>
-           <x>320</x>
-           <y>160</y>
-           <width>131</width>
-           <height>41</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>0</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_ip_2">
-         <property name="geometry">
-          <rect>
-           <x>230</x>
-           <y>160</y>
-           <width>81</width>
-           <height>41</height>
-          </rect>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #4c4a48;
-color: #E1E5EE;</string>
-         </property>
-         <property name="text">
-          <string>COM port:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_port_2">
-         <property name="geometry">
-          <rect>
-           <x>500</x>
-           <y>160</y>
-           <width>111</width>
-           <height>41</height>
-          </rect>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #4c4a48;
-color: #E1E5EE;</string>
-         </property>
-         <property name="text">
-          <string>Modbus ID:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-        <zorder>TCP_PUMP1_lbl_writeBuffer</zorder>
-        <zorder>TCP_PUMP1_lbl_readBuffer</zorder>
-        <zorder>TCP_PUMP1_disp_readBuffer</zorder>
-        <zorder>TCP_PUMP1_btt_reconn</zorder>
-        <zorder>TCP_PUMP1_indi_connected</zorder>
-        <zorder>TCP_PUMP1_disp_writeBuffer</zorder>
-        <zorder>TCP_PUMP1_btt_discon</zorder>
-        <zorder>TCP_PUMP1_lbl_connected</zorder>
-        <zorder>TCP_ROB_disp_port_2</zorder>
-        <zorder>TCP_ROB_disp_ip_2</zorder>
-        <zorder>TCP_ROB_lbl_ip_2</zorder>
-        <zorder>TCP_ROB_lbl_port_2</zorder>
+        <zorder>CONN_PUMP1_lbl_writeBuffer</zorder>
+        <zorder>CONN_PUMP1_lbl_readBuffer</zorder>
+        <zorder>CONN_PUMP1_btt_reconn</zorder>
+        <zorder>CONN_PUMP1_indi_connected</zorder>
+        <zorder>CONN_PUMP1_btt_discon</zorder>
+        <zorder>CONN_PUMP1_lbl_connected</zorder>
+        <zorder>CONN_PUMP1_disp_modbId</zorder>
+        <zorder>CONN_PUMP1_disp_port</zorder>
+        <zorder>CONN_PUMP1_lbl_port</zorder>
+        <zorder>CONN_PUMP1_lbl_modbId</zorder>
+        <zorder>CONN_PUMP1_disp_readBuffer</zorder>
+        <zorder>CONN_PUMP1_lbl_bytesWritten</zorder>
+        <zorder>CONN_PUMP1_lbl_bytesToRead</zorder>
+        <zorder>CONN_PUMP1_disp_bytesToRead</zorder>
+        <zorder>CONN_PUMP1_disp_writeBuffer</zorder>
+        <zorder>CONN_PUMP1_disp_bytesWritten</zorder>
        </widget>
-       <widget class="QWidget" name="TCP_PUMP2_tab">
+       <widget class="QWidget" name="CONN_PUMP2_tab">
         <attribute name="title">
          <string>    PUMP 2    </string>
         </attribute>
-        <widget class="QLabel" name="TCP_PUMP1_lbl_writeBuffer_2">
+        <widget class="QLabel" name="CONN_PUMP2_lbl_writeBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>220</y>
+           <y>210</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -6234,11 +6320,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_PUMP1_disp_writeBuffer_2">
+        <widget class="QLabel" name="CONN_PUMP2_disp_writeBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>250</y>
+           <y>240</y>
            <width>561</width>
            <height>61</height>
           </rect>
@@ -6262,12 +6348,12 @@ color: #E1E5EE;</string>
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_ip_3">
+        <widget class="QLabel" name="CONN_PUMP2_lbl_port">
          <property name="geometry">
           <rect>
-           <x>230</x>
-           <y>160</y>
-           <width>81</width>
+           <x>220</x>
+           <y>150</y>
+           <width>91</width>
            <height>41</height>
           </rect>
          </property>
@@ -6284,11 +6370,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_PUMP1_lbl_connected_2">
+        <widget class="QLabel" name="CONN_PUMP2_lbl_connected">
          <property name="geometry">
           <rect>
            <x>130</x>
-           <y>53</y>
+           <y>43</y>
            <width>131</width>
            <height>51</height>
           </rect>
@@ -6307,11 +6393,11 @@ ESTABLISHED</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_PUMP1_indi_connected_2">
+        <widget class="QLabel" name="CONN_PUMP2_indi_connected">
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>55</y>
+           <y>45</y>
            <width>51</width>
            <height>51</height>
           </rect>
@@ -6324,11 +6410,11 @@ background-color: #4c4a48;</string>
           <string/>
          </property>
         </widget>
-        <widget class="QPushButton" name="TCP_PUMP1_btt_discon_2">
+        <widget class="QPushButton" name="CONN_PUMP2_btt_discon">
          <property name="geometry">
           <rect>
            <x>570</x>
-           <y>60</y>
+           <y>50</y>
            <width>181</width>
            <height>41</height>
           </rect>
@@ -6337,11 +6423,11 @@ background-color: #4c4a48;</string>
           <string>DISCONNECT</string>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_port_3">
+        <widget class="QLabel" name="CONN_PUMP2_lbl_modbId">
          <property name="geometry">
           <rect>
            <x>500</x>
-           <y>160</y>
+           <y>150</y>
            <width>111</width>
            <height>41</height>
           </rect>
@@ -6359,11 +6445,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_PUMP1_disp_readBuffer_2">
+        <widget class="QLabel" name="CONN_PUMP2_disp_readBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>350</y>
+           <y>340</y>
            <width>561</width>
            <height>61</height>
           </rect>
@@ -6381,11 +6467,11 @@ color: #E1E5EE;</string>
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QPushButton" name="TCP_PUMP1_btt_reconn_2">
+        <widget class="QPushButton" name="CONN_PUMP2_btt_reconn">
          <property name="geometry">
           <rect>
            <x>360</x>
-           <y>60</y>
+           <y>50</y>
            <width>181</width>
            <height>41</height>
           </rect>
@@ -6394,11 +6480,11 @@ color: #E1E5EE;</string>
           <string>RECONNECT</string>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_PUMP1_lbl_readBuffer_2">
+        <widget class="QLabel" name="CONN_PUMP2_lbl_readBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>320</y>
+           <y>310</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -6416,11 +6502,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_port_3">
+        <widget class="QLabel" name="CONN_PUMP2_disp_modbId">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>160</y>
+           <y>150</y>
            <width>131</width>
            <height>41</height>
           </rect>
@@ -6432,11 +6518,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_ip_3">
+        <widget class="QLabel" name="CONN_PUMP2_disp_port">
          <property name="geometry">
           <rect>
            <x>320</x>
-           <y>160</y>
+           <y>150</y>
            <width>131</width>
            <height>41</height>
           </rect>
@@ -6448,11 +6534,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_disp_bytesToRead_2">
+        <widget class="QLabel" name="CONN_PUMP2_disp_bytesToRead">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>370</y>
+           <y>360</y>
            <width>131</width>
            <height>41</height>
           </rect>
@@ -6464,12 +6550,12 @@ color: #E1E5EE;</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_lbl_bytesToRead_2">
+        <widget class="QLabel" name="CONN_PUMP2_lbl_bytesToRead">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>340</y>
-           <width>151</width>
+           <y>330</y>
+           <width>131</width>
            <height>31</height>
           </rect>
          </property>
@@ -6480,17 +6566,17 @@ background-color: #4c4a48;
 color: #E1E5EE;</string>
          </property>
          <property name="text">
-          <string>TCP bytes to read</string>
+          <string>bytes to read</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_disp_bytesWritten_2">
+        <widget class="QLabel" name="CONN_PUMP2_disp_bytesWritten">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>270</y>
+           <y>260</y>
            <width>131</width>
            <height>41</height>
           </rect>
@@ -6502,12 +6588,12 @@ color: #E1E5EE;</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_lbl_bytesWritten_2">
+        <widget class="QLabel" name="CONN_PUMP2_lbl_bytesWritten">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>240</y>
-           <width>151</width>
+           <y>230</y>
+           <width>131</width>
            <height>31</height>
           </rect>
          </property>
@@ -6518,38 +6604,38 @@ background-color: #4c4a48;
 color: #E1E5EE;</string>
          </property>
          <property name="text">
-          <string>TCP bytes written</string>
+          <string>bytes written</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <zorder>TCP_PUMP1_lbl_readBuffer_2</zorder>
-        <zorder>TCP_PUMP1_lbl_writeBuffer_2</zorder>
-        <zorder>TCP_PUMP1_disp_writeBuffer_2</zorder>
-        <zorder>TCP_ROB_lbl_ip_3</zorder>
-        <zorder>TCP_PUMP1_lbl_connected_2</zorder>
-        <zorder>TCP_PUMP1_indi_connected_2</zorder>
-        <zorder>TCP_PUMP1_btt_discon_2</zorder>
-        <zorder>TCP_ROB_lbl_port_3</zorder>
-        <zorder>TCP_PUMP1_disp_readBuffer_2</zorder>
-        <zorder>TCP_PUMP1_btt_reconn_2</zorder>
-        <zorder>TCP_ROB_disp_port_3</zorder>
-        <zorder>TCP_ROB_disp_ip_3</zorder>
-        <zorder>TCP_MIXER_disp_bytesToRead_2</zorder>
-        <zorder>TCP_MIXER_lbl_bytesToRead_2</zorder>
-        <zorder>TCP_MIXER_disp_bytesWritten_2</zorder>
-        <zorder>TCP_MIXER_lbl_bytesWritten_2</zorder>
+        <zorder>CONN_PUMP2_lbl_bytesWritten</zorder>
+        <zorder>CONN_PUMP2_lbl_readBuffer</zorder>
+        <zorder>CONN_PUMP2_lbl_writeBuffer</zorder>
+        <zorder>CONN_PUMP2_disp_writeBuffer</zorder>
+        <zorder>CONN_PUMP2_lbl_port</zorder>
+        <zorder>CONN_PUMP2_lbl_connected</zorder>
+        <zorder>CONN_PUMP2_indi_connected</zorder>
+        <zorder>CONN_PUMP2_btt_discon</zorder>
+        <zorder>CONN_PUMP2_lbl_modbId</zorder>
+        <zorder>CONN_PUMP2_disp_readBuffer</zorder>
+        <zorder>CONN_PUMP2_btt_reconn</zorder>
+        <zorder>CONN_PUMP2_disp_modbId</zorder>
+        <zorder>CONN_PUMP2_disp_port</zorder>
+        <zorder>CONN_PUMP2_disp_bytesToRead</zorder>
+        <zorder>CONN_PUMP2_lbl_bytesToRead</zorder>
+        <zorder>CONN_PUMP2_disp_bytesWritten</zorder>
        </widget>
-       <widget class="QWidget" name="TCP_MIXER_tab">
+       <widget class="QWidget" name="CONN_PRH_tab">
         <attribute name="title">
          <string>    PRINTHEAD    </string>
         </attribute>
-        <widget class="QPushButton" name="TCP_MIXER_btt_reconn">
+        <widget class="QPushButton" name="CONN_PRH_btt_reconn">
          <property name="geometry">
           <rect>
            <x>360</x>
-           <y>60</y>
+           <y>50</y>
            <width>181</width>
            <height>41</height>
           </rect>
@@ -6558,11 +6644,11 @@ color: #E1E5EE;</string>
           <string>RECONNECT</string>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_lbl_writeBuffer">
+        <widget class="QLabel" name="CONN_PRH_lbl_writeBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>220</y>
+           <y>210</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -6580,11 +6666,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_lbl_readBuffer">
+        <widget class="QLabel" name="CONN_PRH_lbl_readBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>320</y>
+           <y>310</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -6602,11 +6688,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_disp_bytesWritten">
+        <widget class="QLabel" name="CONN_PRH_disp_bytesWritten">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>270</y>
+           <y>260</y>
            <width>131</width>
            <height>41</height>
           </rect>
@@ -6618,11 +6704,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_indi_connected">
+        <widget class="QLabel" name="CONN_PRH_indi_connected">
          <property name="geometry">
           <rect>
            <x>270</x>
-           <y>55</y>
+           <y>45</y>
            <width>51</width>
            <height>51</height>
           </rect>
@@ -6635,11 +6721,11 @@ background-color: #4c4a48;</string>
           <string/>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_lbl_bytesToRead">
+        <widget class="QLabel" name="CONN_PRH_lbl_bytesToRead">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>340</y>
+           <y>330</y>
            <width>151</width>
            <height>31</height>
           </rect>
@@ -6657,11 +6743,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_disp_bytesToRead">
+        <widget class="QLabel" name="CONN_PRH_disp_bytesToRead">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>370</y>
+           <y>360</y>
            <width>131</width>
            <height>41</height>
           </rect>
@@ -6673,11 +6759,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QPushButton" name="TCP_MIXER_btt_discon">
+        <widget class="QPushButton" name="CONN_PRH_btt_discon">
          <property name="geometry">
           <rect>
            <x>570</x>
-           <y>60</y>
+           <y>50</y>
            <width>181</width>
            <height>41</height>
           </rect>
@@ -6686,11 +6772,11 @@ color: #E1E5EE;</string>
           <string>DISCONNECT</string>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_lbl_connected">
+        <widget class="QLabel" name="CONN_PRH_lbl_connected">
          <property name="geometry">
           <rect>
            <x>130</x>
-           <y>53</y>
+           <y>43</y>
            <width>131</width>
            <height>51</height>
           </rect>
@@ -6709,11 +6795,11 @@ ESTABLISHED</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_disp_writeBuffer">
+        <widget class="QLabel" name="CONN_PRH_disp_writeBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>250</y>
+           <y>240</y>
            <width>561</width>
            <height>61</height>
           </rect>
@@ -6737,11 +6823,11 @@ ESTABLISHED</string>
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_disp_readBuffer">
+        <widget class="QLabel" name="CONN_PRH_disp_readBuffer">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>350</y>
+           <y>340</y>
            <width>561</width>
            <height>61</height>
           </rect>
@@ -6759,11 +6845,11 @@ ESTABLISHED</string>
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_MIXER_lbl_bytesWritten">
+        <widget class="QLabel" name="CONN_PRH_lbl_bytesWritten">
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>240</y>
+           <y>230</y>
            <width>151</width>
            <height>31</height>
           </rect>
@@ -6781,11 +6867,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_port_5">
+        <widget class="QLabel" name="CONN_PRH_lbl_colon">
          <property name="geometry">
           <rect>
            <x>239</x>
-           <y>158</y>
+           <y>148</y>
            <width>21</width>
            <height>41</height>
           </rect>
@@ -6803,11 +6889,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_port_4">
+        <widget class="QLabel" name="CONN_PRH_disp_port">
          <property name="geometry">
           <rect>
            <x>260</x>
-           <y>160</y>
+           <y>150</y>
            <width>131</width>
            <height>41</height>
           </rect>
@@ -6819,11 +6905,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_ip_4">
+        <widget class="QLabel" name="CONN_PRH_lbl_ip">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>130</y>
+           <y>120</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -6841,11 +6927,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_disp_ip_4">
+        <widget class="QLabel" name="CONN_PRH_disp_ip">
          <property name="geometry">
           <rect>
            <x>40</x>
-           <y>160</y>
+           <y>150</y>
            <width>201</width>
            <height>41</height>
           </rect>
@@ -6857,11 +6943,11 @@ color: #E1E5EE;</string>
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
-        <widget class="QLabel" name="TCP_ROB_lbl_port_6">
+        <widget class="QLabel" name="CONN_PRH_lbl_port">
          <property name="geometry">
           <rect>
            <x>260</x>
-           <y>130</y>
+           <y>120</y>
            <width>131</width>
            <height>31</height>
           </rect>
@@ -6879,26 +6965,26 @@ color: #E1E5EE;</string>
           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
-        <zorder>TCP_ROB_lbl_port_6</zorder>
-        <zorder>TCP_MIXER_btt_reconn</zorder>
-        <zorder>TCP_MIXER_lbl_writeBuffer</zorder>
-        <zorder>TCP_MIXER_lbl_readBuffer</zorder>
-        <zorder>TCP_MIXER_disp_bytesWritten</zorder>
-        <zorder>TCP_MIXER_indi_connected</zorder>
-        <zorder>TCP_MIXER_lbl_bytesToRead</zorder>
-        <zorder>TCP_MIXER_disp_bytesToRead</zorder>
-        <zorder>TCP_MIXER_btt_discon</zorder>
-        <zorder>TCP_MIXER_lbl_connected</zorder>
-        <zorder>TCP_MIXER_disp_writeBuffer</zorder>
-        <zorder>TCP_MIXER_disp_readBuffer</zorder>
-        <zorder>TCP_MIXER_lbl_bytesWritten</zorder>
-        <zorder>TCP_ROB_lbl_port_5</zorder>
-        <zorder>TCP_ROB_disp_port_4</zorder>
-        <zorder>TCP_ROB_lbl_ip_4</zorder>
-        <zorder>TCP_ROB_disp_ip_4</zorder>
+        <zorder>CONN_PRH_lbl_port</zorder>
+        <zorder>CONN_PRH_btt_reconn</zorder>
+        <zorder>CONN_PRH_lbl_writeBuffer</zorder>
+        <zorder>CONN_PRH_lbl_readBuffer</zorder>
+        <zorder>CONN_PRH_disp_bytesWritten</zorder>
+        <zorder>CONN_PRH_indi_connected</zorder>
+        <zorder>CONN_PRH_lbl_bytesToRead</zorder>
+        <zorder>CONN_PRH_disp_bytesToRead</zorder>
+        <zorder>CONN_PRH_btt_discon</zorder>
+        <zorder>CONN_PRH_lbl_connected</zorder>
+        <zorder>CONN_PRH_disp_writeBuffer</zorder>
+        <zorder>CONN_PRH_disp_readBuffer</zorder>
+        <zorder>CONN_PRH_lbl_bytesWritten</zorder>
+        <zorder>CONN_PRH_lbl_colon</zorder>
+        <zorder>CONN_PRH_disp_port</zorder>
+        <zorder>CONN_PRH_lbl_ip</zorder>
+        <zorder>CONN_PRH_disp_ip</zorder>
        </widget>
       </widget>
-      <widget class="QSpinBox" name="TCP_num_commForerun">
+      <widget class="QSpinBox" name="CONN_num_commForerun">
        <property name="geometry">
         <rect>
          <x>700</x>
@@ -6926,7 +7012,7 @@ color: #E1E5EE;</string>
         <number>10</number>
        </property>
       </widget>
-      <widget class="QLabel" name="TCP_lbl_commForerun">
+      <widget class="QLabel" name="CONN_lbl_commForerun">
        <property name="geometry">
         <rect>
          <x>560</x>
@@ -6948,7 +7034,7 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="TCP_lbl_qProcessing">
+      <widget class="QLabel" name="CONN_lbl_qProcessing">
        <property name="geometry">
         <rect>
          <x>380</x>
@@ -6971,7 +7057,7 @@ PROCESSING</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="TCP_indi_qProcessing">
+      <widget class="QLabel" name="CONN_indi_qProcessing">
        <property name="geometry">
         <rect>
          <x>520</x>
@@ -8183,7 +8269,7 @@ color: #E1E5EE;</string>
 speed</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_zone</cstring>
@@ -8234,7 +8320,7 @@ color: #E1E5EE;</string>
 flow</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QDoubleSpinBox" name="SET_TE_float_p2VolFlow">
@@ -8282,7 +8368,7 @@ color: #E1E5EE;</string>
 flow</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QLabel" name="SET_TE_1_fllwBhvr">
@@ -8290,7 +8376,7 @@ flow</string>
         <rect>
          <x>289</x>
          <y>79</y>
-         <width>341</width>
+         <width>291</width>
          <height>31</height>
         </rect>
        </property>
@@ -8357,9 +8443,9 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>130</y>
+         <y>160</y>
          <width>1111</width>
-         <height>741</height>
+         <height>711</height>
         </rect>
        </property>
        <property name="flow">
@@ -8376,7 +8462,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>381</width>
+         <width>411</width>
          <height>51</height>
         </rect>
        </property>
@@ -8397,14 +8483,14 @@ color: #E1E5EE;</string>
         <string>INTERNAL COMMAND QUEUE</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignCenter</set>
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QCheckBox" name="ICQ_chk_autoScroll">
        <property name="geometry">
         <rect>
          <x>990</x>
-         <y>100</y>
+         <y>130</y>
          <width>161</width>
          <height>27</height>
         </rect>
@@ -8425,8 +8511,8 @@ color: #f2f4f3;
       <widget class="QLabel" name="SID_lbl_robID">
        <property name="geometry">
         <rect>
-         <x>700</x>
-         <y>30</y>
+         <x>500</x>
+         <y>60</y>
          <width>101</width>
          <height>41</height>
         </rect>
@@ -8446,8 +8532,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SID_disp_robID">
        <property name="geometry">
         <rect>
-         <x>810</x>
-         <y>30</y>
+         <x>610</x>
+         <y>60</y>
          <width>101</width>
          <height>41</height>
         </rect>
@@ -8462,8 +8548,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SID_disp_progID">
        <property name="geometry">
         <rect>
-         <x>610</x>
-         <y>30</y>
+         <x>800</x>
+         <y>60</y>
          <width>101</width>
          <height>41</height>
         </rect>
@@ -8478,8 +8564,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SID_lbl_progID">
        <property name="geometry">
         <rect>
-         <x>520</x>
-         <y>30</y>
+         <x>710</x>
+         <y>60</y>
          <width>81</width>
          <height>41</height>
         </rect>
@@ -8496,30 +8582,91 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
-      <widget class="QPushButton" name="SID_btt_robToProgID">
+      <widget class="QPushButton" name="SID_btt_overwrite">
        <property name="geometry">
         <rect>
-         <x>950</x>
-         <y>30</y>
-         <width>201</width>
+         <x>1030</x>
+         <y>60</y>
+         <width>121</width>
          <height>41</height>
         </rect>
        </property>
        <property name="text">
-        <string>ROBOT ID   🡆  SCRIPT ID</string>
+        <string>OVERWRITE</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="SID_btt_scIdPlus1">
+      <widget class="QSpinBox" name="SID_num_ovewrite">
        <property name="geometry">
         <rect>
-         <x>611</x>
-         <y>80</y>
-         <width>101</width>
-         <height>25</height>
+         <x>910</x>
+         <y>60</y>
+         <width>111</width>
+         <height>41</height>
         </rect>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="DC_0_notice_2">
+       <property name="geometry">
+        <rect>
+         <x>805</x>
+         <y>37</y>
+         <width>91</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 11pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
        <property name="text">
-        <string>+ 1</string>
+        <string>current</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="DC_0_notice_3">
+       <property name="geometry">
+        <rect>
+         <x>915</x>
+         <y>37</y>
+         <width>101</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 11pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>new</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
      </widget>
@@ -9032,7 +9179,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>320</x>
          <y>550</y>
-         <width>241</width>
+         <width>271</width>
          <height>41</height>
         </rect>
        </property>
@@ -9507,10 +9654,10 @@ background-color: #4c4a48;</string>
   <tabstop>TERM_btt_gcodeInterp</tabstop>
   <tabstop>TERM_entry_rapidInterp</tabstop>
   <tabstop>TERM_btt_rapidInterp</tabstop>
-  <tabstop>TCP_tab</tabstop>
-  <tabstop>TCP_num_commForerun</tabstop>
-  <tabstop>TCP_ROB_btt_reconn</tabstop>
-  <tabstop>TCP_ROB_btt_discon</tabstop>
+  <tabstop>CONN_tab</tabstop>
+  <tabstop>CONN_num_commForerun</tabstop>
+  <tabstop>CONN_ROB_btt_reconn</tabstop>
+  <tabstop>CONN_ROB_btt_discon</tabstop>
   <tabstop>SET_float_volPerMM</tabstop>
   <tabstop>SET_float_frToMms</tabstop>
   <tabstop>SET_TE_float_p2VolFlow</tabstop>
@@ -9537,8 +9684,8 @@ background-color: #4c4a48;</string>
   <tabstop>ZERO_float_rx</tabstop>
   <tabstop>ZERO_float_ry</tabstop>
   <tabstop>ZERO_float_rz</tabstop>
-  <tabstop>TCP_PUMP1_btt_reconn</tabstop>
-  <tabstop>TCP_PUMP1_btt_discon</tabstop>
+  <tabstop>CONN_PUMP1_btt_reconn</tabstop>
+  <tabstop>CONN_PUMP1_btt_discon</tabstop>
  </tabstops>
  <resources>
   <include location="../resources.qrc"/>

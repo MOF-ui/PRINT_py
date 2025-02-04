@@ -63,12 +63,12 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(command, du.QEntry(id=1, z=0, Tool=TestTool))
 
         du.SC_curr_comm_id = 1
-        TestFrame.ADC_num_panning.setValue(du.DEF_AMC_PANNING)
-        TestFrame.ADC_num_fibDeliv.setValue(du.DEF_AMC_FIB_DELIV)
-        TestFrame.ADC_btt_clamp.setChecked(du.DEF_AMC_CLAMP)
-        TestFrame.ADC_btt_knifePos.setChecked(du.DEF_AMC_KNIFE_POS)
-        TestFrame.ADC_btt_knife.setChecked(du.DEF_AMC_KNIFE)
-        TestFrame.ADC_btt_fiberPnmtc.setChecked(du.DEF_AMC_FIBER_PNMTC)
+        TestFrame.ADC_num_panning.setValue(du.DEF_PRH_TROLLEY)
+        TestFrame.ADC_num_fibDeliv.setValue(du.DEF_AMC_LOAD_SPR)
+        TestFrame.ADC_btt_clamp.setChecked(du.DEF_PRH_PLACE_SPR)
+        TestFrame.ADC_btt_knifePos.setChecked(du.DEF_AMC_CUT_POS)
+        TestFrame.ADC_btt_knife.setChecked(du.DEF_PRH_CUT)
+        TestFrame.ADC_btt_fiberPnmtc.setChecked(du.DEF_PRH_CLAMP)
 
         TestFrame.ADC_num_panning.blockSignals(False)
         TestFrame.ADC_num_fibDeliv.blockSignals(False)
@@ -347,12 +347,12 @@ class MainframeWinTest(unittest.TestCase):
         )
 
         TestFrame.clr_queue(partial=False)
-        TestFrame.ASC_num_panning.setValue(du.DEF_AMC_PANNING)
-        TestFrame.ASC_num_fibDeliv.setValue(du.DEF_AMC_FIB_DELIV)
-        TestFrame.ASC_btt_clamp.setChecked(du.DEF_AMC_CLAMP)
-        TestFrame.ASC_btt_knifePos.setChecked(du.DEF_AMC_KNIFE_POS)
-        TestFrame.ASC_btt_knife.setChecked(du.DEF_AMC_KNIFE)
-        TestFrame.ASC_btt_fiberPnmtc.setChecked(du.DEF_AMC_FIBER_PNMTC)
+        TestFrame.ASC_num_panning.setValue(du.DEF_PRH_TROLLEY)
+        TestFrame.ASC_num_fibDeliv.setValue(du.DEF_AMC_LOAD_SPR)
+        TestFrame.ASC_btt_clamp.setChecked(du.DEF_PRH_PLACE_SPR)
+        TestFrame.ASC_btt_knifePos.setChecked(du.DEF_AMC_CUT_POS)
+        TestFrame.ASC_btt_knife.setChecked(du.DEF_PRH_CUT)
+        TestFrame.ASC_btt_fiberPnmtc.setChecked(du.DEF_PRH_CLAMP)
 
 
     def test_apply_settings(self):
@@ -412,40 +412,40 @@ class MainframeWinTest(unittest.TestCase):
             TestFrame.SET_TE_float_p2VolFlow.value(), du.DEF_PUMP_LPS
         )
         self.assertEqual(
-            TestFrame.ADC_num_panning.value(), du.DEF_AMC_PANNING
+            TestFrame.ADC_num_panning.value(), du.DEF_PRH_TROLLEY
         )
         self.assertEqual(
-            TestFrame.ADC_num_fibDeliv.value(), du.DEF_AMC_FIB_DELIV
+            TestFrame.ADC_num_fibDeliv.value(), du.DEF_AMC_LOAD_SPR
         )
         self.assertEqual(
-            TestFrame.ADC_btt_clamp.isChecked(), du.DEF_AMC_CLAMP
+            TestFrame.ADC_btt_clamp.isChecked(), du.DEF_PRH_PLACE_SPR
         )
         self.assertEqual(
-            TestFrame.ADC_btt_knifePos.isChecked(), du.DEF_AMC_KNIFE_POS
+            TestFrame.ADC_btt_knifePos.isChecked(), du.DEF_AMC_CUT_POS
         )
         self.assertEqual(
-            TestFrame.ADC_btt_knife.isChecked(), du.DEF_AMC_KNIFE
+            TestFrame.ADC_btt_knife.isChecked(), du.DEF_PRH_CUT
         )
         self.assertEqual(
-            TestFrame.ADC_btt_fiberPnmtc.isChecked(), du.DEF_AMC_FIBER_PNMTC
+            TestFrame.ADC_btt_fiberPnmtc.isChecked(), du.DEF_PRH_CLAMP
         )
         self.assertEqual(
-            TestFrame.ASC_num_panning.value(), du.DEF_AMC_PANNING
+            TestFrame.ASC_num_panning.value(), du.DEF_PRH_TROLLEY
         )
         self.assertEqual(
-            TestFrame.ASC_num_fibDeliv.value(), du.DEF_AMC_FIB_DELIV
+            TestFrame.ASC_num_fibDeliv.value(), du.DEF_AMC_LOAD_SPR
         )
         self.assertEqual(
-            TestFrame.ASC_btt_clamp.isChecked(), du.DEF_AMC_CLAMP
+            TestFrame.ASC_btt_clamp.isChecked(), du.DEF_PRH_PLACE_SPR
         )
         self.assertEqual(
-            TestFrame.ASC_btt_knifePos.isChecked(), du.DEF_AMC_KNIFE_POS
+            TestFrame.ASC_btt_knifePos.isChecked(), du.DEF_AMC_CUT_POS
         )
         self.assertEqual(
-            TestFrame.ASC_btt_knife.isChecked(), du.DEF_AMC_KNIFE
+            TestFrame.ASC_btt_knife.isChecked(), du.DEF_PRH_CUT
         )
         self.assertEqual(
-            TestFrame.ASC_btt_fiberPnmtc.isChecked(), du.DEF_AMC_FIBER_PNMTC
+            TestFrame.ASC_btt_fiberPnmtc.isChecked(), du.DEF_PRH_CLAMP
         )
 
         # test setting by user
@@ -1014,7 +1014,7 @@ class MainframeWinTest(unittest.TestCase):
         du.ROBTelem.Coor = du.Coordinate(1, 1900, 1, 1, 1, 1, 1, 100)
         du.DCCurrZero = du.Coordinate(y=2000, ext=100)
         TCoor = du.Coordinate(x=1, y=2002.2, z=1, rx=1, ry=1, rz=1, q=1, ext=200)
-        TestTool = du.ToolCommand(fib_deliv_steps=10, pnmtc_fiber_yn=True)
+        TestTool = du.ToolCommand(load_spring=10, wait=True)
 
         TestFrame.send_gcode_command()
         command, dc_dummy = du.ROB_send_list[len(du.ROB_send_list) - 1]
@@ -1084,7 +1084,7 @@ class MainframeWinTest(unittest.TestCase):
             f"z50,tool0  EXT600  TOOL"
         )
         TCoor = du.Coordinate(x=1, y=2000, z=3, rx=4, ry=5, rz=6, q=1, ext=600)
-        TestTool = du.ToolCommand(fib_deliv_steps=10, pnmtc_fiber_yn=True)
+        TestTool = du.ToolCommand(load_spring=10, wait=True)
         TestFrame.send_rapid_command()
         command = du.ROB_send_list[len(du.ROB_send_list) - 1]
         self.assertEqual(
@@ -1199,19 +1199,19 @@ rapid_test_file.close()
 app = 0
 win = 0
 app = QApplication(sys.argv)
-TestFrame = mf.Mainframe(lpath=logpath, p_conn=(False, False), testrun=True)
+TestFrame = mf.Mainframe(lpath=logpath, testrun=True)
 rapid_test_file.close()
 
 # grouping
 ACON_btt_group = (
     TestFrame.ADC_btt_clamp,
-    TestFrame.ADC_btt_knifePos,
-    TestFrame.ADC_btt_knife,
-    TestFrame.ADC_btt_fiberPnmtc,
+    TestFrame.ADC_btt_cut,
+    TestFrame.ADC_btt_placeSpring,
+    TestFrame.ADC_num_trolley,
     TestFrame.ASC_btt_clamp,
-    TestFrame.ASC_btt_knifePos,
-    TestFrame.ASC_btt_knife,
-    TestFrame.ASC_btt_fiberPnmtc,
+    TestFrame.ASC_btt_cut,
+    TestFrame.ASC_btt_placeSpring,
+    TestFrame.ASC_num_trolley,
 )
 
 

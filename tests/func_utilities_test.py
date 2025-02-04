@@ -68,7 +68,7 @@ class FuncLibTest(unittest.TestCase):
         ResPos = du.Coordinate(9.5, 10, 1, 1, 1, 1, 1, 11)
         TestSpeed = du.SpeedVector(2, 2, 2, 2)
         ResSpeed = du.SpeedVector(2, 2, 8, 2)
-        ResTool = du.ToolCommand(fib_deliv_steps=10, pnmtc_fiber_yn=True)
+        ResTool = du.ToolCommand(load_spring=10, wait=True)
         test_zone = 3
         du.DCCurrZero = du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4)
 
@@ -104,7 +104,7 @@ class FuncLibTest(unittest.TestCase):
         )
         ResPos = du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 13)
         ResSpeed = du.SpeedVector(10, 11, 8, 9)
-        ResTool = du.ToolCommand(fib_deliv_steps=10, pnmtc_fiber_yn=True)
+        ResTool = du.ToolCommand(load_spring=10, wait=True)
         self.assertEqual(
             fu.rapid_to_qentry(txt=testTxt),
             du.QEntry(

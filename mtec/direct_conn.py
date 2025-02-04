@@ -17,13 +17,13 @@ import libs.data_utilities as du
 
 def connect():
     # pump.serial_port = '/dev/cu.usbmodem1431201'
-    pump.settings_serial_port = "COM3"
+    pump.settings_serial_port = 'COM3'
     serial_def_bus=du.serial.Serial(
-        baudrate=du.DEF_PUMP_SERIAL["BR"],
-        parity=du.DEF_PUMP_SERIAL["P"],
-        stopbits=du.DEF_PUMP_SERIAL["SB"],
-        bytesize=du.DEF_PUMP_SERIAL["BS"],
-        port=du.DEF_PUMP_SERIAL["PORT"],
+        baudrate=du.DEF_PUMP_SERIAL['baud'],
+        parity=du.DEF_PUMP_SERIAL['par'],
+        stopbits=du.DEF_PUMP_SERIAL['stop'],
+        bytesize=du.DEF_PUMP_SERIAL['size'],
+        port=du.DEF_PUMP_SERIAL['port'],
     )
     pump.serial_default = serial_def_bus
     print(pump.connect())
@@ -41,11 +41,11 @@ def change_speed(newSpeed):
 
 def change_keep_alive():
     if keepAliveStt:
-        print("active")
+        print('active')
         KeepAliveTmr.start()
         keepAliveStt = False
     else:
-        print("inactive")
+        print('inactive')
         KeepAliveTmr.cancel()
         keepAliveStt = True
 
@@ -65,13 +65,13 @@ import tkinter
 
 keep_alive_end = False
 
-pump = MtecMod(None, "02")
+pump = MtecMod(None, '02')
 KeepAliveTmr = Timer(0.25, keep_alive_routine)
 
 master = tkinter.Tk()
 
-connectButton = tkinter.Button(master, text="Connect", command=connect)
-stopButton = tkinter.Button(master, text="Stop", command=stop)
+connectButton = tkinter.Button(master, text='Connect', command=connect)
+stopButton = tkinter.Button(master, text='Stop', command=stop)
 connectButton.pack()
 stopButton.pack()
 
@@ -81,14 +81,14 @@ slider = tkinter.Scale(
     to=100,
     orient=tkinter.HORIZONTAL,
     command=change_speed,
-    label="Input: ",
+    label='Input: ',
 )
 slider.pack()
 
 keep_alive_var = tkinter.IntVar(value=1)
 keepAlive = tkinter.Checkbutton(
     master,
-    text="keepAlive",
+    text='keepAlive',
     variable=keep_alive_var,
     onvalue=1,
     offvalue=0,
@@ -101,7 +101,7 @@ tkinter.mainloop()
 KeepAliveTmr.cancel()
 keep_alive_end = True
 
-print("waiting for KATmr..")
+print('waiting for KATmr..')
 while not KeepAliveTmr.finished:
     pass
 

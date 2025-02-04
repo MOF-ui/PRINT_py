@@ -98,10 +98,10 @@ def pre_check_rapid_file(
     """
 
     try:
-        if txt == "":
+        if txt == '':
             return 0, 0.0, 'empty'
 
-        rows = txt.split("\n")
+        rows = txt.split('\n')
         x = 0.0
         y = 0.0
         z = 0.0
@@ -209,8 +209,8 @@ def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
 
     # set tool settings
     if 'TOOL' in txt:
-        entry.Tool.pnmtc_fiber_yn = True
-        entry.Tool.fib_deliv_steps = int(
+        entry.Tool.wait = True
+        entry.Tool.load_spring = int(
             du.TOOL_fib_ratio * du.DEF_TOOL_FIB_STPS
         )
     
@@ -227,7 +227,7 @@ def gcode_to_qentry(
         tuple[du.QEntry|None, str]
     ):
     """converts a single line of GCode G1 command to a QEntry, can be used in
-    loops for multiline code, "pos" should be the pos before this command is
+    loops for multiline code, 'pos' should be the pos before this command is
     executed (before its EXECUTED, not before its added to SC_queue) as its
     the fallback option if no new X, Y, Z or EXT posistion is passed
 
@@ -449,17 +449,17 @@ def create_logfile() -> Path | None:
     """
 
     try:
-        desk = os.environ["USERPROFILE"]
-        log_path = desk / Path("Desktop/PRINT_py_log")
+        desk = os.environ['USERPROFILE']
+        log_path = desk / Path('Desktop/PRINT_py_log')
         log_path.mkdir(parents=True, exist_ok=True)
-        du.LOG_safe_path = Path(log_path / Path("ZERO.zrf"))
+        du.LOG_safe_path = Path(log_path / Path('ZERO.zrf'))
 
-        time = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        time = datetime.now().strftime('%Y-%m-%d_%H%M%S')
 
         log_path = log_path / Path(f"{time}.txt")
         text = f"{time}    [GNRL]:        program booting, starting GUI...\n"
 
-        logfile = open(log_path, "x")
+        logfile = open(log_path, 'x')
         logfile.write(text)
         logfile.close()
 
@@ -494,19 +494,19 @@ def connect_pump(p_num:int) -> None:
 
     if du.PMP_serial_def_bus is None:
         du.PMP_serial_def_bus=du.serial.Serial(
-            baudrate=du.DEF_PUMP_SERIAL["BR"],
-            parity=du.DEF_PUMP_SERIAL["P"],
-            stopbits=du.DEF_PUMP_SERIAL["SB"],
-            bytesize=du.DEF_PUMP_SERIAL["BS"],
-            port=du.DEF_PUMP_SERIAL["PORT"],
+            baudrate=du.DEF_PUMP_SERIAL['baud'],
+            parity=du.DEF_PUMP_SERIAL['par'],
+            stopbits=du.DEF_PUMP_SERIAL['stop'],
+            bytesize=du.DEF_PUMP_SERIAL['size'],
+            port=du.PMP_port,
         )
         du.PMP1Serial.serial_default = du.PMP_serial_def_bus
         du.PMP2Serial.serial_default = du.PMP_serial_def_bus
 
     match p_num:
-        case "P1":
+        case 'P1':
             ret = du.PMP1Serial.connect()
-        case "P2":
+        case 'P2':
             ret = du.PMP2Serial.connect()
         case _:
             raise ValueError(f"wrong pNum given: {p_num}")

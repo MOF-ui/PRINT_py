@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\mainframe.ui'
+# Form implementation generated from reading ui file '.\mainframe_v2.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -15,7 +15,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
-        MainWindow.resize(1945, 1095)
+        MainWindow.resize(1949, 1117)
         MainWindow.setMinimumSize(QtCore.QSize(600, 400))
         MainWindow.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
@@ -237,7 +237,7 @@ class Ui_MainWindow(object):
             "QFrame#DC_frame,\n"
             "QFrame#ICQ_frame,\n"
             "QFrame#IO_frame,\n"
-            "QFrame#MIX_frame,\n"
+            "QFrame#PRH_frame,\n"
             "QFrame#NC_frame,\n"
             "QFrame#PUMP_frame,\n"
             "QFrame#SCRTL_frame,\n"
@@ -389,7 +389,7 @@ class Ui_MainWindow(object):
         )
         self.IO_disp_estimVol.setObjectName("IO_disp_estimVol")
         self.IO_lbl_commNum = QtWidgets.QLabel(self.IO_frame)
-        self.IO_lbl_commNum.setGeometry(QtCore.QRect(10, 200, 151, 51))
+        self.IO_lbl_commNum.setGeometry(QtCore.QRect(0, 200, 151, 51))
         self.IO_lbl_commNum.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -401,7 +401,7 @@ class Ui_MainWindow(object):
         )
         self.IO_lbl_commNum.setObjectName("IO_lbl_commNum")
         self.IO_lbl_estimLen = QtWidgets.QLabel(self.IO_frame)
-        self.IO_lbl_estimLen.setGeometry(QtCore.QRect(10, 270, 151, 51))
+        self.IO_lbl_estimLen.setGeometry(QtCore.QRect(0, 270, 151, 51))
         self.IO_lbl_estimLen.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -413,7 +413,7 @@ class Ui_MainWindow(object):
         )
         self.IO_lbl_estimLen.setObjectName("IO_lbl_estimLen")
         self.IO_lbl_estimVol = QtWidgets.QLabel(self.IO_frame)
-        self.IO_lbl_estimVol.setGeometry(QtCore.QRect(10, 340, 151, 51))
+        self.IO_lbl_estimVol.setGeometry(QtCore.QRect(0, 340, 151, 51))
         self.IO_lbl_estimVol.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -557,7 +557,7 @@ class Ui_MainWindow(object):
         self.SGLC_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.SGLC_frame.setObjectName("SGLC_frame")
         self.SGLC_0_frameLabel = QtWidgets.QLabel(self.SGLC_frame)
-        self.SGLC_0_frameLabel.setGeometry(QtCore.QRect(20, 10, 271, 51))
+        self.SGLC_0_frameLabel.setGeometry(QtCore.QRect(10, 10, 271, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
@@ -801,7 +801,7 @@ class Ui_MainWindow(object):
         self.SCRTL_lbl_queue.setObjectName("SCRTL_lbl_queue")
         self.SCTRL_btt_forcedStop = QtWidgets.QPushButton(self.SCRTL_frame)
         self.SCTRL_btt_forcedStop.setGeometry(QtCore.QRect(780, 60, 131, 41))
-        self.SCTRL_btt_forcedStop.setStyleSheet("background-color: rgb(255, 70, 73);")
+        self.SCTRL_btt_forcedStop.setStyleSheet("background-color: rgb(255, 120, 60);")
         self.SCTRL_btt_forcedStop.setObjectName("SCTRL_btt_forcedStop")
         self.SCTRL_indi_qProcessing = QtWidgets.QLabel(self.SCRTL_frame)
         self.SCTRL_indi_qProcessing.setGeometry(QtCore.QRect(710, 60, 41, 41))
@@ -1129,6 +1129,7 @@ class Ui_MainWindow(object):
         self.DC_sld_stepWidth.setPageStep(1)
         self.DC_sld_stepWidth.setProperty("value", 1)
         self.DC_sld_stepWidth.setOrientation(QtCore.Qt.Horizontal)
+        self.DC_sld_stepWidth.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.DC_sld_stepWidth.setObjectName("DC_sld_stepWidth")
         self.DC_btt_xPlus = QtWidgets.QPushButton(self.DC_frame)
         self.DC_btt_xPlus.setGeometry(QtCore.QRect(380, 190, 51, 51))
@@ -1866,12 +1867,12 @@ class Ui_MainWindow(object):
         self.AMCON_tab.setAcceptDrops(False)
         self.AMCON_tab.setObjectName("AMCON_tab")
         self.ADC_frame = QtWidgets.QFrame(self.AMCON_tab)
-        self.ADC_frame.setGeometry(QtCore.QRect(30, 20, 611, 301))
+        self.ADC_frame.setGeometry(QtCore.QRect(30, 20, 281, 491))
         self.ADC_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.ADC_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ADC_frame.setObjectName("ADC_frame")
         self.ADC_0_framelabel = QtWidgets.QLabel(self.ADC_frame)
-        self.ADC_0_framelabel.setGeometry(QtCore.QRect(10, 20, 281, 51))
+        self.ADC_0_framelabel.setGeometry(QtCore.QRect(0, 20, 281, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
@@ -1885,32 +1886,25 @@ class Ui_MainWindow(object):
         )
         self.ADC_0_framelabel.setAlignment(QtCore.Qt.AlignCenter)
         self.ADC_0_framelabel.setObjectName("ADC_0_framelabel")
-        self.ADC_lbl_panning = QtWidgets.QLabel(self.ADC_frame)
-        self.ADC_lbl_panning.setGeometry(QtCore.QRect(270, 110, 171, 51))
-        self.ADC_lbl_panning.setStyleSheet(
+        self.ADC_lbl_trolley = QtWidgets.QLabel(self.ADC_frame)
+        self.ADC_lbl_trolley.setGeometry(QtCore.QRect(40, 170, 191, 31))
+        self.ADC_lbl_trolley.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #5d707f;\n"
             "color: #E1E5EE;"
         )
-        self.ADC_lbl_panning.setAlignment(
+        self.ADC_lbl_trolley.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
-        self.ADC_lbl_panning.setObjectName("ADC_lbl_panning")
-        self.ADC_lbl_fibDeliv = QtWidgets.QLabel(self.ADC_frame)
-        self.ADC_lbl_fibDeliv.setGeometry(QtCore.QRect(270, 160, 171, 51))
-        self.ADC_lbl_fibDeliv.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #5d707f;\n"
-            "color: #E1E5EE;"
-        )
-        self.ADC_lbl_fibDeliv.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
-        )
-        self.ADC_lbl_fibDeliv.setObjectName("ADC_lbl_fibDeliv")
+        self.ADC_lbl_trolley.setObjectName("ADC_lbl_trolley")
         self.ADC_btt_clamp = QtWidgets.QPushButton(self.ADC_frame)
-        self.ADC_btt_clamp.setGeometry(QtCore.QRect(80, 120, 161, 31))
+        self.ADC_btt_clamp.setGeometry(QtCore.QRect(50, 250, 181, 31))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(14)
+        font.setKerning(True)
+        self.ADC_btt_clamp.setFont(font)
         self.ADC_btt_clamp.setStyleSheet(
             "QPushButton {\n"
             "    background-color: #40a6a8;\n"
@@ -1931,14 +1925,14 @@ class Ui_MainWindow(object):
         self.ADC_btt_clamp.setCheckable(True)
         self.ADC_btt_clamp.setChecked(False)
         self.ADC_btt_clamp.setObjectName("ADC_btt_clamp")
-        self.ADC_btt_knifePos = QtWidgets.QPushButton(self.ADC_frame)
-        self.ADC_btt_knifePos.setGeometry(QtCore.QRect(80, 160, 161, 31))
+        self.ADC_btt_cut = QtWidgets.QPushButton(self.ADC_frame)
+        self.ADC_btt_cut.setGeometry(QtCore.QRect(50, 290, 181, 31))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(14)
         font.setKerning(True)
-        self.ADC_btt_knifePos.setFont(font)
-        self.ADC_btt_knifePos.setStyleSheet(
+        self.ADC_btt_cut.setFont(font)
+        self.ADC_btt_cut.setStyleSheet(
             "QPushButton {\n"
             "    background-color: #40a6a8;\n"
             "}\n"
@@ -1955,17 +1949,17 @@ class Ui_MainWindow(object):
             "    border: 2px solid #40a6a8;\n"
             "}"
         )
-        self.ADC_btt_knifePos.setCheckable(True)
-        self.ADC_btt_knifePos.setChecked(False)
-        self.ADC_btt_knifePos.setObjectName("ADC_btt_knifePos")
-        self.ADC_btt_knife = QtWidgets.QPushButton(self.ADC_frame)
-        self.ADC_btt_knife.setGeometry(QtCore.QRect(80, 200, 161, 31))
+        self.ADC_btt_cut.setCheckable(True)
+        self.ADC_btt_cut.setChecked(False)
+        self.ADC_btt_cut.setObjectName("ADC_btt_cut")
+        self.ADC_btt_placeSpring = QtWidgets.QPushButton(self.ADC_frame)
+        self.ADC_btt_placeSpring.setGeometry(QtCore.QRect(50, 330, 181, 31))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(14)
         font.setKerning(True)
-        self.ADC_btt_knife.setFont(font)
-        self.ADC_btt_knife.setStyleSheet(
+        self.ADC_btt_placeSpring.setFont(font)
+        self.ADC_btt_placeSpring.setStyleSheet(
             "QPushButton {\n"
             "    background-color: #40a6a8;\n"
             "}\n"
@@ -1982,48 +1976,21 @@ class Ui_MainWindow(object):
             "    border: 2px solid #40a6a8;\n"
             "}"
         )
-        self.ADC_btt_knife.setCheckable(True)
-        self.ADC_btt_knife.setChecked(False)
-        self.ADC_btt_knife.setObjectName("ADC_btt_knife")
-        self.ADC_btt_fiberPnmtc = QtWidgets.QPushButton(self.ADC_frame)
-        self.ADC_btt_fiberPnmtc.setGeometry(QtCore.QRect(80, 240, 161, 31))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(14)
-        font.setKerning(True)
-        self.ADC_btt_fiberPnmtc.setFont(font)
-        self.ADC_btt_fiberPnmtc.setStyleSheet(
-            "QPushButton {\n"
-            "    background-color: #40a6a8;\n"
-            "}\n"
-            "\n"
-            "QPushButton:checked {\n"
-            "    background-color: #61fcff;\n"
-            "}\n"
-            "\n"
-            "QPushButton:hover {\n"
-            "    border: 2px solid #abfbff;\n"
-            "}\n"
-            "\n"
-            "QPushButton:checked:hover {\n"
-            "    border: 2px solid #40a6a8;\n"
-            "}"
-        )
-        self.ADC_btt_fiberPnmtc.setCheckable(True)
-        self.ADC_btt_fiberPnmtc.setChecked(False)
-        self.ADC_btt_fiberPnmtc.setObjectName("ADC_btt_fiberPnmtc")
+        self.ADC_btt_placeSpring.setCheckable(True)
+        self.ADC_btt_placeSpring.setChecked(False)
+        self.ADC_btt_placeSpring.setObjectName("ADC_btt_placeSpring")
         self.ADC_btt_resetAll = QtWidgets.QPushButton(self.ADC_frame)
-        self.ADC_btt_resetAll.setGeometry(QtCore.QRect(370, 240, 201, 31))
+        self.ADC_btt_resetAll.setGeometry(QtCore.QRect(50, 430, 181, 31))
         self.ADC_btt_resetAll.setObjectName("ADC_btt_resetAll")
         self.ADC_indi_robotMoving = QtWidgets.QLabel(self.ADC_frame)
-        self.ADC_indi_robotMoving.setGeometry(QtCore.QRect(530, 40, 41, 41))
+        self.ADC_indi_robotMoving.setGeometry(QtCore.QRect(190, 90, 41, 41))
         self.ADC_indi_robotMoving.setStyleSheet(
             "border-radius: 20px;\n" "background-color: #4c4a48;"
         )
         self.ADC_indi_robotMoving.setText("")
         self.ADC_indi_robotMoving.setObjectName("ADC_indi_robotMoving")
         self.ADC_lbl_robotMoving = QtWidgets.QLabel(self.ADC_frame)
-        self.ADC_lbl_robotMoving.setGeometry(QtCore.QRect(390, 40, 131, 41))
+        self.ADC_lbl_robotMoving.setGeometry(QtCore.QRect(50, 90, 131, 41))
         self.ADC_lbl_robotMoving.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -2034,29 +2001,21 @@ class Ui_MainWindow(object):
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.ADC_lbl_robotMoving.setObjectName("ADC_lbl_robotMoving")
-        self.ADC_num_panning = QtWidgets.QSpinBox(self.ADC_frame)
-        self.ADC_num_panning.setGeometry(QtCore.QRect(440, 120, 131, 41))
-        self.ADC_num_panning.setAlignment(
+        self.ADC_num_trolley = QtWidgets.QSpinBox(self.ADC_frame)
+        self.ADC_num_trolley.setGeometry(QtCore.QRect(50, 200, 181, 41))
+        self.ADC_num_trolley.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.ADC_num_panning.setMaximum(2000)
-        self.ADC_num_panning.setSingleStep(10)
-        self.ADC_num_panning.setObjectName("ADC_num_panning")
-        self.ADC_num_fibDeliv = QtWidgets.QSpinBox(self.ADC_frame)
-        self.ADC_num_fibDeliv.setGeometry(QtCore.QRect(440, 170, 131, 41))
-        self.ADC_num_fibDeliv.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.ADC_num_fibDeliv.setMaximum(200)
-        self.ADC_num_fibDeliv.setSingleStep(1)
-        self.ADC_num_fibDeliv.setObjectName("ADC_num_fibDeliv")
+        self.ADC_num_trolley.setMaximum(2000)
+        self.ADC_num_trolley.setSingleStep(10)
+        self.ADC_num_trolley.setObjectName("ADC_num_trolley")
         self.ASC_frame = QtWidgets.QFrame(self.AMCON_tab)
-        self.ASC_frame.setGeometry(QtCore.QRect(30, 360, 611, 301))
+        self.ASC_frame.setGeometry(QtCore.QRect(330, 20, 281, 491))
         self.ASC_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.ASC_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ASC_frame.setObjectName("ASC_frame")
         self.ASC_0_framelabel = QtWidgets.QLabel(self.ASC_frame)
-        self.ASC_0_framelabel.setGeometry(QtCore.QRect(10, 20, 281, 51))
+        self.ASC_0_framelabel.setGeometry(QtCore.QRect(0, 20, 281, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
@@ -2070,32 +2029,8 @@ class Ui_MainWindow(object):
         )
         self.ASC_0_framelabel.setAlignment(QtCore.Qt.AlignCenter)
         self.ASC_0_framelabel.setObjectName("ASC_0_framelabel")
-        self.ASC_lbl_panning = QtWidgets.QLabel(self.ASC_frame)
-        self.ASC_lbl_panning.setGeometry(QtCore.QRect(260, 100, 171, 51))
-        self.ASC_lbl_panning.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #5d707f;\n"
-            "color: #E1E5EE;"
-        )
-        self.ASC_lbl_panning.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
-        )
-        self.ASC_lbl_panning.setObjectName("ASC_lbl_panning")
-        self.ASC_lbl_fibDeliv = QtWidgets.QLabel(self.ASC_frame)
-        self.ASC_lbl_fibDeliv.setGeometry(QtCore.QRect(260, 150, 171, 51))
-        self.ASC_lbl_fibDeliv.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #5d707f;\n"
-            "color: #E1E5EE;"
-        )
-        self.ASC_lbl_fibDeliv.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
-        )
-        self.ASC_lbl_fibDeliv.setObjectName("ASC_lbl_fibDeliv")
         self.ASC_btt_clamp = QtWidgets.QPushButton(self.ASC_frame)
-        self.ASC_btt_clamp.setGeometry(QtCore.QRect(70, 120, 161, 31))
+        self.ASC_btt_clamp.setGeometry(QtCore.QRect(50, 250, 181, 31))
         self.ASC_btt_clamp.setStyleSheet(
             "QPushButton {\n"
             "    background-color: #40a6a8;\n"
@@ -2116,14 +2051,14 @@ class Ui_MainWindow(object):
         self.ASC_btt_clamp.setCheckable(True)
         self.ASC_btt_clamp.setChecked(False)
         self.ASC_btt_clamp.setObjectName("ASC_btt_clamp")
-        self.ASC_btt_knifePos = QtWidgets.QPushButton(self.ASC_frame)
-        self.ASC_btt_knifePos.setGeometry(QtCore.QRect(70, 160, 161, 31))
+        self.ASC_btt_cut = QtWidgets.QPushButton(self.ASC_frame)
+        self.ASC_btt_cut.setGeometry(QtCore.QRect(50, 290, 181, 31))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(14)
         font.setKerning(True)
-        self.ASC_btt_knifePos.setFont(font)
-        self.ASC_btt_knifePos.setStyleSheet(
+        self.ASC_btt_cut.setFont(font)
+        self.ASC_btt_cut.setStyleSheet(
             "QPushButton {\n"
             "    background-color: #40a6a8;\n"
             "}\n"
@@ -2140,17 +2075,17 @@ class Ui_MainWindow(object):
             "    border: 2px solid #40a6a8;\n"
             "}"
         )
-        self.ASC_btt_knifePos.setCheckable(True)
-        self.ASC_btt_knifePos.setChecked(False)
-        self.ASC_btt_knifePos.setObjectName("ASC_btt_knifePos")
-        self.ASC_btt_knife = QtWidgets.QPushButton(self.ASC_frame)
-        self.ASC_btt_knife.setGeometry(QtCore.QRect(70, 200, 161, 31))
+        self.ASC_btt_cut.setCheckable(True)
+        self.ASC_btt_cut.setChecked(False)
+        self.ASC_btt_cut.setObjectName("ASC_btt_cut")
+        self.ASC_btt_placeSpring = QtWidgets.QPushButton(self.ASC_frame)
+        self.ASC_btt_placeSpring.setGeometry(QtCore.QRect(50, 330, 181, 31))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(14)
         font.setKerning(True)
-        self.ASC_btt_knife.setFont(font)
-        self.ASC_btt_knife.setStyleSheet(
+        self.ASC_btt_placeSpring.setFont(font)
+        self.ASC_btt_placeSpring.setStyleSheet(
             "QPushButton {\n"
             "    background-color: #40a6a8;\n"
             "}\n"
@@ -2167,48 +2102,21 @@ class Ui_MainWindow(object):
             "    border: 2px solid #40a6a8;\n"
             "}"
         )
-        self.ASC_btt_knife.setCheckable(True)
-        self.ASC_btt_knife.setChecked(False)
-        self.ASC_btt_knife.setObjectName("ASC_btt_knife")
-        self.ASC_btt_fiberPnmtc = QtWidgets.QPushButton(self.ASC_frame)
-        self.ASC_btt_fiberPnmtc.setGeometry(QtCore.QRect(70, 240, 161, 31))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift")
-        font.setPointSize(14)
-        font.setKerning(True)
-        self.ASC_btt_fiberPnmtc.setFont(font)
-        self.ASC_btt_fiberPnmtc.setStyleSheet(
-            "QPushButton {\n"
-            "    background-color: #40a6a8;\n"
-            "}\n"
-            "\n"
-            "QPushButton:checked {\n"
-            "    background-color: #61fcff;\n"
-            "}\n"
-            "\n"
-            "QPushButton:hover {\n"
-            "    border: 2px solid #abfbff;\n"
-            "}\n"
-            "\n"
-            "QPushButton:checked:hover {\n"
-            "    border: 2px solid #40a6a8;\n"
-            "}"
-        )
-        self.ASC_btt_fiberPnmtc.setCheckable(True)
-        self.ASC_btt_fiberPnmtc.setChecked(False)
-        self.ASC_btt_fiberPnmtc.setObjectName("ASC_btt_fiberPnmtc")
+        self.ASC_btt_placeSpring.setCheckable(True)
+        self.ASC_btt_placeSpring.setChecked(False)
+        self.ASC_btt_placeSpring.setObjectName("ASC_btt_placeSpring")
         self.ASC_btt_overwrSC = QtWidgets.QPushButton(self.ASC_frame)
-        self.ASC_btt_overwrSC.setGeometry(QtCore.QRect(399, 220, 161, 51))
+        self.ASC_btt_overwrSC.setGeometry(QtCore.QRect(50, 430, 181, 31))
         self.ASC_btt_overwrSC.setObjectName("ASC_btt_overwrSC")
         self.ASC_indi_qProcessing = QtWidgets.QLabel(self.ASC_frame)
-        self.ASC_indi_qProcessing.setGeometry(QtCore.QRect(520, 40, 41, 41))
+        self.ASC_indi_qProcessing.setGeometry(QtCore.QRect(190, 90, 41, 41))
         self.ASC_indi_qProcessing.setStyleSheet(
             "border-radius: 20px;\n" "background-color: #4c4a48;"
         )
         self.ASC_indi_qProcessing.setText("")
         self.ASC_indi_qProcessing.setObjectName("ASC_indi_qProcessing")
         self.ASC_lbl_qProcessing = QtWidgets.QLabel(self.ASC_frame)
-        self.ASC_lbl_qProcessing.setGeometry(QtCore.QRect(380, 34, 131, 51))
+        self.ASC_lbl_qProcessing.setGeometry(QtCore.QRect(50, 84, 131, 51))
         self.ASC_lbl_qProcessing.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -2220,40 +2128,54 @@ class Ui_MainWindow(object):
         )
         self.ASC_lbl_qProcessing.setObjectName("ASC_lbl_qProcessing")
         self.ASC_entry_SCLines = QtWidgets.QLineEdit(self.ASC_frame)
-        self.ASC_entry_SCLines.setGeometry(QtCore.QRect(290, 230, 101, 41))
+        self.ASC_entry_SCLines.setGeometry(QtCore.QRect(50, 390, 181, 31))
         self.ASC_entry_SCLines.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.ASC_entry_SCLines.setObjectName("ASC_entry_SCLines")
-        self.ASC_num_fibDeliv = QtWidgets.QSpinBox(self.ASC_frame)
-        self.ASC_num_fibDeliv.setGeometry(QtCore.QRect(430, 160, 131, 41))
-        self.ASC_num_fibDeliv.setAlignment(
+        self.ASC_num_trolley = QtWidgets.QSpinBox(self.ASC_frame)
+        self.ASC_num_trolley.setGeometry(QtCore.QRect(50, 200, 181, 41))
+        self.ASC_num_trolley.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.ASC_num_fibDeliv.setMaximum(200)
-        self.ASC_num_fibDeliv.setSingleStep(1)
-        self.ASC_num_fibDeliv.setObjectName("ASC_num_fibDeliv")
-        self.ASC_num_panning = QtWidgets.QSpinBox(self.ASC_frame)
-        self.ASC_num_panning.setGeometry(QtCore.QRect(430, 110, 131, 41))
-        self.ASC_num_panning.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        self.ASC_num_trolley.setMaximum(2000)
+        self.ASC_num_trolley.setSingleStep(10)
+        self.ASC_num_trolley.setObjectName("ASC_num_trolley")
+        self.ADC_lbl_panning_2 = QtWidgets.QLabel(self.ASC_frame)
+        self.ADC_lbl_panning_2.setGeometry(QtCore.QRect(40, 170, 191, 31))
+        self.ADC_lbl_panning_2.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #5d707f;\n"
+            "color: #E1E5EE;"
         )
-        self.ASC_num_panning.setMaximum(2000)
-        self.ASC_num_panning.setSingleStep(10)
-        self.ASC_num_panning.setObjectName("ASC_num_panning")
+        self.ADC_lbl_panning_2.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+        )
+        self.ADC_lbl_panning_2.setObjectName("ADC_lbl_panning_2")
+        self.ADC_lbl_panning_2.raise_()
+        self.ASC_0_framelabel.raise_()
+        self.ASC_btt_clamp.raise_()
+        self.ASC_btt_cut.raise_()
+        self.ASC_btt_placeSpring.raise_()
+        self.ASC_btt_overwrSC.raise_()
+        self.ASC_indi_qProcessing.raise_()
+        self.ASC_lbl_qProcessing.raise_()
+        self.ASC_entry_SCLines.raise_()
+        self.ASC_num_trolley.raise_()
         self.PUMP_frame = QtWidgets.QFrame(self.AMCON_tab)
-        self.PUMP_frame.setGeometry(QtCore.QRect(680, 20, 1211, 411))
+        self.PUMP_frame.setGeometry(QtCore.QRect(630, 20, 701, 871))
         self.PUMP_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.PUMP_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.PUMP_frame.setObjectName("PUMP_frame")
         self.PUMP_disp_freqP1 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_freqP1.setGeometry(QtCore.QRect(199, 190, 101, 41))
+        self.PUMP_disp_freqP1.setGeometry(QtCore.QRect(140, 620, 101, 41))
         self.PUMP_disp_freqP1.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PUMP_disp_freqP1.setObjectName("PUMP_disp_freqP1")
         self.PUMP_lbl_freq = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_freq.setGeometry(QtCore.QRect(49, 190, 141, 41))
+        self.PUMP_lbl_freq.setGeometry(QtCore.QRect(100, 590, 141, 31))
         self.PUMP_lbl_freq.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -2265,7 +2187,7 @@ class Ui_MainWindow(object):
         )
         self.PUMP_lbl_freq.setObjectName("PUMP_lbl_freq")
         self.PUMP_lbl_volt = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_volt.setGeometry(QtCore.QRect(29, 245, 161, 31))
+        self.PUMP_lbl_volt.setGeometry(QtCore.QRect(270, 590, 101, 31))
         self.PUMP_lbl_volt.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -2277,25 +2199,25 @@ class Ui_MainWindow(object):
         )
         self.PUMP_lbl_volt.setObjectName("PUMP_lbl_volt")
         self.PUMP_disp_voltP1 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_voltP1.setGeometry(QtCore.QRect(199, 240, 101, 41))
+        self.PUMP_disp_voltP1.setGeometry(QtCore.QRect(270, 620, 101, 41))
         self.PUMP_disp_voltP1.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PUMP_disp_voltP1.setObjectName("PUMP_disp_voltP1")
         self.PUMP_disp_ampsP1 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_ampsP1.setGeometry(QtCore.QRect(199, 290, 101, 41))
+        self.PUMP_disp_ampsP1.setGeometry(QtCore.QRect(400, 620, 101, 41))
         self.PUMP_disp_ampsP1.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PUMP_disp_ampsP1.setObjectName("PUMP_disp_ampsP1")
         self.PUMP_disp_torqP1 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_torqP1.setGeometry(QtCore.QRect(199, 340, 101, 41))
+        self.PUMP_disp_torqP1.setGeometry(QtCore.QRect(530, 620, 101, 41))
         self.PUMP_disp_torqP1.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PUMP_disp_torqP1.setObjectName("PUMP_disp_torqP1")
         self.PUMP_lbl_amps = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_amps.setGeometry(QtCore.QRect(29, 295, 161, 31))
+        self.PUMP_lbl_amps.setGeometry(QtCore.QRect(400, 590, 101, 31))
         self.PUMP_lbl_amps.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -2307,7 +2229,7 @@ class Ui_MainWindow(object):
         )
         self.PUMP_lbl_amps.setObjectName("PUMP_lbl_amps")
         self.PUMP_lbl_torq = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_torq.setGeometry(QtCore.QRect(0, 345, 191, 31))
+        self.PUMP_lbl_torq.setGeometry(QtCore.QRect(520, 590, 111, 31))
         self.PUMP_lbl_torq.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
@@ -2319,13 +2241,13 @@ class Ui_MainWindow(object):
         )
         self.PUMP_lbl_torq.setObjectName("PUMP_lbl_torq")
         self.PUMP_btt_plus1 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_plus1.setGeometry(QtCore.QRect(520, 270, 71, 31))
+        self.PUMP_btt_plus1.setGeometry(QtCore.QRect(450, 110, 81, 41))
         self.PUMP_btt_plus1.setObjectName("PUMP_btt_plus1")
         self.PUMP_btt_minus1 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_minus1.setGeometry(QtCore.QRect(620, 270, 71, 31))
+        self.PUMP_btt_minus1.setGeometry(QtCore.QRect(550, 110, 81, 41))
         self.PUMP_btt_minus1.setObjectName("PUMP_btt_minus1")
         self.PUMP_lbl_setSpeed = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_setSpeed.setGeometry(QtCore.QRect(520, 120, 171, 41))
+        self.PUMP_lbl_setSpeed.setGeometry(QtCore.QRect(30, 190, 171, 41))
         self.PUMP_lbl_setSpeed.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -2334,13 +2256,15 @@ class Ui_MainWindow(object):
         )
         self.PUMP_lbl_setSpeed.setObjectName("PUMP_lbl_setSpeed")
         self.PUMP_btt_setSpeed = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_setSpeed.setGeometry(QtCore.QRect(519, 220, 171, 31))
+        self.PUMP_btt_setSpeed.setGeometry(QtCore.QRect(359, 190, 61, 51))
+        self.PUMP_btt_setSpeed.setStyleSheet("font-size: 18pt;")
         self.PUMP_btt_setSpeed.setObjectName("PUMP_btt_setSpeed")
         self.PUMP_btt_stop = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_stop.setGeometry(QtCore.QRect(740, 160, 171, 41))
+        self.PUMP_btt_stop.setGeometry(QtCore.QRect(210, 260, 211, 41))
+        self.PUMP_btt_stop.setStyleSheet("font-size: 18pt;")
         self.PUMP_btt_stop.setObjectName("PUMP_btt_stop")
         self.PUMP_num_setSpeed = QtWidgets.QSpinBox(self.PUMP_frame)
-        self.PUMP_num_setSpeed.setGeometry(QtCore.QRect(520, 160, 171, 51))
+        self.PUMP_num_setSpeed.setGeometry(QtCore.QRect(210, 190, 131, 51))
         self.PUMP_num_setSpeed.setStyleSheet("font-size: 16pt;")
         self.PUMP_num_setSpeed.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -2349,10 +2273,10 @@ class Ui_MainWindow(object):
         self.PUMP_num_setSpeed.setMaximum(100)
         self.PUMP_num_setSpeed.setObjectName("PUMP_num_setSpeed")
         self.PUMP_btt_reverse = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_reverse.setGeometry(QtCore.QRect(740, 210, 171, 41))
+        self.PUMP_btt_reverse.setGeometry(QtCore.QRect(450, 260, 181, 41))
         self.PUMP_btt_reverse.setObjectName("PUMP_btt_reverse")
         self.PUMP_0_frameLabel = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_0_frameLabel.setGeometry(QtCore.QRect(20, 20, 161, 51))
+        self.PUMP_0_frameLabel.setGeometry(QtCore.QRect(20, 20, 241, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
@@ -2364,50 +2288,30 @@ class Ui_MainWindow(object):
             "background-color: #5D707F;\n"
             "color: #E1E5EE;"
         )
-        self.PUMP_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.PUMP_0_frameLabel.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
         self.PUMP_0_frameLabel.setObjectName("PUMP_0_frameLabel")
         self.PUMP_btt_minus10 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_minus10.setGeometry(QtCore.QRect(620, 310, 71, 31))
+        self.PUMP_btt_minus10.setGeometry(QtCore.QRect(550, 160, 81, 41))
         self.PUMP_btt_minus10.setObjectName("PUMP_btt_minus10")
         self.PUMP_btt_plus10 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_plus10.setGeometry(QtCore.QRect(520, 310, 71, 31))
+        self.PUMP_btt_plus10.setGeometry(QtCore.QRect(450, 160, 81, 41))
         self.PUMP_btt_plus10.setObjectName("PUMP_btt_plus10")
         self.PUMP_btt_plus25 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_plus25.setGeometry(QtCore.QRect(520, 350, 71, 31))
+        self.PUMP_btt_plus25.setGeometry(QtCore.QRect(450, 210, 81, 41))
         self.PUMP_btt_plus25.setObjectName("PUMP_btt_plus25")
         self.PUMP_btt_minus25 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_minus25.setGeometry(QtCore.QRect(620, 350, 71, 31))
+        self.PUMP_btt_minus25.setGeometry(QtCore.QRect(550, 210, 81, 41))
         self.PUMP_btt_minus25.setObjectName("PUMP_btt_minus25")
-        self.PUMP_btt_pinchValve = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_pinchValve.setGeometry(QtCore.QRect(1000, 60, 171, 41))
-        self.PUMP_btt_pinchValve.setStyleSheet(
-            "QPushButton {\n"
-            "    background-color: #40a6a8;\n"
-            "}\n"
-            "\n"
-            "QPushButton:checked {\n"
-            "    background-color: #61fcff;\n"
-            "}\n"
-            "\n"
-            "QPushButton:hover {\n"
-            "    border: 2px solid #abfbff;\n"
-            "}\n"
-            "\n"
-            "QPushButton:checked:hover {\n"
-            "    border: 2px solid #40a6a8;\n"
-            "}"
-        )
-        self.PUMP_btt_pinchValve.setCheckable(True)
-        self.PUMP_btt_pinchValve.setChecked(False)
-        self.PUMP_btt_pinchValve.setObjectName("PUMP_btt_pinchValve")
         self.PUMP_btt_ccToDefault = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_ccToDefault.setGeometry(QtCore.QRect(740, 290, 171, 41))
+        self.PUMP_btt_ccToDefault.setGeometry(QtCore.QRect(250, 770, 171, 41))
         self.PUMP_btt_ccToDefault.setObjectName("PUMP_btt_ccToDefault")
         self.PUMP_btt_scToDefault = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_scToDefault.setGeometry(QtCore.QRect(740, 340, 171, 41))
+        self.PUMP_btt_scToDefault.setGeometry(QtCore.QRect(460, 770, 171, 41))
         self.PUMP_btt_scToDefault.setObjectName("PUMP_btt_scToDefault")
         self.PUMP_lbl_pump1 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_pump1.setGeometry(QtCore.QRect(218, 155, 81, 31))
+        self.PUMP_lbl_pump1.setGeometry(QtCore.QRect(40, 624, 81, 30))
         self.PUMP_lbl_pump1.setStyleSheet(
             "border: 0px;\n"
             "font-size: 14pt;\n"
@@ -2419,7 +2323,7 @@ class Ui_MainWindow(object):
         )
         self.PUMP_lbl_pump1.setObjectName("PUMP_lbl_pump1")
         self.PUMP_lbl_pump2 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_pump2.setGeometry(QtCore.QRect(328, 155, 91, 31))
+        self.PUMP_lbl_pump2.setGeometry(QtCore.QRect(30, 674, 91, 30))
         self.PUMP_lbl_pump2.setStyleSheet(
             "border: 0px;\n"
             "font-size: 14pt;\n"
@@ -2431,85 +2335,87 @@ class Ui_MainWindow(object):
         )
         self.PUMP_lbl_pump2.setObjectName("PUMP_lbl_pump2")
         self.PUMP_disp_voltP2 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_voltP2.setGeometry(QtCore.QRect(320, 240, 101, 41))
+        self.PUMP_disp_voltP2.setGeometry(QtCore.QRect(270, 670, 101, 41))
         self.PUMP_disp_voltP2.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PUMP_disp_voltP2.setObjectName("PUMP_disp_voltP2")
         self.PUMP_disp_freqP2 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_freqP2.setGeometry(QtCore.QRect(320, 190, 101, 41))
+        self.PUMP_disp_freqP2.setGeometry(QtCore.QRect(140, 670, 101, 41))
         self.PUMP_disp_freqP2.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PUMP_disp_freqP2.setObjectName("PUMP_disp_freqP2")
         self.PUMP_disp_ampsP2 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_ampsP2.setGeometry(QtCore.QRect(320, 290, 101, 41))
+        self.PUMP_disp_ampsP2.setGeometry(QtCore.QRect(400, 670, 101, 41))
         self.PUMP_disp_ampsP2.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PUMP_disp_ampsP2.setObjectName("PUMP_disp_ampsP2")
         self.PUMP_disp_torqP2 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_torqP2.setGeometry(QtCore.QRect(320, 340, 101, 41))
+        self.PUMP_disp_torqP2.setGeometry(QtCore.QRect(530, 670, 101, 41))
         self.PUMP_disp_torqP2.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PUMP_disp_torqP2.setObjectName("PUMP_disp_torqP2")
         self.PUMP_lbl_p1Half = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_p1Half.setGeometry(QtCore.QRect(213, 120, 61, 31))
+        self.PUMP_lbl_p1Half.setGeometry(QtCore.QRect(319, 429, 61, 31))
         self.PUMP_lbl_p1Half.setStyleSheet(
             "border: 0px;\n"
             "background-color: #5D707F;\n"
             "color: #E1E5EE;\n"
-            "font-size: 10pt;"
+            "font-size: 12pt;"
         )
         self.PUMP_lbl_p1Half.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignHCenter
         )
         self.PUMP_lbl_p1Half.setObjectName("PUMP_lbl_p1Half")
         self.PUMP_sld_outputRatio = QtWidgets.QSlider(self.PUMP_frame)
-        self.PUMP_sld_outputRatio.setGeometry(QtCore.QRect(70, 94, 351, 22))
+        self.PUMP_sld_outputRatio.setGeometry(QtCore.QRect(70, 400, 561, 31))
         self.PUMP_sld_outputRatio.setMaximum(100)
         self.PUMP_sld_outputRatio.setProperty("value", 0)
         self.PUMP_sld_outputRatio.setOrientation(QtCore.Qt.Horizontal)
+        self.PUMP_sld_outputRatio.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.PUMP_sld_outputRatio.setTickInterval(5)
         self.PUMP_sld_outputRatio.setObjectName("PUMP_sld_outputRatio")
         self.PUMP_lbl_p1Zero = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_p1Zero.setGeometry(QtCore.QRect(349, 120, 81, 31))
+        self.PUMP_lbl_p1Zero.setGeometry(QtCore.QRect(557, 429, 81, 31))
         self.PUMP_lbl_p1Zero.setStyleSheet(
             "border: 0px;\n"
             "background-color: #5D707F;\n"
             "color: #E1E5EE;\n"
-            "font-size: 10pt;"
+            "font-size: 12pt;"
         )
         self.PUMP_lbl_p1Zero.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
         self.PUMP_lbl_p1Zero.setObjectName("PUMP_lbl_p1Zero")
         self.PUMP_lbl_p1Full = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_p1Full.setGeometry(QtCore.QRect(60, 120, 61, 31))
+        self.PUMP_lbl_p1Full.setGeometry(QtCore.QRect(60, 429, 61, 31))
         self.PUMP_lbl_p1Full.setStyleSheet(
             "border: 0px;\n"
             "background-color: #5D707F;\n"
             "color: #E1E5EE;\n"
-            "font-size: 10pt;"
+            "font-size: 12pt;"
         )
         self.PUMP_lbl_p1Full.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
         self.PUMP_lbl_p1Full.setObjectName("PUMP_lbl_p1Full")
         self.PUMP_disp_currSpeed = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_currSpeed.setGeometry(QtCore.QRect(520, 70, 171, 51))
+        self.PUMP_disp_currSpeed.setGeometry(QtCore.QRect(260, 110, 161, 61))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
-        font.setPointSize(18)
+        font.setPointSize(22)
         self.PUMP_disp_currSpeed.setFont(font)
-        self.PUMP_disp_currSpeed.setStyleSheet("font-size: 18pt;")
+        self.PUMP_disp_currSpeed.setStyleSheet("font-size: 22pt;")
         self.PUMP_disp_currSpeed.setScaledContents(False)
         self.PUMP_disp_currSpeed.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PUMP_disp_currSpeed.setObjectName("PUMP_disp_currSpeed")
         self.PUMP_lbl_currSpeed = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_currSpeed.setGeometry(QtCore.QRect(460, 20, 231, 51))
+        self.PUMP_lbl_currSpeed.setGeometry(QtCore.QRect(30, 110, 221, 51))
         self.PUMP_lbl_currSpeed.setStyleSheet(
             "border: 0px;\n"
             "background-color: #5D707F;\n"
@@ -2521,26 +2427,26 @@ class Ui_MainWindow(object):
         )
         self.PUMP_lbl_currSpeed.setObjectName("PUMP_lbl_currSpeed")
         self.PUMP_disp_outputRatio = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_disp_outputRatio.setGeometry(QtCore.QRect(360, 60, 61, 22))
-        self.PUMP_disp_outputRatio.setStyleSheet("font-size: 11pt;")
+        self.PUMP_disp_outputRatio.setGeometry(QtCore.QRect(560, 350, 71, 31))
+        self.PUMP_disp_outputRatio.setStyleSheet("font-size: 14pt;")
         self.PUMP_disp_outputRatio.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PUMP_disp_outputRatio.setObjectName("PUMP_disp_outputRatio")
         self.PUMP_lbl_outputRatio = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_outputRatio.setGeometry(QtCore.QRect(260, 59, 101, 21))
+        self.PUMP_lbl_outputRatio.setGeometry(QtCore.QRect(460, 349, 101, 31))
         self.PUMP_lbl_outputRatio.setStyleSheet(
             "border: 0px;\n"
             "background-color: #5D707F;\n"
             "color: #E1E5EE;\n"
-            "font-size: 10pt;"
+            "font-size: 12pt;"
         )
         self.PUMP_lbl_outputRatio.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PUMP_lbl_outputRatio.setObjectName("PUMP_lbl_outputRatio")
         self.PUMP_num_setSpeedP1 = QtWidgets.QSpinBox(self.PUMP_frame)
-        self.PUMP_num_setSpeedP1.setGeometry(QtCore.QRect(1001, 160, 171, 51))
+        self.PUMP_num_setSpeedP1.setGeometry(QtCore.QRect(70, 510, 141, 41))
         self.PUMP_num_setSpeedP1.setStyleSheet("font-size: 16pt;")
         self.PUMP_num_setSpeedP1.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -2549,7 +2455,7 @@ class Ui_MainWindow(object):
         self.PUMP_num_setSpeedP1.setMaximum(100)
         self.PUMP_num_setSpeedP1.setObjectName("PUMP_num_setSpeedP1")
         self.PUMP_lbl_setSpeedP1 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_setSpeedP1.setGeometry(QtCore.QRect(1041, 120, 131, 41))
+        self.PUMP_lbl_setSpeedP1.setGeometry(QtCore.QRect(80, 480, 131, 31))
         self.PUMP_lbl_setSpeedP1.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -2558,13 +2464,13 @@ class Ui_MainWindow(object):
         )
         self.PUMP_lbl_setSpeedP1.setObjectName("PUMP_lbl_setSpeedP1")
         self.PUMP_btt_setSpeedP1 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_setSpeedP1.setGeometry(QtCore.QRect(1000, 220, 171, 31))
+        self.PUMP_btt_setSpeedP1.setGeometry(QtCore.QRect(220, 510, 81, 41))
         self.PUMP_btt_setSpeedP1.setObjectName("PUMP_btt_setSpeedP1")
         self.PUMP_btt_setSpeedP2 = QtWidgets.QPushButton(self.PUMP_frame)
-        self.PUMP_btt_setSpeedP2.setGeometry(QtCore.QRect(1000, 350, 171, 31))
+        self.PUMP_btt_setSpeedP2.setGeometry(QtCore.QRect(550, 510, 81, 41))
         self.PUMP_btt_setSpeedP2.setObjectName("PUMP_btt_setSpeedP2")
         self.PUMP_num_setSpeedP2 = QtWidgets.QSpinBox(self.PUMP_frame)
-        self.PUMP_num_setSpeedP2.setGeometry(QtCore.QRect(1001, 290, 171, 51))
+        self.PUMP_num_setSpeedP2.setGeometry(QtCore.QRect(400, 510, 141, 41))
         self.PUMP_num_setSpeedP2.setStyleSheet("font-size: 16pt;")
         self.PUMP_num_setSpeedP2.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
@@ -2573,7 +2479,7 @@ class Ui_MainWindow(object):
         self.PUMP_num_setSpeedP2.setMaximum(100)
         self.PUMP_num_setSpeedP2.setObjectName("PUMP_num_setSpeedP2")
         self.PUMP_lbl_setSpeedP2 = QtWidgets.QLabel(self.PUMP_frame)
-        self.PUMP_lbl_setSpeedP2.setGeometry(QtCore.QRect(1040, 250, 131, 41))
+        self.PUMP_lbl_setSpeedP2.setGeometry(QtCore.QRect(410, 480, 131, 31))
         self.PUMP_lbl_setSpeedP2.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -2581,15 +2487,16 @@ class Ui_MainWindow(object):
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
         self.PUMP_lbl_setSpeedP2.setObjectName("PUMP_lbl_setSpeedP2")
+        self.PUMP_lbl_torq.raise_()
+        self.PUMP_lbl_amps.raise_()
+        self.PUMP_lbl_volt.raise_()
+        self.PUMP_lbl_freq.raise_()
+        self.PUMP_lbl_outputRatio.raise_()
         self.PUMP_lbl_setSpeed.raise_()
         self.PUMP_disp_freqP1.raise_()
-        self.PUMP_lbl_freq.raise_()
-        self.PUMP_lbl_volt.raise_()
         self.PUMP_disp_voltP1.raise_()
         self.PUMP_disp_ampsP1.raise_()
         self.PUMP_disp_torqP1.raise_()
-        self.PUMP_lbl_amps.raise_()
-        self.PUMP_lbl_torq.raise_()
         self.PUMP_btt_plus1.raise_()
         self.PUMP_btt_minus1.raise_()
         self.PUMP_btt_setSpeed.raise_()
@@ -2601,7 +2508,6 @@ class Ui_MainWindow(object):
         self.PUMP_btt_plus10.raise_()
         self.PUMP_btt_plus25.raise_()
         self.PUMP_btt_minus25.raise_()
-        self.PUMP_btt_pinchValve.raise_()
         self.PUMP_btt_ccToDefault.raise_()
         self.PUMP_btt_scToDefault.raise_()
         self.PUMP_lbl_pump1.raise_()
@@ -2616,7 +2522,6 @@ class Ui_MainWindow(object):
         self.PUMP_lbl_currSpeed.raise_()
         self.PUMP_disp_currSpeed.raise_()
         self.PUMP_disp_outputRatio.raise_()
-        self.PUMP_lbl_outputRatio.raise_()
         self.PUMP_lbl_setSpeedP1.raise_()
         self.PUMP_btt_setSpeedP2.raise_()
         self.PUMP_lbl_setSpeedP2.raise_()
@@ -2624,108 +2529,110 @@ class Ui_MainWindow(object):
         self.PUMP_btt_setSpeedP1.raise_()
         self.PUMP_num_setSpeedP2.raise_()
         self.PUMP_sld_outputRatio.raise_()
-        self.MIX_frame = QtWidgets.QFrame(self.AMCON_tab)
-        self.MIX_frame.setGeometry(QtCore.QRect(680, 470, 941, 191))
-        self.MIX_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.MIX_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.MIX_frame.setObjectName("MIX_frame")
-        self.MIX_0_frameLabel_2 = QtWidgets.QLabel(self.MIX_frame)
-        self.MIX_0_frameLabel_2.setGeometry(QtCore.QRect(30, 20, 161, 51))
+        self.PRH_frame = QtWidgets.QFrame(self.AMCON_tab)
+        self.PRH_frame.setGeometry(QtCore.QRect(30, 530, 581, 361))
+        self.PRH_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.PRH_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.PRH_frame.setObjectName("PRH_frame")
+        self.PRH_0_frameLabel = QtWidgets.QLabel(self.PRH_frame)
+        self.PRH_0_frameLabel.setGeometry(QtCore.QRect(30, 20, 161, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
-        self.MIX_0_frameLabel_2.setFont(font)
-        self.MIX_0_frameLabel_2.setStyleSheet(
+        self.PRH_0_frameLabel.setFont(font)
+        self.PRH_0_frameLabel.setStyleSheet(
             "border: 0px;\n"
             "font-size: 22pt;\n"
             "padding: 0px;\n"
             "background-color: #5D707F;\n"
             "color: #E1E5EE;"
         )
-        self.MIX_0_frameLabel_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.MIX_0_frameLabel_2.setObjectName("MIX_0_frameLabel_2")
-        self.MIX_btt_stop = QtWidgets.QPushButton(self.MIX_frame)
-        self.MIX_btt_stop.setGeometry(QtCore.QRect(710, 120, 171, 41))
-        self.MIX_btt_stop.setObjectName("MIX_btt_stop")
-        self.MIX_disp_currSpeed = QtWidgets.QLabel(self.MIX_frame)
-        self.MIX_disp_currSpeed.setGeometry(QtCore.QRect(710, 50, 171, 41))
-        self.MIX_disp_currSpeed.setAlignment(
+        self.PRH_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.PRH_0_frameLabel.setObjectName("PRH_0_frameLabel")
+        self.PRH_btt_stop = QtWidgets.QPushButton(self.PRH_frame)
+        self.PRH_btt_stop.setGeometry(QtCore.QRect(350, 190, 171, 41))
+        self.PRH_btt_stop.setObjectName("PRH_btt_stop")
+        self.PRH_disp_currSpeed = QtWidgets.QLabel(self.PRH_frame)
+        self.PRH_disp_currSpeed.setGeometry(QtCore.QRect(350, 110, 171, 51))
+        self.PRH_disp_currSpeed.setStyleSheet("font-size: 20pt;")
+        self.PRH_disp_currSpeed.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.MIX_disp_currSpeed.setObjectName("MIX_disp_currSpeed")
-        self.MIX_num_setSpeed = QtWidgets.QSpinBox(self.MIX_frame)
-        self.MIX_num_setSpeed.setGeometry(QtCore.QRect(471, 120, 111, 41))
-        self.MIX_num_setSpeed.setStyleSheet("font-size: 14pt;")
-        self.MIX_num_setSpeed.setAlignment(
+        self.PRH_disp_currSpeed.setObjectName("PRH_disp_currSpeed")
+        self.PRH_num_setSpeed = QtWidgets.QSpinBox(self.PRH_frame)
+        self.PRH_num_setSpeed.setGeometry(QtCore.QRect(161, 190, 111, 41))
+        self.PRH_num_setSpeed.setStyleSheet("font-size: 14pt;")
+        self.PRH_num_setSpeed.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.MIX_num_setSpeed.setObjectName("MIX_num_setSpeed")
-        self.MIX_lbl_currSpeed = QtWidgets.QLabel(self.MIX_frame)
-        self.MIX_lbl_currSpeed.setGeometry(QtCore.QRect(710, 20, 171, 31))
-        self.MIX_lbl_currSpeed.setStyleSheet(
+        self.PRH_num_setSpeed.setObjectName("PRH_num_setSpeed")
+        self.PRH_lbl_currSpeed = QtWidgets.QLabel(self.PRH_frame)
+        self.PRH_lbl_currSpeed.setGeometry(QtCore.QRect(350, 80, 171, 31))
+        self.PRH_lbl_currSpeed.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
-        self.MIX_lbl_currSpeed.setAlignment(
+        self.PRH_lbl_currSpeed.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
-        self.MIX_lbl_currSpeed.setObjectName("MIX_lbl_currSpeed")
-        self.MIX_lbl_setSpeed = QtWidgets.QLabel(self.MIX_frame)
-        self.MIX_lbl_setSpeed.setGeometry(QtCore.QRect(330, 130, 131, 31))
-        self.MIX_lbl_setSpeed.setStyleSheet(
+        self.PRH_lbl_currSpeed.setObjectName("PRH_lbl_currSpeed")
+        self.PRH_lbl_setSpeed = QtWidgets.QLabel(self.PRH_frame)
+        self.PRH_lbl_setSpeed.setGeometry(QtCore.QRect(20, 200, 131, 31))
+        self.PRH_lbl_setSpeed.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
-        self.MIX_lbl_setSpeed.setAlignment(
+        self.PRH_lbl_setSpeed.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
-        self.MIX_lbl_setSpeed.setObjectName("MIX_lbl_setSpeed")
-        self.MIX_sld_speed = QtWidgets.QSlider(self.MIX_frame)
-        self.MIX_sld_speed.setGeometry(QtCore.QRect(381, 54, 261, 22))
-        self.MIX_sld_speed.setMaximum(100)
-        self.MIX_sld_speed.setProperty("value", 50)
-        self.MIX_sld_speed.setOrientation(QtCore.Qt.Horizontal)
-        self.MIX_sld_speed.setObjectName("MIX_sld_speed")
-        self.MIX_btt_setSpeed = QtWidgets.QPushButton(self.MIX_frame)
-        self.MIX_btt_setSpeed.setGeometry(QtCore.QRect(590, 120, 51, 41))
-        self.MIX_btt_setSpeed.setObjectName("MIX_btt_setSpeed")
-        self.MIX_lbl_step0 = QtWidgets.QLabel(self.MIX_frame)
-        self.MIX_lbl_step0.setGeometry(QtCore.QRect(374, 76, 21, 31))
-        self.MIX_lbl_step0.setStyleSheet(
+        self.PRH_lbl_setSpeed.setObjectName("PRH_lbl_setSpeed")
+        self.PRH_sld_speed = QtWidgets.QSlider(self.PRH_frame)
+        self.PRH_sld_speed.setGeometry(QtCore.QRect(61, 108, 261, 22))
+        self.PRH_sld_speed.setMaximum(100)
+        self.PRH_sld_speed.setProperty("value", 50)
+        self.PRH_sld_speed.setOrientation(QtCore.Qt.Horizontal)
+        self.PRH_sld_speed.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.PRH_sld_speed.setObjectName("PRH_sld_speed")
+        self.PRH_btt_setSpeed = QtWidgets.QPushButton(self.PRH_frame)
+        self.PRH_btt_setSpeed.setGeometry(QtCore.QRect(280, 190, 51, 41))
+        self.PRH_btt_setSpeed.setObjectName("PRH_btt_setSpeed")
+        self.PRH_lbl_step0 = QtWidgets.QLabel(self.PRH_frame)
+        self.PRH_lbl_step0.setGeometry(QtCore.QRect(54, 130, 21, 31))
+        self.PRH_lbl_step0.setStyleSheet(
             "border: 0px;\n"
             "background-color: #5D707F;\n"
             "color: #E1E5EE;\n"
             "font-size: 10pt;"
         )
-        self.MIX_lbl_step0.setAlignment(
+        self.PRH_lbl_step0.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
-        self.MIX_lbl_step0.setObjectName("MIX_lbl_step0")
-        self.MIX_lbl_step100 = QtWidgets.QLabel(self.MIX_frame)
-        self.MIX_lbl_step100.setGeometry(QtCore.QRect(590, 76, 61, 31))
-        self.MIX_lbl_step100.setStyleSheet(
+        self.PRH_lbl_step0.setObjectName("PRH_lbl_step0")
+        self.PRH_lbl_step100 = QtWidgets.QLabel(self.PRH_frame)
+        self.PRH_lbl_step100.setGeometry(QtCore.QRect(270, 130, 61, 31))
+        self.PRH_lbl_step100.setStyleSheet(
             "border: 0px;\n"
             "background-color: #5D707F;\n"
             "color: #E1E5EE;\n"
             "font-size: 10pt;"
         )
-        self.MIX_lbl_step100.setAlignment(
+        self.PRH_lbl_step100.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
-        self.MIX_lbl_step100.setObjectName("MIX_lbl_step100")
-        self.MIX_lbl_step50 = QtWidgets.QLabel(self.MIX_frame)
-        self.MIX_lbl_step50.setGeometry(QtCore.QRect(494, 76, 31, 31))
-        self.MIX_lbl_step50.setStyleSheet(
+        self.PRH_lbl_step100.setObjectName("PRH_lbl_step100")
+        self.PRH_lbl_step50 = QtWidgets.QLabel(self.PRH_frame)
+        self.PRH_lbl_step50.setGeometry(QtCore.QRect(174, 130, 31, 31))
+        self.PRH_lbl_step50.setStyleSheet(
             "border: 0px;\n"
             "background-color: #5D707F;\n"
             "color: #E1E5EE;\n"
             "font-size: 10pt;"
         )
-        self.MIX_lbl_step50.setAlignment(
+        self.PRH_lbl_step50.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
-        self.MIX_lbl_step50.setObjectName("MIX_lbl_step50")
-        self.MIX_btt_actWithPump = QtWidgets.QPushButton(self.MIX_frame)
-        self.MIX_btt_actWithPump.setGeometry(QtCore.QRect(150, 130, 171, 31))
-        self.MIX_btt_actWithPump.setStyleSheet(
+        self.PRH_lbl_step50.setObjectName("PRH_lbl_step50")
+        self.PRH_btt_actWithPump = QtWidgets.QPushButton(self.PRH_frame)
+        self.PRH_btt_actWithPump.setGeometry(QtCore.QRect(60, 280, 171, 41))
+        self.PRH_btt_actWithPump.setStyleSheet(
             "QPushButton {\n"
             "    background-color: #40a6a8;\n"
             "}\n"
@@ -2742,21 +2649,44 @@ class Ui_MainWindow(object):
             "    border: 2px solid #40a6a8;\n"
             "}"
         )
-        self.MIX_btt_actWithPump.setCheckable(True)
-        self.MIX_btt_actWithPump.setChecked(False)
-        self.MIX_btt_actWithPump.setObjectName("MIX_btt_actWithPump")
-        self.MIX_0_frameLabel_2.raise_()
-        self.MIX_btt_stop.raise_()
-        self.MIX_num_setSpeed.raise_()
-        self.MIX_lbl_currSpeed.raise_()
-        self.MIX_lbl_setSpeed.raise_()
-        self.MIX_sld_speed.raise_()
-        self.MIX_btt_setSpeed.raise_()
-        self.MIX_lbl_step0.raise_()
-        self.MIX_lbl_step100.raise_()
-        self.MIX_lbl_step50.raise_()
-        self.MIX_disp_currSpeed.raise_()
-        self.MIX_btt_actWithPump.raise_()
+        self.PRH_btt_actWithPump.setCheckable(True)
+        self.PRH_btt_actWithPump.setChecked(False)
+        self.PRH_btt_actWithPump.setObjectName("PRH_btt_actWithPump")
+        self.PRH_btt_pinchValve = QtWidgets.QPushButton(self.PRH_frame)
+        self.PRH_btt_pinchValve.setGeometry(QtCore.QRect(350, 280, 171, 41))
+        self.PRH_btt_pinchValve.setStyleSheet(
+            "QPushButton {\n"
+            "    background-color: #40a6a8;\n"
+            "}\n"
+            "\n"
+            "QPushButton:checked {\n"
+            "    background-color: #61fcff;\n"
+            "}\n"
+            "\n"
+            "QPushButton:hover {\n"
+            "    border: 2px solid #abfbff;\n"
+            "}\n"
+            "\n"
+            "QPushButton:checked:hover {\n"
+            "    border: 2px solid #40a6a8;\n"
+            "}"
+        )
+        self.PRH_btt_pinchValve.setCheckable(True)
+        self.PRH_btt_pinchValve.setChecked(False)
+        self.PRH_btt_pinchValve.setObjectName("PRH_btt_pinchValve")
+        self.PRH_0_frameLabel.raise_()
+        self.PRH_btt_stop.raise_()
+        self.PRH_num_setSpeed.raise_()
+        self.PRH_lbl_currSpeed.raise_()
+        self.PRH_lbl_setSpeed.raise_()
+        self.PRH_sld_speed.raise_()
+        self.PRH_btt_setSpeed.raise_()
+        self.PRH_lbl_step0.raise_()
+        self.PRH_lbl_step100.raise_()
+        self.PRH_lbl_step50.raise_()
+        self.PRH_disp_currSpeed.raise_()
+        self.PRH_btt_actWithPump.raise_()
+        self.PRH_btt_pinchValve.raise_()
         self.tab.addTab(self.AMCON_tab, "")
         self.SET_tab = QtWidgets.QWidget()
         self.SET_tab.setObjectName("SET_tab")
@@ -2766,28 +2696,28 @@ class Ui_MainWindow(object):
         self.TCP_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.TCP_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.TCP_frame.setObjectName("TCP_frame")
-        self.TCP_0_frameLabel = QtWidgets.QLabel(self.TCP_frame)
-        self.TCP_0_frameLabel.setGeometry(QtCore.QRect(20, 10, 221, 51))
+        self.CONN_0_frameLabel = QtWidgets.QLabel(self.TCP_frame)
+        self.CONN_0_frameLabel.setGeometry(QtCore.QRect(20, 20, 341, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
-        self.TCP_0_frameLabel.setFont(font)
-        self.TCP_0_frameLabel.setStyleSheet(
+        self.CONN_0_frameLabel.setFont(font)
+        self.CONN_0_frameLabel.setStyleSheet(
             "border: 0px;\n"
             "font-size: 22pt;\n"
             "padding: 0px;\n"
             "background-color: #5D707F;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.TCP_0_frameLabel.setObjectName("TCP_0_frameLabel")
-        self.TCP_tab = QtWidgets.QTabWidget(self.TCP_frame)
-        self.TCP_tab.setGeometry(QtCore.QRect(40, 130, 791, 461))
+        self.CONN_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.CONN_0_frameLabel.setObjectName("CONN_0_frameLabel")
+        self.CONN_tab = QtWidgets.QTabWidget(self.TCP_frame)
+        self.CONN_tab.setGeometry(QtCore.QRect(40, 130, 791, 461))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(12)
-        self.TCP_tab.setFont(font)
-        self.TCP_tab.setStyleSheet(
+        self.CONN_tab.setFont(font)
+        self.CONN_tab.setStyleSheet(
             "QWidget#TCP_tab {\n"
             "    background: #5d707f;\n"
             "}\n"
@@ -2803,829 +2733,751 @@ class Ui_MainWindow(object):
             "    background-color: #4c4a48;\n"
             "}"
         )
-        self.TCP_tab.setObjectName("TCP_tab")
-        self.TCP_ROB_tab = QtWidgets.QWidget()
-        self.TCP_ROB_tab.setObjectName("TCP_ROB_tab")
-        self.TCP_ROB_lbl_bytesToRead = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 230, 151, 31))
-        self.TCP_ROB_lbl_bytesToRead.setStyleSheet(
+        self.CONN_tab.setObjectName("CONN_tab")
+        self.CONN_ROB_tab = QtWidgets.QWidget()
+        self.CONN_ROB_tab.setObjectName("CONN_ROB_tab")
+        self.CONN_ROB_lbl_bytesToRead = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 330, 131, 31))
+        self.CONN_ROB_lbl_bytesToRead.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_bytesToRead.setAlignment(
+        self.CONN_ROB_lbl_bytesToRead.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_bytesToRead.setObjectName("TCP_ROB_lbl_bytesToRead")
-        self.TCP_ROB_disp_bytesWritten = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_disp_bytesWritten.setGeometry(QtCore.QRect(620, 160, 131, 41))
-        self.TCP_ROB_disp_bytesWritten.setAlignment(
+        self.CONN_ROB_lbl_bytesToRead.setObjectName("CONN_ROB_lbl_bytesToRead")
+        self.CONN_ROB_disp_bytesWritten = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_disp_bytesWritten.setGeometry(QtCore.QRect(620, 260, 131, 41))
+        self.CONN_ROB_disp_bytesWritten.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_ROB_disp_bytesWritten.setObjectName("TCP_ROB_disp_bytesWritten")
-        self.TCP_ROB_lbl_bytesWritten = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 130, 151, 31))
-        self.TCP_ROB_lbl_bytesWritten.setStyleSheet(
+        self.CONN_ROB_disp_bytesWritten.setObjectName("CONN_ROB_disp_bytesWritten")
+        self.CONN_ROB_lbl_bytesWritten = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 230, 131, 31))
+        self.CONN_ROB_lbl_bytesWritten.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_bytesWritten.setAlignment(
+        self.CONN_ROB_lbl_bytesWritten.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_bytesWritten.setObjectName("TCP_ROB_lbl_bytesWritten")
-        self.TCP_ROB_lbl_ip = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_ip.setGeometry(QtCore.QRect(40, 330, 131, 31))
-        self.TCP_ROB_lbl_ip.setStyleSheet(
+        self.CONN_ROB_lbl_bytesWritten.setObjectName("CONN_ROB_lbl_bytesWritten")
+        self.CONN_ROB_lbl_ip = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_lbl_ip.setGeometry(QtCore.QRect(40, 120, 131, 31))
+        self.CONN_ROB_lbl_ip.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_ip.setAlignment(
+        self.CONN_ROB_lbl_ip.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_ip.setObjectName("TCP_ROB_lbl_ip")
-        self.TCP_ROB_lbl_port = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_port.setGeometry(QtCore.QRect(240, 330, 131, 31))
-        self.TCP_ROB_lbl_port.setStyleSheet(
+        self.CONN_ROB_lbl_ip.setObjectName("CONN_ROB_lbl_ip")
+        self.CONN_ROB_lbl_port = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_lbl_port.setGeometry(QtCore.QRect(260, 120, 131, 31))
+        self.CONN_ROB_lbl_port.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_port.setAlignment(
+        self.CONN_ROB_lbl_port.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_port.setObjectName("TCP_ROB_lbl_port")
-        self.TCP_ROB_lbl_tio_conn = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_tio_conn.setGeometry(QtCore.QRect(620, 330, 161, 31))
-        self.TCP_ROB_lbl_tio_conn.setStyleSheet(
+        self.CONN_ROB_lbl_port.setObjectName("CONN_ROB_lbl_port")
+        self.CONN_ROB_lbl_connTo = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_lbl_connTo.setGeometry(QtCore.QRect(630, 120, 141, 31))
+        self.CONN_ROB_lbl_connTo.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_tio_conn.setAlignment(
+        self.CONN_ROB_lbl_connTo.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_tio_conn.setObjectName("TCP_ROB_lbl_tio_conn")
-        self.TCP_ROB_lbl_writeBuffer = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_writeBuffer.setGeometry(QtCore.QRect(40, 110, 131, 31))
-        self.TCP_ROB_lbl_writeBuffer.setStyleSheet(
+        self.CONN_ROB_lbl_connTo.setObjectName("CONN_ROB_lbl_connTo")
+        self.CONN_ROB_lbl_writeBuffer = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_lbl_writeBuffer.setGeometry(QtCore.QRect(40, 210, 131, 31))
+        self.CONN_ROB_lbl_writeBuffer.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_writeBuffer.setAlignment(
+        self.CONN_ROB_lbl_writeBuffer.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_writeBuffer.setObjectName("TCP_ROB_lbl_writeBuffer")
-        self.TCP_ROB_lbl_readBuffer = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_readBuffer.setGeometry(QtCore.QRect(40, 210, 131, 31))
-        self.TCP_ROB_lbl_readBuffer.setStyleSheet(
+        self.CONN_ROB_lbl_writeBuffer.setObjectName("CONN_ROB_lbl_writeBuffer")
+        self.CONN_ROB_lbl_readBuffer = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_lbl_readBuffer.setGeometry(QtCore.QRect(40, 310, 131, 31))
+        self.CONN_ROB_lbl_readBuffer.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_readBuffer.setAlignment(
+        self.CONN_ROB_lbl_readBuffer.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_readBuffer.setObjectName("TCP_ROB_lbl_readBuffer")
-        self.TCP_ROB_disp_writeBuffer = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_disp_writeBuffer.setGeometry(QtCore.QRect(40, 140, 561, 61))
+        self.CONN_ROB_lbl_readBuffer.setObjectName("CONN_ROB_lbl_readBuffer")
+        self.CONN_ROB_disp_writeBuffer = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_disp_writeBuffer.setGeometry(QtCore.QRect(40, 240, 561, 61))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(10)
-        self.TCP_ROB_disp_writeBuffer.setFont(font)
-        self.TCP_ROB_disp_writeBuffer.setStyleSheet("font-size: 10pt")
-        self.TCP_ROB_disp_writeBuffer.setAlignment(
+        self.CONN_ROB_disp_writeBuffer.setFont(font)
+        self.CONN_ROB_disp_writeBuffer.setStyleSheet("font-size: 10pt")
+        self.CONN_ROB_disp_writeBuffer.setAlignment(
             QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
         )
-        self.TCP_ROB_disp_writeBuffer.setWordWrap(True)
-        self.TCP_ROB_disp_writeBuffer.setObjectName("TCP_ROB_disp_writeBuffer")
-        self.TCP_ROB_disp_readBuffer = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_disp_readBuffer.setGeometry(QtCore.QRect(40, 240, 561, 61))
-        self.TCP_ROB_disp_readBuffer.setStyleSheet("font-size: 10pt")
-        self.TCP_ROB_disp_readBuffer.setAlignment(
+        self.CONN_ROB_disp_writeBuffer.setWordWrap(True)
+        self.CONN_ROB_disp_writeBuffer.setObjectName("CONN_ROB_disp_writeBuffer")
+        self.CONN_ROB_disp_readBuffer = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_disp_readBuffer.setGeometry(QtCore.QRect(40, 340, 561, 61))
+        self.CONN_ROB_disp_readBuffer.setStyleSheet("font-size: 10pt")
+        self.CONN_ROB_disp_readBuffer.setAlignment(
             QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
         )
-        self.TCP_ROB_disp_readBuffer.setWordWrap(True)
-        self.TCP_ROB_disp_readBuffer.setObjectName("TCP_ROB_disp_readBuffer")
-        self.TCP_ROB_lbl_tio_rw = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_tio_rw.setGeometry(QtCore.QRect(430, 330, 151, 31))
-        self.TCP_ROB_lbl_tio_rw.setStyleSheet(
+        self.CONN_ROB_disp_readBuffer.setWordWrap(True)
+        self.CONN_ROB_disp_readBuffer.setObjectName("CONN_ROB_disp_readBuffer")
+        self.CONN_ROB_lbl_rwTo = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_lbl_rwTo.setGeometry(QtCore.QRect(480, 120, 131, 31))
+        self.CONN_ROB_lbl_rwTo.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_tio_rw.setAlignment(
+        self.CONN_ROB_lbl_rwTo.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_ROB_lbl_tio_rw.setObjectName("TCP_ROB_lbl_tio_rw")
-        self.TCP_ROB_indi_connected = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_indi_connected.setGeometry(QtCore.QRect(270, 55, 51, 51))
-        self.TCP_ROB_indi_connected.setStyleSheet(
+        self.CONN_ROB_lbl_rwTo.setObjectName("CONN_ROB_lbl_rwTo")
+        self.CONN_ROB_indi_connected = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_indi_connected.setGeometry(QtCore.QRect(270, 45, 51, 51))
+        self.CONN_ROB_indi_connected.setStyleSheet(
             "border-radius: 25px;\n" "background-color: #4c4a48;"
         )
-        self.TCP_ROB_indi_connected.setText("")
-        self.TCP_ROB_indi_connected.setObjectName("TCP_ROB_indi_connected")
-        self.TCP_ROB_lbl_connected = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_lbl_connected.setGeometry(QtCore.QRect(130, 53, 131, 51))
-        self.TCP_ROB_lbl_connected.setStyleSheet(
+        self.CONN_ROB_indi_connected.setText("")
+        self.CONN_ROB_indi_connected.setObjectName("CONN_ROB_indi_connected")
+        self.CONN_ROB_lbl_connected = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_lbl_connected.setGeometry(QtCore.QRect(130, 43, 131, 51))
+        self.CONN_ROB_lbl_connected.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_ROB_lbl_connected.setAlignment(
+        self.CONN_ROB_lbl_connected.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_ROB_lbl_connected.setObjectName("TCP_ROB_lbl_connected")
-        self.TCP_ROB_btt_discon = QtWidgets.QPushButton(self.TCP_ROB_tab)
-        self.TCP_ROB_btt_discon.setGeometry(QtCore.QRect(570, 60, 181, 41))
-        self.TCP_ROB_btt_discon.setObjectName("TCP_ROB_btt_discon")
-        self.TCP_ROB_btt_reconn = QtWidgets.QPushButton(self.TCP_ROB_tab)
-        self.TCP_ROB_btt_reconn.setGeometry(QtCore.QRect(360, 60, 181, 41))
-        self.TCP_ROB_btt_reconn.setObjectName("TCP_ROB_btt_reconn")
-        self.TCP_ROB_disp_ip = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_disp_ip.setGeometry(QtCore.QRect(40, 360, 131, 41))
-        self.TCP_ROB_disp_ip.setAlignment(
+        self.CONN_ROB_lbl_connected.setObjectName("CONN_ROB_lbl_connected")
+        self.CONN_ROB_btt_discon = QtWidgets.QPushButton(self.CONN_ROB_tab)
+        self.CONN_ROB_btt_discon.setGeometry(QtCore.QRect(570, 50, 181, 41))
+        self.CONN_ROB_btt_discon.setObjectName("CONN_ROB_btt_discon")
+        self.CONN_ROB_btt_reconn = QtWidgets.QPushButton(self.CONN_ROB_tab)
+        self.CONN_ROB_btt_reconn.setGeometry(QtCore.QRect(360, 50, 181, 41))
+        self.CONN_ROB_btt_reconn.setObjectName("CONN_ROB_btt_reconn")
+        self.CONN_ROB_disp_ip = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_disp_ip.setGeometry(QtCore.QRect(40, 150, 201, 41))
+        self.CONN_ROB_disp_ip.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_ROB_disp_ip.setObjectName("TCP_ROB_disp_ip")
-        self.TCP_ROB_disp_port = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_disp_port.setGeometry(QtCore.QRect(240, 360, 131, 41))
-        self.TCP_ROB_disp_port.setAlignment(
+        self.CONN_ROB_disp_ip.setObjectName("CONN_ROB_disp_ip")
+        self.CONN_ROB_disp_port = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_disp_port.setGeometry(QtCore.QRect(260, 150, 131, 41))
+        self.CONN_ROB_disp_port.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_ROB_disp_port.setObjectName("CONN_ROB_disp_port")
+        self.CONN_ROB_disp_rwTo = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_disp_rwTo.setGeometry(QtCore.QRect(480, 150, 121, 41))
+        self.CONN_ROB_disp_rwTo.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_ROB_disp_port.setObjectName("TCP_ROB_disp_port")
-        self.TCP_ROB_disp_tio_rw = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_disp_tio_rw.setGeometry(QtCore.QRect(430, 360, 131, 41))
-        self.TCP_ROB_disp_tio_rw.setAlignment(
+        self.CONN_ROB_disp_rwTo.setObjectName("CONN_ROB_disp_rwTo")
+        self.CONN_ROB_disp_connTo = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_disp_connTo.setGeometry(QtCore.QRect(630, 150, 121, 41))
+        self.CONN_ROB_disp_connTo.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_ROB_disp_tio_rw.setObjectName("TCP_ROB_disp_tio_rw")
-        self.TCP_ROB_disp_tio_conn = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_disp_tio_conn.setGeometry(QtCore.QRect(620, 360, 131, 41))
-        self.TCP_ROB_disp_tio_conn.setAlignment(
+        self.CONN_ROB_disp_connTo.setObjectName("CONN_ROB_disp_connTo")
+        self.CONN_ROB_disp_bytesToRead = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_disp_bytesToRead.setGeometry(QtCore.QRect(620, 360, 131, 41))
+        self.CONN_ROB_disp_bytesToRead.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_ROB_disp_tio_conn.setObjectName("TCP_ROB_disp_tio_conn")
-        self.TCP_ROB_disp_bytesToRead = QtWidgets.QLabel(self.TCP_ROB_tab)
-        self.TCP_ROB_disp_bytesToRead.setGeometry(QtCore.QRect(620, 260, 131, 41))
-        self.TCP_ROB_disp_bytesToRead.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        self.CONN_ROB_disp_bytesToRead.setObjectName("CONN_ROB_disp_bytesToRead")
+        self.CONN_ROB_lbl_colon = QtWidgets.QLabel(self.CONN_ROB_tab)
+        self.CONN_ROB_lbl_colon.setGeometry(QtCore.QRect(239, 148, 21, 41))
+        self.CONN_ROB_lbl_colon.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 18pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
         )
-        self.TCP_ROB_disp_bytesToRead.setObjectName("TCP_ROB_disp_bytesToRead")
-        self.TCP_ROB_lbl_bytesToRead.raise_()
-        self.TCP_ROB_lbl_bytesWritten.raise_()
-        self.TCP_ROB_lbl_port.raise_()
-        self.TCP_ROB_lbl_tio_conn.raise_()
-        self.TCP_ROB_lbl_ip.raise_()
-        self.TCP_ROB_lbl_writeBuffer.raise_()
-        self.TCP_ROB_lbl_readBuffer.raise_()
-        self.TCP_ROB_disp_bytesWritten.raise_()
-        self.TCP_ROB_disp_writeBuffer.raise_()
-        self.TCP_ROB_disp_readBuffer.raise_()
-        self.TCP_ROB_lbl_tio_rw.raise_()
-        self.TCP_ROB_indi_connected.raise_()
-        self.TCP_ROB_lbl_connected.raise_()
-        self.TCP_ROB_btt_discon.raise_()
-        self.TCP_ROB_btt_reconn.raise_()
-        self.TCP_ROB_disp_ip.raise_()
-        self.TCP_ROB_disp_port.raise_()
-        self.TCP_ROB_disp_tio_rw.raise_()
-        self.TCP_ROB_disp_tio_conn.raise_()
-        self.TCP_ROB_disp_bytesToRead.raise_()
-        self.TCP_tab.addTab(self.TCP_ROB_tab, "")
-        self.TCP_PUMP1_tab = QtWidgets.QWidget()
-        self.TCP_PUMP1_tab.setObjectName("TCP_PUMP1_tab")
-        self.TCP_PUMP1_disp_readBuffer = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_disp_readBuffer.setGeometry(QtCore.QRect(40, 240, 561, 61))
-        self.TCP_PUMP1_disp_readBuffer.setStyleSheet("font-size: 10pt")
-        self.TCP_PUMP1_disp_readBuffer.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
-        )
-        self.TCP_PUMP1_disp_readBuffer.setWordWrap(True)
-        self.TCP_PUMP1_disp_readBuffer.setObjectName("TCP_PUMP1_disp_readBuffer")
-        self.TCP_PUMP1_lbl_bytesToRead = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 230, 161, 31))
-        self.TCP_PUMP1_lbl_bytesToRead.setStyleSheet(
+        self.CONN_ROB_lbl_colon.setAlignment(QtCore.Qt.AlignCenter)
+        self.CONN_ROB_lbl_colon.setObjectName("CONN_ROB_lbl_colon")
+        self.CONN_ROB_lbl_colon.raise_()
+        self.CONN_ROB_lbl_bytesToRead.raise_()
+        self.CONN_ROB_lbl_bytesWritten.raise_()
+        self.CONN_ROB_lbl_port.raise_()
+        self.CONN_ROB_lbl_connTo.raise_()
+        self.CONN_ROB_lbl_ip.raise_()
+        self.CONN_ROB_lbl_writeBuffer.raise_()
+        self.CONN_ROB_lbl_readBuffer.raise_()
+        self.CONN_ROB_disp_bytesWritten.raise_()
+        self.CONN_ROB_disp_writeBuffer.raise_()
+        self.CONN_ROB_disp_readBuffer.raise_()
+        self.CONN_ROB_lbl_rwTo.raise_()
+        self.CONN_ROB_indi_connected.raise_()
+        self.CONN_ROB_lbl_connected.raise_()
+        self.CONN_ROB_btt_discon.raise_()
+        self.CONN_ROB_btt_reconn.raise_()
+        self.CONN_ROB_disp_ip.raise_()
+        self.CONN_ROB_disp_port.raise_()
+        self.CONN_ROB_disp_rwTo.raise_()
+        self.CONN_ROB_disp_connTo.raise_()
+        self.CONN_ROB_disp_bytesToRead.raise_()
+        self.CONN_tab.addTab(self.CONN_ROB_tab, "")
+        self.CONN_PUMP1_tab = QtWidgets.QWidget()
+        self.CONN_PUMP1_tab.setObjectName("CONN_PUMP1_tab")
+        self.CONN_PUMP1_btt_reconn = QtWidgets.QPushButton(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_btt_reconn.setGeometry(QtCore.QRect(360, 50, 181, 41))
+        self.CONN_PUMP1_btt_reconn.setObjectName("CONN_PUMP1_btt_reconn")
+        self.CONN_PUMP1_lbl_writeBuffer = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_lbl_writeBuffer.setGeometry(QtCore.QRect(40, 210, 131, 31))
+        self.CONN_PUMP1_lbl_writeBuffer.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_PUMP1_lbl_bytesToRead.setAlignment(
+        self.CONN_PUMP1_lbl_writeBuffer.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_PUMP1_lbl_bytesToRead.setObjectName("TCP_PUMP1_lbl_bytesToRead")
-        self.TCP_PUMP1_disp_tio_rw = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_disp_tio_rw.setGeometry(QtCore.QRect(430, 360, 131, 41))
-        self.TCP_PUMP1_disp_tio_rw.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP1_disp_tio_rw.setObjectName("TCP_PUMP1_disp_tio_rw")
-        self.TCP_PUMP1_btt_reconn = QtWidgets.QPushButton(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_btt_reconn.setGeometry(QtCore.QRect(360, 60, 181, 41))
-        self.TCP_PUMP1_btt_reconn.setObjectName("TCP_PUMP1_btt_reconn")
-        self.TCP_PUMP1_lbl_writeBuffer = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_writeBuffer.setGeometry(QtCore.QRect(40, 110, 131, 31))
-        self.TCP_PUMP1_lbl_writeBuffer.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_writeBuffer.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP1_lbl_writeBuffer.setObjectName("TCP_PUMP1_lbl_writeBuffer")
-        self.TCP_PUMP1_disp_bytesWritten = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_disp_bytesWritten.setGeometry(QtCore.QRect(620, 160, 131, 41))
-        self.TCP_PUMP1_disp_bytesWritten.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP1_disp_bytesWritten.setObjectName("TCP_PUMP1_disp_bytesWritten")
-        self.TCP_PUMP1_indi_connected = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_indi_connected.setGeometry(QtCore.QRect(270, 55, 51, 51))
-        self.TCP_PUMP1_indi_connected.setStyleSheet(
+        self.CONN_PUMP1_lbl_writeBuffer.setObjectName("CONN_PUMP1_lbl_writeBuffer")
+        self.CONN_PUMP1_indi_connected = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_indi_connected.setGeometry(QtCore.QRect(270, 45, 51, 51))
+        self.CONN_PUMP1_indi_connected.setStyleSheet(
             "border-radius: 25px;\n" "background-color: #4c4a48;"
         )
-        self.TCP_PUMP1_indi_connected.setText("")
-        self.TCP_PUMP1_indi_connected.setObjectName("TCP_PUMP1_indi_connected")
-        self.TCP_PUMP1_disp_writeBuffer = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_disp_writeBuffer.setGeometry(QtCore.QRect(40, 140, 561, 61))
+        self.CONN_PUMP1_indi_connected.setText("")
+        self.CONN_PUMP1_indi_connected.setObjectName("CONN_PUMP1_indi_connected")
+        self.CONN_PUMP1_btt_discon = QtWidgets.QPushButton(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_btt_discon.setGeometry(QtCore.QRect(570, 50, 181, 41))
+        self.CONN_PUMP1_btt_discon.setObjectName("CONN_PUMP1_btt_discon")
+        self.CONN_PUMP1_lbl_readBuffer = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_lbl_readBuffer.setGeometry(QtCore.QRect(40, 310, 131, 31))
+        self.CONN_PUMP1_lbl_readBuffer.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PUMP1_lbl_readBuffer.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.CONN_PUMP1_lbl_readBuffer.setObjectName("CONN_PUMP1_lbl_readBuffer")
+        self.CONN_PUMP1_lbl_connected = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_lbl_connected.setGeometry(QtCore.QRect(130, 43, 131, 51))
+        self.CONN_PUMP1_lbl_connected.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PUMP1_lbl_connected.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PUMP1_lbl_connected.setObjectName("CONN_PUMP1_lbl_connected")
+        self.CONN_PUMP1_disp_modbId = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_disp_modbId.setGeometry(QtCore.QRect(620, 150, 131, 41))
+        self.CONN_PUMP1_disp_modbId.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PUMP1_disp_modbId.setObjectName("CONN_PUMP1_disp_modbId")
+        self.CONN_PUMP1_disp_port = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_disp_port.setGeometry(QtCore.QRect(320, 150, 131, 41))
+        self.CONN_PUMP1_disp_port.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PUMP1_disp_port.setObjectName("CONN_PUMP1_disp_port")
+        self.CONN_PUMP1_lbl_port = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_lbl_port.setGeometry(QtCore.QRect(220, 150, 91, 41))
+        self.CONN_PUMP1_lbl_port.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PUMP1_lbl_port.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PUMP1_lbl_port.setObjectName("CONN_PUMP1_lbl_port")
+        self.CONN_PUMP1_lbl_modbId = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_lbl_modbId.setGeometry(QtCore.QRect(500, 150, 111, 41))
+        self.CONN_PUMP1_lbl_modbId.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PUMP1_lbl_modbId.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PUMP1_lbl_modbId.setObjectName("CONN_PUMP1_lbl_modbId")
+        self.CONN_PUMP1_disp_readBuffer = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_disp_readBuffer.setGeometry(QtCore.QRect(40, 340, 561, 61))
+        self.CONN_PUMP1_disp_readBuffer.setStyleSheet("font-size: 10pt")
+        self.CONN_PUMP1_disp_readBuffer.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
+        )
+        self.CONN_PUMP1_disp_readBuffer.setWordWrap(True)
+        self.CONN_PUMP1_disp_readBuffer.setObjectName("CONN_PUMP1_disp_readBuffer")
+        self.CONN_PUMP1_lbl_bytesWritten = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 230, 131, 31))
+        self.CONN_PUMP1_lbl_bytesWritten.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PUMP1_lbl_bytesWritten.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.CONN_PUMP1_lbl_bytesWritten.setObjectName("CONN_PUMP1_lbl_bytesWritten")
+        self.CONN_PUMP1_lbl_bytesToRead = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 330, 131, 31))
+        self.CONN_PUMP1_lbl_bytesToRead.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PUMP1_lbl_bytesToRead.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.CONN_PUMP1_lbl_bytesToRead.setObjectName("CONN_PUMP1_lbl_bytesToRead")
+        self.CONN_PUMP1_disp_bytesToRead = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_disp_bytesToRead.setGeometry(QtCore.QRect(620, 360, 131, 41))
+        self.CONN_PUMP1_disp_bytesToRead.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PUMP1_disp_bytesToRead.setObjectName("CONN_PUMP1_disp_bytesToRead")
+        self.CONN_PUMP1_disp_writeBuffer = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_disp_writeBuffer.setGeometry(QtCore.QRect(40, 240, 561, 61))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(10)
-        self.TCP_PUMP1_disp_writeBuffer.setFont(font)
-        self.TCP_PUMP1_disp_writeBuffer.setStyleSheet("font-size: 10pt")
-        self.TCP_PUMP1_disp_writeBuffer.setAlignment(
+        self.CONN_PUMP1_disp_writeBuffer.setFont(font)
+        self.CONN_PUMP1_disp_writeBuffer.setStyleSheet("font-size: 10pt")
+        self.CONN_PUMP1_disp_writeBuffer.setAlignment(
             QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
         )
-        self.TCP_PUMP1_disp_writeBuffer.setWordWrap(True)
-        self.TCP_PUMP1_disp_writeBuffer.setObjectName("TCP_PUMP1_disp_writeBuffer")
-        self.TCP_PUMP1_lbl_tio_conn = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_tio_conn.setGeometry(QtCore.QRect(620, 330, 161, 31))
-        self.TCP_PUMP1_lbl_tio_conn.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_tio_conn.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP1_lbl_tio_conn.setObjectName("TCP_PUMP1_lbl_tio_conn")
-        self.TCP_PUMP1_lbl_tio_rw = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_tio_rw.setGeometry(QtCore.QRect(430, 330, 161, 31))
-        self.TCP_PUMP1_lbl_tio_rw.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_tio_rw.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP1_lbl_tio_rw.setObjectName("TCP_PUMP1_lbl_tio_rw")
-        self.TCP_PUMP1_btt_discon = QtWidgets.QPushButton(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_btt_discon.setGeometry(QtCore.QRect(570, 60, 181, 41))
-        self.TCP_PUMP1_btt_discon.setObjectName("TCP_PUMP1_btt_discon")
-        self.TCP_PUMP1_lbl_port = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_port.setGeometry(QtCore.QRect(240, 330, 131, 31))
-        self.TCP_PUMP1_lbl_port.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_port.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP1_lbl_port.setObjectName("TCP_PUMP1_lbl_port")
-        self.TCP_PUMP1_lbl_readBuffer = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_readBuffer.setGeometry(QtCore.QRect(40, 210, 131, 31))
-        self.TCP_PUMP1_lbl_readBuffer.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_readBuffer.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP1_lbl_readBuffer.setObjectName("TCP_PUMP1_lbl_readBuffer")
-        self.TCP_PUMP1_disp_ip = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_disp_ip.setGeometry(QtCore.QRect(40, 360, 131, 41))
-        self.TCP_PUMP1_disp_ip.setAlignment(
+        self.CONN_PUMP1_disp_writeBuffer.setWordWrap(True)
+        self.CONN_PUMP1_disp_writeBuffer.setObjectName("CONN_PUMP1_disp_writeBuffer")
+        self.CONN_PUMP1_disp_bytesWritten = QtWidgets.QLabel(self.CONN_PUMP1_tab)
+        self.CONN_PUMP1_disp_bytesWritten.setGeometry(QtCore.QRect(620, 260, 131, 41))
+        self.CONN_PUMP1_disp_bytesWritten.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_PUMP1_disp_ip.setObjectName("TCP_PUMP1_disp_ip")
-        self.TCP_PUMP1_lbl_bytesWritten = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 130, 151, 31))
-        self.TCP_PUMP1_lbl_bytesWritten.setStyleSheet(
+        self.CONN_PUMP1_disp_bytesWritten.setObjectName("CONN_PUMP1_disp_bytesWritten")
+        self.CONN_PUMP1_lbl_writeBuffer.raise_()
+        self.CONN_PUMP1_lbl_readBuffer.raise_()
+        self.CONN_PUMP1_btt_reconn.raise_()
+        self.CONN_PUMP1_indi_connected.raise_()
+        self.CONN_PUMP1_btt_discon.raise_()
+        self.CONN_PUMP1_lbl_connected.raise_()
+        self.CONN_PUMP1_disp_modbId.raise_()
+        self.CONN_PUMP1_disp_port.raise_()
+        self.CONN_PUMP1_lbl_port.raise_()
+        self.CONN_PUMP1_lbl_modbId.raise_()
+        self.CONN_PUMP1_disp_readBuffer.raise_()
+        self.CONN_PUMP1_lbl_bytesWritten.raise_()
+        self.CONN_PUMP1_lbl_bytesToRead.raise_()
+        self.CONN_PUMP1_disp_bytesToRead.raise_()
+        self.CONN_PUMP1_disp_writeBuffer.raise_()
+        self.CONN_PUMP1_disp_bytesWritten.raise_()
+        self.CONN_tab.addTab(self.CONN_PUMP1_tab, "")
+        self.CONN_PUMP2_tab = QtWidgets.QWidget()
+        self.CONN_PUMP2_tab.setObjectName("CONN_PUMP2_tab")
+        self.CONN_PUMP2_lbl_writeBuffer = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_lbl_writeBuffer.setGeometry(QtCore.QRect(40, 210, 131, 31))
+        self.CONN_PUMP2_lbl_writeBuffer.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_PUMP1_lbl_bytesWritten.setAlignment(
+        self.CONN_PUMP2_lbl_writeBuffer.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_PUMP1_lbl_bytesWritten.setObjectName("TCP_PUMP1_lbl_bytesWritten")
-        self.TCP_PUMP1_disp_port = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_disp_port.setGeometry(QtCore.QRect(240, 360, 131, 41))
-        self.TCP_PUMP1_disp_port.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP1_disp_port.setObjectName("TCP_PUMP1_disp_port")
-        self.TCP_PUMP1_lbl_connected = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_connected.setGeometry(QtCore.QRect(130, 53, 131, 51))
-        self.TCP_PUMP1_lbl_connected.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_connected.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP1_lbl_connected.setObjectName("TCP_PUMP1_lbl_connected")
-        self.TCP_PUMP1_lbl_ip = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_lbl_ip.setGeometry(QtCore.QRect(40, 330, 131, 31))
-        self.TCP_PUMP1_lbl_ip.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP1_lbl_ip.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP1_lbl_ip.setObjectName("TCP_PUMP1_lbl_ip")
-        self.TCP_PUMP1_disp_tio_conn = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_disp_tio_conn.setGeometry(QtCore.QRect(620, 360, 131, 41))
-        self.TCP_PUMP1_disp_tio_conn.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP1_disp_tio_conn.setObjectName("TCP_PUMP1_disp_tio_conn")
-        self.TCP_PUMP1_disp_bytesToRead = QtWidgets.QLabel(self.TCP_PUMP1_tab)
-        self.TCP_PUMP1_disp_bytesToRead.setGeometry(QtCore.QRect(620, 260, 131, 41))
-        self.TCP_PUMP1_disp_bytesToRead.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP1_disp_bytesToRead.setObjectName("TCP_PUMP1_disp_bytesToRead")
-        self.TCP_PUMP1_lbl_writeBuffer.raise_()
-        self.TCP_PUMP1_lbl_readBuffer.raise_()
-        self.TCP_PUMP1_lbl_bytesToRead.raise_()
-        self.TCP_PUMP1_lbl_tio_conn.raise_()
-        self.TCP_PUMP1_lbl_ip.raise_()
-        self.TCP_PUMP1_lbl_port.raise_()
-        self.TCP_PUMP1_lbl_tio_rw.raise_()
-        self.TCP_PUMP1_lbl_bytesWritten.raise_()
-        self.TCP_PUMP1_disp_readBuffer.raise_()
-        self.TCP_PUMP1_disp_tio_rw.raise_()
-        self.TCP_PUMP1_btt_reconn.raise_()
-        self.TCP_PUMP1_disp_bytesWritten.raise_()
-        self.TCP_PUMP1_indi_connected.raise_()
-        self.TCP_PUMP1_disp_writeBuffer.raise_()
-        self.TCP_PUMP1_btt_discon.raise_()
-        self.TCP_PUMP1_disp_ip.raise_()
-        self.TCP_PUMP1_disp_port.raise_()
-        self.TCP_PUMP1_lbl_connected.raise_()
-        self.TCP_PUMP1_disp_tio_conn.raise_()
-        self.TCP_PUMP1_disp_bytesToRead.raise_()
-        self.TCP_tab.addTab(self.TCP_PUMP1_tab, "")
-        self.TCP_PUMP2_tab = QtWidgets.QWidget()
-        self.TCP_PUMP2_tab.setObjectName("TCP_PUMP2_tab")
-        self.TCP_PUMP2_lbl_tio_conn = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_tio_conn.setGeometry(QtCore.QRect(620, 330, 161, 31))
-        self.TCP_PUMP2_lbl_tio_conn.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_tio_conn.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_tio_conn.setObjectName("TCP_PUMP2_lbl_tio_conn")
-        self.TCP_PUMP2_lbl_connected = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_connected.setGeometry(QtCore.QRect(130, 53, 131, 51))
-        self.TCP_PUMP2_lbl_connected.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_connected.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP2_lbl_connected.setObjectName("TCP_PUMP2_lbl_connected")
-        self.TCP_PUMP2_disp_tio_conn = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_disp_tio_conn.setGeometry(QtCore.QRect(620, 360, 131, 41))
-        self.TCP_PUMP2_disp_tio_conn.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP2_disp_tio_conn.setObjectName("TCP_PUMP2_disp_tio_conn")
-        self.TCP_PUMP2_lbl_ip = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_ip.setGeometry(QtCore.QRect(40, 330, 131, 31))
-        self.TCP_PUMP2_lbl_ip.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_ip.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_ip.setObjectName("TCP_PUMP2_lbl_ip")
-        self.TCP_PUMP2_lbl_tio_rw = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_tio_rw.setGeometry(QtCore.QRect(430, 330, 161, 31))
-        self.TCP_PUMP2_lbl_tio_rw.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_tio_rw.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_tio_rw.setObjectName("TCP_PUMP2_lbl_tio_rw")
-        self.TCP_PUMP2_disp_port = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_disp_port.setGeometry(QtCore.QRect(240, 360, 131, 41))
-        self.TCP_PUMP2_disp_port.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP2_disp_port.setObjectName("TCP_PUMP2_disp_port")
-        self.TCP_PUMP2_btt_reconn = QtWidgets.QPushButton(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_btt_reconn.setGeometry(QtCore.QRect(360, 60, 181, 41))
-        self.TCP_PUMP2_btt_reconn.setObjectName("TCP_PUMP2_btt_reconn")
-        self.TCP_PUMP2_disp_bytesToRead = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_disp_bytesToRead.setGeometry(QtCore.QRect(620, 260, 131, 41))
-        self.TCP_PUMP2_disp_bytesToRead.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP2_disp_bytesToRead.setObjectName("TCP_PUMP2_disp_bytesToRead")
-        self.TCP_PUMP2_lbl_bytesWritten = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 130, 161, 31))
-        self.TCP_PUMP2_lbl_bytesWritten.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_bytesWritten.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_bytesWritten.setObjectName("TCP_PUMP2_lbl_bytesWritten")
-        self.TCP_PUMP2_lbl_bytesToRead = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 230, 151, 31))
-        self.TCP_PUMP2_lbl_bytesToRead.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_bytesToRead.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_bytesToRead.setObjectName("TCP_PUMP2_lbl_bytesToRead")
-        self.TCP_PUMP2_disp_bytesWritten = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_disp_bytesWritten.setGeometry(QtCore.QRect(620, 160, 131, 41))
-        self.TCP_PUMP2_disp_bytesWritten.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP2_disp_bytesWritten.setObjectName("TCP_PUMP2_disp_bytesWritten")
-        self.TCP_PUMP2_lbl_readBuffer = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_readBuffer.setGeometry(QtCore.QRect(40, 210, 131, 31))
-        self.TCP_PUMP2_lbl_readBuffer.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_readBuffer.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_readBuffer.setObjectName("TCP_PUMP2_lbl_readBuffer")
-        self.TCP_PUMP2_indi_connected = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_indi_connected.setGeometry(QtCore.QRect(270, 55, 51, 51))
-        self.TCP_PUMP2_indi_connected.setStyleSheet(
-            "border-radius: 25px;\n" "background-color: #4c4a48;"
-        )
-        self.TCP_PUMP2_indi_connected.setText("")
-        self.TCP_PUMP2_indi_connected.setObjectName("TCP_PUMP2_indi_connected")
-        self.TCP_PUMP2_disp_tio_rw = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_disp_tio_rw.setGeometry(QtCore.QRect(430, 360, 131, 41))
-        self.TCP_PUMP2_disp_tio_rw.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP2_disp_tio_rw.setObjectName("TCP_PUMP2_disp_tio_rw")
-        self.TCP_PUMP2_lbl_port = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_port.setGeometry(QtCore.QRect(240, 330, 131, 31))
-        self.TCP_PUMP2_lbl_port.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_port.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_port.setObjectName("TCP_PUMP2_lbl_port")
-        self.TCP_PUMP2_disp_ip = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_disp_ip.setGeometry(QtCore.QRect(40, 360, 131, 41))
-        self.TCP_PUMP2_disp_ip.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_PUMP2_disp_ip.setObjectName("TCP_PUMP2_disp_ip")
-        self.TCP_PUMP2_lbl_writeBuffer = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_lbl_writeBuffer.setGeometry(QtCore.QRect(40, 110, 131, 31))
-        self.TCP_PUMP2_lbl_writeBuffer.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_PUMP2_lbl_writeBuffer.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_PUMP2_lbl_writeBuffer.setObjectName("TCP_PUMP2_lbl_writeBuffer")
-        self.TCP_PUMP2_disp_writeBuffer = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_disp_writeBuffer.setGeometry(QtCore.QRect(40, 140, 561, 61))
+        self.CONN_PUMP2_lbl_writeBuffer.setObjectName("CONN_PUMP2_lbl_writeBuffer")
+        self.CONN_PUMP2_disp_writeBuffer = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_disp_writeBuffer.setGeometry(QtCore.QRect(40, 240, 561, 61))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(10)
-        self.TCP_PUMP2_disp_writeBuffer.setFont(font)
-        self.TCP_PUMP2_disp_writeBuffer.setStyleSheet("font-size: 10pt")
-        self.TCP_PUMP2_disp_writeBuffer.setAlignment(
+        self.CONN_PUMP2_disp_writeBuffer.setFont(font)
+        self.CONN_PUMP2_disp_writeBuffer.setStyleSheet("font-size: 10pt")
+        self.CONN_PUMP2_disp_writeBuffer.setAlignment(
             QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
         )
-        self.TCP_PUMP2_disp_writeBuffer.setWordWrap(True)
-        self.TCP_PUMP2_disp_writeBuffer.setObjectName("TCP_PUMP2_disp_writeBuffer")
-        self.TCP_PUMP2_btt_discon = QtWidgets.QPushButton(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_btt_discon.setGeometry(QtCore.QRect(570, 60, 181, 41))
-        self.TCP_PUMP2_btt_discon.setObjectName("TCP_PUMP2_btt_discon")
-        self.TCP_PUMP2_disp_readBuffer = QtWidgets.QLabel(self.TCP_PUMP2_tab)
-        self.TCP_PUMP2_disp_readBuffer.setGeometry(QtCore.QRect(40, 240, 561, 61))
-        self.TCP_PUMP2_disp_readBuffer.setStyleSheet("font-size: 10pt")
-        self.TCP_PUMP2_disp_readBuffer.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
-        )
-        self.TCP_PUMP2_disp_readBuffer.setWordWrap(True)
-        self.TCP_PUMP2_disp_readBuffer.setObjectName("TCP_PUMP2_disp_readBuffer")
-        self.TCP_PUMP2_lbl_bytesWritten.raise_()
-        self.TCP_PUMP2_lbl_writeBuffer.raise_()
-        self.TCP_PUMP2_lbl_readBuffer.raise_()
-        self.TCP_PUMP2_lbl_ip.raise_()
-        self.TCP_PUMP2_lbl_port.raise_()
-        self.TCP_PUMP2_lbl_tio_rw.raise_()
-        self.TCP_PUMP2_lbl_tio_conn.raise_()
-        self.TCP_PUMP2_lbl_bytesToRead.raise_()
-        self.TCP_PUMP2_lbl_connected.raise_()
-        self.TCP_PUMP2_disp_tio_conn.raise_()
-        self.TCP_PUMP2_disp_port.raise_()
-        self.TCP_PUMP2_btt_reconn.raise_()
-        self.TCP_PUMP2_disp_bytesToRead.raise_()
-        self.TCP_PUMP2_disp_bytesWritten.raise_()
-        self.TCP_PUMP2_indi_connected.raise_()
-        self.TCP_PUMP2_disp_tio_rw.raise_()
-        self.TCP_PUMP2_disp_ip.raise_()
-        self.TCP_PUMP2_disp_writeBuffer.raise_()
-        self.TCP_PUMP2_btt_discon.raise_()
-        self.TCP_PUMP2_disp_readBuffer.raise_()
-        self.TCP_tab.addTab(self.TCP_PUMP2_tab, "")
-        self.TCP_MIXER_tab = QtWidgets.QWidget()
-        self.TCP_MIXER_tab.setObjectName("TCP_MIXER_tab")
-        self.TCP_MIXER_btt_reconn = QtWidgets.QPushButton(self.TCP_MIXER_tab)
-        self.TCP_MIXER_btt_reconn.setGeometry(QtCore.QRect(360, 60, 181, 41))
-        self.TCP_MIXER_btt_reconn.setObjectName("TCP_MIXER_btt_reconn")
-        self.TCP_MIXER_lbl_writeBuffer = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_lbl_writeBuffer.setGeometry(QtCore.QRect(40, 110, 131, 31))
-        self.TCP_MIXER_lbl_writeBuffer.setStyleSheet(
+        self.CONN_PUMP2_disp_writeBuffer.setWordWrap(True)
+        self.CONN_PUMP2_disp_writeBuffer.setObjectName("CONN_PUMP2_disp_writeBuffer")
+        self.CONN_PUMP2_lbl_port = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_lbl_port.setGeometry(QtCore.QRect(220, 150, 91, 41))
+        self.CONN_PUMP2_lbl_port.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_MIXER_lbl_writeBuffer.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_MIXER_lbl_writeBuffer.setObjectName("TCP_MIXER_lbl_writeBuffer")
-        self.TCP_MIXER_lbl_port = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_lbl_port.setGeometry(QtCore.QRect(240, 330, 131, 31))
-        self.TCP_MIXER_lbl_port.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_MIXER_lbl_port.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_MIXER_lbl_port.setObjectName("TCP_MIXER_lbl_port")
-        self.TCP_MIXER_lbl_tio_conn = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_lbl_tio_conn.setGeometry(QtCore.QRect(620, 330, 161, 31))
-        self.TCP_MIXER_lbl_tio_conn.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_MIXER_lbl_tio_conn.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_MIXER_lbl_tio_conn.setObjectName("TCP_MIXER_lbl_tio_conn")
-        self.TCP_MIXER_disp_tio_rw = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_disp_tio_rw.setGeometry(QtCore.QRect(430, 360, 131, 41))
-        self.TCP_MIXER_disp_tio_rw.setAlignment(
+        self.CONN_PUMP2_lbl_port.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_MIXER_disp_tio_rw.setObjectName("TCP_MIXER_disp_tio_rw")
-        self.TCP_MIXER_lbl_readBuffer = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_lbl_readBuffer.setGeometry(QtCore.QRect(40, 210, 131, 31))
-        self.TCP_MIXER_lbl_readBuffer.setStyleSheet(
+        self.CONN_PUMP2_lbl_port.setObjectName("CONN_PUMP2_lbl_port")
+        self.CONN_PUMP2_lbl_connected = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_lbl_connected.setGeometry(QtCore.QRect(130, 43, 131, 51))
+        self.CONN_PUMP2_lbl_connected.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_MIXER_lbl_readBuffer.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_MIXER_lbl_readBuffer.setObjectName("TCP_MIXER_lbl_readBuffer")
-        self.TCP_MIXER_disp_bytesWritten = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_disp_bytesWritten.setGeometry(QtCore.QRect(620, 160, 131, 41))
-        self.TCP_MIXER_disp_bytesWritten.setAlignment(
+        self.CONN_PUMP2_lbl_connected.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_MIXER_disp_bytesWritten.setObjectName("TCP_MIXER_disp_bytesWritten")
-        self.TCP_MIXER_disp_tio_conn = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_disp_tio_conn.setGeometry(QtCore.QRect(620, 360, 131, 41))
-        self.TCP_MIXER_disp_tio_conn.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_MIXER_disp_tio_conn.setObjectName("TCP_MIXER_disp_tio_conn")
-        self.TCP_MIXER_lbl_ip = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_lbl_ip.setGeometry(QtCore.QRect(40, 330, 131, 31))
-        self.TCP_MIXER_lbl_ip.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_MIXER_lbl_ip.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_MIXER_lbl_ip.setObjectName("TCP_MIXER_lbl_ip")
-        self.TCP_MIXER_lbl_tio_rw = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_lbl_tio_rw.setGeometry(QtCore.QRect(430, 330, 161, 31))
-        self.TCP_MIXER_lbl_tio_rw.setStyleSheet(
-            "border: 0px;\n"
-            "font-size: 12pt;\n"
-            "background-color: #4c4a48;\n"
-            "color: #E1E5EE;"
-        )
-        self.TCP_MIXER_lbl_tio_rw.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
-        )
-        self.TCP_MIXER_lbl_tio_rw.setObjectName("TCP_MIXER_lbl_tio_rw")
-        self.TCP_MIXER_disp_ip = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_disp_ip.setGeometry(QtCore.QRect(40, 360, 131, 41))
-        self.TCP_MIXER_disp_ip.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_MIXER_disp_ip.setObjectName("TCP_MIXER_disp_ip")
-        self.TCP_MIXER_indi_connected = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_indi_connected.setGeometry(QtCore.QRect(270, 55, 51, 51))
-        self.TCP_MIXER_indi_connected.setStyleSheet(
+        self.CONN_PUMP2_lbl_connected.setObjectName("CONN_PUMP2_lbl_connected")
+        self.CONN_PUMP2_indi_connected = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_indi_connected.setGeometry(QtCore.QRect(270, 45, 51, 51))
+        self.CONN_PUMP2_indi_connected.setStyleSheet(
             "border-radius: 25px;\n" "background-color: #4c4a48;"
         )
-        self.TCP_MIXER_indi_connected.setText("")
-        self.TCP_MIXER_indi_connected.setObjectName("TCP_MIXER_indi_connected")
-        self.TCP_MIXER_lbl_bytesToRead = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 230, 151, 31))
-        self.TCP_MIXER_lbl_bytesToRead.setStyleSheet(
+        self.CONN_PUMP2_indi_connected.setText("")
+        self.CONN_PUMP2_indi_connected.setObjectName("CONN_PUMP2_indi_connected")
+        self.CONN_PUMP2_btt_discon = QtWidgets.QPushButton(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_btt_discon.setGeometry(QtCore.QRect(570, 50, 181, 41))
+        self.CONN_PUMP2_btt_discon.setObjectName("CONN_PUMP2_btt_discon")
+        self.CONN_PUMP2_lbl_modbId = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_lbl_modbId.setGeometry(QtCore.QRect(500, 150, 111, 41))
+        self.CONN_PUMP2_lbl_modbId.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_MIXER_lbl_bytesToRead.setAlignment(
+        self.CONN_PUMP2_lbl_modbId.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PUMP2_lbl_modbId.setObjectName("CONN_PUMP2_lbl_modbId")
+        self.CONN_PUMP2_disp_readBuffer = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_disp_readBuffer.setGeometry(QtCore.QRect(40, 340, 561, 61))
+        self.CONN_PUMP2_disp_readBuffer.setStyleSheet("font-size: 10pt")
+        self.CONN_PUMP2_disp_readBuffer.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
+        )
+        self.CONN_PUMP2_disp_readBuffer.setWordWrap(True)
+        self.CONN_PUMP2_disp_readBuffer.setObjectName("CONN_PUMP2_disp_readBuffer")
+        self.CONN_PUMP2_btt_reconn = QtWidgets.QPushButton(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_btt_reconn.setGeometry(QtCore.QRect(360, 50, 181, 41))
+        self.CONN_PUMP2_btt_reconn.setObjectName("CONN_PUMP2_btt_reconn")
+        self.CONN_PUMP2_lbl_readBuffer = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_lbl_readBuffer.setGeometry(QtCore.QRect(40, 310, 131, 31))
+        self.CONN_PUMP2_lbl_readBuffer.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PUMP2_lbl_readBuffer.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_MIXER_lbl_bytesToRead.setObjectName("TCP_MIXER_lbl_bytesToRead")
-        self.TCP_MIXER_disp_bytesToRead = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_disp_bytesToRead.setGeometry(QtCore.QRect(620, 260, 131, 41))
-        self.TCP_MIXER_disp_bytesToRead.setAlignment(
+        self.CONN_PUMP2_lbl_readBuffer.setObjectName("CONN_PUMP2_lbl_readBuffer")
+        self.CONN_PUMP2_disp_modbId = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_disp_modbId.setGeometry(QtCore.QRect(620, 150, 131, 41))
+        self.CONN_PUMP2_disp_modbId.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_MIXER_disp_bytesToRead.setObjectName("TCP_MIXER_disp_bytesToRead")
-        self.TCP_MIXER_btt_discon = QtWidgets.QPushButton(self.TCP_MIXER_tab)
-        self.TCP_MIXER_btt_discon.setGeometry(QtCore.QRect(570, 60, 181, 41))
-        self.TCP_MIXER_btt_discon.setObjectName("TCP_MIXER_btt_discon")
-        self.TCP_MIXER_lbl_connected = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_lbl_connected.setGeometry(QtCore.QRect(130, 53, 131, 51))
-        self.TCP_MIXER_lbl_connected.setStyleSheet(
+        self.CONN_PUMP2_disp_modbId.setObjectName("CONN_PUMP2_disp_modbId")
+        self.CONN_PUMP2_disp_port = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_disp_port.setGeometry(QtCore.QRect(320, 150, 131, 41))
+        self.CONN_PUMP2_disp_port.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PUMP2_disp_port.setObjectName("CONN_PUMP2_disp_port")
+        self.CONN_PUMP2_disp_bytesToRead = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_disp_bytesToRead.setGeometry(QtCore.QRect(620, 360, 131, 41))
+        self.CONN_PUMP2_disp_bytesToRead.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PUMP2_disp_bytesToRead.setObjectName("CONN_PUMP2_disp_bytesToRead")
+        self.CONN_PUMP2_lbl_bytesToRead = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 330, 131, 31))
+        self.CONN_PUMP2_lbl_bytesToRead.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_MIXER_lbl_connected.setAlignment(
+        self.CONN_PUMP2_lbl_bytesToRead.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.CONN_PUMP2_lbl_bytesToRead.setObjectName("CONN_PUMP2_lbl_bytesToRead")
+        self.CONN_PUMP2_disp_bytesWritten = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_disp_bytesWritten.setGeometry(QtCore.QRect(620, 260, 131, 41))
+        self.CONN_PUMP2_disp_bytesWritten.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_MIXER_lbl_connected.setObjectName("TCP_MIXER_lbl_connected")
-        self.TCP_MIXER_disp_writeBuffer = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_disp_writeBuffer.setGeometry(QtCore.QRect(40, 140, 561, 61))
+        self.CONN_PUMP2_disp_bytesWritten.setObjectName("CONN_PUMP2_disp_bytesWritten")
+        self.CONN_PUMP2_lbl_bytesWritten = QtWidgets.QLabel(self.CONN_PUMP2_tab)
+        self.CONN_PUMP2_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 230, 131, 31))
+        self.CONN_PUMP2_lbl_bytesWritten.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PUMP2_lbl_bytesWritten.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.CONN_PUMP2_lbl_bytesWritten.setObjectName("CONN_PUMP2_lbl_bytesWritten")
+        self.CONN_PUMP2_lbl_bytesWritten.raise_()
+        self.CONN_PUMP2_lbl_readBuffer.raise_()
+        self.CONN_PUMP2_lbl_writeBuffer.raise_()
+        self.CONN_PUMP2_disp_writeBuffer.raise_()
+        self.CONN_PUMP2_lbl_port.raise_()
+        self.CONN_PUMP2_lbl_connected.raise_()
+        self.CONN_PUMP2_indi_connected.raise_()
+        self.CONN_PUMP2_btt_discon.raise_()
+        self.CONN_PUMP2_lbl_modbId.raise_()
+        self.CONN_PUMP2_disp_readBuffer.raise_()
+        self.CONN_PUMP2_btt_reconn.raise_()
+        self.CONN_PUMP2_disp_modbId.raise_()
+        self.CONN_PUMP2_disp_port.raise_()
+        self.CONN_PUMP2_disp_bytesToRead.raise_()
+        self.CONN_PUMP2_lbl_bytesToRead.raise_()
+        self.CONN_PUMP2_disp_bytesWritten.raise_()
+        self.CONN_tab.addTab(self.CONN_PUMP2_tab, "")
+        self.CONN_PRH_tab = QtWidgets.QWidget()
+        self.CONN_PRH_tab.setObjectName("CONN_PRH_tab")
+        self.CONN_PRH_btt_reconn = QtWidgets.QPushButton(self.CONN_PRH_tab)
+        self.CONN_PRH_btt_reconn.setGeometry(QtCore.QRect(360, 50, 181, 41))
+        self.CONN_PRH_btt_reconn.setObjectName("CONN_PRH_btt_reconn")
+        self.CONN_PRH_lbl_writeBuffer = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_lbl_writeBuffer.setGeometry(QtCore.QRect(40, 210, 131, 31))
+        self.CONN_PRH_lbl_writeBuffer.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PRH_lbl_writeBuffer.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.CONN_PRH_lbl_writeBuffer.setObjectName("CONN_PRH_lbl_writeBuffer")
+        self.CONN_PRH_lbl_readBuffer = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_lbl_readBuffer.setGeometry(QtCore.QRect(40, 310, 131, 31))
+        self.CONN_PRH_lbl_readBuffer.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PRH_lbl_readBuffer.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.CONN_PRH_lbl_readBuffer.setObjectName("CONN_PRH_lbl_readBuffer")
+        self.CONN_PRH_disp_bytesWritten = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_disp_bytesWritten.setGeometry(QtCore.QRect(620, 260, 131, 41))
+        self.CONN_PRH_disp_bytesWritten.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PRH_disp_bytesWritten.setObjectName("CONN_PRH_disp_bytesWritten")
+        self.CONN_PRH_indi_connected = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_indi_connected.setGeometry(QtCore.QRect(270, 45, 51, 51))
+        self.CONN_PRH_indi_connected.setStyleSheet(
+            "border-radius: 25px;\n" "background-color: #4c4a48;"
+        )
+        self.CONN_PRH_indi_connected.setText("")
+        self.CONN_PRH_indi_connected.setObjectName("CONN_PRH_indi_connected")
+        self.CONN_PRH_lbl_bytesToRead = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_lbl_bytesToRead.setGeometry(QtCore.QRect(620, 330, 151, 31))
+        self.CONN_PRH_lbl_bytesToRead.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PRH_lbl_bytesToRead.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.CONN_PRH_lbl_bytesToRead.setObjectName("CONN_PRH_lbl_bytesToRead")
+        self.CONN_PRH_disp_bytesToRead = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_disp_bytesToRead.setGeometry(QtCore.QRect(620, 360, 131, 41))
+        self.CONN_PRH_disp_bytesToRead.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PRH_disp_bytesToRead.setObjectName("CONN_PRH_disp_bytesToRead")
+        self.CONN_PRH_btt_discon = QtWidgets.QPushButton(self.CONN_PRH_tab)
+        self.CONN_PRH_btt_discon.setGeometry(QtCore.QRect(570, 50, 181, 41))
+        self.CONN_PRH_btt_discon.setObjectName("CONN_PRH_btt_discon")
+        self.CONN_PRH_lbl_connected = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_lbl_connected.setGeometry(QtCore.QRect(130, 43, 131, 51))
+        self.CONN_PRH_lbl_connected.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PRH_lbl_connected.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PRH_lbl_connected.setObjectName("CONN_PRH_lbl_connected")
+        self.CONN_PRH_disp_writeBuffer = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_disp_writeBuffer.setGeometry(QtCore.QRect(40, 240, 561, 61))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(10)
-        self.TCP_MIXER_disp_writeBuffer.setFont(font)
-        self.TCP_MIXER_disp_writeBuffer.setStyleSheet("font-size: 10pt")
-        self.TCP_MIXER_disp_writeBuffer.setAlignment(
+        self.CONN_PRH_disp_writeBuffer.setFont(font)
+        self.CONN_PRH_disp_writeBuffer.setStyleSheet("font-size: 10pt")
+        self.CONN_PRH_disp_writeBuffer.setAlignment(
             QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
         )
-        self.TCP_MIXER_disp_writeBuffer.setWordWrap(True)
-        self.TCP_MIXER_disp_writeBuffer.setObjectName("TCP_MIXER_disp_writeBuffer")
-        self.TCP_MIXER_disp_readBuffer = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_disp_readBuffer.setGeometry(QtCore.QRect(40, 240, 561, 61))
-        self.TCP_MIXER_disp_readBuffer.setStyleSheet("font-size: 10pt")
-        self.TCP_MIXER_disp_readBuffer.setAlignment(
+        self.CONN_PRH_disp_writeBuffer.setWordWrap(True)
+        self.CONN_PRH_disp_writeBuffer.setObjectName("CONN_PRH_disp_writeBuffer")
+        self.CONN_PRH_disp_readBuffer = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_disp_readBuffer.setGeometry(QtCore.QRect(40, 340, 561, 61))
+        self.CONN_PRH_disp_readBuffer.setStyleSheet("font-size: 10pt")
+        self.CONN_PRH_disp_readBuffer.setAlignment(
             QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
         )
-        self.TCP_MIXER_disp_readBuffer.setWordWrap(True)
-        self.TCP_MIXER_disp_readBuffer.setObjectName("TCP_MIXER_disp_readBuffer")
-        self.TCP_MIXER_disp_port = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_disp_port.setGeometry(QtCore.QRect(240, 360, 131, 41))
-        self.TCP_MIXER_disp_port.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
-        )
-        self.TCP_MIXER_disp_port.setObjectName("TCP_MIXER_disp_port")
-        self.TCP_MIXER_lbl_bytesWritten = QtWidgets.QLabel(self.TCP_MIXER_tab)
-        self.TCP_MIXER_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 130, 151, 31))
-        self.TCP_MIXER_lbl_bytesWritten.setStyleSheet(
+        self.CONN_PRH_disp_readBuffer.setWordWrap(True)
+        self.CONN_PRH_disp_readBuffer.setObjectName("CONN_PRH_disp_readBuffer")
+        self.CONN_PRH_lbl_bytesWritten = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_lbl_bytesWritten.setGeometry(QtCore.QRect(620, 230, 151, 31))
+        self.CONN_PRH_lbl_bytesWritten.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #4c4a48;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_MIXER_lbl_bytesWritten.setAlignment(
+        self.CONN_PRH_lbl_bytesWritten.setAlignment(
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
         )
-        self.TCP_MIXER_lbl_bytesWritten.setObjectName("TCP_MIXER_lbl_bytesWritten")
-        self.TCP_tab.addTab(self.TCP_MIXER_tab, "")
-        self.TCP_num_commForerun = QtWidgets.QSpinBox(self.TCP_frame)
-        self.TCP_num_commForerun.setGeometry(QtCore.QRect(700, 80, 131, 41))
-        self.TCP_num_commForerun.setStyleSheet("font-size: 14pt")
-        self.TCP_num_commForerun.setAlignment(
+        self.CONN_PRH_lbl_bytesWritten.setObjectName("CONN_PRH_lbl_bytesWritten")
+        self.CONN_PRH_lbl_colon = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_lbl_colon.setGeometry(QtCore.QRect(239, 148, 21, 41))
+        self.CONN_PRH_lbl_colon.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 18pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PRH_lbl_colon.setAlignment(QtCore.Qt.AlignCenter)
+        self.CONN_PRH_lbl_colon.setObjectName("CONN_PRH_lbl_colon")
+        self.CONN_PRH_disp_port = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_disp_port.setGeometry(QtCore.QRect(260, 150, 131, 41))
+        self.CONN_PRH_disp_port.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_PRH_disp_port.setObjectName("CONN_PRH_disp_port")
+        self.CONN_PRH_lbl_ip = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_lbl_ip.setGeometry(QtCore.QRect(40, 120, 131, 31))
+        self.CONN_PRH_lbl_ip.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PRH_lbl_ip.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.CONN_PRH_lbl_ip.setObjectName("CONN_PRH_lbl_ip")
+        self.CONN_PRH_disp_ip = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_disp_ip.setGeometry(QtCore.QRect(40, 150, 201, 41))
+        self.CONN_PRH_disp_ip.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_num_commForerun.setMinimum(1)
-        self.TCP_num_commForerun.setMaximum(99999)
-        self.TCP_num_commForerun.setProperty("value", 10)
-        self.TCP_num_commForerun.setDisplayIntegerBase(10)
-        self.TCP_num_commForerun.setObjectName("TCP_num_commForerun")
-        self.TCP_lbl_commForerun = QtWidgets.QLabel(self.TCP_frame)
-        self.TCP_lbl_commForerun.setGeometry(QtCore.QRect(560, 90, 131, 21))
-        self.TCP_lbl_commForerun.setStyleSheet(
+        self.CONN_PRH_disp_ip.setObjectName("CONN_PRH_disp_ip")
+        self.CONN_PRH_lbl_port = QtWidgets.QLabel(self.CONN_PRH_tab)
+        self.CONN_PRH_lbl_port.setGeometry(QtCore.QRect(260, 120, 131, 31))
+        self.CONN_PRH_lbl_port.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 12pt;\n"
+            "background-color: #4c4a48;\n"
+            "color: #E1E5EE;"
+        )
+        self.CONN_PRH_lbl_port.setAlignment(
+            QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft
+        )
+        self.CONN_PRH_lbl_port.setObjectName("CONN_PRH_lbl_port")
+        self.CONN_PRH_lbl_port.raise_()
+        self.CONN_PRH_btt_reconn.raise_()
+        self.CONN_PRH_lbl_writeBuffer.raise_()
+        self.CONN_PRH_lbl_readBuffer.raise_()
+        self.CONN_PRH_disp_bytesWritten.raise_()
+        self.CONN_PRH_indi_connected.raise_()
+        self.CONN_PRH_lbl_bytesToRead.raise_()
+        self.CONN_PRH_disp_bytesToRead.raise_()
+        self.CONN_PRH_btt_discon.raise_()
+        self.CONN_PRH_lbl_connected.raise_()
+        self.CONN_PRH_disp_writeBuffer.raise_()
+        self.CONN_PRH_disp_readBuffer.raise_()
+        self.CONN_PRH_lbl_bytesWritten.raise_()
+        self.CONN_PRH_lbl_colon.raise_()
+        self.CONN_PRH_disp_port.raise_()
+        self.CONN_PRH_lbl_ip.raise_()
+        self.CONN_PRH_disp_ip.raise_()
+        self.CONN_tab.addTab(self.CONN_PRH_tab, "")
+        self.CONN_num_commForerun = QtWidgets.QSpinBox(self.TCP_frame)
+        self.CONN_num_commForerun.setGeometry(QtCore.QRect(700, 60, 131, 41))
+        self.CONN_num_commForerun.setStyleSheet("font-size: 14pt")
+        self.CONN_num_commForerun.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.CONN_num_commForerun.setMinimum(1)
+        self.CONN_num_commForerun.setMaximum(99999)
+        self.CONN_num_commForerun.setProperty("value", 10)
+        self.CONN_num_commForerun.setDisplayIntegerBase(10)
+        self.CONN_num_commForerun.setObjectName("CONN_num_commForerun")
+        self.CONN_lbl_commForerun = QtWidgets.QLabel(self.TCP_frame)
+        self.CONN_lbl_commForerun.setGeometry(QtCore.QRect(560, 70, 131, 21))
+        self.CONN_lbl_commForerun.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #5d707f;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_lbl_commForerun.setAlignment(
+        self.CONN_lbl_commForerun.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_lbl_commForerun.setObjectName("TCP_lbl_commForerun")
-        self.TCP_lbl_qProcessing = QtWidgets.QLabel(self.TCP_frame)
-        self.TCP_lbl_qProcessing.setGeometry(QtCore.QRect(380, 74, 131, 51))
-        self.TCP_lbl_qProcessing.setStyleSheet(
+        self.CONN_lbl_commForerun.setObjectName("CONN_lbl_commForerun")
+        self.CONN_lbl_qProcessing = QtWidgets.QLabel(self.TCP_frame)
+        self.CONN_lbl_qProcessing.setGeometry(QtCore.QRect(380, 54, 131, 51))
+        self.CONN_lbl_qProcessing.setStyleSheet(
             "border: 0px;\n"
             "font-size: 12pt;\n"
             "background-color: #5D707F;\n"
             "color: #E1E5EE;"
         )
-        self.TCP_lbl_qProcessing.setAlignment(
+        self.CONN_lbl_qProcessing.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
-        self.TCP_lbl_qProcessing.setObjectName("TCP_lbl_qProcessing")
-        self.TCP_indi_qProcessing = QtWidgets.QLabel(self.TCP_frame)
-        self.TCP_indi_qProcessing.setGeometry(QtCore.QRect(520, 80, 41, 41))
-        self.TCP_indi_qProcessing.setStyleSheet(
+        self.CONN_lbl_qProcessing.setObjectName("CONN_lbl_qProcessing")
+        self.CONN_indi_qProcessing = QtWidgets.QLabel(self.TCP_frame)
+        self.CONN_indi_qProcessing.setGeometry(QtCore.QRect(520, 60, 41, 41))
+        self.CONN_indi_qProcessing.setStyleSheet(
             "border-radius: 20px;\n" "background-color: #4c4a48;"
         )
-        self.TCP_indi_qProcessing.setText("")
-        self.TCP_indi_qProcessing.setObjectName("TCP_indi_qProcessing")
+        self.CONN_indi_qProcessing.setText("")
+        self.CONN_indi_qProcessing.setObjectName("CONN_indi_qProcessing")
         self.SIB_frame = QtWidgets.QFrame(self.SET_tab)
         self.SIB_frame.setGeometry(QtCore.QRect(940, 440, 951, 491))
         self.SIB_frame.setStyleSheet("")
@@ -4105,7 +3957,7 @@ class Ui_MainWindow(object):
             "color: #E1E5EE;"
         )
         self.SET_TE_lbl_retractSpeed.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.SET_TE_lbl_retractSpeed.setObjectName("SET_TE_lbl_retractSpeed")
         self.SET_TE_float_p1VolFlow = QtWidgets.QDoubleSpinBox(self.SET_TE_frame)
@@ -4126,7 +3978,7 @@ class Ui_MainWindow(object):
             "color: #E1E5EE;"
         )
         self.SET_TE_lbl_p1VolFlow.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.SET_TE_lbl_p1VolFlow.setObjectName("SET_TE_lbl_p1VolFlow")
         self.SET_TE_float_p2VolFlow = QtWidgets.QDoubleSpinBox(self.SET_TE_frame)
@@ -4147,11 +3999,11 @@ class Ui_MainWindow(object):
             "color: #E1E5EE;"
         )
         self.SET_TE_lbl_p2VolFlow.setAlignment(
-            QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.SET_TE_lbl_p2VolFlow.setObjectName("SET_TE_lbl_p2VolFlow")
         self.SET_TE_1_fllwBhvr = QtWidgets.QLabel(self.SET_TE_frame)
-        self.SET_TE_1_fllwBhvr.setGeometry(QtCore.QRect(289, 79, 341, 31))
+        self.SET_TE_1_fllwBhvr.setGeometry(QtCore.QRect(289, 79, 291, 31))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(14)
@@ -4194,13 +4046,13 @@ class Ui_MainWindow(object):
         self.ICQ_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ICQ_frame.setObjectName("ICQ_frame")
         self.ICQ_arr_terminal = QtWidgets.QListWidget(self.ICQ_frame)
-        self.ICQ_arr_terminal.setGeometry(QtCore.QRect(40, 130, 1111, 741))
+        self.ICQ_arr_terminal.setGeometry(QtCore.QRect(40, 160, 1111, 711))
         self.ICQ_arr_terminal.setFlow(QtWidgets.QListView.TopToBottom)
         self.ICQ_arr_terminal.setObjectName("ICQ_arr_terminal")
         item = QtWidgets.QListWidgetItem()
         self.ICQ_arr_terminal.addItem(item)
         self.ICQ_0_frameLabel = QtWidgets.QLabel(self.ICQ_frame)
-        self.ICQ_0_frameLabel.setGeometry(QtCore.QRect(20, 30, 381, 51))
+        self.ICQ_0_frameLabel.setGeometry(QtCore.QRect(20, 30, 411, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(22)
@@ -4212,17 +4064,19 @@ class Ui_MainWindow(object):
             "background-color: #5D707F;\n"
             "color: #E1E5EE;"
         )
-        self.ICQ_0_frameLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.ICQ_0_frameLabel.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
         self.ICQ_0_frameLabel.setObjectName("ICQ_0_frameLabel")
         self.ICQ_chk_autoScroll = QtWidgets.QCheckBox(self.ICQ_frame)
-        self.ICQ_chk_autoScroll.setGeometry(QtCore.QRect(990, 100, 161, 27))
+        self.ICQ_chk_autoScroll.setGeometry(QtCore.QRect(990, 130, 161, 27))
         self.ICQ_chk_autoScroll.setStyleSheet(
             "background-color: #5d707f;\n" "font-size: 12pt;\n" "color: #f2f4f3;\n" ""
         )
         self.ICQ_chk_autoScroll.setChecked(False)
         self.ICQ_chk_autoScroll.setObjectName("ICQ_chk_autoScroll")
         self.SID_lbl_robID = QtWidgets.QLabel(self.ICQ_frame)
-        self.SID_lbl_robID.setGeometry(QtCore.QRect(700, 30, 101, 41))
+        self.SID_lbl_robID.setGeometry(QtCore.QRect(500, 60, 101, 41))
         self.SID_lbl_robID.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -4231,19 +4085,19 @@ class Ui_MainWindow(object):
         )
         self.SID_lbl_robID.setObjectName("SID_lbl_robID")
         self.SID_disp_robID = QtWidgets.QLabel(self.ICQ_frame)
-        self.SID_disp_robID.setGeometry(QtCore.QRect(810, 30, 101, 41))
+        self.SID_disp_robID.setGeometry(QtCore.QRect(610, 60, 101, 41))
         self.SID_disp_robID.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.SID_disp_robID.setObjectName("SID_disp_robID")
         self.SID_disp_progID = QtWidgets.QLabel(self.ICQ_frame)
-        self.SID_disp_progID.setGeometry(QtCore.QRect(610, 30, 101, 41))
+        self.SID_disp_progID.setGeometry(QtCore.QRect(800, 60, 101, 41))
         self.SID_disp_progID.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.SID_disp_progID.setObjectName("SID_disp_progID")
         self.SID_lbl_progID = QtWidgets.QLabel(self.ICQ_frame)
-        self.SID_lbl_progID.setGeometry(QtCore.QRect(520, 30, 81, 41))
+        self.SID_lbl_progID.setGeometry(QtCore.QRect(710, 60, 81, 41))
         self.SID_lbl_progID.setStyleSheet(
             "border: 0px;\n" "background-color: #5D707F;\n" "color: #E1E5EE;"
         )
@@ -4251,12 +4105,50 @@ class Ui_MainWindow(object):
             QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing
         )
         self.SID_lbl_progID.setObjectName("SID_lbl_progID")
-        self.SID_btt_robToProgID = QtWidgets.QPushButton(self.ICQ_frame)
-        self.SID_btt_robToProgID.setGeometry(QtCore.QRect(950, 30, 201, 41))
-        self.SID_btt_robToProgID.setObjectName("SID_btt_robToProgID")
-        self.SID_btt_scIdPlus1 = QtWidgets.QPushButton(self.ICQ_frame)
-        self.SID_btt_scIdPlus1.setGeometry(QtCore.QRect(611, 80, 101, 25))
-        self.SID_btt_scIdPlus1.setObjectName("SID_btt_scIdPlus1")
+        self.SID_btt_overwrite = QtWidgets.QPushButton(self.ICQ_frame)
+        self.SID_btt_overwrite.setGeometry(QtCore.QRect(1030, 60, 121, 41))
+        self.SID_btt_overwrite.setObjectName("SID_btt_overwrite")
+        self.SID_num_ovewrite = QtWidgets.QSpinBox(self.ICQ_frame)
+        self.SID_num_ovewrite.setGeometry(QtCore.QRect(910, 60, 111, 41))
+        self.SID_num_ovewrite.setStyleSheet("font-size: 14pt;")
+        self.SID_num_ovewrite.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
+        self.SID_num_ovewrite.setObjectName("SID_num_ovewrite")
+        self.DC_0_notice_2 = QtWidgets.QLabel(self.ICQ_frame)
+        self.DC_0_notice_2.setGeometry(QtCore.QRect(805, 37, 91, 20))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(11)
+        self.DC_0_notice_2.setFont(font)
+        self.DC_0_notice_2.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.DC_0_notice_2.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
+        self.DC_0_notice_2.setObjectName("DC_0_notice_2")
+        self.DC_0_notice_3 = QtWidgets.QLabel(self.ICQ_frame)
+        self.DC_0_notice_3.setGeometry(QtCore.QRect(915, 37, 101, 20))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(11)
+        self.DC_0_notice_3.setFont(font)
+        self.DC_0_notice_3.setStyleSheet(
+            "border: 0px;\n"
+            "font-size: 11pt;\n"
+            "padding: 0px;\n"
+            "background-color: #5D707F;\n"
+            "color: #E1E5EE;"
+        )
+        self.DC_0_notice_3.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
+        self.DC_0_notice_3.setObjectName("DC_0_notice_3")
         self.ZERO_frame = QtWidgets.QFrame(self.MONITOR_tab)
         self.ZERO_frame.setGeometry(QtCore.QRect(1260, 20, 631, 621))
         self.ZERO_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -4459,7 +4351,7 @@ class Ui_MainWindow(object):
         self.ZERO_btt_loadZeroFile.setGeometry(QtCore.QRect(140, 550, 161, 41))
         self.ZERO_btt_loadZeroFile.setObjectName("ZERO_btt_loadZeroFile")
         self.ZERO_0_notice = QtWidgets.QLabel(self.ZERO_frame)
-        self.ZERO_0_notice.setGeometry(QtCore.QRect(320, 550, 241, 41))
+        self.ZERO_0_notice.setGeometry(QtCore.QRect(320, 550, 271, 41))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(11)
@@ -4687,7 +4579,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tab.setCurrentIndex(0)
-        self.TCP_tab.setCurrentIndex(0)
+        self.CONN_tab.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.tab, self.IO_btt_newFile)
         MainWindow.setTabOrder(self.IO_btt_newFile, self.IO_btt_xyzextZero)
@@ -4780,11 +4672,11 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.TERM_entry_gcodeInterp, self.TERM_btt_gcodeInterp)
         MainWindow.setTabOrder(self.TERM_btt_gcodeInterp, self.TERM_entry_rapidInterp)
         MainWindow.setTabOrder(self.TERM_entry_rapidInterp, self.TERM_btt_rapidInterp)
-        MainWindow.setTabOrder(self.TERM_btt_rapidInterp, self.TCP_tab)
-        MainWindow.setTabOrder(self.TCP_tab, self.TCP_num_commForerun)
-        MainWindow.setTabOrder(self.TCP_num_commForerun, self.TCP_ROB_btt_reconn)
-        MainWindow.setTabOrder(self.TCP_ROB_btt_reconn, self.TCP_ROB_btt_discon)
-        MainWindow.setTabOrder(self.TCP_ROB_btt_discon, self.SET_float_volPerMM)
+        MainWindow.setTabOrder(self.TERM_btt_rapidInterp, self.CONN_tab)
+        MainWindow.setTabOrder(self.CONN_tab, self.CONN_num_commForerun)
+        MainWindow.setTabOrder(self.CONN_num_commForerun, self.CONN_ROB_btt_reconn)
+        MainWindow.setTabOrder(self.CONN_ROB_btt_reconn, self.CONN_ROB_btt_discon)
+        MainWindow.setTabOrder(self.CONN_ROB_btt_discon, self.SET_float_volPerMM)
         MainWindow.setTabOrder(self.SET_float_volPerMM, self.SET_float_frToMms)
         MainWindow.setTabOrder(self.SET_float_frToMms, self.SET_TE_float_p2VolFlow)
         MainWindow.setTabOrder(self.SET_TE_float_p2VolFlow, self.SET_num_zone)
@@ -4816,10 +4708,8 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.ZERO_float_ext, self.ZERO_float_rx)
         MainWindow.setTabOrder(self.ZERO_float_rx, self.ZERO_float_ry)
         MainWindow.setTabOrder(self.ZERO_float_ry, self.ZERO_float_rz)
-        MainWindow.setTabOrder(self.ZERO_float_rz, self.TCP_PUMP1_btt_reconn)
-        MainWindow.setTabOrder(self.TCP_PUMP1_btt_reconn, self.TCP_PUMP2_btt_discon)
-        MainWindow.setTabOrder(self.TCP_PUMP2_btt_discon, self.TCP_PUMP2_btt_reconn)
-        MainWindow.setTabOrder(self.TCP_PUMP2_btt_reconn, self.TCP_PUMP1_btt_discon)
+        MainWindow.setTabOrder(self.ZERO_float_rz, self.CONN_PUMP1_btt_reconn)
+        MainWindow.setTabOrder(self.CONN_PUMP1_btt_reconn, self.CONN_PUMP1_btt_discon)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -5024,34 +4914,24 @@ class Ui_MainWindow(object):
             _translate("MainWindow", "     DIRECT CONTROL     "),
         )
         self.ADC_0_framelabel.setText(_translate("MainWindow", "DIRECT CONTROL"))
-        self.ADC_lbl_panning.setText(
-            _translate("MainWindow", "panning value \n" "(step-driven servor)")
-        )
-        self.ADC_lbl_fibDeliv.setText(
-            _translate("MainWindow", "fiber delivery ratio\n" "(MT dependent) [%]")
+        self.ADC_lbl_trolley.setText(
+            _translate("MainWindow", "trolley position [steps]:")
         )
         self.ADC_btt_clamp.setText(_translate("MainWindow", "CLAMP"))
-        self.ADC_btt_knifePos.setText(_translate("MainWindow", "KNIFE POS"))
-        self.ADC_btt_knife.setText(_translate("MainWindow", "KNIFE"))
-        self.ADC_btt_fiberPnmtc.setText(_translate("MainWindow", "FIBER PNMTC"))
+        self.ADC_btt_cut.setText(_translate("MainWindow", "CUT"))
+        self.ADC_btt_placeSpring.setText(_translate("MainWindow", "PLACE SPRING"))
         self.ADC_btt_resetAll.setText(_translate("MainWindow", "RESET ALL"))
         self.ADC_lbl_robotMoving.setText(_translate("MainWindow", "ROBOT MOVING"))
         self.ASC_0_framelabel.setText(_translate("MainWindow", "SCRIPT CONTROL"))
-        self.ASC_lbl_panning.setText(
-            _translate("MainWindow", "panning value \n" "(step-driven servor)")
-        )
-        self.ASC_lbl_fibDeliv.setText(
-            _translate("MainWindow", "fiber delivery ratio\n" "(MT dependent) [%]")
-        )
         self.ASC_btt_clamp.setText(_translate("MainWindow", "CLAMP"))
-        self.ASC_btt_knifePos.setText(_translate("MainWindow", "KNIFE POS"))
-        self.ASC_btt_knife.setText(_translate("MainWindow", "KNIFE"))
-        self.ASC_btt_fiberPnmtc.setText(_translate("MainWindow", "FIBER PNMTC"))
-        self.ASC_btt_overwrSC.setText(
-            _translate("MainWindow", "OVERWRITE\n" "SC LINES")
-        )
+        self.ASC_btt_cut.setText(_translate("MainWindow", "CUT"))
+        self.ASC_btt_placeSpring.setText(_translate("MainWindow", "PLACE SPRING"))
+        self.ASC_btt_overwrSC.setText(_translate("MainWindow", "OVERWRITE SC LINES"))
         self.ASC_lbl_qProcessing.setText(
             _translate("MainWindow", "QUEUE\n" "PROCESSING")
+        )
+        self.ADC_lbl_panning_2.setText(
+            _translate("MainWindow", "trolley position [steps]:")
         )
         self.PUMP_disp_freqP1.setText(_translate("MainWindow", "0.0%"))
         self.PUMP_lbl_freq.setText(_translate("MainWindow", "motor frequency"))
@@ -5063,17 +4943,16 @@ class Ui_MainWindow(object):
         self.PUMP_lbl_torq.setText(_translate("MainWindow", "shaft torque"))
         self.PUMP_btt_plus1.setText(_translate("MainWindow", "+ 1%"))
         self.PUMP_btt_minus1.setText(_translate("MainWindow", "- 1%"))
-        self.PUMP_lbl_setSpeed.setText(_translate("MainWindow", "set total speed"))
+        self.PUMP_lbl_setSpeed.setText(_translate("MainWindow", "set total speed:"))
         self.PUMP_btt_setSpeed.setText(_translate("MainWindow", "SET"))
         self.PUMP_btt_stop.setText(_translate("MainWindow", "⛔ STOP"))
         self.PUMP_num_setSpeed.setSuffix(_translate("MainWindow", "%"))
         self.PUMP_btt_reverse.setText(_translate("MainWindow", "REVERSE DIRECTION"))
-        self.PUMP_0_frameLabel.setText(_translate("MainWindow", "PUMP CTRL"))
+        self.PUMP_0_frameLabel.setText(_translate("MainWindow", "PUMP CONTROL"))
         self.PUMP_btt_minus10.setText(_translate("MainWindow", "- 10%"))
         self.PUMP_btt_plus10.setText(_translate("MainWindow", "+ 10%"))
         self.PUMP_btt_plus25.setText(_translate("MainWindow", "+ 25%"))
         self.PUMP_btt_minus25.setText(_translate("MainWindow", "- 25%"))
-        self.PUMP_btt_pinchValve.setText(_translate("MainWindow", "PINCH VALVE"))
         self.PUMP_btt_ccToDefault.setText(_translate("MainWindow", "CC 🡆 DEFAULT"))
         self.PUMP_btt_scToDefault.setText(_translate("MainWindow", "SC 🡆 DEFAULT"))
         self.PUMP_lbl_pump1.setText(_translate("MainWindow", "PUMP 1"))
@@ -5087,172 +4966,153 @@ class Ui_MainWindow(object):
         self.PUMP_lbl_p1Full.setText(_translate("MainWindow", "P1 100%"))
         self.PUMP_disp_currSpeed.setText(_translate("MainWindow", "0%"))
         self.PUMP_lbl_currSpeed.setText(
-            _translate("MainWindow", " current total speed")
+            _translate("MainWindow", " current total speed:")
         )
         self.PUMP_disp_outputRatio.setText(_translate("MainWindow", "100 / 0"))
-        self.PUMP_lbl_outputRatio.setText(_translate("MainWindow", "output ratio"))
+        self.PUMP_lbl_outputRatio.setText(_translate("MainWindow", "output ratio: "))
         self.PUMP_num_setSpeedP1.setSuffix(_translate("MainWindow", "%"))
-        self.PUMP_lbl_setSpeedP1.setText(_translate("MainWindow", "P1 set speed"))
+        self.PUMP_lbl_setSpeedP1.setText(_translate("MainWindow", "set P1 speed"))
         self.PUMP_btt_setSpeedP1.setText(_translate("MainWindow", "SET"))
         self.PUMP_btt_setSpeedP2.setText(_translate("MainWindow", "SET"))
         self.PUMP_num_setSpeedP2.setSuffix(_translate("MainWindow", "%"))
-        self.PUMP_lbl_setSpeedP2.setText(_translate("MainWindow", "P2 set speed"))
-        self.MIX_0_frameLabel_2.setText(_translate("MainWindow", "MIXER CTRL"))
-        self.MIX_btt_stop.setText(_translate("MainWindow", "⛔ STOP"))
-        self.MIX_disp_currSpeed.setText(_translate("MainWindow", "0%"))
-        self.MIX_num_setSpeed.setSuffix(_translate("MainWindow", "%"))
-        self.MIX_lbl_currSpeed.setText(_translate("MainWindow", "current speed"))
-        self.MIX_lbl_setSpeed.setText(_translate("MainWindow", "set speed"))
-        self.MIX_btt_setSpeed.setText(_translate("MainWindow", "SET"))
-        self.MIX_lbl_step0.setText(_translate("MainWindow", "0"))
-        self.MIX_lbl_step100.setText(_translate("MainWindow", "100 [%]"))
-        self.MIX_lbl_step50.setText(_translate("MainWindow", "50"))
-        self.MIX_btt_actWithPump.setText(_translate("MainWindow", "ACT WITH PUMP"))
+        self.PUMP_lbl_setSpeedP2.setText(_translate("MainWindow", "set P2 speed"))
+        self.PRH_0_frameLabel.setText(_translate("MainWindow", "PRH CTRL"))
+        self.PRH_btt_stop.setText(_translate("MainWindow", "⛔ STOP"))
+        self.PRH_disp_currSpeed.setText(_translate("MainWindow", "0%"))
+        self.PRH_num_setSpeed.setSuffix(_translate("MainWindow", "%"))
+        self.PRH_lbl_currSpeed.setText(_translate("MainWindow", "current speed"))
+        self.PRH_lbl_setSpeed.setText(_translate("MainWindow", "set speed"))
+        self.PRH_btt_setSpeed.setText(_translate("MainWindow", "SET"))
+        self.PRH_lbl_step0.setText(_translate("MainWindow", "0"))
+        self.PRH_lbl_step100.setText(_translate("MainWindow", "100 [%]"))
+        self.PRH_lbl_step50.setText(_translate("MainWindow", "50"))
+        self.PRH_btt_actWithPump.setText(_translate("MainWindow", "ACT WITH PUMP"))
+        self.PRH_btt_pinchValve.setText(_translate("MainWindow", "PINCH VALVE"))
         self.tab.setTabText(
             self.tab.indexOf(self.AMCON_tab),
-            _translate("MainWindow", "     AMCON && PUMP     "),
+            _translate("MainWindow", "     PRINTHEAD && PUMP     "),
         )
-        self.TCP_0_frameLabel.setText(_translate("MainWindow", "TCP SETTINGS"))
-        self.TCP_ROB_lbl_bytesToRead.setText(
-            _translate("MainWindow", "TCP bytes to read")
+        self.CONN_0_frameLabel.setText(_translate("MainWindow", "CONNECTION SETTINGS"))
+        self.CONN_ROB_lbl_bytesToRead.setText(_translate("MainWindow", "bytes to read"))
+        self.CONN_ROB_disp_bytesWritten.setText(_translate("MainWindow", "0"))
+        self.CONN_ROB_lbl_bytesWritten.setText(
+            _translate("MainWindow", "bytes written")
         )
-        self.TCP_ROB_disp_bytesWritten.setText(_translate("MainWindow", "0"))
-        self.TCP_ROB_lbl_bytesWritten.setText(
-            _translate("MainWindow", "TCP bytes written")
-        )
-        self.TCP_ROB_lbl_ip.setText(_translate("MainWindow", "TCP IP"))
-        self.TCP_ROB_lbl_port.setText(_translate("MainWindow", "TCP port"))
-        self.TCP_ROB_lbl_tio_conn.setText(_translate("MainWindow", "TCP conn timeout"))
-        self.TCP_ROB_lbl_writeBuffer.setText(_translate("MainWindow", "TCP written"))
-        self.TCP_ROB_lbl_readBuffer.setText(_translate("MainWindow", "TCP read"))
-        self.TCP_ROB_disp_writeBuffer.setText(
+        self.CONN_ROB_lbl_ip.setText(_translate("MainWindow", "TCP IP"))
+        self.CONN_ROB_lbl_port.setText(_translate("MainWindow", "TCP port"))
+        self.CONN_ROB_lbl_connTo.setText(_translate("MainWindow", "conn timeout [s]"))
+        self.CONN_ROB_lbl_writeBuffer.setText(_translate("MainWindow", "written"))
+        self.CONN_ROB_lbl_readBuffer.setText(_translate("MainWindow", "received"))
+        self.CONN_ROB_disp_writeBuffer.setText(
             _translate("MainWindow", "nothing send, yet..")
         )
-        self.TCP_ROB_disp_readBuffer.setText(
+        self.CONN_ROB_disp_readBuffer.setText(
             _translate("MainWindow", "nothing received, yet..")
         )
-        self.TCP_ROB_lbl_tio_rw.setText(_translate("MainWindow", "TCP r/w timeout"))
-        self.TCP_ROB_lbl_connected.setText(
+        self.CONN_ROB_lbl_rwTo.setText(_translate("MainWindow", "R/W timeout [s]"))
+        self.CONN_ROB_lbl_connected.setText(
             _translate("MainWindow", "CONNECTION\n" "ESTABLISHED")
         )
-        self.TCP_ROB_btt_discon.setText(_translate("MainWindow", "DISCONNECT"))
-        self.TCP_ROB_btt_reconn.setText(_translate("MainWindow", "RECONNECT"))
-        self.TCP_ROB_disp_ip.setText(_translate("MainWindow", "0"))
-        self.TCP_ROB_disp_port.setText(_translate("MainWindow", "0"))
-        self.TCP_ROB_disp_tio_rw.setText(_translate("MainWindow", "0"))
-        self.TCP_ROB_disp_tio_conn.setText(_translate("MainWindow", "0"))
-        self.TCP_ROB_disp_bytesToRead.setText(_translate("MainWindow", "0"))
-        self.TCP_tab.setTabText(
-            self.TCP_tab.indexOf(self.TCP_ROB_tab),
+        self.CONN_ROB_btt_discon.setText(_translate("MainWindow", "DISCONNECT"))
+        self.CONN_ROB_btt_reconn.setText(_translate("MainWindow", "RECONNECT"))
+        self.CONN_ROB_disp_ip.setText(_translate("MainWindow", "0"))
+        self.CONN_ROB_disp_port.setText(_translate("MainWindow", "0"))
+        self.CONN_ROB_disp_rwTo.setText(_translate("MainWindow", "0"))
+        self.CONN_ROB_disp_connTo.setText(_translate("MainWindow", "0"))
+        self.CONN_ROB_disp_bytesToRead.setText(_translate("MainWindow", "0"))
+        self.CONN_ROB_lbl_colon.setText(_translate("MainWindow", ":"))
+        self.CONN_tab.setTabText(
+            self.CONN_tab.indexOf(self.CONN_ROB_tab),
             _translate("MainWindow", "    ROBOT    "),
         )
-        self.TCP_PUMP1_disp_readBuffer.setText(
-            _translate("MainWindow", "nothing received, yet..")
-        )
-        self.TCP_PUMP1_lbl_bytesToRead.setText(
-            _translate("MainWindow", "TCP bytes to read")
-        )
-        self.TCP_PUMP1_disp_tio_rw.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP1_btt_reconn.setText(_translate("MainWindow", "RECONNECT"))
-        self.TCP_PUMP1_lbl_writeBuffer.setText(_translate("MainWindow", "TCP written"))
-        self.TCP_PUMP1_disp_bytesWritten.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP1_disp_writeBuffer.setText(
-            _translate("MainWindow", "nothing send, yet..")
-        )
-        self.TCP_PUMP1_lbl_tio_conn.setText(
-            _translate("MainWindow", "TCP conn timeout")
-        )
-        self.TCP_PUMP1_lbl_tio_rw.setText(_translate("MainWindow", "TCP r/w timeout"))
-        self.TCP_PUMP1_btt_discon.setText(_translate("MainWindow", "DISCONNECT"))
-        self.TCP_PUMP1_lbl_port.setText(_translate("MainWindow", "TCP port"))
-        self.TCP_PUMP1_lbl_readBuffer.setText(_translate("MainWindow", "TCP read"))
-        self.TCP_PUMP1_disp_ip.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP1_lbl_bytesWritten.setText(
-            _translate("MainWindow", "TCP bytes written")
-        )
-        self.TCP_PUMP1_disp_port.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP1_lbl_connected.setText(
+        self.CONN_PUMP1_btt_reconn.setText(_translate("MainWindow", "RECONNECT"))
+        self.CONN_PUMP1_lbl_writeBuffer.setText(_translate("MainWindow", "written"))
+        self.CONN_PUMP1_btt_discon.setText(_translate("MainWindow", "DISCONNECT"))
+        self.CONN_PUMP1_lbl_readBuffer.setText(_translate("MainWindow", "received"))
+        self.CONN_PUMP1_lbl_connected.setText(
             _translate("MainWindow", "CONNECTION\n" "ESTABLISHED")
         )
-        self.TCP_PUMP1_lbl_ip.setText(_translate("MainWindow", "TCP IP"))
-        self.TCP_PUMP1_disp_tio_conn.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP1_disp_bytesToRead.setText(_translate("MainWindow", "0"))
-        self.TCP_tab.setTabText(
-            self.TCP_tab.indexOf(self.TCP_PUMP1_tab),
+        self.CONN_PUMP1_disp_modbId.setText(_translate("MainWindow", "0"))
+        self.CONN_PUMP1_disp_port.setText(_translate("MainWindow", "0"))
+        self.CONN_PUMP1_lbl_port.setText(_translate("MainWindow", "COM port:"))
+        self.CONN_PUMP1_lbl_modbId.setText(_translate("MainWindow", "Modbus ID:"))
+        self.CONN_PUMP1_disp_readBuffer.setText(
+            _translate("MainWindow", "nothing received, yet..")
+        )
+        self.CONN_PUMP1_lbl_bytesWritten.setText(
+            _translate("MainWindow", "bytes written")
+        )
+        self.CONN_PUMP1_lbl_bytesToRead.setText(
+            _translate("MainWindow", "bytes to read")
+        )
+        self.CONN_PUMP1_disp_bytesToRead.setText(_translate("MainWindow", "0"))
+        self.CONN_PUMP1_disp_writeBuffer.setText(
+            _translate("MainWindow", "nothing send, yet..")
+        )
+        self.CONN_PUMP1_disp_bytesWritten.setText(_translate("MainWindow", "0"))
+        self.CONN_tab.setTabText(
+            self.CONN_tab.indexOf(self.CONN_PUMP1_tab),
             _translate("MainWindow", "    PUMP 1    "),
         )
-        self.TCP_PUMP2_lbl_tio_conn.setText(
-            _translate("MainWindow", "TCP conn timeout")
-        )
-        self.TCP_PUMP2_lbl_connected.setText(
-            _translate("MainWindow", "CONNECTION\n" "ESTABLISHED")
-        )
-        self.TCP_PUMP2_disp_tio_conn.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP2_lbl_ip.setText(_translate("MainWindow", "TCP IP"))
-        self.TCP_PUMP2_lbl_tio_rw.setText(_translate("MainWindow", "TCP r/w timeout"))
-        self.TCP_PUMP2_disp_port.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP2_btt_reconn.setText(_translate("MainWindow", "RECONNECT"))
-        self.TCP_PUMP2_disp_bytesToRead.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP2_lbl_bytesWritten.setText(
-            _translate("MainWindow", "TCP bytes written")
-        )
-        self.TCP_PUMP2_lbl_bytesToRead.setText(
-            _translate("MainWindow", "TCP bytes to read")
-        )
-        self.TCP_PUMP2_disp_bytesWritten.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP2_lbl_readBuffer.setText(_translate("MainWindow", "TCP read"))
-        self.TCP_PUMP2_disp_tio_rw.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP2_lbl_port.setText(_translate("MainWindow", "TCP port"))
-        self.TCP_PUMP2_disp_ip.setText(_translate("MainWindow", "0"))
-        self.TCP_PUMP2_lbl_writeBuffer.setText(_translate("MainWindow", "TCP written"))
-        self.TCP_PUMP2_disp_writeBuffer.setText(
+        self.CONN_PUMP2_lbl_writeBuffer.setText(_translate("MainWindow", "written"))
+        self.CONN_PUMP2_disp_writeBuffer.setText(
             _translate("MainWindow", "nothing send, yet..")
         )
-        self.TCP_PUMP2_btt_discon.setText(_translate("MainWindow", "DISCONNECT"))
-        self.TCP_PUMP2_disp_readBuffer.setText(
+        self.CONN_PUMP2_lbl_port.setText(_translate("MainWindow", "COM port:"))
+        self.CONN_PUMP2_lbl_connected.setText(
+            _translate("MainWindow", "CONNECTION\n" "ESTABLISHED")
+        )
+        self.CONN_PUMP2_btt_discon.setText(_translate("MainWindow", "DISCONNECT"))
+        self.CONN_PUMP2_lbl_modbId.setText(_translate("MainWindow", "Modbus ID:"))
+        self.CONN_PUMP2_disp_readBuffer.setText(
             _translate("MainWindow", "nothing received, yet..")
         )
-        self.TCP_tab.setTabText(
-            self.TCP_tab.indexOf(self.TCP_PUMP2_tab),
+        self.CONN_PUMP2_btt_reconn.setText(_translate("MainWindow", "RECONNECT"))
+        self.CONN_PUMP2_lbl_readBuffer.setText(_translate("MainWindow", "received"))
+        self.CONN_PUMP2_disp_modbId.setText(_translate("MainWindow", "0"))
+        self.CONN_PUMP2_disp_port.setText(_translate("MainWindow", "0"))
+        self.CONN_PUMP2_disp_bytesToRead.setText(_translate("MainWindow", "0"))
+        self.CONN_PUMP2_lbl_bytesToRead.setText(
+            _translate("MainWindow", "bytes to read")
+        )
+        self.CONN_PUMP2_disp_bytesWritten.setText(_translate("MainWindow", "0"))
+        self.CONN_PUMP2_lbl_bytesWritten.setText(
+            _translate("MainWindow", "bytes written")
+        )
+        self.CONN_tab.setTabText(
+            self.CONN_tab.indexOf(self.CONN_PUMP2_tab),
             _translate("MainWindow", "    PUMP 2    "),
         )
-        self.TCP_MIXER_btt_reconn.setText(_translate("MainWindow", "RECONNECT"))
-        self.TCP_MIXER_lbl_writeBuffer.setText(_translate("MainWindow", "TCP written"))
-        self.TCP_MIXER_lbl_port.setText(_translate("MainWindow", "TCP port"))
-        self.TCP_MIXER_lbl_tio_conn.setText(
-            _translate("MainWindow", "TCP conn timeout")
-        )
-        self.TCP_MIXER_disp_tio_rw.setText(_translate("MainWindow", "0"))
-        self.TCP_MIXER_lbl_readBuffer.setText(_translate("MainWindow", "TCP read"))
-        self.TCP_MIXER_disp_bytesWritten.setText(_translate("MainWindow", "0"))
-        self.TCP_MIXER_disp_tio_conn.setText(_translate("MainWindow", "0"))
-        self.TCP_MIXER_lbl_ip.setText(_translate("MainWindow", "TCP IP"))
-        self.TCP_MIXER_lbl_tio_rw.setText(_translate("MainWindow", "TCP r/w timeout"))
-        self.TCP_MIXER_disp_ip.setText(_translate("MainWindow", "0"))
-        self.TCP_MIXER_lbl_bytesToRead.setText(
-            _translate("MainWindow", "TCP bytes to read")
-        )
-        self.TCP_MIXER_disp_bytesToRead.setText(_translate("MainWindow", "0"))
-        self.TCP_MIXER_btt_discon.setText(_translate("MainWindow", "DISCONNECT"))
-        self.TCP_MIXER_lbl_connected.setText(
+        self.CONN_PRH_btt_reconn.setText(_translate("MainWindow", "RECONNECT"))
+        self.CONN_PRH_lbl_writeBuffer.setText(_translate("MainWindow", "written"))
+        self.CONN_PRH_lbl_readBuffer.setText(_translate("MainWindow", "received"))
+        self.CONN_PRH_disp_bytesWritten.setText(_translate("MainWindow", "0"))
+        self.CONN_PRH_lbl_bytesToRead.setText(_translate("MainWindow", "bytes to read"))
+        self.CONN_PRH_disp_bytesToRead.setText(_translate("MainWindow", "0"))
+        self.CONN_PRH_btt_discon.setText(_translate("MainWindow", "DISCONNECT"))
+        self.CONN_PRH_lbl_connected.setText(
             _translate("MainWindow", "CONNECTION\n" "ESTABLISHED")
         )
-        self.TCP_MIXER_disp_writeBuffer.setText(
+        self.CONN_PRH_disp_writeBuffer.setText(
             _translate("MainWindow", "nothing send, yet..")
         )
-        self.TCP_MIXER_disp_readBuffer.setText(
+        self.CONN_PRH_disp_readBuffer.setText(
             _translate("MainWindow", "nothing received, yet..")
         )
-        self.TCP_MIXER_disp_port.setText(_translate("MainWindow", "0"))
-        self.TCP_MIXER_lbl_bytesWritten.setText(
-            _translate("MainWindow", "TCP bytes written")
+        self.CONN_PRH_lbl_bytesWritten.setText(
+            _translate("MainWindow", "bytes written")
         )
-        self.TCP_tab.setTabText(
-            self.TCP_tab.indexOf(self.TCP_MIXER_tab),
-            _translate("MainWindow", "    MIXER    "),
+        self.CONN_PRH_lbl_colon.setText(_translate("MainWindow", ":"))
+        self.CONN_PRH_disp_port.setText(_translate("MainWindow", "0"))
+        self.CONN_PRH_lbl_ip.setText(_translate("MainWindow", "TCP IP"))
+        self.CONN_PRH_disp_ip.setText(_translate("MainWindow", "0"))
+        self.CONN_PRH_lbl_port.setText(_translate("MainWindow", "TCP port"))
+        self.CONN_tab.setTabText(
+            self.CONN_tab.indexOf(self.CONN_PRH_tab),
+            _translate("MainWindow", "    PRINTHEAD    "),
         )
-        self.TCP_lbl_commForerun.setText(_translate("MainWindow", "COMM FORERUN"))
-        self.TCP_lbl_qProcessing.setText(
+        self.CONN_lbl_commForerun.setText(_translate("MainWindow", "COMM FORERUN"))
+        self.CONN_lbl_qProcessing.setText(
             _translate("MainWindow", "QUEUE\n" "PROCESSING")
         )
         self.SIB_0_frameLabel.setText(_translate("MainWindow", "SIB"))
@@ -5382,10 +5242,9 @@ class Ui_MainWindow(object):
         self.SID_disp_robID.setText(_translate("MainWindow", "0"))
         self.SID_disp_progID.setText(_translate("MainWindow", "0"))
         self.SID_lbl_progID.setText(_translate("MainWindow", "SC ID"))
-        self.SID_btt_robToProgID.setText(
-            _translate("MainWindow", "ROBOT ID   🡆  SCRIPT ID")
-        )
-        self.SID_btt_scIdPlus1.setText(_translate("MainWindow", "+ 1"))
+        self.SID_btt_overwrite.setText(_translate("MainWindow", "OVERWRITE"))
+        self.DC_0_notice_2.setText(_translate("MainWindow", "current"))
+        self.DC_0_notice_3.setText(_translate("MainWindow", "new"))
         self.ZERO_0_frameLabel.setText(_translate("MainWindow", "ZERO POSITION"))
         self.ZERO_disp_z.setText(_translate("MainWindow", "0.0"))
         self.ZERO_lbl_y_disp.setText(_translate("MainWindow", "Y"))

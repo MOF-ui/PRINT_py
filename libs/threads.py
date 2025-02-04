@@ -140,7 +140,7 @@ class PumpCommWorker(QObject):
 
         # SEND TO MIXER
         if du.PRH_connected and du.MIX_last_speed != du.MIX_speed:
-            if du.MIX_act_with_pump:
+            if du.PRH_act_with_pump:
                 mixer_speed = pmp_speed * du.MIX_max_speed / 100.0
             else:
                 mixer_speed = du.MIX_speed
@@ -343,7 +343,7 @@ class RoboCommWorker(QObject):
 
             # reset robMoving indicator if near end, skip if queue is processed
             if du.DC_rob_moving and not du.SC_q_processing:
-                check_dist = self.check_zero_dist()
+                check_dist = self._check_zero_dist()
                 if check_dist is not None:
                     if check_dist < 1:
                         self.endDcMoving.emit()
@@ -361,7 +361,7 @@ class RoboCommWorker(QObject):
         # if qProcessing is ending, define end as being in 1mm range of
         # the last robtarget
         if du.SC_q_prep_end:
-            check_dist = self.check_zero_dist()
+            check_dist = self._check_zero_dist()
             if check_dist is not None:
                 if check_dist < 1:
                     self.endProcessing.emit()
@@ -395,9 +395,7 @@ class RoboCommWorker(QObject):
 
         # send commands until send_list is empty
         while len(du.ROB_send_list) > 0:
-            comm_tuple = du.ROB_send_list.pop(0)
-            Comm = comm_tuple[0]
-            direct_ctrl = comm_tuple[1]
+            Comm, direct_ctrl = du.ROB_send_list.pop(0)
 
             # check for type, ID overflow & live adjustments to tcp speed
             if not isinstance(Comm, du.QEntry):
@@ -446,7 +444,7 @@ class RoboCommWorker(QObject):
                 self.sendElem.emit(Comm, res, num_send, direct_ctrl)
 
 
-    def check_zero_dist(self) -> float | None:
+    def _check_zero_dist(self) -> float | None:
         """calculates distance between next entry in ROB_commQueue and current
         position; calculates 4 dimensional only to account for external axis
         movement (0,0,0,1) 
@@ -744,7 +742,7 @@ class IPCamWorker(QObject):
         given URLs"""
 
         for url in du.CAM_urls:
-            self.cam_streams.append(cv2.VideoCapture(url, cv2.CAP_FFMPEG))
+            self.cam_streams.append(cv2.VideoCapture(url, cv2.CAP_FFMPEG,))
         
         self.CapTimer = QTimer()
         self.CapTimer.setInterval(250)

@@ -21,7 +21,11 @@ sys.path.append(parent_dir)
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
 
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
-from ui.UI_dialogs import Ui_Dialog, Ui_FileDialog, Ui_ConnDialog
+from ui.UI_connDialog import Ui_CONN
+from ui.UI_strdDialog import Ui_Dialog
+
+# import my own libs
+import libs.data_utilities as du
 
 
 
@@ -35,20 +39,24 @@ class StandardDialog(QDialog, Ui_Dialog):
     def __init__(self, text='', title='default window', parent=None) -> None:
 
         super().__init__(parent)
-
         self.setupUi(self)
         self.label.setText(text)
         self.setWindowTitle(title)
 
 
 
-class FileDialog(QFileDialog, Ui_FileDialog):
+class FileDialog(QFileDialog):
     """file dialog for print file loading"""
+
+    def setupUi(self, Dialog):
+        if not Dialog.objectName():
+            Dialog.setObjectName("Dialog")
+        Dialog.resize(1000, 620)
+
 
     def __init__(self, title='default window', parent=None) -> None:
 
         super().__init__(parent)
-
         self.setupUi(self)
         self.setWindowTitle(title)
         self.setFileMode(1)  # enum for 'ExistingFile'
@@ -76,90 +84,77 @@ class FileDialog(QFileDialog, Ui_FileDialog):
 
 
 
-class ConnDialog(QDialog, Ui_ConnDialog):
+class ConnDialog(QDialog, Ui_CONN):
     """default dialog class to costumize connection settings"""
 
-    def_rob_tcp = None
-    def_pump1_tcp = None
-    def_pump2_tcp = None
-
-    set_rob_tcp = None
-    set_pump1_tcp = None
-    set_pump2_tcp = None
-    set_p1_conn = None
-    set_p2_conn = None
+    rob_set = {}
+    p_com = None
+    prh_url = None
+    db_url = None
+    dev_available = False
 
     def __init__(
         self,
-        title='default window',
-        rob_def=None,
-        pump1_def=None,
-        pump2_def=None,
+        title='Connection Dialog',
         parent=None,
     ) -> None:
 
         super().__init__(parent)
-
         self.setupUi(self)
         self.setWindowTitle(title)
 
-        if rob_def is None or pump1_def is None or pump2_def is None:
-            self.close()
-        else:
-            self.def_rob_tcp = rob_def
-            self.def_pump1_tcp = pump1_def
-            self.def_pump2_tcp = pump2_def
-            self.set_default()
-            self.TCP_btt_default.pressed.connect(self.set_default)
-            self.buttonBox.accepted.connect(self.safe_settings)
+        self.set_default()
+        self.CONN_btt_default.pressed.connect(self.set_default)
+        self.CONN_bttbox.accepted.connect(self.safe_settings)
 
     def set_default(self) -> None:
-        self.TCP_ROB_entry_ip.setText(str(self.def_rob_tcp['IP']))
-        self.TCP_ROB_entry_port.setText(str(self.def_rob_tcp['PORT']))
-        self.TCP_ROB_num_tio_conn.setValue(int(self.def_rob_tcp['C_TOUT']))
-        self.TCP_ROB_num_bytesToRead.setValue(int(self.def_rob_tcp['R_BL']))
-        self.TCP_ROB_num_tio_rw.setValue(int(self.def_rob_tcp['RW_TOUT']))
-
-        self.TCP_PUMP1_entry_ip.setText(str(self.def_pump1_tcp['IP']))
-        self.TCP_PUMP1_entry_port.setText(str(self.def_pump1_tcp['PORT']))
-        self.TCP_PUMP1_num_tio_conn.setValue(int(self.def_pump1_tcp['C_TOUT']))
-        self.TCP_PUMP1_num_bytesToRead.setValue(int(self.def_pump1_tcp['R_BL']))
-        self.TCP_PUMP1_num_tio_rw.setValue(int(self.def_pump1_tcp['RW_TOUT']))
-
-        self.TCP_PUMP2_entry_ip.setText(str(self.def_pump2_tcp['IP']))
-        self.TCP_PUMP2_entry_port.setText(str(self.def_pump2_tcp['PORT']))
-        self.TCP_PUMP2_num_tio_conn.setValue(int(self.def_pump2_tcp['C_TOUT']))
-        self.TCP_PUMP2_num_bytesToRead.setValue(int(self.def_pump2_tcp['R_BL']))
-        self.TCP_PUMP2_num_tio_rw.setValue(int(self.def_pump2_tcp['RW_TOUT']))
+        # ROBOT
+        self.ROB_entry_ip.setText(du.DEF_ROB_TCP['ip'])
+        self.ROB_entry_port.setText(str(du.DEF_ROB_TCP['port']))
+        self.ROB_num_connTo.setValue(du.DEF_ROB_TCP['c_tout'])
+        self.ROB_num_rwTo.setValue(du.DEF_ROB_TCP['rw_tout'])
+        # PMPs
+        self.P1_entry_port.setText(du.DEF_PUMP_SERIAL['port'])
+        self.P2_entry_port.setText(du.DEF_PUMP_SERIAL['port'])
+        # PRH
+        ip, port = du.PRH_url.split(':')
+        self.PRH_entry_ip.setText(ip)
+        self.PRH_entry_port.setText(port)
+        # DB
+        ip, port = du.DB_url.split(':')
+        self.DB_entry_ip.setText(ip)
+        self.DB_entry_port.setText(port)
 
     def safe_settings(self) -> None:
-        self.set_rob_tcp = {}
-        self.set_pump1_tcp = {}
-        self.set_pump2_tcp = {}
-
-        self.set_p1_conn = self.TCP_PUMP1_connDef.isChecked()
-        self.set_p2_conn = self.TCP_PUMP2_connDef.isChecked()
-
-        self.set_rob_tcp['IP'] = self.TCP_ROB_entry_ip.text()
-        self.set_rob_tcp['PORT'] = self.TCP_ROB_entry_port.text()
-        self.set_rob_tcp['C_TOUT'] = self.TCP_ROB_num_tio_conn.value() / 1000
-        self.set_rob_tcp['R_BL'] = self.TCP_ROB_num_bytesToRead.value()
-        self.set_rob_tcp['RW_TOUT'] = self.TCP_ROB_num_tio_rw.value() / 1000
-        self.set_rob_tcp['W_BL'] = self.def_rob_tcp['W_BL']
-
-        self.set_pump1_tcp['IP'] = self.TCP_PUMP1_entry_ip.text()
-        self.set_pump1_tcp['PORT'] = self.TCP_PUMP1_entry_port.text()
-        self.set_pump1_tcp['C_TOUT'] = self.TCP_PUMP1_num_tio_conn.value() / 1000
-        self.set_pump1_tcp['R_BL'] = self.TCP_PUMP1_num_bytesToRead.value()
-        self.set_pump1_tcp['RW_TOUT'] = self.TCP_PUMP1_num_tio_rw.value() / 1000
-        self.set_pump1_tcp['W_BL'] = self.def_pump2_tcp['W_BL']
-
-        self.set_pump2_tcp['IP'] = self.TCP_PUMP2_entry_ip.text()
-        self.set_pump2_tcp['PORT'] = self.TCP_PUMP2_entry_port.text()
-        self.set_pump2_tcp['C_TOUT'] = self.TCP_PUMP2_num_tio_conn.value() / 1000
-        self.set_pump2_tcp['R_BL'] = self.TCP_PUMP2_num_bytesToRead.value()
-        self.set_pump2_tcp['RW_TOUT'] = self.TCP_PUMP2_num_tio_rw.value() / 1000
-        self.set_pump2_tcp['W_BL'] = self.def_pump2_tcp['W_BL']
+        # availablity
+        rob = self.ROB_chk_available.isChecked()
+        p1 = self.P1_chk_available.isChecked()
+        p2 = self.P2_chk_available.isChecked()
+        prh = self.PRH_chk_available.isChecked()
+        db = self.DB_chk_available.isChecked()
+        self.dev_available = rob<<4 | p1 <<3 | p2 <<2 | prh<<1 | db
+        # ROBOT
+        self.rob_set['ip'] = self.ROB_entry_ip.text()
+        self.rob_set['port'] = self.ROB_entry_port.text()
+        self.rob_set['c_tout'] = self.ROB_num_connTo.value() / 1000
+        self.rob_set['rw_tout'] = self.ROB_num_rwTo.value() / 1000
+        self.rob_set['r_bl'] = du.DEF_ROB_TCP['r_bl']
+        self.rob_set['w_bl'] = du.DEF_ROB_TCP['w_bl']
+        # PMPs
+        p_port = self.P1_entry_port.text()
+        if p_port != self.P2_entry_port.text():
+            raise ValueError('Please connect both P20 to the same port')
+        else:
+            self.p_com = p_port
+        # PRINTHEAD
+        self.prh_url = (
+            f"http://{self.PRH_entry_ip.text}:{self.PRH_entry_port.text}"
+        )
+        # PRINTHEAD
+        self.DB_url = (
+            f"http://{self.DB_entry_ip.text}:{self.DB_entry_port.text}"
+        )
+        
 
 
 
@@ -168,7 +163,7 @@ class ConnDialog(QDialog, Ui_ConnDialog):
 
 def strd_dialog(
         usr_text='you forgot to set a text, dummy',
-        usr_title='default window',
+        usr_title='default dialog',
         standalone=False,
 ) -> StandardDialog | int:
     """shows a dialog window, text and title can be set, returns the 
@@ -176,18 +171,13 @@ def strd_dialog(
     """
 
     if standalone:
-        # leave that here so app doesnt include the remnant of a previous
-        # QApplication instance
         strd_dialog_app = 0
         strd_dialog_app = QApplication(sys.argv)
-
     strd_dialog_win = StandardDialog(text=usr_text, title=usr_title)
-
     if standalone:
         strd_dialog_win.show()
         strd_dialog_app.exec()
         # sys.exit(app.exec())
-
         return strd_dialog_win.result()
 
     return strd_dialog_win
@@ -202,60 +192,42 @@ def file_dialog(
     """
 
     if standalone:
-        # leave that here so app doesnt include the remnant of a previous QApplication instance
         file_dialog_app = 0
         file_dialog_app = QApplication(sys.argv)
-
     file_dialog_win = FileDialog(title=usr_title)
-
     if standalone:
         file_dialog_win.show()
         file_dialog_app.exec()
         # sys.exit(app.exec())
-
         return file_dialog_win.selectedFiles()
 
     return file_dialog_win
 
 
 def conn_dialog(
-        rob:dict,
-        p1:dict,
-        p2:dict,
         title='default window',
         standalone=False
-) -> ConnDialog | dict:
+) -> ConnDialog | list:
     """shows a dialog with robots and pumps connection setting, IPs, ports,
     etc. can be set, user can choose if to connect the pumps right away,
     returns the users settings
     """
 
     if standalone:
-        # leave that here so app doesnt include the remnant of a previous
-        # QApplication instance
         conn_dialog_app = 0
         conn_dialog_app = QApplication(sys.argv)
-
-    conn_dialog_win = ConnDialog(
-        title=title,
-        rob_def=rob,
-        pump1_def=p1,
-        pump2_def=p2)
-
+    conn_dialog_win = ConnDialog(title=title)
     if standalone:
         conn_dialog_win.show()
         conn_dialog_app.exec()
         # sys.exit(app.exec())
-
-        ret_dict = {
-            'result': int(conn_dialog_win.result()),
-            'rob_tcp': conn_dialog_win.set_rob_tcp,
-            'p1_tcp': conn_dialog_win.set_pump1_tcp,
-            'p2_tcp': conn_dialog_win.set_pump2_tcp,
-            'p1_connect': bool(conn_dialog_win.set_p1_conn),
-            'p2_connect': bool(conn_dialog_win.set_p2_conn),
-        }
-
-        return ret_dict
+        return [
+            conn_dialog_win.result(),
+            conn_dialog_win.dev_available,
+            conn_dialog_win.rob_set,
+            conn_dialog_win.p_com,
+            conn_dialog_win.prh_url,
+            conn_dialog_win.db_url,
+        ]
 
     return conn_dialog_win

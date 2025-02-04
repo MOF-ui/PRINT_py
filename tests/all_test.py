@@ -7,11 +7,11 @@ import os
 import sys
 import unittest
 
-# comment out tests you dont want to run here
-from data_utilities_test import DataLibTest
-from func_utilities_test import FuncLibTest
-from win_mainframe_test import MainframeWinTest
-from pump_utilities_test import PumpLibTest
+# comment out tests you dont want to run he<re
+from tests.data_utilities_test import DataLibTest
+from tests.func_utilities_test import FuncLibTest
+from tests.win_mainframe_test import MainframeWinTest
+from tests.pump_utilities_test import PumpLibTest
 from tests.threads_test import ThreadsTest
 
 # appending the parent directory path
@@ -33,5 +33,6 @@ import libs.win_daq
 import libs.win_dialogs
 import libs.win_mainframe
 
-# run unittests
-unittest.main()
+if __name__ == '__main__':
+    # run unittests
+    unittest.main()
