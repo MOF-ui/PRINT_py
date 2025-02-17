@@ -208,11 +208,16 @@ def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
         pass
 
     # set tool settings
-    if 'TOOL' in txt:
-        entry.Tool.wait = True
-        entry.Tool.load_spring = int(
-            du.TOOL_fib_ratio * du.DEF_TOOL_FIB_STPS
-        )
+    troll_steps = re_short(None, txt, None, find_coor='TT')
+    entry.Tool.trolley_steps = int(troll_steps * du.TOOL_trol_ratio)
+    clamp = re_short(None, txt, None, find_coor='TCL')
+    entry.Tool.clamp = int(clamp)
+    cut = re_short(None, txt, None, find_coor='TCU')
+    entry.Tool.cut = int(cut)
+    place_spring = re_short(None, txt, None, find_coor='TPS')
+    entry.Tool.place_spring = int(place_spring)
+    load_spring = re_short(None, txt, None, find_coor='TLS')
+    entry.Tool.load_spring = int(load_spring)
     
     return entry
 
@@ -357,7 +362,7 @@ def gcode_to_qentry(
     return entry, command
 
 
-def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception:
+def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
     """converts a single line of MoveL, MoveJ, MoveC or Move* Offs command 
     (no Reltool) to a QEntry (relative to DC_curr_zero for 'Offs'), can be
     used in loops for multiline code, returns entry or any Exceptions, 
@@ -371,44 +376,36 @@ def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception:
 
     # if no movement-type command is given, return None
     try:
-        entry.mt = re.findall('Move[J,L,C]', txt, 0)[0][4]
+        entry.mt = re.findall('Move([J,L,C])', txt, 0)[0]
     except IndexError:
         return None
     
-    ext = re_short(None, txt, None, find_coor='EXT')
-    if ext is None:
-        return None # to-do: add missing value handler
-    
     # otherwise try to decode
-    # re matches '12', '12.3' or '12.34'
+    # re matches '12', '-12.3' or '12.34'
     num_regex = '-?\d+\.?[\d+]*'
     # but only if they follow a '[' or ','
     regex = f"[\[,]({num_regex})" 
     decimals = re.findall(regex, txt)
+    
     try:
-        ext = float(ext)
-
         # look for relative coordinates
         if 'Offs' in txt:
             res_coor = [
-                du.DCCurrZero.x,
-                du.DCCurrZero.y,
-                du.DCCurrZero.z,
+                du.DCCurrZero.x + float(decimals[0]),
+                du.DCCurrZero.y + float(decimals[1]),
+                du.DCCurrZero.z + float(decimals[2]),
                 du.DCCurrZero.rx,
                 du.DCCurrZero.ry,
                 du.DCCurrZero.rz,
                 du.DCCurrZero.q,
             ]
-            for i in range(3):
-                res_coor[i] += float(decimals[i])
-            ext += du.DCCurrZero.ext
+            ext = du.DCCurrZero.ext
 
         # or standard robtarget
         else:
+            ext = 0.0
             entry.pt = 'Q'
-            res_coor = []
-            for i in range(7):
-                res_coor.append(float(decimals[i]))
+            res_coor = [float(decimals[i]) for i in range(7)]
 
         speed_regex = f"{num_regex},{num_regex},{num_regex},{num_regex}\],z"
         res_speed = re.findall(speed_regex, txt)[0]
@@ -421,7 +418,16 @@ def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception:
         entry.Coor1.ry = res_coor[4]
         entry.Coor1.rz = res_coor[5]
         entry.Coor1.q = res_coor[6]
-        entry.Coor1.ext = ext
+        ext_from_file = re_short(None, txt, None, find_coor='EXT')
+        if ext_from_file is None:
+            if ext_trail:
+                ext_from_file = (
+                    int(entry.Coor1.x / du.SC_ext_fllw_bhvr[0])
+                    * du.SC_ext_fllw_bhvr[1]
+                )
+        else:
+            ext_from_file = float(ext_from_file)
+        entry.Coor1.ext = ext + ext_from_file
 
         # converting '1.2'-like strings to int throws an error
         # convert to float first
@@ -429,7 +435,6 @@ def rapid_to_qentry(txt:str) -> du.QEntry | None | Exception:
         entry.Speed.ors = int(float(res_speed[1]))
         entry.Speed.acr = int(float(res_speed[2]))
         entry.Speed.dcr = int(float(res_speed[3]))
-
         zone = re_short(['z\d+'], txt, du.IO_zone)
         entry.z = int(zone[1:])
 

@@ -692,7 +692,7 @@ class LoadFileWorker(QObject):
     def rapid_conv(self, id:int, txt:str) -> du.QEntry | None | Exception:
         """single line conversion from RAPID"""
 
-        Entry = fu.rapid_to_qentry(txt)
+        Entry = fu.rapid_to_qentry(txt, lfw_ext_trail)
         if isinstance(Entry, Exception) or Entry is None:
             return Entry
 

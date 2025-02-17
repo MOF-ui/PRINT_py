@@ -1817,8 +1817,7 @@ DEF_SC_MAX_LINES = 400
 DEF_SC_VOL_PER_M = 0.4  # [L/m] calculated for 1m of 4cm x 1cm high filament
 DEF_STT_VALID_TIME = 60 # [seconds]
 DEF_TERM_MAX_LINES = 300
-DEF_TOOL_FIB_RATIO = 1.0
-DEF_TOOL_FIB_STPS = 10
+DEF_TOOL_TROL_RATIO = 500
 DEF_WD_TIMEOUT = 10000 # [ms]
 
 
@@ -1846,7 +1845,7 @@ SCBreakPoint = Coordinate() # to-do: write routine to stop at predefined point d
 SCQueue = Queue()
 STTDataBlock = DaqBlock()
 TERM_log = []
-TOOL_fib_ratio = DEF_TOOL_FIB_RATIO
+TOOL_trol_ratio = DEF_TOOL_TROL_RATIO
 
 # DATABASE SETTINGS
 DB_log_interval = 10
