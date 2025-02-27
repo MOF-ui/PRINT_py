@@ -57,7 +57,7 @@ def stt_update() -> None:
             print("OSError in stt_update, last package lost..")
             toggle = 0
             break
-        sleep(0.1)
+        sleep(0.5)
 
 
 def usr_input():

@@ -489,7 +489,7 @@ class QEntry:
         sc='V',
         z=10,
         Tool=None,
-        p_mode=None,
+        p_mode=-1001, # -1001 is indicator for 'no p_mode given'
         p_ratio=1.0,
     ) -> None:
 
@@ -499,7 +499,7 @@ class QEntry:
         self.sbt = int(sbt)
         self.sc = str(sc)
         self.z = int(z)
-        self.p_mode = str(p_mode)
+        self.p_mode = int(p_mode)
         self.p_ratio = float(p_ratio)
 
         # handle those beasty mutables
@@ -1712,9 +1712,9 @@ class RobConnection(TCPIP):
                 # as no other usage makes sense
                 entry.Tool.cut,
                 0,
-                entry.Tool.cut,
-                0,
                 entry.Tool.load_spring,
+                0,
+                entry.Tool.cut,
                 0,
                 entry.Tool.place_spring,
                 0,
@@ -1784,6 +1784,14 @@ DEF_PUMP_SERIAL = {
     'port': 'COM3',
 }
 DEF_PUMP_OUTP_RATIO = 1.0
+DEF_PUMP_VALID_COMMANDS = [
+    -1001, # = no p_mode
+    1001, # default mode
+    1002, # start profile
+    1003, # end profile
+    1101, # class 1 profile
+    1102, # class 2 profile
+]
 
 # ROBOT DEFAULT SETTINGS
 DEF_ROB_BUFF_SIZE = 3000

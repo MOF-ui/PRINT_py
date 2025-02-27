@@ -191,32 +191,27 @@ def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
     
     # set pump settings
     p_mode = re_short(None, txt, None, find_coor='PMP')
-    match p_mode:
-        case '1': entry.p_mode = 'default'
-        case '2': entry.p_mode = 'class1'
-        case '3': entry.p_mode = 'class2'
-        case '10': entry.p_mode = 'start'
-        case '11': entry.p_mode = 'end'
-        case _: entry.p_mode = 'None'
+    p_mode = int(float(p_mode))
+    if -100 <= p_mode <= 100 or p_mode in du.DEF_PUMP_VALID_COMMANDS:
+        entry.p_mode = p_mode
+    else:
+        p_mode = -1001 # = no pump mode given
     p_ratio = re_short(None, txt, None, find_coor='PR')
-    try:
-        p_ratio = float(p_ratio)
-        if p_ratio > 1.0: p_ratio = 1.0
-        if p_ratio < 0: p_ratio = 0.0
-        entry.p_ratio = p_ratio
-    except:
-        pass
+    p_ratio = float(p_ratio)
+    if p_ratio > 1.0: p_ratio = 1.0
+    if p_ratio < 0: p_ratio = 0.0
+    entry.p_ratio = p_ratio
 
     # set tool settings
-    troll_steps = re_short(None, txt, None, find_coor='TT')
+    troll_steps = re_short(None, txt, 0, find_coor='TT')
     entry.Tool.trolley_steps = int(troll_steps * du.TOOL_trol_ratio)
-    clamp = re_short(None, txt, None, find_coor='TCL')
+    clamp = re_short(None, txt, 0, find_coor='TCL')
     entry.Tool.clamp = int(clamp)
-    cut = re_short(None, txt, None, find_coor='TCU')
+    cut = re_short(None, txt, 0, find_coor='TCU')
     entry.Tool.cut = int(cut)
-    place_spring = re_short(None, txt, None, find_coor='TPS')
+    place_spring = re_short(None, txt, 0, find_coor='TPS')
     entry.Tool.place_spring = int(place_spring)
-    load_spring = re_short(None, txt, None, find_coor='TLS')
+    load_spring = re_short(None, txt, 0, find_coor='TLS')
     entry.Tool.load_spring = int(load_spring)
     
     return entry

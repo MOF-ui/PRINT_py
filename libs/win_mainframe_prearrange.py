@@ -97,7 +97,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self._RobRecvWd = Watchdog(True, 'Robot', 'ROBTcp', 'ROB')
         self._P1RecvWd = Watchdog(True, 'Pump 1', 'PMP1Serial', 'P1')
         self._P2RecvWd = Watchdog(True, 'Pump 2', 'PMP2Serial', 'P2')
-        self._PRHRecvWd = Watchdog(True, 'Printhead', 'PRH_connected', 'PRH')
+        self._PRHRecvWd = Watchdog(False, 'Printhead', 'PRH_connected', 'PRH')
 
         # GROUP PANEL ELEMENTS
         self.group_elems()
@@ -426,7 +426,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.CONN_PUMP2_disp_port.setText(du.PMP_port)
         self.CONN_PUMP2_disp_modbId.setText(du.PMP2_modbus_id)
         # PRH
-        ip, port = du.PRH_url.split(':')
+        _, ip, port = du.PRH_url.split(':')
         self.CONN_PRH_disp_ip.setText(ip)
         self.CONN_PRH_disp_port.setText(port)
 
@@ -514,7 +514,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             displays[0].setText(str(command))
             displays[1].setText(str(len(command)))
             displays[2].setText(str(ans))
-            displays[3].setText(str(len(ans)))
+            ans_len = 4 if isinstance(ans, int) else 0
+            # sys.getsizeof(int) returns 28, because of python and objects 
+            # and stuff so I will just hard code it
+            displays[3].setText(str(ans_len))
 
             self.log_entry(
                 f"PMP{p_num}", f"speed set to {speed}, command: {command}"

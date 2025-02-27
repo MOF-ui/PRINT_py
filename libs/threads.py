@@ -43,7 +43,7 @@ class PumpCommWorker(QObject):
     p1Active = pyqtSignal()
     p2Active = pyqtSignal()
     dataRecv = pyqtSignal(du.PumpTelemetry, str)
-    PRHDisconnect = pyqtSignal(int)
+    prhActive = pyqtSignal()
     dataSend = pyqtSignal(int, str, int, str)
     dataMixerSend = pyqtSignal(float)
     logEntry = pyqtSignal(str, str)
@@ -88,11 +88,10 @@ class PumpCommWorker(QObject):
         1.0, pump1_speed would otherwise be 200.
         """
 
-        p_ratio = du.PMP_output_ratio
         if du.SC_q_processing:
             total_speed, p_ratio = pu.calc_speed()
         else: 
-            total_speed = du.PMP_speed
+            total_speed, p_ratio = du.PMP_speed, du.PMP_output_ratio
 
         # get speed
         if du.PMP1Serial.connected and du.PMP2Serial.connected:
@@ -141,7 +140,7 @@ class PumpCommWorker(QObject):
         # SEND TO MIXER
         if du.PRH_connected and du.MIX_last_speed != du.MIX_speed:
             if du.PRH_act_with_pump:
-                mixer_speed = pmp_speed * du.MIX_max_speed / 100.0
+                mixer_speed = du.MIX_max_speed * pmp_speed / 100.0
             else:
                 mixer_speed = du.MIX_speed
             
@@ -160,7 +159,7 @@ class PumpCommWorker(QObject):
         from pump, pass to mainframe
         """
 
-        # for serial,dummy in [(du.PMP1Serial, None),(du.PMP2Serial, None)]:
+        # for serial,_ in [(du.PMP1Serial, None),(du.PMP2Serial, None)]:
         #     if serial.connected:
         #         print(f"P2 freq: {serial.frequency}")
 
@@ -201,13 +200,8 @@ class PumpCommWorker(QObject):
         # RECEIVE FROM PRINTHEAD (just ping to check)
         if du.PRH_connected:
             ping_resp = requests.get(f"{du.PRH_url}/ping")
-            if not ping_resp.ok or ping_resp.text != 'ack':
-                # retry
-                for i in range(3):
-                    ping_resp = requests.get(f"{du.PRH_url}/ping")
-                    if ping_resp.ok and ping_resp.text == 'ack':
-                        return
-                self.PRHDisconnect.emit()
+            if ping_resp.ok and ping_resp.text == 'ack':
+                self.prhActive.emit()
 
 
 

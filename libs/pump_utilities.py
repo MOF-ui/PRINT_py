@@ -36,7 +36,7 @@ def calc_speed() -> tuple[int | None, float]:
     global preceeding_speed
     global last_speed
 
-    p_mode = 'None'
+    p_mode = -1001 # = no p_mode given
     p_ratio = 1.0
     try:
         curr_comm = du.ROBCommQueue[0]
@@ -51,23 +51,24 @@ def calc_speed() -> tuple[int | None, float]:
             preceeding_comm = copy.deepcopy(curr_comm)
             preceeding_speed = last_speed
 
-    match p_mode:
-        case 'None':
-            speed = du.PMP_speed
-        case 'default':
-            speed = default_mode(command=curr_comm)
-        case 'start':
-            speed = profile_mode(command=curr_comm, profile=START_SUPP_PTS)
-        case 'end':
-            speed = profile_mode(command=curr_comm, profile=END_SUPP_PTS)
-        case 'class1':
-            speed = du.DEF_PUMP_CLASS1
-        case 'class2':
-            speed = du.DEF_PUMP_CLASS2
-        case 'zero':
-            speed = 0
-        case _:
-            speed = 0
+    if p_mode in du.DEF_PUMP_VALID_COMMANDS:
+        match p_mode:
+            case -1001:
+                speed = du.PMP_speed
+            case 1001:
+                speed = default_mode(command=curr_comm)
+            case 1002:
+                speed = profile_mode(command=curr_comm, profile=START_SUPP_PTS)
+            case 1003:
+                speed = profile_mode(command=curr_comm, profile=END_SUPP_PTS)
+            case 1101:
+                speed = du.DEF_PUMP_CLASS1
+            case 1102:
+                speed = du.DEF_PUMP_CLASS2
+            case _:
+                speed = 0
+    else:
+        speed = p_mode
 
     # check value domain for speed
     if speed is None:

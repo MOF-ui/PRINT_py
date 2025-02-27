@@ -46,7 +46,6 @@ from libs.win_dialogs import strd_dialog, conn_dialog
 from libs.win_mainframe import Mainframe
 import libs.data_utilities as du
 import libs.func_utilities as fu
-import tests.all_test as full_test
 
 
 #######################    COMMAND LINE ARGUMENTS    #########################
@@ -58,6 +57,7 @@ if arg_len == 2:
     arg1 = sys.argv[1]
     match arg1:
         case 'test':
+            import tests.all_test as full_test
             full_test()
             exit()
         case 'local':

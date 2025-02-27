@@ -391,27 +391,30 @@ class Mainframe(PreMainframe):
             # mixer running as a http server for now, just ping to see
             # if the microcontroller is running
             # if request is valid, consider it "connected"
-            ping_resp = requests.get(f"{du.PRH_url}/ping")
-            if ping_resp.ok and ping_resp.text == 'ack':
-                with QMutexLocker(GlobalMutex):
-                    du.PRH_connected = True
-                if not self._PumpCommThread.isRunning():
-                    # restart if necessary; if so reconnect threads
-                    self.connect_threads('PMP')
-                    self._PumpCommThread.start()
-
-                _action_on_success(
-                    self._PRHRecvWd,
-                    self.CONN_PRH_indi_connected,
-                    self.PRH_group,
-                    f"mixer controller found at {du.PRH_url}",
-                )
-                return True
-
-            else:
-                log_txt = f"mixer controller not present at {du.PRH_url}!"
+            try:
+                ping_resp = requests.get(f"{du.PRH_url}/ping", timeout=3)
+                if not ping_resp.ok or ping_resp.text != 'ack':
+                    raise ValueError
+            except (requests.Timeout, ValueError) as err:
+                log_txt = f"printhead controller not present at {du.PRH_url}!"
                 self.log_entry('CONN', log_txt)
+                print(log_txt)
                 return False
+            
+            with QMutexLocker(GlobalMutex):
+                du.PRH_connected = True
+            if not self._PumpCommThread.isRunning():
+                # restart if necessary; if so reconnect threads
+                self.connect_threads('PMP')
+                self._PumpCommThread.start()
+
+            _action_on_success(
+                self._PRHRecvWd,
+                self.CONN_PRH_indi_connected,
+                self.PRH_group,
+                f"mixer controller found at {du.PRH_url}",
+            )
+            return True
 
         # FUNCTION CALLS
         match slot:
@@ -591,7 +594,7 @@ class Mainframe(PreMainframe):
             self._PumpCommWorker.dataSend.connect(self.pump_send)
             self._PumpCommWorker.dataRecv.connect(self.pump_recv)
             self._PumpCommWorker.dataMixerSend.connect(self.prh_send)
-            self._PumpCommWorker.PRHDisconnect.connect(lambda: self.disconnect_device('PRH'))
+            self._PumpCommWorker.prhActive.connect(self._PRHRecvWd.reset)
             self._PumpCommWorker.p1Active.connect(self._P1RecvWd.reset)
             self._PumpCommWorker.p2Active.connect(self._P2RecvWd.reset)
         
@@ -1265,9 +1268,9 @@ class Mainframe(PreMainframe):
         if fs_warning.result():
             self.stop_SCTRL_queue()
             du.ROBTcp.send(Command) # bypass all queued commands
-            # to-do: stop pum, pinch
+            # to-do: stop pump, pinch
             self.pump_set_speed('0')
-            self.pinch_valve_toggle(internal=True, )
+            self.pinch_valve_toggle(internal=True, val=0)
 
             with QMutexLocker(GlobalMutex):
                 LostBuf = dcpy(du.ROBCommQueue)
@@ -1317,7 +1320,7 @@ class Mainframe(PreMainframe):
 
         # error catching for fast-clicking users
         if len(du.ROB_send_list) != 0:
-            LastCom, dummy = du.ROB_send_list[len(du.ROB_send_list) - 1]
+            LastCom,_ = du.ROB_send_list[len(du.ROB_send_list) - 1]
             if command.id <= LastCom.id:
                 command.id = LastCom.id + 1
         
@@ -1409,7 +1412,12 @@ class Mainframe(PreMainframe):
             pinch_state = self.PUMP_btt_pinchValve.isChecked()
         else:
             pinch_state = val
-        requests.post(f"{du.PRH_url}\pinch", f"s={pinch_state}")
+        try:
+            requests.post(f"{du.PRH_url}\pinch", f"s={pinch_state}")
+        except requests.Timeout as e:
+            log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
+            self.log_entry('CONN', log_txt)
+            print(log_txt)
 
 
     ##########################################################################

@@ -148,11 +148,11 @@ class ConnDialog(QDialog, Ui_CONN):
             self.p_com = p_port
         # PRINTHEAD
         self.prh_url = (
-            f"http://{self.PRH_entry_ip.text}:{self.PRH_entry_port.text}"
+            f"http://{self.PRH_entry_ip.text()}:{self.PRH_entry_port.text()}"
         )
         # PRINTHEAD
-        self.DB_url = (
-            f"http://{self.DB_entry_ip.text}:{self.DB_entry_port.text}"
+        self.db_url = (
+            f"http://{self.DB_entry_ip.text()}:{self.DB_entry_port.text()}"
         )
         
 
