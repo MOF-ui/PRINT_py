@@ -7,19 +7,17 @@ import os
 import sys
 import unittest
 
+# appending the parent directory path
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 # comment out tests you dont want to run he<re
 from tests.data_utilities_test import DataLibTest
 from tests.func_utilities_test import FuncLibTest
 from tests.win_mainframe_test import MainframeWinTest
 from tests.pump_utilities_test import PumpLibTest
 from tests.threads_test import ThreadsTest
-
-# appending the parent directory path
-current_dir = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(current_dir)
-sys.path.append(parent_dir)
-
-
 
 
 #############################     MAIN      #################################

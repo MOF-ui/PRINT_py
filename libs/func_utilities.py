@@ -47,23 +47,16 @@ def pre_check_gcode_file(
             return 0, 0.0, 'empty'
 
         rows = txt.split('\n')
-        x = 0.0
-        y = 0.0
-        z = 0.0
+        x = y = z = 0.0
         comm_num = 0
         filament_length = 0.0
 
-        x_regex = ['X\d+[,.]\d+', 'X\d+', 'X-\d+[,.]\d+', 'X-\d+']
-        y_regex = ['Y\d+[,.]\d+', 'Y\d+', 'Y-\d+[,.]\d+', 'Y-\d+']
-        z_regex = ['Z\d+[,.]\d+', 'Z\d+', 'Z-\d+[,.]\d+', 'Z-\d+']
-
         for row in rows:
-            if len(re.findall('G\d+', row)) > 0:
+            if len(re.findall(r'G\d+', row)) > 0:
                 comm_num += 1
-
-            x_new = float(re_short(x_regex, row, 'X' + str(x))[1:])
-            y_new = float(re_short(y_regex, row, 'Y' + str(y))[1:])
-            z_new = float(re_short(z_regex, row, 'Z' + str(z))[1:])
+            x_new = float(re_short(None, txt, x, find_coor='X'))
+            y_new = float(re_short(None, txt, y, find_coor='Y'))
+            z_new = float(re_short(None, txt, z, find_coor='Z'))
 
             # do the Pythagoras for me, baby
             filament_length += m.sqrt(
@@ -71,7 +64,6 @@ def pre_check_gcode_file(
                 + m.pow(y_new - y, 2)
                 + m.pow(z_new - z, 2)
             )
-
             x, y, z = x_new, y_new, z_new
 
         # convert filamentLength to meters and round
@@ -113,9 +105,12 @@ def pre_check_rapid_file(
             # and 'MoveJ Offs(pHome [...]'
             if ('Move' in row) and (' p' not in row):
                 comm_num += 1
-                x_new = float(re.findall('\d+\.\d+', row)[0])
-                y_new = float(re.findall('\d+\.\d+', row)[1])
-                z_new = float(re.findall('\d+\.\d+', row)[2])
+                digits = re.findall(r'(-?\d+[,\.]?[\d+]?)', row)
+                if not isinstance(digits, list):
+                    continue
+                x_new = float(digits[0])
+                y_new = float(digits[1])
+                z_new = float(digits[2])
 
                 # do the Pythagoras for me, baby
                 filament_length += m.sqrt(
@@ -123,7 +118,6 @@ def pre_check_rapid_file(
                     + m.pow(y_new - y, 2)
                     + m.pow(z_new - z, 2)
                 )
-
                 x, y, z = x_new, y_new, z_new
 
         # convert filamentLength to meters and round
@@ -170,7 +164,7 @@ def re_short(
     #   '(' and ')' brackets:
     #       specify only the inner part to be contained in the actual match
     if find_coor != '':
-        regex = [find_coor + '(-?\d+[,\.]?[\d+]?)']
+        regex = [find_coor + r'(-?\d+[,\.]?[\d+]?)']
     
     if not isinstance(regex, list):
         raise ValueError
@@ -256,7 +250,7 @@ def gcode_to_qentry(
     if not isinstance(speed, du.SpeedVector):
         raise ValueError(f"{speed} is not an instance of SpeedVector!")
     
-    command = re_short(['G\d+', '^;'], txt, None)
+    command = re_short([r'G\d+', '^;'], txt, None)
     if command is None:
         return None, ''
 
@@ -377,9 +371,9 @@ def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
     
     # otherwise try to decode
     # re matches '12', '-12.3' or '12.34'
-    num_regex = '-?\d+\.?[\d+]*'
-    # but only if they follow a '[' or ','
-    regex = f"[\[,]({num_regex})" 
+    num_regex = r'-?\d+\.?[\d+]*'
+    # but only if they follow behind a '[' or ','
+    regex = r'[\[,](' + num_regex 
     decimals = re.findall(regex, txt)
     
     try:
@@ -402,7 +396,7 @@ def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
             entry.pt = 'Q'
             res_coor = [float(decimals[i]) for i in range(7)]
 
-        speed_regex = f"{num_regex},{num_regex},{num_regex},{num_regex}\],z"
+        speed_regex = num_regex + num_regex + num_regex + num_regex + r'\],z'
         res_speed = re.findall(speed_regex, txt)[0]
         res_speed = re.findall(num_regex, res_speed)
 
@@ -430,7 +424,7 @@ def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
         entry.Speed.ors = int(float(res_speed[1]))
         entry.Speed.acr = int(float(res_speed[2]))
         entry.Speed.dcr = int(float(res_speed[3]))
-        zone = re_short(['z\d+'], txt, du.IO_zone)
+        zone = re_short([r'z\d+'], txt, du.IO_zone)
         entry.z = int(zone[1:])
 
         # rounding everything to 2 decimals causes inaccuarcy on quaternions

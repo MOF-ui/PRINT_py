@@ -1,7 +1,6 @@
 ##############################################################################
 #
 #   PRINT_py main
-#   Release: 1.0
 #
 #   author:     Max Ole Frohmüller
 #   instituion: TU Berlin,
@@ -35,6 +34,7 @@
 
 # python standard libraries
 import sys
+import unittest
 
 
 # PyQt stuff
@@ -57,8 +57,12 @@ if arg_len == 2:
     arg1 = sys.argv[1]
     match arg1:
         case 'test':
-            import tests.all_test as full_test
-            full_test()
+            from tests.data_utilities_test import DataLibTest
+            from tests.func_utilities_test import FuncLibTest
+            from tests.win_mainframe_test import MainframeWinTest
+            from tests.pump_utilities_test import PumpLibTest
+            from tests.threads_test import ThreadsTest
+            unittest.main()
             exit()
         case 'local':
             du.ROBTcp.ip = 'localhost'

@@ -47,7 +47,7 @@ class FuncLibTest(unittest.TestCase):
         """see reShort in libs/PRINT_data_utilities"""
 
         TestCoor = du.Coordinate(1, 2, 3, 4, 5, 6, 7, 8)
-        regex = ['\d+.\d+', '\d+']
+        regex = [r'\d+.\d+', r'\d+']
         self.assertIsNone(fu.re_short(regex, 'ABC', None))
         self.assertEqual(fu.re_short(regex, 'ABC', TestCoor), TestCoor)
         self.assertEqual(fu.re_short(regex, 'AB1C', TestCoor), '1')
