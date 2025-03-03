@@ -29,6 +29,7 @@
 #   (movement finished, list emptied, stop pumping, pinch)
 #   rework UI
 #   implement pre-checked driving
+#   test pump ratio look ahead
 
 ###############################    IMPORTS    ################################
 

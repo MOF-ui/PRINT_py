@@ -70,6 +70,22 @@ def calc_speed() -> tuple[int | None, float, bool]:
             case _:
                 speed = 0
     else:
+        # TEST #
+        # trying to switch pump ratio ahead of turning point
+        try:
+            next_comm = du.ROBCommQueue[1]
+            curr_pos = du.ROBTelem.Coor
+            if isinstance(next_comm, du.QEntry):
+                tp_dist = m.sqrt(
+                    m.pow(next_comm.Coor1.x - curr_pos.x, 2)
+                    + m.pow(next_comm.Coor1.y - curr_pos.y, 2)
+                    + m.pow(next_comm.Coor1.z - curr_pos.z, 2)
+                )
+                if tp_dist < 150.0:
+                    p_ratio = next_comm.p_ratio
+        except:
+            pass
+        # TEST #
         speed = p_mode
 
     # check value domain for speed
