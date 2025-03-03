@@ -54,9 +54,9 @@ def pre_check_gcode_file(
         for row in rows:
             if len(re.findall(r'G\d+', row)) > 0:
                 comm_num += 1
-            x_new = float(re_short(None, txt, x, find_coor='X'))
-            y_new = float(re_short(None, txt, y, find_coor='Y'))
-            z_new = float(re_short(None, txt, z, find_coor='Z'))
+            x_new = float(re_short(None, row, x, find_coor='X'))
+            y_new = float(re_short(None, row, y, find_coor='Y'))
+            z_new = float(re_short(None, row, z, find_coor='Z'))
 
             # do the Pythagoras for me, baby
             filament_length += m.sqrt(
@@ -67,7 +67,7 @@ def pre_check_gcode_file(
             x, y, z = x_new, y_new, z_new
 
         # convert filamentLength to meters and round
-        filament_length /= 1000
+        filament_length /= 1000.0
         filament_length = round(filament_length, 2)
 
     except Exception as err:
@@ -184,29 +184,31 @@ def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
     """short-hand for pump & tool settings detection"""
     
     # set pump settings
-    p_mode = re_short(None, txt, None, find_coor='PMP')
+    p_mode = re_short(None, txt, -1001, find_coor='PMP')
     p_mode = int(float(p_mode))
     if -100 <= p_mode <= 100 or p_mode in du.DEF_PUMP_VALID_COMMANDS:
         entry.p_mode = p_mode
     else:
         p_mode = -1001 # = no pump mode given
-    p_ratio = re_short(None, txt, None, find_coor='PR')
+    p_ratio = re_short(None, txt, 1.0, find_coor='PR')
     p_ratio = float(p_ratio)
     if p_ratio > 1.0: p_ratio = 1.0
     if p_ratio < 0: p_ratio = 0.0
     entry.p_ratio = p_ratio
+    pinch = re_short(None, txt, False, find_coor='PIN')
+    entry.pinch = bool(pinch)
 
     # set tool settings
-    troll_steps = re_short(None, txt, 0, find_coor='TT')
-    entry.Tool.trolley_steps = int(troll_steps * du.TOOL_trol_ratio)
+    troll_steps = re_short(None, txt, 0, find_coor='TRL')
+    entry.Tool.trolley_steps = int(float(troll_steps) * du.TOOL_trol_ratio)
     clamp = re_short(None, txt, 0, find_coor='TCL')
-    entry.Tool.clamp = int(clamp)
+    entry.Tool.clamp = bool(int(clamp))
     cut = re_short(None, txt, 0, find_coor='TCU')
-    entry.Tool.cut = int(cut)
+    entry.Tool.cut = bool(int(cut))
     place_spring = re_short(None, txt, 0, find_coor='TPS')
-    entry.Tool.place_spring = int(place_spring)
+    entry.Tool.place_spring = bool(int(place_spring))
     load_spring = re_short(None, txt, 0, find_coor='TLS')
-    entry.Tool.load_spring = int(load_spring)
+    entry.Tool.load_spring = bool(int(load_spring))
     
     return entry
 
@@ -373,7 +375,7 @@ def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
     # re matches '12', '-12.3' or '12.34'
     num_regex = r'-?\d+\.?[\d+]*'
     # but only if they follow behind a '[' or ','
-    regex = r'[\[,](' + num_regex 
+    regex = r'[\[,](' + num_regex + r')' 
     decimals = re.findall(regex, txt)
     
     try:
@@ -396,7 +398,7 @@ def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
             entry.pt = 'Q'
             res_coor = [float(decimals[i]) for i in range(7)]
 
-        speed_regex = num_regex + num_regex + num_regex + num_regex + r'\],z'
+        speed_regex = f"{num_regex},{num_regex},{num_regex},{num_regex}" + r'\],z'
         res_speed = re.findall(speed_regex, txt)[0]
         res_speed = re.findall(num_regex, res_speed)
 

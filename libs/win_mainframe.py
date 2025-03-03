@@ -58,7 +58,6 @@ class Mainframe(PreMainframe):
     #                                ATTRIBUTES                              #
     ##########################################################################
 
-    _testrun = False  # switch for mainframe_test.py
     _first_pos = True  # one-time switch to get robot home position
 
 
@@ -87,7 +86,7 @@ class Mainframe(PreMainframe):
         self.load_defaults(setup=True)
 
         self.log_entry('GNRL', 'init threading...')
-        if testrun:
+        if self._testrun:
             # TESTRUN OPTION WITH RETURN
             self.connect_threads('ALL')
             self.log_entry('TEST', 'testrun, skipping robot connection...')
@@ -985,7 +984,6 @@ class Mainframe(PreMainframe):
                 line_id = du.SCQueue[0].id
             except AttributeError:
                 line_id = du.ROBTelem.id + 1
-    
         else:
             line_id = du.SCQueue.last_entry().id + 1
 
@@ -1050,6 +1048,9 @@ class Mainframe(PreMainframe):
         """checking for a direct command if the coordinates are reachable
         (in theory)"""
         # to-do: check for implausibile coor combinations
+
+        if self._testrun:
+            return True
 
         msg = ''
         target = Entry.Coor1
@@ -1413,7 +1414,7 @@ class Mainframe(PreMainframe):
         else:
             pinch_state = val
         try:
-            requests.post(f"{du.PRH_url}\pinch", f"s={pinch_state}")
+            requests.post(f"{du.PRH_url}/pinch", f"s={pinch_state}")
         except requests.Timeout as e:
             log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
             self.log_entry('CONN', log_txt)
@@ -1429,11 +1430,11 @@ class Mainframe(PreMainframe):
 
         match type:
             case 'sld':
-                speed = self.MIX_sld_speed.value()
+                speed = self.PRH_sld_speed.value()
             case '0':
                 speed = 0
             case _:
-                speed = self.MIX_num_setSpeed.value()
+                speed = self.PRH_num_setSpeed.value()
 
         with QMutexLocker(GlobalMutex):
             du.MIX_speed = speed
@@ -1449,9 +1450,9 @@ class Mainframe(PreMainframe):
         RetTool = du.ToolCommand()
         group = self.ADC_group if (panel=='ADC') else self.ASC_group
         RetTool.trolley_steps = group[0].value()
-        RetTool.clamp = group[1].isChecked()
-        RetTool.cut = group[2].isChecked()
-        RetTool.place_spring = group[3].isChecked()
+        RetTool.clamp = bool(group[1].isChecked())
+        RetTool.cut = bool(group[2].isChecked())
+        RetTool.place_spring = bool(group[3].isChecked())
         return RetTool
 
 
@@ -1490,6 +1491,7 @@ class Mainframe(PreMainframe):
             Command.Tool.load_spring = False
             Command.id += 1
             ans = self.send_command(Command, dc=True)
+            self.log_entry('ACON', f"reloading done.")
             for widget in self.ADC_group:
                 widget.setEnabled(True)
         
@@ -1517,7 +1519,7 @@ class Mainframe(PreMainframe):
         usr_txt = ''
 
         try:
-            start = int(re.findall('\d+', id_range)[0])
+            start = int(re.findall(r'\d+', id_range)[0])
             if start < SC_first:
                 usr_txt = (
                     f"SC lines value is lower than lowest SC queue ID, "
@@ -1538,7 +1540,7 @@ class Mainframe(PreMainframe):
 
         Tool = self.prh_read_user_input('ASC')
         if '..' in id_range:
-            ids = re.findall('\d+', id_range)
+            ids = re.findall(r'\d+', id_range)
             if len(ids) != 2:
                 user_info = strd_dialog(
                     'Worng syntax used in SC lines value, nothing was done.',
@@ -1555,7 +1557,7 @@ class Mainframe(PreMainframe):
                         break
 
         else:
-            ids = re.findall('\d+', id_range)
+            ids = re.findall(r'\d+', id_range)
             if len(ids) != 1:
                 user_info = strd_dialog(
                     'Worng syntax used in SC lines value, nothing was done.',

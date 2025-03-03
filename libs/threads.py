@@ -89,9 +89,9 @@ class PumpCommWorker(QObject):
         """
 
         if du.SC_q_processing:
-            total_speed, p_ratio = pu.calc_speed()
+            total_speed, p_ratio, pinch = pu.calc_speed()
         else: 
-            total_speed, p_ratio = du.PMP_speed, du.PMP_output_ratio
+            total_speed, p_ratio, pinch = du.PMP_speed, du.PMP_output_ratio, None #to-do: implement pinch
 
         # get speed
         if du.PMP1Serial.connected and du.PMP2Serial.connected:

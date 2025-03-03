@@ -25,8 +25,8 @@ class FuncLibTest(unittest.TestCase):
         """
 
         test_txt = ";comment\nG1 X0 Y0 Z0\nG1 X2000 Y0 Z0.0\nG1 X2000 Y1500 Z0"
-        self.assertEqual(fu.pre_check_gcode_file(''), (0, 0, "empty"))
-        self.assertEqual(fu.pre_check_gcode_file(test_txt), (3, 3.5, ""))
+        self.assertEqual(fu.pre_check_gcode_file(''), (0, 0, 'empty'))
+        self.assertEqual(fu.pre_check_gcode_file(test_txt), (3, 3.5, ''))
 
 
     def test_pre_check_rapid_file_function(self):
@@ -68,11 +68,18 @@ class FuncLibTest(unittest.TestCase):
         ResPos = du.Coordinate(9.5, 10, 1, 1, 1, 1, 1, 11)
         TestSpeed = du.SpeedVector(2, 2, 2, 2)
         ResSpeed = du.SpeedVector(2, 2, 8, 2)
-        ResTool = du.ToolCommand(load_spring=10, wait=True)
+        ResTool = du.ToolCommand(
+            0.1 * du.DEF_TOOL_TROL_RATIO,
+            True,
+            True,
+            False,
+            True,
+            0
+        )
         test_zone = 3
         du.DCCurrZero = du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4)
 
-        test_txt = 'G1 X5.5 Y6 EXT7 F80 TOOL'
+        test_txt = 'G1 X5.5 Y6 EXT7 F80 TRL0.1 TCL1 TCU1 TPS0 TLS1'
         self.assertEqual(
             fu.gcode_to_qentry(TestPos, TestSpeed, test_zone, test_txt),
             (
@@ -98,15 +105,22 @@ class FuncLibTest(unittest.TestCase):
         """see gcodeToQEntry in libs/PRINT_data_utilities"""
 
         du.DCCurrZero = du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4)
-        testTxt = (
+        test_txt = (
             f"MoveJ [[1.1,2.2,3.3],[4.4,5.5,6.6,7.7],[0,0,0,0],"
-            f"[0,0,0,0,0,0]],[8,9,10,11],z12,tool0 EXT13 TOOL"
+            f"[0,0,0,0,0,0]],[8,9,10,11],z12,tool0 EXT13 TRL0.1 TCL1 TCU1 TLS1"
         )
         ResPos = du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 13)
         ResSpeed = du.SpeedVector(10, 11, 8, 9)
-        ResTool = du.ToolCommand(load_spring=10, wait=True)
+        ResTool = du.ToolCommand(
+            0.1 * du.DEF_TOOL_TROL_RATIO,
+            True,
+            True,
+            False,
+            True,
+            0,
+        )
         self.assertEqual(
-            fu.rapid_to_qentry(txt=testTxt),
+            fu.rapid_to_qentry(txt=test_txt),
             du.QEntry(
                 mt='J',
                 pt='Q',
@@ -117,9 +131,9 @@ class FuncLibTest(unittest.TestCase):
             ),
         )
 
-        testTxt = "MoveL Offs(pHome,1.1,2.2,3.3),[8,9,10,11],z12,tool0 EXT13"
+        test_txt = "MoveL Offs(pHome,1.1,2.2,3.3),[8,9,10,11],z12,tool0 EXT13"
         self.assertEqual(
-            fu.rapid_to_qentry(txt=testTxt),
+            fu.rapid_to_qentry(txt=test_txt),
             (
                 du.QEntry(
                     pt='E',

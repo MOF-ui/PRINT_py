@@ -14,27 +14,26 @@
 #   International (CC BY-SA 4.0) 
 #   (https://creativecommons.org/licenses/by-sa/4.0/). 
 #   Feel free to use, modify or distribute this code as far as you like, so
-#   long as you make anything based on it publicly avialable under the same 
+#   long as you make anything based on it publicly avialable under the same
 #   license.
 #
 ##############################################################################
 # to-do:
 #   work with reconnects in automatic modes (open cell inbetween)
-#   test automatic pump control
-#   debug mixer protocoll 
-#   integrate pinch valve
+#   debug mixer protocoll
 #   check if PRH WD has to be critical
 #   debug temperature readout at printhead
 #   new EE protocol
 #   wait times in EE protocol
-#   implement new 'S' behaviour (movement finished, list emptied, stop pumping, pinch)
+#   implement new 'S' behaviour
+#   (movement finished, list emptied, stop pumping, pinch)
 #   rework UI
+#   implement pre-checked driving
 
 ###############################    IMPORTS    ################################
 
 # python standard libraries
 import sys
-import unittest
 
 
 # PyQt stuff
@@ -57,12 +56,8 @@ if arg_len == 2:
     arg1 = sys.argv[1]
     match arg1:
         case 'test':
-            from tests.data_utilities_test import DataLibTest
-            from tests.func_utilities_test import FuncLibTest
-            from tests.win_mainframe_test import MainframeWinTest
-            from tests.pump_utilities_test import PumpLibTest
-            from tests.threads_test import ThreadsTest
-            unittest.main()
+            import tests.all_test as at
+            at.run_all()
             exit()
         case 'local':
             du.ROBTcp.ip = 'localhost'

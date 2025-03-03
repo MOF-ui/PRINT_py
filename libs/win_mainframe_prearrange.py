@@ -52,6 +52,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     ##########################################################################
 
     _logpath = ''  # reference for logEntry, set by __init__
+    _testrun = False
 
     _last_comm_id = 0
     _LastP1Telem = None

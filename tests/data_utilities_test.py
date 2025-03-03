@@ -115,18 +115,14 @@ class DataLibTest(unittest.TestCase):
         """test ToolCommand class, used to store AmConEE data"""
 
         # __init__ & __str__
-        TestTool = du.ToolCommand(
-            1, 2.2, 3, 4, 5, 6, 7.7, True, 8, False, 9, 0, 10, 5, 11, 12
-        )
+        TestTool = du.ToolCommand(1, True, False, True, False, 2)
         self.assertEqual(
             str(TestTool),
-            f"PAN: 1, 2   FB: 3, 4   MP: 5, 6   PC: 7, True   KP: 8, False   "
-            f"K: 9, False   PF: 10, True   TIME: 11, 12",
+            f"TRL: 1   PS: True   LS: False   CUT: False   CL: True   W: 2"
         )
         self.assertEqual(
             str(du.ToolCommand()),
-            f"PAN: 0, 0   FB: 0, 0   MP: 0, 0   PC: 0, False   "
-            f"KP: 0, False   K: 0, False   PF: 0, False   TIME: 0, 0",
+            f"TRL: 0   PS: False   LS: False   CUT: False   CL: False   W: 0",
         )
 
         # __eq__ & __ne__
@@ -151,9 +147,7 @@ class DataLibTest(unittest.TestCase):
         TestCoor1 = du.Coordinate(4, 4, 4, 4, 4, 4, 4, 4)
         TestCoor2 = du.Coordinate(5, 5, 5, 5, 5, 5, 5, 5)
         TestVector = du.SpeedVector(6, 6, 6, 6)
-        TestTool = du.ToolCommand(
-            9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9
-        )
+        TestTool = du.ToolCommand(9, 1, 1, 1, 1, 9)
         TestEntry = du.QEntry(
             1, 'A', 'B', TestCoor1, TestCoor2, TestVector, 7, 'C', 8, TestTool
         )
@@ -163,7 +157,7 @@ class DataLibTest(unittest.TestCase):
             f"\n\t\t|| COOR_2: {TestCoor2}"
             f"\n\t\t|| SV:     {TestVector} \t|| SBT: 7   SC: C   Z: 8"
             f"\n\t\t|| TOOL:   {TestTool}"
-            f"\n\t\t|| PM/PR:  None/1.0",
+            f"\n\t\t|| PM/PR:  -1001/1.0   PIN: False",
         )
         self.assertEqual(
             str(du.QEntry()),
@@ -171,7 +165,7 @@ class DataLibTest(unittest.TestCase):
             f"\n\t\t|| COOR_2: {du.Coordinate()}"
             f"\n\t\t|| SV:     {du.SpeedVector()} \t|| SBT: 0   SC: V   Z: 10"
             f"\n\t\t|| TOOL:   {du.ToolCommand()}"
-            f"\n\t\t|| PM/PR:  None/1.0",
+            f"\n\t\t|| PM/PR:  -1001/1.0   PIN: False",
         )
 
         # __eq__ & __ne__
@@ -187,13 +181,14 @@ class DataLibTest(unittest.TestCase):
             TestEntry != 5
 
         # print_short
-        TestEntry.p_mode = 'default'
+        TestEntry.p_mode = 1001
         TestEntry.p_ratio = 0.2
+        TestEntry.pinch = True
         self.assertEqual(
             TestEntry.print_short(),
             f"ID: 1 -- A, B -- "
             f"COOR_1: {TestCoor1} -- SV: {TestVector} -- "
-            f"PM/PR:  default/0.2"
+            f"PM/PR,PIN:  1001/0.2, True",
         )
 
 
@@ -717,12 +712,12 @@ class DataLibTest(unittest.TestCase):
 
         # setParams
         TestTCPIP.set_params({
-            "IP": "1.1.1.1",
-            "PORT": 2222,
-            "C_TOUT": 0.003,
-            "RW_TOUT": 0.004,
-            "R_BL": 5.5,
-            "W_BL": 6.6,
+            'ip': "1.1.1.1",
+            'port': 2222,
+            'c_tout': 0.003,
+            'rw_tout': 0.004,
+            'r_bl': 5.5,
+            'w_bl': 6.6,
         })
         self.assertEqual(
             str(TestTCPIP),
@@ -773,7 +768,7 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ValueError)
 
-        TestRobCon.w_bl = 159
+        TestRobCon.w_bl = du.DEF_ROB_TCP['w_bl']
         ans0, ans1 = TestRobCon.send(du.QEntry(id=1))
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, OSError)

@@ -31,6 +31,17 @@ import libs.win_daq
 import libs.win_dialogs
 import libs.win_mainframe
 
+def run_all() -> None:
+    # to run unittest programmatically
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(DataLibTest))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(FuncLibTest))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(MainframeWinTest))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(PumpLibTest))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(ThreadsTest))
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+
 if __name__ == '__main__':
     # run unittests
     unittest.main()

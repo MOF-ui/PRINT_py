@@ -30,34 +30,34 @@ class PumpLibTest(unittest.TestCase):
         du.ROBCommQueue.clear()
         testEntry = du.QEntry(
             Speed=du.SpeedVector(ts=2000),
-            p_mode="default",
+            p_mode=1001, # = default mode
             p_ratio=0.345
         )
 
         du.ROBCommQueue.add(testEntry)
-        self.assertEqual(pu.calc_speed(), (100, 0.345))
+        self.assertEqual(pu.calc_speed(), (100, 0.345, False))
 
         du.ROBCommQueue[0].Speed.ts = -2000
-        self.assertEqual(pu.calc_speed(), (-100, 0.345))
+        self.assertEqual(pu.calc_speed(), (-100, 0.345, False))
 
         # test empty ROB_commQueue
         du.ROBCommQueue.clear()
-        self.assertEqual(pu.calc_speed(), (89, 1.0))
+        self.assertEqual(pu.calc_speed(), (89, 1.0, False))
 
         # mode: None
         testEntry = du.QEntry(Speed=du.SpeedVector(ts=123))
         du.ROBCommQueue.add(testEntry)
-        self.assertEqual(pu.calc_speed(), (89, 1.0))
+        self.assertEqual(pu.calc_speed(), (89, 1.0, False))
 
         # mode: default
         testEntry = du.QEntry(
             id=1,
             Speed=du.SpeedVector(ts=234),
-            p_mode="default",
+            p_mode=1001,
             p_ratio=0.765
         )
         du.ROBCommQueue.add(testEntry)
-        self.assertEqual(pu.calc_speed(), (19, 0.765))
+        self.assertEqual(pu.calc_speed(), (19, 0.765, False))
 
         du.ROBCommQueue.clear()
 

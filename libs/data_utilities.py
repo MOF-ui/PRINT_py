@@ -384,7 +384,7 @@ class ToolCommand:
 
         return (
             f"TRL: {self.trolley_steps}   PS: {self.place_spring}   "
-            f"LS: {self.load_spring}  CUT: {self.cut}   CL: {self.clamp}   "
+            f"LS: {self.load_spring}   CUT: {self.cut}   CL: {self.clamp}   "
             f"W: {self.wait}"
         )
 
@@ -491,6 +491,7 @@ class QEntry:
         Tool=None,
         p_mode=-1001, # -1001 is indicator for 'no p_mode given'
         p_ratio=1.0,
+        pinch=False,
     ) -> None:
 
         self.id = int(id)
@@ -501,6 +502,7 @@ class QEntry:
         self.z = int(z)
         self.p_mode = int(p_mode)
         self.p_ratio = float(p_ratio)
+        self.pinch = bool(pinch)
 
         # handle those beasty mutables
         self.Coor1 = Coordinate() if (Coor1 is None) else Coor1
@@ -518,7 +520,8 @@ class QEntry:
             f"\n\t\t|| SV:     {self.Speed} "
             f"\t|| SBT: {self.sbt}   SC: {self.sc}   Z: {self.z}"
             f"\n\t\t|| TOOL:   {self.Tool}"
-            f"\n\t\t|| PM/PR:  {self.p_mode}/{self.p_ratio}"
+            f"\n\t\t|| PM/PR:  {self.p_mode}/{self.p_ratio}   "
+            f"PIN: {self.pinch}"
         )
 
 
@@ -538,6 +541,7 @@ class QEntry:
                 and self.Tool == other.Tool
                 and self.p_mode == other.p_mode
                 and self.p_ratio == other.p_ratio
+                and self.pinch == other.pinch
             ):
                 return True
 
@@ -568,6 +572,7 @@ class QEntry:
                 or self.Tool != other.Tool
                 or self.p_mode != other.p_mode
                 or self.p_ratio != other.p_ratio
+                or self.pinch != other.pinch
             ):
                 return True
 
@@ -585,7 +590,7 @@ class QEntry:
         return (
             f"ID: {self.id} -- {self.mt}, {self.pt} -- "
             f"COOR_1: {self.Coor1} -- SV: {self.Speed} -- "
-            f"PM/PR:  {self.p_mode}/{self.p_ratio}"
+            f"PM/PR,PIN:  {self.p_mode}/{self.p_ratio}, {self.pinch}"
         )
 
 
@@ -920,7 +925,7 @@ class Queue:
         if len(self) == 0:
             return
 
-        ids = re.findall('\d+', id)
+        ids = re.findall(r'\d+', id)
         id_num = len(ids)
         first_id = self[0].id
         last_id = self[len(self) - 1].id
