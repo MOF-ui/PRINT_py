@@ -11,8 +11,8 @@
 # import re
 import os
 import sys
-import copy
 import math as m
+from copy import deepcopy as dcpy
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -21,12 +21,92 @@ sys.path.append(parent_dir)
 
 # import my own libs
 import libs.data_utilities as du
+import libs.func_utilities as fu
 
 
 
 ###########################     FUNCTIONS      ###############################
 
-def calc_speed() -> tuple[int | None, float, bool]:
+def get_pmp_speeds() -> tuple[int, int]:
+    """see if pump settings have been scripted, otherwise use user 
+    input;
+    """
+    global last_speed
+
+    if du.SC_q_processing:
+        ans = calc_speed()
+        if ans is None:
+            return None
+        p1_speed, p2_speed, pinch = ans
+    else: 
+        p1_speed, p2_speed = speed_by_ratio(du.PMP_speed, du.PMP_output_ratio)
+        pinch = None #to-do: implement pinch
+
+    # look for user overwrite, no mutex, as changing
+    # global PUMP_user_speed would not harm the process
+    if du.PMP1_user_speed != du.DEF_PUMP_NO_USER_SPEED:
+        p1_speed = du.PMP1_user_speed
+        du.PMP1_user_speed = du.DEF_PUMP_NO_USER_SPEED
+    if du.PMP2_user_speed != du.DEF_PUMP_NO_USER_SPEED:
+        p2_speed = du.PMP2_user_speed
+        du.PMP2_user_speed = du.DEF_PUMP_NO_USER_SPEED
+    
+    last_speed = (p1_speed + p2_speed) / 2
+    return p1_speed, p2_speed
+
+
+def speed_by_ratio(t_speed, ratio) -> tuple[float, float]:
+    """calculates the speed of the pumps according to the given ratio"""
+
+    # get speed
+    if du.PMP1Serial.connected and du.PMP2Serial.connected:
+        p1_speed = t_speed * ratio
+        p2_speed = t_speed * (1.0 - ratio)
+    else:
+        p1_speed = p2_speed = t_speed
+    return p1_speed, p2_speed
+
+
+def look_ahead(p1_speed, p2_speed) -> tuple[float, float]:
+    """determines the pump speed by looking at the next movement
+    in the queue, retracts current pump"""
+    try:
+        curr_comm = du.ROBCommQueue[0]
+        next_comm = du.ROBCommQueue[1]
+        if (
+                not isinstance(curr_comm, du.QEntry)
+                or not isinstance(next_comm, du.QEntry)
+        ):
+            raise TypeError
+        
+        if next_comm.p_ratio != curr_comm.p_ratio:
+            curr_pos = du.ROBTelem.Coor
+            tp_dist = m.sqrt(
+                m.pow(next_comm.Coor1.x - curr_pos.x, 2)
+                + m.pow(next_comm.Coor1.y - curr_pos.y, 2)
+                + m.pow(next_comm.Coor1.z - curr_pos.z, 2)
+            )
+            if tp_dist < du.PMP_look_ahead_dist:
+                # reverse direction on currently running pump
+                # to reduce pressure in the hose system
+                next_speed = next_comm.p_mode
+                if -100 < next_speed < 100:
+                    next_p1_speed, next_p2_speed = speed_by_ratio(
+                        next_speed, next_comm.p_ratio
+                    )
+                    if p1_speed > 0:
+                        p1_speed = -p1_speed
+                        p2_speed = next_p2_speed
+                    elif p2_speed > 0:
+                        p1_speed = next_p1_speed
+                        p2_speed = -p2_speed
+    except:
+        pass
+    
+    return p1_speed, p2_speed
+
+
+def calc_speed() -> tuple[int | None, int, bool]:
     """main function to be called from outside this file, calculates speed the
     pump needs to be set to for the current robot position
     """
@@ -50,7 +130,7 @@ def calc_speed() -> tuple[int | None, float, bool]:
         pinch = curr_comm.pinch
 
         if curr_comm != preceeding_comm:
-            preceeding_comm = copy.deepcopy(curr_comm)
+            preceeding_comm = dcpy(curr_comm)
             preceeding_speed = last_speed
 
     if p_mode in du.DEF_PUMP_VALID_COMMANDS:
@@ -69,35 +149,17 @@ def calc_speed() -> tuple[int | None, float, bool]:
                 speed = du.DEF_PUMP_CLASS2
             case _:
                 speed = 0
-    else:
-        # TEST #
-        # trying to switch pump ratio ahead of turning point
-        try:
-            next_comm = du.ROBCommQueue[1]
-            curr_pos = du.ROBTelem.Coor
-            if isinstance(next_comm, du.QEntry):
-                tp_dist = m.sqrt(
-                    m.pow(next_comm.Coor1.x - curr_pos.x, 2)
-                    + m.pow(next_comm.Coor1.y - curr_pos.y, 2)
-                    + m.pow(next_comm.Coor1.z - curr_pos.z, 2)
-                )
-                if tp_dist < 150.0:
-                    p_ratio = next_comm.p_ratio
-        except:
-            pass
-        # TEST #
-        speed = p_mode
-
-    # check value domain for speed
     if speed is None:
         return None
-    if speed > 100.0:
-        speed = 100.0
-    if speed < -100.0:
-        speed = -100.0
 
-    last_speed = float(speed)
-    return int(round(speed, 0)), p_ratio, pinch
+    p1_speed, p2_speed = speed_by_ratio(speed, p_ratio)
+    if du.PMP_look_ahead:
+        p1_speed, p2_speed = look_ahead(p1_speed, p2_speed)
+
+    # check value domain for speed
+    p1_speed = int(fu.domain_clip(p1_speed, -100.0, 100.0))
+    p2_speed = int(fu.domain_clip(p2_speed, -100.0, 100.0))
+    return p1_speed, p2_speed, pinch
 
 
 def default_mode(command=None) -> float | None:
@@ -139,19 +201,19 @@ def profile_mode(command=None, profile=None) -> float | None:
     global preceeding_speed
 
     # check passed arguments
-    if None in [command, profile]:
-        return None
-    elif not isinstance(command, du.QEntry):
+    if (
+            profile is None
+            or not isinstance(command, du.QEntry)
+    ):
         return None
     else:
         Comm = command
 
-    # get default speed if profile isn't readable
+    # get default speed in case profile isn't readable
     speed = default_mode(Comm)
-
     # as more complex pump scripts should only apply to linear movements,
     # the remaining travel distance can be calculated using pythagoras
-    curr = copy.deepcopy(du.ROBTelem.Coor)
+    curr = dcpy(du.ROBTelem.Coor)
     dist_remaining = m.sqrt(
         m.pow(Comm.Coor1.x - curr.x, 2)
         + m.pow(Comm.Coor1.y - curr.y, 2)
@@ -160,71 +222,44 @@ def profile_mode(command=None, profile=None) -> float | None:
 
     # get the remaining time ( [mm] / [mm/s] = [s] )
     time_remaining = float(dist_remaining / Comm.Speed.ts)
-
     # get time-dependent settings
     settings = None
     prev_set = None
-
     for item in profile:
         if item['until'] <= time_remaining:
-            settings = copy.deepcopy(item)
+            settings = dcpy(item)
             break
         prev_set = item
-
+    # if no active settings are found, return the default speed
     if settings is None:
         return speed
 
     # calc speed accorrding to 'mode' settings
     base = get_base_speed(settings['base'], speed)
+    time_0 = 0.0
+    base_0 = 0.0
+    # if prev_set is None this is the first setting, need to calculate
+    # time from the movements starting point
+    if prev_set is not None:
+        time_0 = prev_set['until']
+        base_0 = get_base_speed(prev_set['base'], speed)
+    else:
+        strt = dcpy(du.ROBMovStartP)
+        dist_total = m.sqrt(
+            m.pow(Comm.Coor1.x - strt.x, 2)
+            + m.pow(Comm.Coor1.y - strt.y, 2)
+            + m.pow(Comm.Coor1.z - strt.z, 2)
+        )
+
+        # get the remaining time ( [mm] / [mm/s] = [s] )
+        time_0 = dist_total / Comm.Speed.ts
+        base_0 = preceeding_speed
+
     match settings['mode']:
-
-        case 'instant':
-            speed = base
-
         case 'linear':
-            # if prev_set is None this is the first setting, need to calculate
-            # time from the movements starting point
-            time_0 = 0.0
-            base_0 = 0.0
-            if prev_set is not None:
-                time_0 = prev_set['until']
-                base_0 = get_base_speed(prev_set['base'], speed)
-
-            else:
-                strt = copy.deepcopy(du.ROBMovStartP)
-                dist_total = m.sqrt(
-                    m.pow(Comm.Coor1.x - strt.x, 2)
-                    + m.pow(Comm.Coor1.y - strt.y, 2)
-                    + m.pow(Comm.Coor1.z - strt.z, 2)
-                )
-
-                # get the remaining time ( [mm] / [mm/s] = [s] )
-                time_0 = dist_total / Comm.Speed.ts
-                base_0 = preceeding_speed
-
             slope = (base - base_0) / (settings['until'] - time_0)
             speed = float(time_remaining * slope + base)
-
         case 'smoothstep':
-            # same principle as 'linear' but as sigmoid-like smoothstep
-            time_0 = 0.0
-            base_0 = 0.0
-            if prev_set is not None:
-                time_0 = prev_set['until']
-                base_0 = get_base_speed(prev_set['base'], speed)
-
-            else:
-                strt = copy.deepcopy(du.ROBMovStartP)
-                dist_total = m.sqrt(
-                    m.pow(Comm.Coor1.x - strt.x, 2)
-                    + m.pow(Comm.Coor1.y - strt.y, 2)
-                    + m.pow(Comm.Coor1.z - strt.z, 2)
-                )
-
-                # get the remaining time ( [mm] / [mm/s] = [s] )
-                time_0 = dist_total / Comm.Speed.ts
-                base_0 = preceeding_speed
-
             normalized_t = float(
                 (time_remaining - time_0) / (settings['until'] - time_0)
             )
@@ -236,6 +271,8 @@ def profile_mode(command=None, profile=None) -> float | None:
                 * (3-2 * normalized_t)
             )
             speed = float(speed + base_0)
+        case _:
+            speed = base
 
     return speed
 

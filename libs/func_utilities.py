@@ -29,6 +29,22 @@ import libs.data_utilities as du
 
 ###########################     FUNCTIONS      ###############################
 
+def domain_clip(x:float, min_val:float, max_val:float) -> float:
+    """checks if x is within [min_val, max_val], if not, returns the 
+    closest value to x within the domain
+
+    accepts:
+        x:
+            value to be checked
+        max_val:
+            maximum value of domain
+        min_val:
+            minimum value of domain
+    """
+
+    return float(max(min(x, max_val), min_val))
+
+
 def pre_check_gcode_file(
         txt:str
 ) -> (
@@ -192,8 +208,7 @@ def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
         p_mode = -1001 # = no pump mode given
     p_ratio = re_short(None, txt, 1.0, find_coor='PR')
     p_ratio = float(p_ratio)
-    if p_ratio > 1.0: p_ratio = 1.0
-    if p_ratio < 0: p_ratio = 0.0
+    p_ratio = domain_clip(p_ratio, 0.0, 1.0)
     entry.p_ratio = p_ratio
     pinch = re_short(None, txt, False, find_coor='PIN')
     entry.pinch = bool(pinch)
@@ -377,6 +392,8 @@ def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
     # but only if they follow behind a '[' or ','
     regex = r'[\[,](' + num_regex + r')' 
     decimals = re.findall(regex, txt)
+    if not decimals:
+        return None
     
     try:
         # look for relative coordinates

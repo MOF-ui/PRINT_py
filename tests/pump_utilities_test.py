@@ -25,8 +25,6 @@ class PumpLibTest(unittest.TestCase):
         """cases 'default', 'start' and 'end' are tested seperately"""
 
         du.PMP_speed = 89
-
-        # domain control
         du.ROBCommQueue.clear()
         testEntry = du.QEntry(
             Speed=du.SpeedVector(ts=2000),
@@ -34,20 +32,25 @@ class PumpLibTest(unittest.TestCase):
             p_ratio=0.345
         )
 
+        # domain control
         du.ROBCommQueue.add(testEntry)
-        self.assertEqual(pu.calc_speed(), (100, 0.345, False))
-
+        self.assertEqual(pu.calc_speed(), (100, 100, False))
         du.ROBCommQueue[0].Speed.ts = -2000
-        self.assertEqual(pu.calc_speed(), (-100, 0.345, False))
+        self.assertEqual(pu.calc_speed(), (-100, -100, False))
 
         # test empty ROB_commQueue
         du.ROBCommQueue.clear()
-        self.assertEqual(pu.calc_speed(), (89, 1.0, False))
+        du.PMP1Serial.connected = True
+        du.PMP2Serial.connected = False
+        self.assertEqual(pu.calc_speed(), (89, 89, False))
+        du.PMP1Serial.connected = True
+        du.PMP2Serial.connected = True
+        self.assertEqual(pu.calc_speed(), (89, 0, False))
 
         # mode: None
         testEntry = du.QEntry(Speed=du.SpeedVector(ts=123))
         du.ROBCommQueue.add(testEntry)
-        self.assertEqual(pu.calc_speed(), (89, 1.0, False))
+        self.assertEqual(pu.calc_speed(), (89, 0, False))
 
         # mode: default
         testEntry = du.QEntry(
@@ -57,7 +60,7 @@ class PumpLibTest(unittest.TestCase):
             p_ratio=0.765
         )
         du.ROBCommQueue.add(testEntry)
-        self.assertEqual(pu.calc_speed(), (19, 0.765, False))
+        self.assertEqual(pu.calc_speed(), (14, 4, False))
 
         du.ROBCommQueue.clear()
 

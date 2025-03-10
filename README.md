@@ -1,5 +1,5 @@
 > [!WARNING]
-> This software controls expensive and possible dangerous machines. You may use
+> This software controls expensive and possibly dangerous machines. You may use
 > it at your own risk, if so, you're responsible to ensure safety of people and
 > material. PRINT_py is distributed on an 'AS IS' basis, without warranties of
 > conditions of any kind, either expressed or implied.

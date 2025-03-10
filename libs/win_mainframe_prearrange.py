@@ -289,6 +289,12 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     else:
                         new_val = -1
                     du.ROB_speed_overwrite = new_val
+                case 'pump_look_ahead':
+                    new_val = self.LAH_btt_active.isChecked()
+                    du.PMP_look_ahead = new_val
+                case 'pmp_look_ahead_dist':
+                    new_val = self.LAH_num_distance.value()
+                    du.PMP_look_ahead_dist = new_val
                 case _:
                     raise KeyError(f"'{flag}' is not a defined flag")
 

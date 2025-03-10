@@ -57,7 +57,6 @@ class PumpCommWorker(QObject):
         self.LoopTimer.setInterval(250)
         self.LoopTimer.timeout.connect(self.active_state)
         self.LoopTimer.start()
-
         self.logEntry.emit('THRT','PumpComm thread running.')
 
 
@@ -78,39 +77,6 @@ class PumpCommWorker(QObject):
         self.receive()
         with QMutexLocker(GlobalMutex):
             du.PMP_comm_active = False
-    
-
-    def get_speed_settings(self) -> tuple[int, int, int]:
-        """see if pump settings have been scripted, otherwise use user 
-        input; interpret total_speed as combined maximum possible flow,
-        if both pumps are connected; pump values are capped at 100, e.g.
-        when P1 & P2 are connected, speed is set to 100 & ratio is set to
-        1.0, pump1_speed would otherwise be 200.
-        """
-
-        if du.SC_q_processing:
-            total_speed, p_ratio, pinch = pu.calc_speed()
-        else: 
-            total_speed, p_ratio, pinch = du.PMP_speed, du.PMP_output_ratio, None #to-do: implement pinch
-
-        # get speed
-        if du.PMP1Serial.connected and du.PMP2Serial.connected:
-            total_speed *= 2
-            p1_speed = total_speed * p_ratio
-            p2_speed = total_speed * (1 - p_ratio)
-        else:
-            p1_speed = p2_speed = total_speed
-
-        # look for user overwrite, no mutex, as changing 
-        # global PUMP_user_speed would not harm the process
-        if du.PMP1_user_speed != -999:
-            p1_speed = du.PMP1_user_speed
-            du.PMP1_user_speed = -999
-        if du.PMP2_user_speed != -999:
-            p2_speed = du.PMP2_user_speed
-            du.PMP2_user_speed = -999
-        
-        return total_speed, p1_speed, p2_speed
 
 
     def send(self) -> None:
@@ -121,14 +87,13 @@ class PumpCommWorker(QObject):
         """
         
         # send to P1 and P2 & keepAlive both
-        pmp_speed, p1_speed, p2_speed = self.get_speed_settings() 
+        p1_speed, p2_speed = pu.get_pmp_speeds()
         for serial, speed, live_ad, speed_global, p_num in [
                 (du.PMP1Serial, p1_speed, 'PMP1_live_ad', 'PMP1_speed', 'P1'),
                 (du.PMP2Serial, p2_speed, 'PMP2_live_ad', 'PMP2_speed', 'P2'),
         ]:
             if serial.connected and speed is not None:
                 res = serial.set_speed(int(speed * getattr(du, live_ad)))
-                
                 if res is not None:
                     with QMutexLocker(GlobalMutex):
                         setattr(du, speed_global, speed)
@@ -140,13 +105,12 @@ class PumpCommWorker(QObject):
         # SEND TO MIXER
         if du.PRH_connected and du.MIX_last_speed != du.MIX_speed:
             if du.PRH_act_with_pump:
-                mixer_speed = du.MIX_max_speed * pmp_speed / 100.0
+                mixer_speed = du.MIX_max_speed * (p1_speed + p2_speed) / (2 * 100.0)
             else:
                 mixer_speed = du.MIX_speed
             
             post_url = f"http://{du.PRH_url}/motor"
             post_resp = requests.post(post_url, data=f"s={mixer_speed}")
-
             if post_resp.ok and post_resp.text == f"RECV{mixer_speed}":
                 with QMutexLocker(GlobalMutex):
                     du.MIX_last_speed = mixer_speed

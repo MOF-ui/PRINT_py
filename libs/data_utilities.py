@@ -1789,6 +1789,7 @@ DEF_PUMP_SERIAL = {
     'port': 'COM3',
 }
 DEF_PUMP_OUTP_RATIO = 1.0
+DEF_PUMP_NO_USER_SPEED = -999
 DEF_PUMP_VALID_COMMANDS = [
     -1001, # = no p_mode
     1001, # default mode
@@ -1882,18 +1883,21 @@ PMP_port = DEF_PUMP_SERIAL['port']
 PMP_retract_speed = DEF_PUMP_RETR_SPEED
 PMP_serial_def_bus = None  # is created after user input in win_mainframe
 PMP_speed = 0
+PMP_look_ahead = False
+PMP_look_ahead_dist = 50
 PMP1_liter_per_s = DEF_PUMP_LPS
 PMP1_live_ad = 1.0
 PMP1_modbus_id = '01'
 PMP1_speed = 0
-PMP1_user_speed = -999
+PMP1_user_speed = DEF_PUMP_NO_USER_SPEED
 PMP1LastTelem = PumpTelemetry()
 PMP1Serial = MtecMod(None, PMP1_modbus_id)
 PMP2_liter_per_s = DEF_PUMP_LPS
 PMP2_live_ad = 1.0
 PMP2_modbus_id = '02'
 PMP2_speed = 0
-PMP2_user_speed = -999
+PMP2_user_speed = DEF_PUMP_NO_USER_SPEED
+
 PMP2LastTelem = PumpTelemetry()
 PMP2Serial = MtecMod(None, PMP2_modbus_id)
 

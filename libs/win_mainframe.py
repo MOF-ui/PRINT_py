@@ -153,6 +153,10 @@ class Mainframe(PreMainframe):
         self.IO_btt_xyzextZero.pressed.connect(lambda: self.set_zero([1, 2, 3, 8]))
         self.IO_btt_orientZero.pressed.connect(lambda: self.set_zero([4, 5, 6]))
 
+        # LOOK AHEAD
+        self.LAH_btt_active.pressed.connect(lambda: self.mutex_setattr('pmp_look_ahead'))
+        self.LAH_num_distance.valueChanged.connect(lambda: self.mutex_setattr('pmp_look_ahead_dist'))
+
         # MIXER CONTROL
         self.PRH_btt_actWithPump.pressed.connect(lambda: self.mutex_setattr('mixer_act_w_pump'))
         self.PRH_btt_pinchValve.pressed.connect(self.pinch_valve_toggle)

@@ -277,8 +277,9 @@ QFrame#ASC_frame,
 QFrame#DC_frame,
 QFrame#ICQ_frame,
 QFrame#IO_frame,
-QFrame#PRH_frame,
+QFrame#LAH_frame,
 QFrame#NC_frame,
+QFrame#PRH_frame,
 QFrame#PUMP_frame,
 QFrame#SCRTL_frame,
 QFrame#SET_frame,
@@ -4538,10 +4539,10 @@ color: #E1E5EE;</string>
         <string>%</string>
        </property>
        <property name="minimum">
-        <number>-100</number>
+        <number>-200</number>
        </property>
        <property name="maximum">
-        <number>100</number>
+        <number>200</number>
        </property>
       </widget>
       <widget class="QPushButton" name="PUMP_btt_reverse">
@@ -4822,9 +4823,9 @@ font-size: 12pt;</string>
       <widget class="QLabel" name="PUMP_lbl_p1Zero">
        <property name="geometry">
         <rect>
-         <x>557</x>
+         <x>537</x>
          <y>429</y>
-         <width>81</width>
+         <width>101</width>
          <height>31</height>
         </rect>
        </property>
@@ -4846,7 +4847,7 @@ font-size: 12pt;</string>
         <rect>
          <x>60</x>
          <y>429</y>
-         <width>61</width>
+         <width>71</width>
          <height>31</height>
         </rect>
        </property>
@@ -4935,9 +4936,9 @@ font-size: 16pt;</string>
       <widget class="QLabel" name="PUMP_lbl_outputRatio">
        <property name="geometry">
         <rect>
-         <x>460</x>
+         <x>430</x>
          <y>349</y>
-         <width>101</width>
+         <width>131</width>
          <height>31</height>
         </rect>
        </property>
@@ -5438,6 +5439,146 @@ QPushButton:checked:hover {
       <zorder>PRH_disp_currSpeed</zorder>
       <zorder>PRH_btt_actWithPump</zorder>
       <zorder>PRH_btt_pinchValve</zorder>
+     </widget>
+     <widget class="QFrame" name="LAH_frame">
+      <property name="geometry">
+       <rect>
+        <x>1350</x>
+        <y>20</y>
+        <width>561</width>
+        <height>221</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="LAH_0_frameLabel">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>20</y>
+         <width>241</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>22</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 22pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>LOOK AHEAD</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="LAH_btt_active">
+       <property name="geometry">
+        <rect>
+         <x>340</x>
+         <y>40</y>
+         <width>181</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>14</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+	background-color: #40a6a8;
+}
+
+QPushButton:checked {
+	background-color: #61fcff;
+}
+
+QPushButton:hover {
+	border: 2px solid #abfbff;
+}
+
+QPushButton:checked:hover {
+	border: 2px solid #40a6a8;
+}</string>
+       </property>
+       <property name="text">
+        <string>ON / OFF</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="LAH_num_distance">
+       <property name="geometry">
+        <rect>
+         <x>360</x>
+         <y>130</y>
+         <width>161</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 16pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string>mm</string>
+       </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="value">
+        <number>50</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="LAH_lbl_distance">
+       <property name="geometry">
+        <rect>
+         <x>180</x>
+         <y>130</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>LAH distance:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="SET_tab">

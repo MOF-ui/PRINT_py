@@ -18,6 +18,7 @@
 #   license.
 #
 ##############################################################################
+#
 # to-do:
 #   work with reconnects in automatic modes (open cell inbetween)
 #   debug mixer protocoll
