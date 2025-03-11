@@ -1411,14 +1411,14 @@ class Mainframe(PreMainframe):
 
 
     def pinch_valve_toggle(self, internal=False, val=0.0) -> None:
-        """not implemented yet"""
+        """no docstring yet"""
 
         if not internal:
-            pinch_state = self.PUMP_btt_pinchValve.isChecked()
+            pinch_state = int(not self.PRH_btt_pinchValve.isChecked())
         else:
             pinch_state = val
         try:
-            requests.post(f"{du.PRH_url}/pinch", f"s={pinch_state}")
+            requests.post(f"{du.PRH_url}/pinch", data={'s': pinch_state})
         except requests.Timeout as e:
             log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
             self.log_entry('CONN', log_txt)

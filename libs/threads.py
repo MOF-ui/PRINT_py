@@ -109,8 +109,8 @@ class PumpCommWorker(QObject):
             else:
                 mixer_speed = du.MIX_speed
             
-            post_url = f"http://{du.PRH_url}/motor"
-            post_resp = requests.post(post_url, data=f"s={mixer_speed}")
+            post_url = f"{du.PRH_url}/motor"
+            post_resp = requests.post(post_url, data={'s': mixer_speed})
             if post_resp.ok and post_resp.text == f"RECV{mixer_speed}":
                 with QMutexLocker(GlobalMutex):
                     du.MIX_last_speed = mixer_speed
