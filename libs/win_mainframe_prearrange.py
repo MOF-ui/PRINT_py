@@ -615,7 +615,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         """display printhead communication"""
 
         self.CONN_PRH_disp_writeBuffer.setText(str(mixer_speed))
-        self.CONN_PRH_disp_bytesWritten.setText(str(len(mixer_speed)))
+        self.CONN_PRH_disp_bytesWritten.setText("length of float")
         self.log_entry('PRTH', f"speed set to {mixer_speed}")
 
 

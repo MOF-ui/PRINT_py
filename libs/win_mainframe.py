@@ -1434,11 +1434,11 @@ class Mainframe(PreMainframe):
 
         match type:
             case 'sld':
-                speed = self.PRH_sld_speed.value()
+                speed = float(self.PRH_sld_speed.value())
             case '0':
-                speed = 0
+                speed = 0.0
             case _:
-                speed = self.PRH_num_setSpeed.value()
+                speed = float(self.PRH_num_setSpeed.value())
 
         with QMutexLocker(GlobalMutex):
             du.MIX_speed = speed
