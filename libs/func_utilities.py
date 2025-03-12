@@ -211,7 +211,7 @@ def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
     p_ratio = domain_clip(p_ratio, 0.0, 1.0)
     entry.p_ratio = p_ratio
     pinch = re_short(None, txt, False, find_coor='PIN')
-    entry.pinch = bool(pinch)
+    entry.pinch = bool(int(pinch))
 
     # set tool settings
     troll_steps = re_short(None, txt, 0, find_coor='TRL')
@@ -540,7 +540,7 @@ def calc_pump_ratio(p1_speed:int, p2_speed:int) -> tuple[float, float]:
 
     curr_total = p1_speed + p2_speed
     p1_ratio = (p1_speed / curr_total) if (curr_total != 0) else 1.0
-    curr_total = curr_total / 2
+    curr_total = curr_total
 
     return curr_total, p1_ratio
 

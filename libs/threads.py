@@ -87,7 +87,7 @@ class PumpCommWorker(QObject):
         """
         
         # send to P1 and P2 & keepAlive both
-        p1_speed, p2_speed = pu.get_pmp_speeds()
+        p1_speed, p2_speed, pinch = pu.get_pmp_speeds()
         for serial, speed, live_ad, speed_global, p_num in [
                 (du.PMP1Serial, p1_speed, 'PMP1_live_ad', 'PMP1_speed', 'P1'),
                 (du.PMP2Serial, p2_speed, 'PMP2_live_ad', 'PMP2_speed', 'P2'),
@@ -101,6 +101,14 @@ class PumpCommWorker(QObject):
                     self.dataSend.emit(speed, res[0], res[1], p_num)
 
                 serial.keepAlive()
+        if pinch is not None:
+            try:
+                ans = requests.post(f"{du.PRH_url}/pinch", data={'s': str(float(pinch))})
+                print(ans.text)
+            except requests.Timeout as e:
+                log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
+                self.logEntry.emit('CONN', log_txt)
+                print(log_txt)
 
         # SEND TO MIXER
         if du.PRH_connected and du.MIX_last_speed != du.MIX_speed:

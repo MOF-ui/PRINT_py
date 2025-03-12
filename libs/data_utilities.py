@@ -1803,7 +1803,7 @@ DEF_PUMP_VALID_COMMANDS = [
 DEF_ROB_BUFF_SIZE = 3000
 DEF_ROB_COMM_FR = 10
 DEF_ROB_COOR_CHK_RANGE = ( # to-do: better mapping
-    Coordinate(-1600.0, 1200.0, -80.0, 0.0, 0.0, 0.0, 0.0, 10.0),
+    Coordinate(-1600.0, 1200.0, -895.0, 0.0, 0.0, 0.0, 0.0, 10.0),
     Coordinate(3500.0, 2600.0, 2000.0, 360.0, 360.0, 360.0, 1.0, 3000.0),
 )
 DEF_ROB_TCP = {

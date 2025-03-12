@@ -27,7 +27,7 @@ import libs.func_utilities as fu
 
 ###########################     FUNCTIONS      ###############################
 
-def get_pmp_speeds() -> tuple[int, int]:
+def get_pmp_speeds() -> tuple[int, int, bool]:
     """see if pump settings have been scripted, otherwise use user 
     input;
     """
@@ -51,8 +51,8 @@ def get_pmp_speeds() -> tuple[int, int]:
         p2_speed = du.PMP2_user_speed
         du.PMP2_user_speed = du.DEF_PUMP_NO_USER_SPEED
     
-    last_speed = (p1_speed + p2_speed) / 2
-    return p1_speed, p2_speed
+    last_speed = (p1_speed + p2_speed)
+    return p1_speed, p2_speed, pinch
 
 
 def speed_by_ratio(t_speed, ratio) -> tuple[float, float]:
@@ -100,8 +100,8 @@ def look_ahead(p1_speed, p2_speed) -> tuple[float, float]:
                     elif p2_speed > 0:
                         p1_speed = next_p1_speed
                         p2_speed = -p2_speed
-    except:
-        pass
+    except Exception as e:
+        print(e)
     
     return p1_speed, p2_speed
 
@@ -133,6 +133,7 @@ def calc_speed() -> tuple[int | None, int, bool]:
             preceeding_comm = dcpy(curr_comm)
             preceeding_speed = last_speed
 
+    speed = None
     if p_mode in du.DEF_PUMP_VALID_COMMANDS:
         match p_mode:
             case -1001:
@@ -149,6 +150,8 @@ def calc_speed() -> tuple[int | None, int, bool]:
                 speed = du.DEF_PUMP_CLASS2
             case _:
                 speed = 0
+    if -100 <= p_mode <= 100:
+        speed = p_mode
     if speed is None:
         return None
 
