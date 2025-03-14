@@ -25,8 +25,8 @@ class FuncLibTest(unittest.TestCase):
         """
 
         test_txt = ";comment\nG1 X0 Y0 Z0\nG1 X2000 Y0 Z0.0\nG1 X2000 Y1500 Z0"
-        self.assertEqual(fu.pre_check_gcode_file(''), (0, 0, 'empty'))
-        self.assertEqual(fu.pre_check_gcode_file(test_txt), (3, 3.5, ''))
+        self.assertEqual(fu.pre_check_gcode_file(''), (0, 0, 0, 'empty'))
+        self.assertEqual(fu.pre_check_gcode_file(test_txt), (3, 1, 3.5, ''))
 
 
     def test_pre_check_rapid_file_function(self):
@@ -39,8 +39,8 @@ class FuncLibTest(unittest.TestCase):
             f"MoveL [[2000.0,0.0,0.0],...,v50,z10,tool0\n"
             f"MoveL [[2000.0,1500.0,0.0],...,v50,z10,tool0"
         )
-        self.assertEqual(fu.pre_check_rapid_file(''), (0, 0, 'empty'))
-        self.assertEqual(fu.pre_check_rapid_file(test_txt), (3, 3.5, ''))
+        self.assertEqual(fu.pre_check_rapid_file(''), (0, 0, 0, 'empty'))
+        self.assertEqual(fu.pre_check_rapid_file(test_txt), (3, 1, 3.5, ''))
 
 
     def test_re_short_function(self):

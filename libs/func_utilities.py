@@ -45,10 +45,26 @@ def domain_clip(x:float, min_val:float, max_val:float) -> float:
     return float(max(min(x, max_val), min_val))
 
 
+def range_check(target_entry:du.QEntry) -> tuple[bool, str]:
+    """checks if a given target violates the range of safe movement"""
+
+    target = target_entry.Coor1
+    names = target.attr_names
+    RangeMin, RangeMax = dcpy(du.DEF_ROB_COOR_CHK_RANGE)
+    for t_attr, rmin_attr, rmax_attr, name in zip(target, RangeMin, RangeMax, names):
+        if not rmin_attr <= t_attr <= rmax_attr:
+            msg =  (
+                f"Target out of range on axis {name.upper}: "
+                f"{t_attr} ({rmin_attr} - {rmax_attr})"
+            )
+            return False, msg
+    return True, ''
+
+
 def pre_check_gcode_file(
         txt:str
 ) -> (
-        tuple[int | Exception, float, str]
+        tuple[int | Exception, int, float, str]
 ):
     """extracts the number of GCode commands and the filament length from
     text, ignores Z movement for now, slicing only in x-y-plane yet
@@ -60,42 +76,50 @@ def pre_check_gcode_file(
 
     try:
         if txt == '':
-            return 0, 0.0, 'empty'
+            return 0, 0, 0.0, 'empty'
 
         rows = txt.split('\n')
         x = y = z = 0.0
         comm_num = 0
+        skips = 0
         filament_length = 0.0
 
         for row in rows:
+            # skip comments (starting with ';', regex ignores whitespace)
+            if len(re.findall(r'^\s*;', row)) > 0:
+                skips += 1
+                continue
+            # look for valid command lines (ignores M-commands)
             if len(re.findall(r'G\d+', row)) > 0:
                 comm_num += 1
-            x_new = float(re_short(None, row, x, find_coor='X'))
-            y_new = float(re_short(None, row, y, find_coor='Y'))
-            z_new = float(re_short(None, row, z, find_coor='Z'))
+                x_new = float(re_short(None, row, x, find_coor='X'))
+                y_new = float(re_short(None, row, y, find_coor='Y'))
+                z_new = float(re_short(None, row, z, find_coor='Z'))
 
-            # do the Pythagoras for me, baby
-            filament_length += m.sqrt(
-                m.pow(x_new - x, 2)
-                + m.pow(y_new - y, 2)
-                + m.pow(z_new - z, 2)
-            )
-            x, y, z = x_new, y_new, z_new
+                # do the Pythagoras for me, baby
+                filament_length += m.sqrt(
+                    m.pow(x_new - x, 2)
+                    + m.pow(y_new - y, 2)
+                    + m.pow(z_new - z, 2)
+                )
+                x, y, z = x_new, y_new, z_new
+            else:
+                skips += 1
 
         # convert filamentLength to meters and round
         filament_length /= 1000.0
         filament_length = round(filament_length, 2)
 
     except Exception as err:
-        return err, 0.0, ''
+        return err, 0, 0.0, ''
 
-    return comm_num, filament_length, ''
+    return comm_num, skips, filament_length, ''
 
 
 def pre_check_rapid_file(
         txt:str
 ) -> (
-        tuple[int | Exception, float, str]
+        tuple[int | Exception, int, float, str]
 ):
     """extracts the number of GCode commands and the filament length from
     text, does not handle Offs commands yet
@@ -107,18 +131,23 @@ def pre_check_rapid_file(
 
     try:
         if txt == '':
-            return 0, 0.0, 'empty'
+            return 0, 0, 0.0, 'empty'
 
         rows = txt.split('\n')
         x = 0.0
         y = 0.0
         z = 0.0
         comm_num = 0
+        skips = 0
         filament_length = 0.0
 
         for row in rows:
-            # the ' p' expression is to differ between 'MoveJ pHome,[...]'
-            # and 'MoveJ Offs(pHome [...]'
+            # skip comments (starting with '!', regex ignores whitespace)
+            if len(re.findall(r'^\s*!', row)) > 0:
+                skips += 1
+                continue
+            # ' p' (notice the whitespace) expression to differ between
+            # 'MoveJ pHome,[...]' and 'MoveJ Offs(pHome [...]'
             if ('Move' in row) and (' p' not in row):
                 comm_num += 1
                 digits = re.findall(r'(-?\d+[,\.]?[\d+]?)', row)
@@ -135,15 +164,17 @@ def pre_check_rapid_file(
                     + m.pow(z_new - z, 2)
                 )
                 x, y, z = x_new, y_new, z_new
+            else:
+                skips += 1
 
         # convert filamentLength to meters and round
         filament_length /= 1000
         filament_length = round(filament_length, 2)
 
     except Exception as err:
-        return err, 0.0, ''
+        return err, 0, 0.0, ''
 
-    return comm_num, filament_length, ''
+    return comm_num, skips, filament_length, ''
 
 
 def re_short(
@@ -287,8 +318,8 @@ def gcode_to_qentry(
                     # calculate following position of external axis
                     if entry.Coor1.x > 0:
                         entry.Coor1.ext = (
-                            int(entry.Coor1.x / du.SC_ext_fllw_bhvr[0])
-                            * du.SC_ext_fllw_bhvr[1]
+                            int(entry.Coor1.x / du.SC_ext_trail[0])
+                            * du.SC_ext_trail[1]
                         )
                         entry.Coor1.ext += zero.ext
 
@@ -430,8 +461,8 @@ def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
         if ext_from_file is None:
             if ext_trail:
                 ext_from_file = (
-                    int(entry.Coor1.x / du.SC_ext_fllw_bhvr[0])
-                    * du.SC_ext_fllw_bhvr[1]
+                    int(entry.Coor1.x / du.SC_ext_trail[0])
+                    * du.SC_ext_trail[1]
                 )
         else:
             ext_from_file = float(ext_from_file)

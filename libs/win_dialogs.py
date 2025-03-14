@@ -60,7 +60,7 @@ class FileDialog(QFileDialog):
         self.setupUi(self)
         self.setWindowTitle(title)
         self.setFileMode(1)  # enum for 'ExistingFile'
-        self.setDirectory(r"C:\Users\Max\Desktop\MultiCarb3D\TCP_Robo\CAD2RAPID")
+        self.setDirectory(r"C:\Users\Max\Downloads")
         self.setNameFilters({'GCode files (*.gcode)', 'RAPID files (*.mod)'})
         self.selectNameFilter('GCode files (*.gcode)')
 

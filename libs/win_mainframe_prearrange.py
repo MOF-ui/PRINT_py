@@ -180,8 +180,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         self.NC_group = [
             self.NC_btt_xyzSend,
-            self.NC_btt_xyzExtSend,
-            self.NC_btt_orientSend,
+            self.NC_btt_xyzextSend,
+            self.NC_btt_rSend,
         ]
 
         self.PMP1_group = [
@@ -255,9 +255,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         try:
             with open(self._logpath, 'a') as log_file:
                 log_file.write(text)
-            self.SET_disp_logEntry.setText(text)
+            self.disp_logEntry.setText(text)
         except:
-            self.SET_disp_logEntry.setText('LOG FILE ERROR!')
+            self.disp_logEntry.setText('LOG FILE ERROR!')
 
 
 
@@ -314,6 +314,13 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             du.PRINSpeed.ors = self.SET_num_orientSpeed_print.value()
             du.PRINSpeed.acr = self.SET_num_accelRamp_print.value()
             du.PRINSpeed.dcr = self.SET_num_decelRamp_print.value()
+            du.SC_ext_trail = (
+                self.SET_num_followInterv.value(),
+                self.SET_num_followSkip.value(),
+            )
+            du.PMP_retract_speed = self.SET_num_retractSpeed.value()
+            du.PMP1_liter_per_s = self.SET_float_p1Flow.value()
+            du.PMP2_liter_per_s = self.SET_float_p2Flow.value()
 
         self.log_entry(
             'SETS',
@@ -322,29 +329,12 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             f", PrinTS: {du.PRINSpeed.ts}, PrinOS: {du.PRINSpeed.ors}"
             f", PrinACR: {du.PRINSpeed.acr} PrinDCR: {du.PRINSpeed.dcr}"
             f", DCTS: {du.DCSpeed.ts}, DCOS: {du.DCSpeed.ors}"
-            f", DCACR: {du.DCSpeed.acr}, DCDCR: {du.DCSpeed.dcr}",
-        )
-
-
-    def apply_TE_settings(self) -> None:
-        """load default settings to settings display"""
-
-        with QMutexLocker(GlobalMutex):
-            du.SC_ext_fllw_bhvr = (
-                self.SET_TE_num_fllwBhvrInterv.value(),
-                self.SET_TE_num_fllwBhvrSkip.value(),
-            )
-            du.PMP_retract_speed = self.SET_TE_num_retractSpeed.value()
-            du.PMP1_liter_per_s = self.SET_TE_float_p1VolFlow.value()
-            du.PMP2_liter_per_s = self.SET_TE_float_p2VolFlow.value()
-
-        self.log_entry(
-            'SETS',
-            f"TE settings updated -- FB_inter: {du.SC_ext_fllw_bhvr[0]}, "
-            f"FB_skip: {du.SC_ext_fllw_bhvr[1]}, "
+            f", DCACR: {du.DCSpeed.acr}, DCDCR: {du.DCSpeed.dcr}, "
+            f"FB_inter: {du.SC_ext_trail[0]}, "
+            f"FB_skip: {du.SC_ext_trail[1]}, "
             f"PmpRS: {du.PMP_retract_speed}, "
             f"Pmp1LPS: {du.PMP1_liter_per_s}, "
-            f"Pmp2LPS: {du.PMP2_liter_per_s}",
+            f"Pmp2LPS: {du.PMP2_liter_per_s}"
         )
 
 
@@ -362,33 +352,23 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.SET_num_orientSpeed_print.setValue(du.DEF_PRIN_SPEED.ors)
         self.SET_num_accelRamp_print.setValue(du.DEF_PRIN_SPEED.acr)
         self.SET_num_decelRamp_print.setValue(du.DEF_PRIN_SPEED.dcr)
+        self.SET_num_followInterv.setValue(du.DEF_SC_EXT_TRAIL[0])
+        self.SET_num_followSkip.setValue(du.DEF_SC_EXT_TRAIL[1])
+        self.SET_float_p1Flow.setValue(du.DEF_PUMP_LPS)
+        self.SET_float_p2Flow.setValue(du.DEF_PUMP_LPS)
+        self.SET_num_retractSpeed.setValue(int(du.DEF_PUMP_RETR_SPEED))
 
         if not setup:
             self.log_entry(
-                "SETS", "User resetted general properties to default values."
+                "SETS", "User reset general properties to default values."
             )
         else:
-            self.load_TE_defaults(setup=True)
             self.CONN_num_commForerun.setValue(du.DEF_ROB_COMM_FR)
-
             self.load_ADC_defaults()
             self.ASC_num_trolley.setValue(du.DEF_PRH_TROLLEY)
             self.ASC_btt_clamp.setChecked(du.DEF_PRH_CLAMP)
             self.ASC_btt_cut.setChecked(du.DEF_PRH_CUT)
             self.ASC_btt_placeSpring.setChecked(du.DEF_PRH_PLACE_SPR)
-
-
-    def load_TE_defaults(self, setup=False) -> None:
-        """load default Tool/External settings to user display"""
-
-        self.SET_TE_num_fllwBhvrInterv.setValue(du.DEF_SC_EXT_FLLW_BHVR[0])
-        self.SET_TE_num_fllwBhvrSkip.setValue(du.DEF_SC_EXT_FLLW_BHVR[1])
-        self.SET_TE_float_p1VolFlow.setValue(du.DEF_PUMP_LPS)
-        self.SET_TE_float_p2VolFlow.setValue(du.DEF_PUMP_LPS)
-        self.SET_TE_num_retractSpeed.setValue(int(du.DEF_PUMP_RETR_SPEED))
-
-        if not setup:
-            self.log_entry("SETS", "User resetted TE properties to default values.")
 
 
     def load_ADC_defaults(self, send_changes=False) -> None:
@@ -656,9 +636,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.NC_disp_x.setText(f"{Pos.x}")
         self.NC_disp_y.setText(f"{Pos.y}")
         self.NC_disp_z.setText(f"{Pos.z}")
-        self.NC_disp_xOrient.setText(f"{Pos.rx}°")
-        self.NC_disp_yOrient.setText(f"{Pos.ry}°")
-        self.NC_disp_zOrient.setText(f"{Pos.rz}°")
+        self.NC_disp_rx.setText(f"{Pos.rx}°")
+        self.NC_disp_ry.setText(f"{Pos.ry}°")
+        self.NC_disp_rz.setText(f"{Pos.rz}°")
         self.NC_disp_ext.setText(f"{Pos.ext}")
 
         # TERMINAL
@@ -777,9 +757,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.ZERO_disp_x.setText(str(du.DCCurrZero.x))
         self.ZERO_disp_y.setText(str(du.DCCurrZero.y))
         self.ZERO_disp_z.setText(str(du.DCCurrZero.z))
-        self.ZERO_disp_xOrient.setText(str(du.DCCurrZero.rx))
-        self.ZERO_disp_yOrient.setText(str(du.DCCurrZero.ry))
-        self.ZERO_disp_zOrient.setText(str(du.DCCurrZero.rz))
+        self.ZERO_disp_rx.setText(str(du.DCCurrZero.rx))
+        self.ZERO_disp_ry.setText(str(du.DCCurrZero.ry))
+        self.ZERO_disp_rz.setText(str(du.DCCurrZero.rz))
         self.ZERO_disp_ext.setText(str(du.DCCurrZero.ext))
 
         self.ZERO_float_x.setValue(du.DCCurrZero.x)
@@ -899,9 +879,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.NC_float_x.setValue(du.ROBTelem.Coor.x)
         self.NC_float_y.setValue(du.ROBTelem.Coor.y)
         self.NC_float_z.setValue(du.ROBTelem.Coor.z)
-        self.NC_float_xOrient.setValue(du.ROBTelem.Coor.rx)
-        self.NC_float_yOrient.setValue(du.ROBTelem.Coor.ry)
-        self.NC_float_zOrient.setValue(du.ROBTelem.Coor.rz)
+        self.NC_float_rx.setValue(du.ROBTelem.Coor.rx)
+        self.NC_float_ry.setValue(du.ROBTelem.Coor.ry)
+        self.NC_float_rz.setValue(du.ROBTelem.Coor.rz)
         self.NC_float_ext.setValue(du.ROBTelem.Coor.ext)
 
 

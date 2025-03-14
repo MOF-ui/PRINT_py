@@ -379,21 +379,21 @@ class MainframeWinTest(unittest.TestCase):
             TestFrame.SET_num_decelRamp_print.value(), du.DEF_PRIN_SPEED.dcr
         )
         self.assertEqual(
-            TestFrame.SET_TE_num_fllwBhvrInterv.value(),
-            du.DEF_SC_EXT_FLLW_BHVR[0],
+            TestFrame.SET_num_followInterv.value(),
+            du.DEF_SC_EXT_TRAIL[0],
         )
         self.assertEqual(
-            TestFrame.SET_TE_num_fllwBhvrSkip.value(),
-            du.DEF_SC_EXT_FLLW_BHVR[1],
+            TestFrame.SET_num_followSkip.value(),
+            du.DEF_SC_EXT_TRAIL[1],
         )
         self.assertEqual(
-            TestFrame.SET_TE_num_retractSpeed.value(), du.DEF_PUMP_RETR_SPEED
+            TestFrame.SET_num_retractSpeed.value(), du.DEF_PUMP_RETR_SPEED
         )
         self.assertEqual(
-            TestFrame.SET_TE_float_p1VolFlow.value(), du.DEF_PUMP_LPS
+            TestFrame.SET_float_p1Flow.value(), du.DEF_PUMP_LPS
         )
         self.assertEqual(
-            TestFrame.SET_TE_float_p2VolFlow.value(), du.DEF_PUMP_LPS
+            TestFrame.SET_float_p2Flow.value(), du.DEF_PUMP_LPS
         )
         self.assertEqual(
             TestFrame.ADC_num_trolley.value(), du.DEF_PRH_TROLLEY
@@ -433,14 +433,12 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.SET_num_orientSpeed_print.setValue(10)
         TestFrame.SET_num_accelRamp_print.setValue(11)
         TestFrame.SET_num_decelRamp_print.setValue(12)
+        TestFrame.SET_num_followInterv.setValue(13)
+        TestFrame.SET_num_followSkip.setValue(14)
+        TestFrame.SET_num_retractSpeed.setValue(15)
+        TestFrame.SET_float_p1Flow.setValue(16)
+        TestFrame.SET_float_p2Flow.setValue(17)
         TestFrame.apply_settings()
-
-        TestFrame.SET_TE_num_fllwBhvrInterv.setValue(13)
-        TestFrame.SET_TE_num_fllwBhvrSkip.setValue(14)
-        TestFrame.SET_TE_num_retractSpeed.setValue(15)
-        TestFrame.SET_TE_float_p1VolFlow.setValue(16)
-        TestFrame.SET_TE_float_p2VolFlow.setValue(17)
-        TestFrame.apply_TE_settings()
 
         self.assertEqual(du.ROB_comm_fr, 1)
         self.assertEqual(du.SC_vol_per_m, 2.2)
@@ -454,9 +452,8 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(du.PRINSpeed.ors, 10)
         self.assertEqual(du.PRINSpeed.acr, 11)
         self.assertEqual(du.PRINSpeed.dcr, 12)
-
-        self.assertEqual(du.SC_ext_fllw_bhvr[0], 13)
-        self.assertEqual(du.SC_ext_fllw_bhvr[1], 14)
+        self.assertEqual(du.SC_ext_trail[0], 13)
+        self.assertEqual(du.SC_ext_trail[1], 14)
         self.assertEqual(du.PMP_retract_speed, 15)
         self.assertEqual(du.PMP1_liter_per_s, 16)
         self.assertEqual(du.PMP2_liter_per_s, 17)
@@ -465,8 +462,6 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.CONN_num_commForerun.setValue(10)
         TestFrame.load_defaults()
         TestFrame.apply_settings()
-        TestFrame.load_TE_defaults()
-        TestFrame.apply_TE_settings()
 
         self.assertEqual(TestFrame.SET_num_zone.value(), du.DEF_IO_ZONE)
         self.assertEqual(
@@ -503,21 +498,21 @@ class MainframeWinTest(unittest.TestCase):
             TestFrame.SET_num_decelRamp_print.value(), du.DEF_PRIN_SPEED.dcr
         )
         self.assertEqual(
-            TestFrame.SET_TE_num_fllwBhvrInterv.value(),
-            du.DEF_SC_EXT_FLLW_BHVR[0],
+            TestFrame.SET_num_followInterv.value(),
+            du.DEF_SC_EXT_TRAIL[0],
         )
         self.assertEqual(
-            TestFrame.SET_TE_num_fllwBhvrSkip.value(),
-            du.DEF_SC_EXT_FLLW_BHVR[1],
+            TestFrame.SET_num_followSkip.value(),
+            du.DEF_SC_EXT_TRAIL[1],
         )
         self.assertEqual(
-            TestFrame.SET_TE_num_retractSpeed.value(), du.DEF_PUMP_RETR_SPEED
+            TestFrame.SET_num_retractSpeed.value(), du.DEF_PUMP_RETR_SPEED
         )
         self.assertEqual(
-            TestFrame.SET_TE_float_p1VolFlow.value(), du.DEF_PUMP_LPS
+            TestFrame.SET_float_p1Flow.value(), du.DEF_PUMP_LPS
         )
         self.assertEqual(
-            TestFrame.SET_TE_float_p2VolFlow.value(), du.DEF_PUMP_LPS
+            TestFrame.SET_float_p2Flow.value(), du.DEF_PUMP_LPS
         )
 
 
@@ -526,7 +521,7 @@ class MainframeWinTest(unittest.TestCase):
         self.maxDiff = 2000
 
         du.SCQueue.clear()
-        du.SC_ext_fllw_bhvr = (500, 200)
+        du.SC_ext_trail = (500, 200)
 
         for i in range(1, 7, 1):
             TestFrame.add_gcode_sgl(
@@ -557,7 +552,7 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.clr_queue(partial=False)
         self.assertEqual(du.SCQueue.display(), ['Queue is empty!'])
 
-        du.SC_ext_fllw_bhvr = du.DEF_SC_EXT_FLLW_BHVR
+        du.SC_ext_trail = du.DEF_SC_EXT_TRAIL
 
 
     def test_home_command(self):
@@ -628,9 +623,9 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(TestFrame.ZERO_disp_x.text(), '1.1')
         self.assertEqual(TestFrame.ZERO_disp_y.text(), '2.0')
         self.assertEqual(TestFrame.ZERO_disp_z.text(), '3.0')
-        self.assertEqual(TestFrame.ZERO_disp_xOrient.text(), '4.0')
-        self.assertEqual(TestFrame.ZERO_disp_yOrient.text(), '5.0')
-        self.assertEqual(TestFrame.ZERO_disp_zOrient.text(), '6.0')
+        self.assertEqual(TestFrame.ZERO_disp_rx.text(), '4.0')
+        self.assertEqual(TestFrame.ZERO_disp_ry.text(), '5.0')
+        self.assertEqual(TestFrame.ZERO_disp_rz.text(), '6.0')
         self.assertEqual(TestFrame.ZERO_disp_ext.text(), '8.0')
 
         du.DCCurrZero = du.Coordinate()
@@ -695,7 +690,7 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(TestFrame.IO_num_addByID.value(), 1)
         self.assertEqual(
             TestFrame.IO_lbl_loadFile.text(),
-            '... 3 command(s) skipped (syntax)',
+            '... conversion successful',
         )
 
 
@@ -885,9 +880,9 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(TestFrame.NC_disp_x.text(), '1.1')
         self.assertEqual(TestFrame.NC_disp_y.text(), '2.2')
         self.assertEqual(TestFrame.NC_disp_z.text(), '3.3')
-        self.assertEqual(TestFrame.NC_disp_xOrient.text(), '4.4°')
-        self.assertEqual(TestFrame.NC_disp_yOrient.text(), '5.5°')
-        self.assertEqual(TestFrame.NC_disp_zOrient.text(), '6.6°')
+        self.assertEqual(TestFrame.NC_disp_rx.text(), '4.4°')
+        self.assertEqual(TestFrame.NC_disp_ry.text(), '5.5°')
+        self.assertEqual(TestFrame.NC_disp_rz.text(), '6.6°')
         self.assertEqual(TestFrame.NC_disp_ext.text(), '8.8')
 
         self.assertEqual(TestFrame.TERM_disp_tcpSpeed.text(), '9.9')
@@ -1023,9 +1018,9 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.NC_float_x.setValue(1)
         TestFrame.NC_float_y.setValue(2000)
         TestFrame.NC_float_z.setValue(0)
-        TestFrame.NC_float_xOrient.setValue(4)
-        TestFrame.NC_float_yOrient.setValue(5)
-        TestFrame.NC_float_zOrient.setValue(6)
+        TestFrame.NC_float_rx.setValue(4)
+        TestFrame.NC_float_ry.setValue(5)
+        TestFrame.NC_float_rz.setValue(6)
         TestFrame.NC_float_ext.setValue(102)
         TestFrame.DC_drpd_moveType.setCurrentText('LINEAR')
 

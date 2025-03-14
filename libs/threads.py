@@ -521,11 +521,12 @@ class LoadFileWorker(QObject):
 
     def run(self, testrun=False) -> None:
         """get data, start conversion loop"""
-
         global lfw_file_path
         global lfw_line_id
         global lfw_ext_trail
         global lfw_p_ctrl
+        global lfw_range_chk
+        global lfw_xy_ext_chk
         global lfw_running
         global lfw_pre_run_time
 
@@ -537,68 +538,27 @@ class LoadFileWorker(QObject):
             lfw_running = False
             return
 
-        file = open(file_path, "r")
-        txt = file.read()
-        file.close()
-
         # init vars
-        self._CommList.clear()
+        with open(file_path, 'r') as file:
+            txt = file.read()
         rows = txt.split("\n")
-        skips = 0
+        self._CommList.clear()
         start_id = line_id
 
         # iterate over file rows
-        if not testrun:
-            print(f"streaming file: {file_path}")
-
         if file_path.suffix == ".gcode":
-            for row in rows:
-                Entry, command = self.gcode_conv(id=line_id, txt=row)
-
-                if isinstance(Entry, Exception):
-                    self.convFailed.emit(f"VALUE ERROR: {command}")
-                    lfw_running = False
-                    return
-                if (command == "G92") or (command == ";") or (command == ''):
-                    skips += 1
-                elif (command == "G1") or (command == "G28"):
-                    line_id += 1
-                else:
-                    self.convFailed.emit(f"{command}!, ABORTED")
-                    lfw_running = False
-                    return
-
+            result, skips = self.gcode_conv(line_id, rows)
         else:
-            for row in rows:
-                Entry = self.rapid_conv(id=line_id, txt=row)
-
-                if isinstance(Entry, Exception):
-                    self.convFailed.emit(f"ERROR: {Entry}")
-                    lfw_running = False
-                    return
-                elif Entry is None:
-                    skips += 1
-                else:
-                    line_id += 1
-
+            result, skips = self.rapid_conv(line_id, rows)
         if len(self._CommList) == 0:
             self.convFailed.emit("No commands found!")
+            result = False
+        if not result:
             lfw_running = False
             return
 
-        # check for unidistance mode
-        # um_check = fu.re_short("\&\&: \d+.\d+", txt, None, "\&\&: \d+")
-        # if um_check is not None:
-        #     um_dist = fu.re_short("\d+.\d+", um_check, ValueError, "\d+")
-        #     um_conv_res = self.add_um_tool(um_dist)
-        #     if um_conv_res is not None:
-        #         self.convFailed.emit(um_conv_res)
-        #         lfw_running = False
-        #         return
-
         # automatic pump control
-        if lfw_p_ctrl and (len(self._CommList) > 0):
-
+        if lfw_p_ctrl:
             # set all entries to pmode=default
             for Entry in self._CommList:
                 Entry.p_mode = "default"
@@ -616,81 +576,76 @@ class LoadFileWorker(QObject):
             # set the last entry to pMode=end
             self._CommList[len(self._CommList) - 1].p_mode = "end"
 
+        # range check
+        if lfw_range_chk:
+            for Entry in self._CommList:
+                result, msg = fu.range_check(Entry)
+                if not result:
+                    return 
+
+        # add to command queue
         du.SCQueue.add_queue(self._CommList)
         self.convFinished.emit(line_id, start_id, skips)
         lfw_running = False
 
 
-    def gcode_conv(
-            self,
-            id:int,
-            txt:str
-    ) -> (
-        tuple[du.QEntry | None | ValueError, str]
-    ):
-        """single line conversion from GCode"""
+    def gcode_conv(self, id:int, rows:list) -> tuple[bool, int]:
+        """row-wise conversion from GCode"""
 
-        # get text and position BEFORE PLANNED COMMAND EXECUTION
+        skips = 0
         Speed = dcpy(du.PRINSpeed)
-        try:
-            if len(self._CommList) == 0:
-                Pos = dcpy(du.SCQueue.entry_before_id(id).Coor1)
+        # file import always starts from home, regardless of current pos:
+        LastPos = du.DCCurrZero
+
+        for row in rows:
+            Entry, command = fu.gcode_to_qentry(
+                LastPos,
+                Speed,
+                du.IO_zone,
+                row,
+                lfw_ext_trail
+            )
+            # check if valid command
+            if (command == "G1") or (command == "G28"):
+                Entry.id = id
+                res = self._CommList.add(Entry, thread_call=True)
+                if res == ValueError:
+                    self.convFailed.emit(f"COULD NOT ADD: {command}!")
+                    return False, 0
+                id += 1
+                LastPos = Entry.Coor1
+            elif (command == "G92") or (command == ";") or (command == ''):
+                skips += 1
             else:
-                Pos = dcpy(self._CommList.last_entry().Coor1)
-        except AttributeError:
-            Pos = du.DCCurrZero
-
-        # act according to GCode command
-        Entry, command = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt, lfw_ext_trail)
-
-        if (command != "G1") and (command != "G28"):
-            return Entry, command
-
-        Entry.id = id
-        res = self._CommList.add(Entry, thread_call=True)
-
-        if res == ValueError:
-            return ValueError, ''
-
-        return Entry, command
+                # if invalid, break conversion
+                if isinstance(Entry, Exception):
+                    self.convFailed.emit(f"VALUE ERROR: {command}!")
+                else:
+                    self.convFailed.emit(f"{command}, ABORTED!")
+                return False, 0
+        return True, skips
 
 
-    def rapid_conv(self, id:int, txt:str) -> du.QEntry | None | Exception:
+    def rapid_conv(self, id:int, rows:list) -> tuple[bool, int]:
         """single line conversion from RAPID"""
 
-        Entry = fu.rapid_to_qentry(txt, lfw_ext_trail)
-        if isinstance(Entry, Exception) or Entry is None:
-            return Entry
+        skips = 0
+        for row in rows:
+            Entry = fu.rapid_to_qentry(row, lfw_ext_trail)
+            if Entry is None:
+                skips += 1
+            elif isinstance(Entry, Exception):
+                self.convFailed.emit(f"ERROR: {Entry}")
+                return False, 0
+            else:
+                Entry.id = id
+                res = self._CommList.add(Entry, thread_call=True)
+                if res == ValueError:
+                    return False, 0
+                id += 1
+        return True, skips
 
-        Entry.id = id
-        res = self._CommList.add(Entry, thread_call=True)
 
-        if res == ValueError:
-            return ValueError
-
-        return Entry
-
-
-    # def add_um_tool(self, umd:float):
-    #     """check if the data makes send, add the tooldata to entries"""
-
-    #     try:
-    #         um_dist = float(umd)
-    #     except:
-    #         return f"UM-Mode failed reading {umd}"
-
-    #     if um_dist < 0.0 or um_dist > 2000.0:
-    #         return f"UM-Distance <0 or >2000"
-
-    #     for Entry in self._CommList:
-    #         travel_time = um_dist / Entry.Speed.ts
-    #         if (um_dist % Entry.Speed.ts) != 0:
-    #             return f"UM-Mode failed setting {travel_time} to int."
-
-    #         Entry.sc = "T"
-    #         Entry.sbt = int(travel_time)
-    #         Entry.Tool.time_time = int(travel_time)
-    #     return None
 
 
 
@@ -767,5 +722,7 @@ lfw_file_path = None
 lfw_line_id = 0
 lfw_ext_trail = True
 lfw_p_ctrl = False
+lfw_range_chk = True
+lfw_xy_ext_chk = True
 lfw_running = False
 lfw_pre_run_time = 10

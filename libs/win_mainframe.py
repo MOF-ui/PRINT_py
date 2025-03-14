@@ -151,7 +151,7 @@ class Mainframe(PreMainframe):
         self.IO_btt_loadFile.pressed.connect(self.load_file)
         self.IO_btt_addByID.pressed.connect(lambda: self.load_file(lf_atID=True))
         self.IO_btt_xyzextZero.pressed.connect(lambda: self.set_zero([1, 2, 3, 8]))
-        self.IO_btt_orientZero.pressed.connect(lambda: self.set_zero([4, 5, 6]))
+        self.IO_btt_rZero.pressed.connect(lambda: self.set_zero([4, 5, 6]))
 
         # LOOK AHEAD
         self.LAH_btt_active.pressed.connect(lambda: self.mutex_setattr('pmp_look_ahead'))
@@ -167,9 +167,9 @@ class Mainframe(PreMainframe):
         # NUMERIC CONTROL
         self.NC_btt_getValues.pressed.connect(self.values_to_DC_spinbox)
         self.NC_btt_xyzSend.pressed.connect(lambda: self.send_NC_command([1, 2, 3]))
-        self.NC_btt_xyzExtSend.pressed.connect(lambda: self.send_NC_command([1, 2, 3, 8]))
-        self.NC_btt_orientSend.pressed.connect(lambda: self.send_NC_command([4, 5, 6]))
-        self.NC_btt_orientZero.pressed.connect(lambda: self.set_zero([4, 5, 6]))
+        self.NC_btt_xyzextSend.pressed.connect(lambda: self.send_NC_command([1, 2, 3, 8]))
+        self.NC_btt_rSend.pressed.connect(lambda: self.send_NC_command([4, 5, 6]))
+        self.NC_btt_rZero.pressed.connect(lambda: self.set_zero([4, 5, 6]))
 
         # PUMP CONTROL
         self.PUMP_sld_outputRatio.sliderMoved.connect(lambda: self.mutex_setattr('pmp_out_ratio'))
@@ -210,8 +210,6 @@ class Mainframe(PreMainframe):
         self.CONN_num_commForerun.valueChanged.connect(lambda: self.mutex_setattr('robot_comm_fr'))
         self.SET_btt_apply.pressed.connect(self.apply_settings)
         self.SET_btt_default.pressed.connect(self.load_defaults)
-        self.SET_TE_btt_apply.pressed.connect(self.apply_TE_settings)
-        self.SET_TE_btt_default.pressed.connect(self.load_TE_defaults)
         self.SID_btt_overwrite.pressed.connect(self.sc_id_overwrite)
 
         # SINGLE COMMAND
@@ -697,35 +695,35 @@ class Mainframe(PreMainframe):
 
         # get number of commands and filament length
         if file_path.suffix == '.mod':
-            comm_num, filament_length, res = fu.pre_check_rapid_file(txt)
+            comm_num, skips, fil_length, res = fu.pre_check_rapid_file(txt)
         else:
-            comm_num, filament_length, res = fu.pre_check_gcode_file(txt)
+            comm_num, skips, fil_length, res = fu.pre_check_gcode_file(txt)
 
         if isinstance(comm_num, Exception):
-            self.IO_disp_filename.setText('COULD NOT READ FILE!')
+            self.IO_disp_filename.setText('UNREADABLE FILE!')
             self.log_entry(
                 'F-IO',
                 f"Error while opening {file_path} file: {comm_num}"
             )
             du.IO_curr_filepath = None
             return
-
         if res == 'empty':
             self.IO_disp_filename.setText('FILE EMPTY!')
             return
 
         # display data
-        filament_vol = round(filament_length * du.SC_vol_per_m, 1)
+        fil_vol = round(fil_length * du.SC_vol_per_m, 1)
         self.IO_disp_filename.setText(file_path.name)
         self.IO_disp_commNum.setText(f"{comm_num}")
-        self.IO_disp_estimLen.setText(f"{filament_length} m")
-        self.IO_disp_estimVol.setText(f"{filament_vol} L")
+        self.IO_disp_ignoredLines.setText(f"{skips}")
+        self.IO_disp_estimLen.setText(f"{fil_length} m")
+        self.IO_disp_estimVol.setText(f"{fil_vol} L")
 
         self.log_entry(
             'F-IO',
             (
-                f"Opened new file at {file_path}:   {comm_num} commands,   "
-                f"{filament_length}m filament, {filament_vol}L"
+                f"Opened new file at {file_path}:   {comm_num} commands, "
+                f"{skips} lines skipted, {fil_length}m filament, {fil_vol}L"
             ),
         )
         du.IO_curr_filepath = file_path
@@ -740,8 +738,10 @@ class Mainframe(PreMainframe):
 
         # get user input
         start_id = self.IO_num_addByID.value() if (lf_at_id) else 0
-        ext_trail = self.IO_chk_externalFllwBhvr.isChecked()
+        ext_trail = self.IO_chk_extTrailing.isChecked()
         p_ctrl = self.IO_chk_autoPCtrl.isChecked()
+        range_chk = self.IO_chk_rangeChk.isChecked()
+        xy_ext_chk = self.IO_chk_xyextChk.isChecked()
         fpath = du.IO_curr_filepath
 
         if fpath is None or not (
@@ -759,12 +759,14 @@ class Mainframe(PreMainframe):
             ),
         )
 
-        # set up THREADS vars and start
+        # set up thread vars and start
         with QMutexLocker(GlobalMutex):
             workers.lfw_file_path = fpath
             workers.lfw_line_id = start_id
             workers.lfw_ext_trail = ext_trail
             workers.lfw_p_ctrl = p_ctrl
+            workers.lfw_range_chk = range_chk
+            workers.lfw_xy_ext_chk = xy_ext_chk
 
         if not testrun:
             self._LoadFileThread.start()
@@ -802,13 +804,7 @@ class Mainframe(PreMainframe):
         self.label_update_on_new_zero()
         self.SCTRL_disp_elemInQ.setText(str(len(du.SCQueue)))
         self.IO_num_addByID.setValue(line_id)
-
-        if skips == 0:
-            self.IO_lbl_loadFile.setText('... conversion successful')
-        else:
-            self.IO_lbl_loadFile.setText(
-                f"... {skips} command(s) skipped (syntax)"
-            )
+        self.IO_lbl_loadFile.setText('... conversion successful')
 
         log_text = (
             f"File loading finished:   {line_id - start_id} commands added "
@@ -1048,30 +1044,20 @@ class Mainframe(PreMainframe):
     #                               DC COMMANDS                              #
     ##########################################################################
 
-    def coor_plausibility_check(self, Entry:du.QEntry) -> bool:
+    def coor_plausibility_check(self, entry:du.QEntry) -> bool:
         """checking for a direct command if the coordinates are reachable
         (in theory)"""
         # to-do: check for implausibile coor combinations
 
         if self._testrun:
             return True
+        res, msg = fu.range_check(entry)
+        if res:
+            return True
 
-        msg = ''
-        target = Entry.Coor1
-        names = target.attr_names
-        RangeMin, RangeMax = dcpy(du.DEF_ROB_COOR_CHK_RANGE)
-        for t_attr, rmin_attr, rmax_attr, name in zip(target, RangeMin, RangeMax, names):
-            if not rmin_attr <= t_attr <= rmax_attr:
-                msg =  (
-                    f"Target out of range on axis {name}: "
-                    f"{t_attr} ({rmin_attr} - {rmax_attr})"
-                )
-        
-        if msg != '':
-            imp_warning = strd_dialog(msg, 'IMPLAUSIBILE TARGET')
-            imp_warning.exec()
-            return imp_warning.result()
-        return True
+        imp_warning = strd_dialog(msg, 'IMPLAUSIBILE TARGET')
+        imp_warning.exec()
+        return imp_warning.result()
 
 
     def home_command(self) -> None:
@@ -1165,11 +1151,11 @@ class Mainframe(PreMainframe):
         if 3 in axis:
             NewPos.z = float(self.NC_float_z.value())
         if 4 in axis:
-            NewPos.rx = float(self.NC_float_xOrient.value())
+            NewPos.rx = float(self.NC_float_rx.value())
         if 5 in axis:
-            NewPos.ry = float(self.NC_float_yOrient.value())
+            NewPos.ry = float(self.NC_float_ry.value())
         if 6 in axis:
-            NewPos.rz = float(self.NC_float_zOrient.value())
+            NewPos.rz = float(self.NC_float_rz.value())
         if 8 in axis:
             NewPos.ext = float(self.NC_float_ext.value())
 
