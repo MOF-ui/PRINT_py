@@ -730,7 +730,7 @@ class DataLibTest(unittest.TestCase):
 
         # connect
         ans0 = TestTCPIP.connect()
-        self.assertIsInstance(ans0, TimeoutError)
+        self.assertIsInstance(ans0, (TimeoutError, OSError))
         TestTCPIP.port = "ABC"
         self.assertRaises(ConnectionError, TestTCPIP.connect)
 

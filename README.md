@@ -81,7 +81,7 @@ device in the future.
 
 # Usage
 
-start with `py .\PRINT.py`
+Start with `py .\PRINT.py`
 
 > [!TIP]
 > you can also start a testing environment with:
@@ -89,6 +89,13 @@ start with `py .\PRINT.py`
 > start a virtual robot with `py .\simCom\test_server.py`
 >
 > start PRINT_py in local mode with `py .\PRINT.py local`
+
+If you change the source code, you can also test the software before use. 
+I won't guarantee that the test is an exhausting one, though. Rather, I know 
+its not.
+
+> [!TIP]
+> run all available test with: `py .\PRINT.py test`
 
 Pumps are currently connected via COM port using a USB001Z-3 USB-to-Serial
 conversion unit. Both pumps are connected to this converter via Modbus, sharing

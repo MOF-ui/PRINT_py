@@ -21,6 +21,55 @@ import libs.pump_utilities as pu
 class PumpLibTest(unittest.TestCase):
 
 
+    def test_get_pmp_speeds(self):
+        """"""
+
+        du.SC_q_processing = False
+        preset_speed = du.PMP_speed
+        preset_pmp_out_ratio = du.PMP_output_ratio
+        du.PMP_speed = 10
+        du.PMP_output_ratio = 0.5
+        self.assertEqual(pu.get_pmp_speeds(), (5, 5, None))
+
+        du.PMP1_user_speed = 12
+        du.PMP2_user_speed = 34
+        self.assertEqual(pu.get_pmp_speeds(), (12, 34, None))
+        self.assertEqual(du.PMP1_user_speed, -999)
+        self.assertEqual(du.PMP2_user_speed, -999)
+
+        du.PMP_speed = preset_speed
+        du.PMP_output_ratio = preset_pmp_out_ratio
+
+
+    def test_look_ahead(self):
+        """ """
+
+        # if no valid command comming up, return input
+        du.ROBCommQueue.add(du.QEntry(Coor1=du.Coordinate(x=10), p_mode=10))
+        du.ROBTelem = du.RoboTelemetry(Coor=du.Coordinate(x=8))
+        preset_look_ahead_dist = du.PMP_look_ahead_dist
+        du.PMP_look_ahead_dist = 5.0
+        self.assertEqual(pu.look_ahead(10,0), (10, 0))
+
+        # if so and we're closer than PMP_look_ahead_dist, return retract
+        # for running pump and prerun for upcomming pump
+        du.ROBCommQueue.add(du.QEntry(
+            Coor1=du.Coordinate(x=20),
+            p_mode=10,
+            p_ratio=0.0,
+        ))
+        self.assertEqual(pu.look_ahead(10,0), (-10, 10))
+
+        # if we're further away, return input
+        du.ROBTelem = du.RoboTelemetry(Coor=du.Coordinate(x=2))
+        self.assertEqual(pu.look_ahead(10,0), (10, 0))
+
+        du.ROBCommQueue.clear()
+        du.ROBTelem = du.RoboTelemetry()
+        du.PMP_look_ahead_dist = preset_look_ahead_dist
+
+
+
     def test_calcSpeed(self):
         """cases 'default', 'start' and 'end' are tested seperately"""
 

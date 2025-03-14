@@ -27,7 +27,7 @@ import libs.func_utilities as fu
 
 ###########################     FUNCTIONS      ###############################
 
-def get_pmp_speeds() -> tuple[int, int, bool]:
+def get_pmp_speeds() -> tuple[int, int, bool | None]:
     """see if pump settings have been scripted, otherwise use user 
     input;
     """
@@ -82,9 +82,9 @@ def look_ahead(p1_speed, p2_speed) -> tuple[float, float]:
         if next_comm.p_ratio != curr_comm.p_ratio:
             curr_pos = du.ROBTelem.Coor
             tp_dist = m.sqrt(
-                m.pow(next_comm.Coor1.x - curr_pos.x, 2)
-                + m.pow(next_comm.Coor1.y - curr_pos.y, 2)
-                + m.pow(next_comm.Coor1.z - curr_pos.z, 2)
+                m.pow(curr_comm.Coor1.x - curr_pos.x, 2)
+                + m.pow(curr_comm.Coor1.y - curr_pos.y, 2)
+                + m.pow(curr_comm.Coor1.z - curr_pos.z, 2)
             )
             if tp_dist < du.PMP_look_ahead_dist:
                 # reverse direction on currently running pump
@@ -101,7 +101,7 @@ def look_ahead(p1_speed, p2_speed) -> tuple[float, float]:
                         p1_speed = next_p1_speed
                         p2_speed = -p2_speed
     except Exception as e:
-        print(e)
+        pass
     
     return p1_speed, p2_speed
 

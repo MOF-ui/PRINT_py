@@ -274,6 +274,7 @@ QTextEdit:selected {
     <property name="styleSheet">
      <string notr="true">QFrame#ADC_frame,
 QFrame#ASC_frame,
+QFrame#CHKR_frame,
 QFrame#DC_frame,
 QFrame#ICQ_frame,
 QFrame#IO_frame,
@@ -377,21 +378,18 @@ QTabBar::tab:!selected:hover {
 }</string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
-    <widget class="QWidget" name="PRINT_tab">
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
+    <widget class="QWidget" name="tab_2">
      <attribute name="title">
-      <string>     PRINTING     </string>
+      <string>     FILE IMPORT     </string>
      </attribute>
      <widget class="QFrame" name="IO_frame">
       <property name="geometry">
        <rect>
         <x>30</x>
         <y>20</y>
-        <width>311</width>
+        <width>781</width>
         <height>911</height>
        </rect>
       </property>
@@ -408,7 +406,7 @@ QTabBar::tab:!selected:hover {
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>10</y>
+         <y>20</y>
          <width>271</width>
          <height>51</height>
         </rect>
@@ -436,9 +434,9 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="IO_btt_newFile">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>620</x>
          <y>130</y>
-         <width>71</width>
+         <width>111</width>
          <height>41</height>
         </rect>
        </property>
@@ -452,9 +450,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="IO_disp_filename">
        <property name="geometry">
         <rect>
-         <x>34</x>
+         <x>44</x>
          <y>130</y>
-         <width>181</width>
+         <width>581</width>
          <height>41</height>
         </rect>
        </property>
@@ -469,7 +467,7 @@ border-bottom-right-radius: 0px;</string>
       <widget class="QLabel" name="IO_disp_commNum">
        <property name="geometry">
         <rect>
-         <x>160</x>
+         <x>250</x>
          <y>210</y>
          <width>121</width>
          <height>41</height>
@@ -485,8 +483,8 @@ border-bottom-right-radius: 0px;</string>
       <widget class="QLabel" name="IO_disp_estimLen">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>280</y>
+         <x>610</x>
+         <y>210</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -501,8 +499,8 @@ border-bottom-right-radius: 0px;</string>
       <widget class="QLabel" name="IO_disp_estimVol">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>350</y>
+         <x>610</x>
+         <y>270</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -517,9 +515,9 @@ border-bottom-right-radius: 0px;</string>
       <widget class="QLabel" name="IO_lbl_commNum">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>50</x>
          <y>200</y>
-         <width>151</width>
+         <width>191</width>
          <height>51</height>
         </rect>
        </property>
@@ -530,8 +528,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>number of 
-commands:</string>
+        <string>number of commands:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -540,10 +537,10 @@ commands:</string>
       <widget class="QLabel" name="IO_lbl_estimLen">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>270</y>
-         <width>151</width>
-         <height>51</height>
+         <x>440</x>
+         <y>210</y>
+         <width>161</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -553,20 +550,19 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>estimated  
-length:</string>
+        <string>estimated  length:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QLabel" name="IO_lbl_estimVol">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>340</y>
-         <width>151</width>
-         <height>51</height>
+         <x>440</x>
+         <y>270</y>
+         <width>161</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -576,18 +572,17 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>estimated 
-volume:</string>
+        <string>estimated volume:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QPushButton" name="IO_btt_xyzextZero">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>500</y>
+         <x>500</x>
+         <y>360</y>
          <width>231</width>
          <height>41</height>
         </rect>
@@ -596,11 +591,11 @@ volume:</string>
         <string>XYZ &amp;&amp; EXT 🡆 ZERO</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="IO_btt_orientZero">
+      <widget class="QPushButton" name="IO_btt_rZero">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>560</y>
+         <x>500</x>
+         <y>420</y>
          <width>231</width>
          <height>41</height>
         </rect>
@@ -612,9 +607,9 @@ volume:</string>
       <widget class="QSpinBox" name="IO_num_addByID">
        <property name="geometry">
         <rect>
-         <x>130</x>
-         <y>730</y>
-         <width>101</width>
+         <x>540</x>
+         <y>710</y>
+         <width>121</width>
          <height>41</height>
         </rect>
        </property>
@@ -631,21 +626,20 @@ volume:</string>
       <widget class="QLabel" name="IO_lbl_addByID">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>720</y>
-         <width>91</width>
-         <height>51</height>
+         <x>340</x>
+         <y>710</y>
+         <width>181</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true">border: 0px;
-font-size: 12pt;
+font-size: 14pt;
 background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>add at
-specific ID:</string>
+        <string>add at specific ID:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -654,9 +648,9 @@ specific ID:</string>
       <widget class="QPushButton" name="IO_btt_addByID">
        <property name="geometry">
         <rect>
-         <x>240</x>
-         <y>730</y>
-         <width>31</width>
+         <x>670</x>
+         <y>710</y>
+         <width>51</width>
          <height>41</height>
         </rect>
        </property>
@@ -670,9 +664,9 @@ specific ID:</string>
       <widget class="QPushButton" name="IO_btt_loadFile">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>790</y>
-         <width>231</width>
+         <x>310</x>
+         <y>770</y>
+         <width>411</width>
          <height>61</height>
         </rect>
        </property>
@@ -692,8 +686,8 @@ specific ID:</string>
       <widget class="QLabel" name="IO_lbl_loadFile">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>850</y>
+         <x>470</x>
+         <y>830</y>
          <width>251</width>
          <height>41</height>
         </rect>
@@ -714,7 +708,7 @@ padding-right: 0px;</string>
       <widget class="QLabel" name="IO_lbl_newFile">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>46</x>
          <y>100</y>
          <width>231</width>
          <height>31</height>
@@ -735,15 +729,15 @@ color: #E1E5EE;</string>
       <widget class="QCheckBox" name="IO_chk_autoPCtrl">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>677</y>
-         <width>231</width>
-         <height>31</height>
+         <x>60</x>
+         <y>550</y>
+         <width>291</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true">QCheckBox::indicator {
-    width: 20px;
+    width: 80px;
     height: 20px;
     background-color: #f2f4f3;
     border-radius: 4px;
@@ -756,27 +750,98 @@ QCheckBox::indicator:checked {
 
 QWidget {
 	background-color: #5d707f;
-	font-size: 12pt;
+	font-size: 14pt;
 	color: #f2f4f3;
 }
 </string>
        </property>
        <property name="text">
-        <string>use automatic pump ctrl</string>
+        <string> DEFAULT PUMP CTRL</string>
        </property>
       </widget>
-      <widget class="QCheckBox" name="IO_chk_externalFllwBhvr">
+      <widget class="QCheckBox" name="IO_chk_extTrailing">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>495</y>
+         <width>291</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QCheckBox::indicator {
+    width: 80px;
+    height: 20px;
+    background-color: #f2f4f3;
+    border-radius: 4px;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #ffba00;
+    image: url(:/images/right.png);
+}
+
+QWidget {
+	background-color: #5d707f;
+	font-size: 14pt;
+	color: #f2f4f3;
+}
+</string>
+       </property>
+       <property name="text">
+        <string> TRAIL EXTERNAL</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="IO_lbl_ignoredLines">
        <property name="geometry">
         <rect>
          <x>50</x>
-         <y>642</y>
-         <width>231</width>
-         <height>31</height>
+         <y>260</y>
+         <width>191</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>ignored lines:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="IO_disp_ignoredLines">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>270</y>
+         <width>121</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="IO_chk_rangeChk">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>600</y>
+         <width>291</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true">QCheckBox::indicator {
-    width: 20px;
+    width: 80px;
     height: 20px;
     background-color: #f2f4f3;
     border-radius: 4px;
@@ -789,13 +854,82 @@ QCheckBox::indicator:checked {
 
 QWidget {
 	background-color: #5d707f;
-	font-size: 12pt;
+	font-size: 14pt;
 	color: #f2f4f3;
 }
 </string>
        </property>
        <property name="text">
-        <string>use external trailing</string>
+        <string> RANGE CHECK</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="IO_lbl_extTrailing">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>494</y>
+         <width>421</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 11pt;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>(trailing behaviour of axis 7 determined by settings tab)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="IO_lbl_autoPCtrl">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>550</y>
+         <width>381</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 11pt;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>(p_mode to default for every command)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="IO_lbl_rangeChk">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>600</y>
+         <width>431</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 11pt;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>(check every command against chk_range, raise warnings)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
       <zorder>IO_lbl_newFile</zorder>
@@ -810,20 +944,235 @@ QWidget {
       <zorder>IO_lbl_estimLen</zorder>
       <zorder>IO_lbl_estimVol</zorder>
       <zorder>IO_btt_xyzextZero</zorder>
-      <zorder>IO_btt_orientZero</zorder>
+      <zorder>IO_btt_rZero</zorder>
       <zorder>IO_num_addByID</zorder>
       <zorder>IO_lbl_addByID</zorder>
       <zorder>IO_btt_addByID</zorder>
       <zorder>IO_btt_loadFile</zorder>
       <zorder>IO_chk_autoPCtrl</zorder>
-      <zorder>IO_chk_externalFllwBhvr</zorder>
+      <zorder>IO_chk_extTrailing</zorder>
+      <zorder>IO_lbl_ignoredLines</zorder>
+      <zorder>IO_disp_ignoredLines</zorder>
+      <zorder>IO_chk_rangeChk</zorder>
+      <zorder>IO_lbl_extTrailing</zorder>
+      <zorder>IO_lbl_autoPCtrl</zorder>
+      <zorder>IO_lbl_rangeChk</zorder>
      </widget>
+     <widget class="QFrame" name="SIB_frame">
+      <property name="geometry">
+       <rect>
+        <x>850</x>
+        <y>20</y>
+        <width>1041</width>
+        <height>631</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="SIB_0_frameLabel">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>20</y>
+         <width>411</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>22</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 22pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>STANDARD INSTRUCTIONS</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="SIB_lbl_sib1">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>100</y>
+         <width>311</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5d707f;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>standard instruction block 1 (SIB1)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="buddy">
+        <cstring>SIB_entry_sib1</cstring>
+       </property>
+      </widget>
+      <widget class="QTextEdit" name="SIB_entry_sib2">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>301</y>
+         <width>961</width>
+         <height>121</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0 px;</string>
+       </property>
+       <property name="html">
+        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[0.0,1900.0,-600.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[200,100,200,200],z50,tool0 EXT400&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[0.0,1900.0,-895.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[200,100,200,200],z0,tool0 EXT400&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="acceptRichText">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="SIB_lbl_sib2">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>270</y>
+         <width>301</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5d707f;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>standard instruction block 2 (SIB2)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="buddy">
+        <cstring>SIB_entry_sib2</cstring>
+       </property>
+      </widget>
+      <widget class="QTextEdit" name="SIB_entry_sib1">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>130</y>
+         <width>961</width>
+         <height>121</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0 px;</string>
+       </property>
+       <property name="html">
+        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[-340.0,2060.0,0.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[300,100,200,200],z100,tool0 EXT200&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[-340.0,2060.0,-500.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[300,100,200,200],z0,tool0 EXT200&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="acceptRichText">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QTextEdit" name="SIB_entry_sib3">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>470</y>
+         <width>961</width>
+         <height>121</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0 px;</string>
+       </property>
+       <property name="html">
+        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1153.4,3945.6,1297.05],[0.70620,0.02032,0.70771,0.00352],[,,,,,]],[100,50,50,50],z0,tool0 EXT0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="acceptRichText">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="SIB_lbl_sib3">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>440</y>
+         <width>301</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5d707f;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>standard instruction block 3 (SIB3)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <property name="buddy">
+        <cstring>SIB_entry_sib2</cstring>
+       </property>
+      </widget>
+      <zorder>SIB_lbl_sib3</zorder>
+      <zorder>SIB_lbl_sib2</zorder>
+      <zorder>SIB_lbl_sib1</zorder>
+      <zorder>SIB_0_frameLabel</zorder>
+      <zorder>SIB_entry_sib2</zorder>
+      <zorder>SIB_entry_sib1</zorder>
+      <zorder>SIB_entry_sib3</zorder>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="PRINT_tab">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <attribute name="title">
+      <string>     PRINTING     </string>
+     </attribute>
      <widget class="QFrame" name="SGLC_frame">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>30</x>
         <y>20</y>
-        <width>291</width>
+        <width>361</width>
         <height>911</height>
        </rect>
       </property>
@@ -842,8 +1191,8 @@ QWidget {
       <widget class="QLabel" name="SGLC_0_frameLabel">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>10</y>
+         <x>40</x>
+         <y>20</y>
          <width>271</width>
          <height>51</height>
         </rect>
@@ -894,7 +1243,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>30</x>
          <y>410</y>
-         <width>231</width>
+         <width>281</width>
          <height>41</height>
         </rect>
        </property>
@@ -905,8 +1254,8 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="SGLC_btt_gcodeSglComm_addByID">
        <property name="geometry">
         <rect>
-         <x>220</x>
-         <y>490</y>
+         <x>270</x>
+         <y>470</y>
          <width>41</width>
          <height>41</height>
         </rect>
@@ -925,8 +1274,8 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>460</y>
-         <width>171</width>
+         <y>480</y>
+         <width>121</width>
          <height>31</height>
         </rect>
        </property>
@@ -937,7 +1286,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>add at specific ID:</string>
+        <string>at specific ID:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
@@ -946,8 +1295,8 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="SGLC_btt_rapidSglComm_addByID">
        <property name="geometry">
         <rect>
-         <x>220</x>
-         <y>840</y>
+         <x>270</x>
+         <y>820</y>
          <width>41</width>
          <height>41</height>
         </rect>
@@ -964,7 +1313,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>30</x>
          <y>760</y>
-         <width>231</width>
+         <width>281</width>
          <height>41</height>
         </rect>
        </property>
@@ -996,9 +1345,9 @@ color: #E1E5EE;</string>
       <widget class="QSpinBox" name="SGLC_num_rapidSglComm_addByID">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>840</y>
-         <width>181</width>
+         <x>150</x>
+         <y>820</y>
+         <width>111</width>
          <height>41</height>
         </rect>
        </property>
@@ -1016,7 +1365,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>810</y>
+         <y>830</y>
          <width>161</width>
          <height>31</height>
         </rect>
@@ -1028,7 +1377,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>add at specific ID:</string>
+        <string>at specific ID:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
@@ -1039,7 +1388,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>30</x>
          <y>270</y>
-         <width>231</width>
+         <width>281</width>
          <height>131</height>
         </rect>
        </property>
@@ -1062,7 +1411,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>30</x>
          <y>620</y>
-         <width>231</width>
+         <width>281</width>
          <height>131</height>
         </rect>
        </property>
@@ -1086,9 +1435,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QSpinBox" name="SGLC_num_gcodeSglComm_addByID">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>490</y>
-         <width>181</width>
+         <x>150</x>
+         <y>470</y>
+         <width>111</width>
          <height>41</height>
         </rect>
        </property>
@@ -1108,9 +1457,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="SGLC_btt_sendFirstQComm">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>40</x>
          <y>130</y>
-         <width>231</width>
+         <width>271</width>
          <height>51</height>
         </rect>
        </property>
@@ -1140,9 +1489,9 @@ queue command</string>
      <widget class="QFrame" name="SCRTL_frame">
       <property name="geometry">
        <rect>
-        <x>670</x>
+        <x>430</x>
         <y>20</y>
-        <width>1241</width>
+        <width>1461</width>
         <height>911</height>
        </rect>
       </property>
@@ -1158,8 +1507,8 @@ queue command</string>
       <widget class="QLabel" name="SCRTL_0_frameLabel">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>10</y>
+         <x>40</x>
+         <y>20</y>
          <width>271</width>
          <height>51</height>
         </rect>
@@ -1362,9 +1711,9 @@ background-color: #ffba00;</string>
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>680</y>
+         <y>670</y>
          <width>51</width>
-         <height>31</height>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
@@ -1380,8 +1729,11 @@ background-color: #ffba00;</string>
          <height>31</height>
         </rect>
        </property>
+       <property name="styleSheet">
+        <string notr="true">image: url(:/images/down.png);</string>
+       </property>
        <property name="text">
-        <string>2</string>
+        <string/>
        </property>
       </widget>
       <widget class="QPushButton" name="SCTRL_btt_addSIB1_atEnd">
@@ -1393,17 +1745,20 @@ background-color: #ffba00;</string>
          <height>31</height>
         </rect>
        </property>
+       <property name="styleSheet">
+        <string notr="true">image: url(:/images/down.png);</string>
+       </property>
        <property name="text">
-        <string>1</string>
+        <string/>
        </property>
       </widget>
       <widget class="QPushButton" name="SCTRL_btt_addSIB1_atFront">
        <property name="geometry">
         <rect>
          <x>130</x>
-         <y>680</y>
+         <y>670</y>
          <width>51</width>
-         <height>31</height>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
@@ -1434,7 +1789,7 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="SCTRL_btt_forcedStop">
        <property name="geometry">
         <rect>
-         <x>780</x>
+         <x>940</x>
          <y>60</y>
          <width>131</width>
          <height>41</height>
@@ -1450,7 +1805,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SCTRL_indi_qProcessing">
        <property name="geometry">
         <rect>
-         <x>710</x>
+         <x>870</x>
          <y>60</y>
          <width>41</width>
          <height>41</height>
@@ -1467,7 +1822,7 @@ background-color: #4c4a48;</string>
       <widget class="QLabel" name="SCTRL_lbl_qProcessing">
        <property name="geometry">
         <rect>
-         <x>570</x>
+         <x>730</x>
          <y>54</y>
          <width>131</width>
          <height>51</height>
@@ -1490,9 +1845,9 @@ PROCESSING</string>
       <widget class="QLabel" name="SCTRL_disp_buffComms">
        <property name="geometry">
         <rect>
-         <x>930</x>
+         <x>1100</x>
          <y>60</y>
-         <width>131</width>
+         <width>141</width>
          <height>41</height>
         </rect>
        </property>
@@ -1506,9 +1861,9 @@ PROCESSING</string>
       <widget class="QLabel" name="SCTRL_disp_elemInQ">
        <property name="geometry">
         <rect>
-         <x>1080</x>
+         <x>1270</x>
          <y>60</y>
-         <width>131</width>
+         <width>141</width>
          <height>41</height>
         </rect>
        </property>
@@ -1522,7 +1877,7 @@ PROCESSING</string>
       <widget class="QLabel" name="SCTRL_lbl_buffComms">
        <property name="geometry">
         <rect>
-         <x>920</x>
+         <x>1100</x>
          <y>20</y>
          <width>151</width>
          <height>41</height>
@@ -1545,7 +1900,7 @@ padding-left: 0px;</string>
       <widget class="QLabel" name="SCTRL_lbl_elemInQ">
        <property name="geometry">
         <rect>
-         <x>1070</x>
+         <x>1270</x>
          <y>20</y>
          <width>141</width>
          <height>41</height>
@@ -1570,7 +1925,7 @@ padding-left: 0px;</string>
         <rect>
          <x>360</x>
          <y>140</y>
-         <width>851</width>
+         <width>1051</width>
          <height>741</height>
         </rect>
        </property>
@@ -1589,9 +1944,9 @@ padding-left: 0px;</string>
       <widget class="QLabel" name="SCTRL_lbl_liveAd_robot">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>504</y>
-         <width>141</width>
+         <x>50</x>
+         <y>489</y>
+         <width>111</width>
          <height>31</height>
         </rect>
        </property>
@@ -1605,15 +1960,15 @@ color: #E1E5EE;</string>
         <string>LA: ROBOT</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
       <widget class="QLabel" name="SCTRL_lbl_liveAd_pump1">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>555</y>
-         <width>121</width>
+         <x>50</x>
+         <y>540</y>
+         <width>111</width>
          <height>31</height>
         </rect>
        </property>
@@ -1627,15 +1982,15 @@ color: #E1E5EE;</string>
         <string>LA: PUMP 1</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
       <widget class="QSpinBox" name="SCTRL_num_liveAd_robot">
        <property name="geometry">
         <rect>
-         <x>180</x>
-         <y>500</y>
-         <width>121</width>
+         <x>170</x>
+         <y>485</y>
+         <width>131</width>
          <height>41</height>
         </rect>
        </property>
@@ -1658,9 +2013,9 @@ color: #E1E5EE;</string>
       <widget class="QSpinBox" name="SCTRL_num_liveAd_pump1">
        <property name="geometry">
         <rect>
-         <x>180</x>
-         <y>550</y>
-         <width>121</width>
+         <x>170</x>
+         <y>535</y>
+         <width>131</width>
          <height>41</height>
         </rect>
        </property>
@@ -1690,17 +2045,20 @@ color: #E1E5EE;</string>
          <height>31</height>
         </rect>
        </property>
+       <property name="styleSheet">
+        <string notr="true">image: url(:/images/down.png);</string>
+       </property>
        <property name="text">
-        <string>3</string>
+        <string/>
        </property>
       </widget>
       <widget class="QPushButton" name="SCTRL_btt_addSIB3_atFront">
        <property name="geometry">
         <rect>
          <x>250</x>
-         <y>680</y>
+         <y>670</y>
          <width>51</width>
-         <height>31</height>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
@@ -1710,7 +2068,7 @@ color: #E1E5EE;</string>
       <widget class="QCheckBox" name="SCTRL_chk_autoScroll">
        <property name="geometry">
         <rect>
-         <x>1050</x>
+         <x>1250</x>
          <y>115</y>
          <width>161</width>
          <height>20</height>
@@ -1732,9 +2090,9 @@ color: #f2f4f3;
       <widget class="QLabel" name="SCTRL_lbl_liveAd_pump2">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>605</y>
-         <width>121</width>
+         <x>50</x>
+         <y>590</y>
+         <width>111</width>
          <height>31</height>
         </rect>
        </property>
@@ -1748,15 +2106,15 @@ color: #E1E5EE;</string>
         <string>LA: PUMP 2</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
       <widget class="QSpinBox" name="SCTRL_num_liveAd_pump2">
        <property name="geometry">
         <rect>
-         <x>180</x>
-         <y>600</y>
-         <width>121</width>
+         <x>170</x>
+         <y>585</y>
+         <width>131</width>
          <height>41</height>
         </rect>
        </property>
@@ -1781,7 +2139,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>50</x>
-         <y>419</y>
+         <y>427</y>
          <width>151</width>
          <height>41</height>
         </rect>
@@ -1806,7 +2164,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>210</x>
-         <y>420</y>
+         <y>428</y>
          <width>91</width>
          <height>41</height>
         </rect>
@@ -1849,7 +2207,7 @@ QPushButton:checked:hover {
        <property name="geometry">
         <rect>
          <x>25</x>
-         <y>680</y>
+         <y>676</y>
          <width>101</width>
          <height>31</height>
         </rect>
@@ -1889,12 +2247,12 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
-      <widget class="QLabel" name="SCTRL_lbl_addSIBAtEnd_2">
+      <widget class="QLabel" name="SCTRL_lbl_mmsOverwrite">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>387</y>
-         <width>181</width>
+         <x>50</x>
+         <y>395</y>
+         <width>191</width>
          <height>31</height>
         </rect>
        </property>
@@ -1908,10 +2266,10 @@ color: #E1E5EE;</string>
         <string>TCP speed overwrite</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
-      <zorder>SCTRL_lbl_addSIBAtEnd_2</zorder>
+      <zorder>SCTRL_lbl_mmsOverwrite</zorder>
       <zorder>SCTRL_lbl_elemInQ</zorder>
       <zorder>SCTRL_lbl_buffComms</zorder>
       <zorder>SCRTL_lbl_queue</zorder>
@@ -1950,9 +2308,6 @@ color: #E1E5EE;</string>
       <zorder>SCTRL_lbl_addSIB</zorder>
       <zorder>SCTRL_lbl_addSIBAtEnd</zorder>
      </widget>
-     <zorder>SGLC_frame</zorder>
-     <zorder>SCRTL_frame</zorder>
-     <zorder>IO_frame</zorder>
     </widget>
     <widget class="QWidget" name="DIRECT_tab">
      <attribute name="title">
@@ -1964,7 +2319,7 @@ color: #E1E5EE;</string>
         <x>30</x>
         <y>20</y>
         <width>971</width>
-        <height>441</height>
+        <height>461</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -1979,8 +2334,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="DC_0_frameLabel">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>10</y>
+         <x>40</x>
+         <y>18</y>
          <width>231</width>
          <height>51</height>
         </rect>
@@ -2040,8 +2395,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="DC_lbl_robotMoving">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>175</y>
+         <x>50</x>
+         <y>180</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -2062,8 +2417,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="DC_indi_robotMoving">
        <property name="geometry">
         <rect>
-         <x>180</x>
-         <y>170</y>
+         <x>190</x>
+         <y>175</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2080,7 +2435,7 @@ background-color: #4c4a48;</string>
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>250</y>
+         <y>260</y>
          <width>181</width>
          <height>41</height>
         </rect>
@@ -2093,7 +2448,7 @@ background-color: #4c4a48;</string>
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>310</y>
+         <y>320</y>
          <width>181</width>
          <height>41</height>
         </rect>
@@ -2106,7 +2461,7 @@ background-color: #4c4a48;</string>
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>370</y>
+         <y>380</y>
          <width>181</width>
          <height>41</height>
         </rect>
@@ -2119,7 +2474,7 @@ background-color: #4c4a48;</string>
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>80</y>
+         <y>100</y>
          <width>501</width>
          <height>31</height>
         </rect>
@@ -2150,7 +2505,7 @@ background-color: #4c4a48;</string>
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>190</y>
+         <y>200</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2169,7 +2524,7 @@ background-color: #4c4a48;</string>
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>290</y>
+         <y>300</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2188,7 +2543,7 @@ background-color: #4c4a48;</string>
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>240</y>
+         <y>250</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2217,7 +2572,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>530</x>
-         <y>190</y>
+         <y>200</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2236,7 +2591,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>530</x>
-         <y>290</y>
+         <y>300</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2255,7 +2610,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>530</x>
-         <y>240</y>
+         <y>250</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2284,7 +2639,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>830</x>
-         <y>240</y>
+         <y>250</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2313,7 +2668,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>830</x>
-         <y>190</y>
+         <y>200</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2332,7 +2687,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>680</x>
-         <y>290</y>
+         <y>300</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2351,7 +2706,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>680</x>
-         <y>240</y>
+         <y>250</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2380,7 +2735,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>680</x>
-         <y>190</y>
+         <y>200</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2399,7 +2754,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>830</x>
-         <y>290</y>
+         <y>300</y>
          <width>51</width>
          <height>51</height>
         </rect>
@@ -2418,7 +2773,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>370</x>
-         <y>360</y>
+         <y>370</y>
          <width>71</width>
          <height>51</height>
         </rect>
@@ -2434,7 +2789,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>520</x>
-         <y>360</y>
+         <y>370</y>
          <width>71</width>
          <height>51</height>
         </rect>
@@ -2450,7 +2805,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>670</x>
-         <y>360</y>
+         <y>370</y>
          <width>71</width>
          <height>51</height>
         </rect>
@@ -2466,7 +2821,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>820</x>
-         <y>360</y>
+         <y>370</y>
          <width>71</width>
          <height>51</height>
         </rect>
@@ -2482,7 +2837,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>330</x>
-         <y>110</y>
+         <y>130</y>
          <width>111</width>
          <height>41</height>
         </rect>
@@ -2510,7 +2865,7 @@ font-size: 14pt;</string>
        <property name="geometry">
         <rect>
          <x>570</x>
-         <y>110</y>
+         <y>130</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -2532,7 +2887,7 @@ font-size: 14pt;</string>
        <property name="geometry">
         <rect>
          <x>810</x>
-         <y>100</y>
+         <y>120</y>
          <width>131</width>
          <height>51</height>
         </rect>
@@ -2553,8 +2908,8 @@ font-size: 14pt;</string>
       <widget class="QLabel" name="DC_0_notice">
        <property name="geometry">
         <rect>
-         <x>250</x>
-         <y>32</y>
+         <x>270</x>
+         <y>40</y>
          <width>131</width>
          <height>20</height>
         </rect>
@@ -2612,9 +2967,9 @@ color: #E1E5EE;</string>
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>500</y>
+        <y>520</y>
         <width>971</width>
-        <height>431</height>
+        <height>411</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -2629,8 +2984,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_0_frameLabel">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>10</y>
+         <x>40</x>
+         <y>30</y>
          <width>331</width>
          <height>51</height>
         </rect>
@@ -2658,8 +3013,8 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="NC_btt_xyzSend">
        <property name="geometry">
         <rect>
-         <x>710</x>
-         <y>170</y>
+         <x>723</x>
+         <y>140</y>
          <width>181</width>
          <height>41</height>
         </rect>
@@ -2668,11 +3023,11 @@ color: #E1E5EE;</string>
         <string>SEND XYZ</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="NC_btt_xyzExtSend">
+      <widget class="QPushButton" name="NC_btt_xyzextSend">
        <property name="geometry">
         <rect>
-         <x>710</x>
-         <y>220</y>
+         <x>723</x>
+         <y>190</y>
          <width>181</width>
          <height>41</height>
         </rect>
@@ -2681,11 +3036,11 @@ color: #E1E5EE;</string>
         <string>SEND XYZ &amp;&amp; EXT</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="NC_btt_orientSend">
+      <widget class="QPushButton" name="NC_btt_rSend">
        <property name="geometry">
         <rect>
-         <x>710</x>
-         <y>270</y>
+         <x>723</x>
+         <y>280</y>
          <width>181</width>
          <height>41</height>
         </rect>
@@ -2694,11 +3049,11 @@ color: #E1E5EE;</string>
         <string>SEND ORIENTATION</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="NC_btt_orientZero">
+      <widget class="QPushButton" name="NC_btt_rZero">
        <property name="geometry">
         <rect>
-         <x>710</x>
-         <y>340</y>
+         <x>723</x>
+         <y>330</y>
          <width>181</width>
          <height>41</height>
         </rect>
@@ -2711,7 +3066,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>530</x>
-         <y>100</y>
+         <y>140</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -2723,13 +3078,13 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="NC_lbl_ext_disp">
+      <widget class="QLabel" name="NC_lbl_ext">
        <property name="geometry">
         <rect>
-         <x>540</x>
-         <y>60</y>
+         <x>530</x>
+         <y>110</y>
          <width>121</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -2745,13 +3100,13 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
-      <widget class="QLabel" name="NC_lbl_z_disp">
+      <widget class="QLabel" name="NC_lbl_z">
        <property name="geometry">
         <rect>
-         <x>370</x>
-         <y>60</y>
+         <x>390</x>
+         <y>110</y>
          <width>121</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -2770,8 +3125,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_disp_z">
        <property name="geometry">
         <rect>
-         <x>370</x>
-         <y>100</y>
+         <x>390</x>
+         <y>140</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -2786,8 +3141,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_disp_x">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>100</y>
+         <x>110</x>
+         <y>140</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -2799,13 +3154,13 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="NC_lbl_x_disp">
+      <widget class="QLabel" name="NC_lbl_x">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>60</y>
+         <x>110</x>
+         <y>110</y>
          <width>121</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -2824,8 +3179,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_disp_y">
        <property name="geometry">
         <rect>
-         <x>210</x>
-         <y>100</y>
+         <x>250</x>
+         <y>140</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -2837,13 +3192,13 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="NC_lbl_y_disp">
+      <widget class="QLabel" name="NC_lbl_y">
        <property name="geometry">
         <rect>
-         <x>210</x>
-         <y>60</y>
+         <x>250</x>
+         <y>110</y>
          <width>121</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -2859,13 +3214,13 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
-      <widget class="QLabel" name="NC_lbl_x_set">
+      <widget class="QLabel" name="NC_lbl_set">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>130</y>
-         <width>121</width>
-         <height>41</height>
+         <x>36</x>
+         <y>196</y>
+         <width>71</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -2878,82 +3233,16 @@ color: #E1E5EE;</string>
         <string>set to:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
-      <widget class="QLabel" name="NC_lbl_y_set">
+      <widget class="QLabel" name="NC_lbl_rz">
        <property name="geometry">
         <rect>
-         <x>210</x>
-         <y>130</y>
+         <x>390</x>
+         <y>250</y>
          <width>121</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5D707F;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>set to:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="NC_lbl_ext_set">
-       <property name="geometry">
-        <rect>
-         <x>530</x>
-         <y>130</y>
-         <width>121</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5D707F;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>set to:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="NC_lbl_z_set">
-       <property name="geometry">
-        <rect>
-         <x>370</x>
-         <y>130</y>
-         <width>121</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5D707F;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>set to:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="NC_lbl_zOrient_disp">
-       <property name="geometry">
-        <rect>
-         <x>370</x>
-         <y>230</y>
-         <width>121</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -2969,13 +3258,13 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
-      <widget class="QLabel" name="NC_lbl_yOrient_disp">
+      <widget class="QLabel" name="NC_lbl_ry">
        <property name="geometry">
         <rect>
-         <x>210</x>
-         <y>230</y>
+         <x>250</x>
+         <y>250</y>
          <width>121</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -2991,35 +3280,13 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
-      <widget class="QLabel" name="NC_lbl_zOrient_set">
+      <widget class="QLabel" name="NC_lbl_rx">
        <property name="geometry">
         <rect>
-         <x>370</x>
-         <y>300</y>
-         <width>131</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5D707F;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>set to:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="NC_lbl_xOrient_disp">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>230</y>
+         <x>110</x>
+         <y>250</y>
          <width>121</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -3035,33 +3302,11 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
-      <widget class="QLabel" name="NC_lbl_xOrient_set">
+      <widget class="QLabel" name="NC_disp_rx">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>300</y>
-         <width>131</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5D707F;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>set to:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="NC_disp_xOrient">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>270</y>
+         <x>110</x>
+         <y>280</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -3073,33 +3318,11 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="NC_lbl_yOrient_set">
+      <widget class="QLabel" name="NC_disp_ry">
        <property name="geometry">
         <rect>
-         <x>210</x>
-         <y>300</y>
-         <width>131</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5D707F;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>set to:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="NC_disp_yOrient">
-       <property name="geometry">
-        <rect>
-         <x>210</x>
-         <y>270</y>
+         <x>250</x>
+         <y>280</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -3111,11 +3334,11 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="NC_disp_zOrient">
+      <widget class="QLabel" name="NC_disp_rz">
        <property name="geometry">
         <rect>
-         <x>370</x>
-         <y>270</y>
+         <x>390</x>
+         <y>280</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -3130,8 +3353,8 @@ color: #E1E5EE;</string>
       <widget class="QDoubleSpinBox" name="NC_float_x">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>170</y>
+         <x>110</x>
+         <y>190</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -3149,8 +3372,8 @@ color: #E1E5EE;</string>
       <widget class="QDoubleSpinBox" name="NC_float_y">
        <property name="geometry">
         <rect>
-         <x>210</x>
-         <y>170</y>
+         <x>250</x>
+         <y>190</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -3169,7 +3392,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>530</x>
-         <y>170</y>
+         <y>190</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -3187,8 +3410,8 @@ color: #E1E5EE;</string>
       <widget class="QDoubleSpinBox" name="NC_float_z">
        <property name="geometry">
         <rect>
-         <x>370</x>
-         <y>170</y>
+         <x>390</x>
+         <y>190</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -3203,33 +3426,11 @@ color: #E1E5EE;</string>
         <double>9999.989999999999782</double>
        </property>
       </widget>
-      <widget class="QDoubleSpinBox" name="NC_float_zOrient">
+      <widget class="QDoubleSpinBox" name="NC_float_rz">
        <property name="geometry">
         <rect>
-         <x>370</x>
-         <y>340</y>
-         <width>121</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="suffix">
-        <string>°</string>
-       </property>
-       <property name="minimum">
-        <double>-9999.989999999999782</double>
-       </property>
-       <property name="maximum">
-        <double>9999.989999999999782</double>
-       </property>
-      </widget>
-      <widget class="QDoubleSpinBox" name="NC_float_yOrient">
-       <property name="geometry">
-        <rect>
-         <x>210</x>
-         <y>340</y>
+         <x>390</x>
+         <y>330</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -3247,11 +3448,33 @@ color: #E1E5EE;</string>
         <double>9999.989999999999782</double>
        </property>
       </widget>
-      <widget class="QDoubleSpinBox" name="NC_float_xOrient">
+      <widget class="QDoubleSpinBox" name="NC_float_ry">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>340</y>
+         <x>250</x>
+         <y>330</y>
+         <width>121</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string>°</string>
+       </property>
+       <property name="minimum">
+        <double>-9999.989999999999782</double>
+       </property>
+       <property name="maximum">
+        <double>9999.989999999999782</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="NC_float_rx">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>330</y>
          <width>121</width>
          <height>41</height>
         </rect>
@@ -3272,8 +3495,8 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="NC_btt_getValues">
        <property name="geometry">
         <rect>
-         <x>710</x>
-         <y>100</y>
+         <x>723</x>
+         <y>60</y>
          <width>181</width>
          <height>41</height>
         </rect>
@@ -3285,8 +3508,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_0_notice">
        <property name="geometry">
         <rect>
-         <x>360</x>
-         <y>32</y>
+         <x>380</x>
+         <y>52</y>
          <width>301</width>
          <height>20</height>
         </rect>
@@ -3311,41 +3534,58 @@ color: #E1E5EE;</string>
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <zorder>NC_lbl_ext_set</zorder>
-      <zorder>NC_lbl_y_set</zorder>
-      <zorder>NC_lbl_z_set</zorder>
-      <zorder>NC_lbl_ext_disp</zorder>
-      <zorder>NC_lbl_z_disp</zorder>
-      <zorder>NC_lbl_x_disp</zorder>
-      <zorder>NC_lbl_y_disp</zorder>
-      <zorder>NC_lbl_x_set</zorder>
+      <widget class="QLabel" name="NC_lbl_set_2">
+       <property name="geometry">
+        <rect>
+         <x>37</x>
+         <y>334</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>set to:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+      <zorder>NC_lbl_ext</zorder>
+      <zorder>NC_lbl_z</zorder>
+      <zorder>NC_lbl_x</zorder>
+      <zorder>NC_lbl_y</zorder>
+      <zorder>NC_lbl_set</zorder>
       <zorder>NC_0_frameLabel</zorder>
       <zorder>NC_btt_xyzSend</zorder>
-      <zorder>NC_btt_xyzExtSend</zorder>
-      <zorder>NC_btt_orientSend</zorder>
-      <zorder>NC_btt_orientZero</zorder>
+      <zorder>NC_btt_xyzextSend</zorder>
+      <zorder>NC_btt_rSend</zorder>
+      <zorder>NC_btt_rZero</zorder>
       <zorder>NC_disp_ext</zorder>
       <zorder>NC_disp_z</zorder>
       <zorder>NC_disp_x</zorder>
       <zorder>NC_disp_y</zorder>
-      <zorder>NC_lbl_zOrient_disp</zorder>
-      <zorder>NC_lbl_yOrient_disp</zorder>
-      <zorder>NC_lbl_zOrient_set</zorder>
-      <zorder>NC_lbl_xOrient_disp</zorder>
-      <zorder>NC_lbl_xOrient_set</zorder>
-      <zorder>NC_disp_xOrient</zorder>
-      <zorder>NC_lbl_yOrient_set</zorder>
-      <zorder>NC_disp_yOrient</zorder>
-      <zorder>NC_disp_zOrient</zorder>
+      <zorder>NC_lbl_rz</zorder>
+      <zorder>NC_lbl_ry</zorder>
+      <zorder>NC_lbl_rx</zorder>
+      <zorder>NC_disp_rx</zorder>
+      <zorder>NC_disp_ry</zorder>
+      <zorder>NC_disp_rz</zorder>
       <zorder>NC_float_x</zorder>
       <zorder>NC_float_y</zorder>
       <zorder>NC_float_ext</zorder>
       <zorder>NC_float_z</zorder>
-      <zorder>NC_float_zOrient</zorder>
-      <zorder>NC_float_yOrient</zorder>
-      <zorder>NC_float_xOrient</zorder>
+      <zorder>NC_float_rz</zorder>
+      <zorder>NC_float_ry</zorder>
+      <zorder>NC_float_rx</zorder>
       <zorder>NC_btt_getValues</zorder>
       <zorder>NC_0_notice</zorder>
+      <zorder>NC_lbl_set_2</zorder>
      </widget>
      <widget class="QFrame" name="TERM_frame">
       <property name="geometry">
@@ -3368,8 +3608,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="TERM_0_frameLabel">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>10</y>
+         <x>30</x>
+         <y>20</y>
          <width>231</width>
          <height>51</height>
         </rect>
@@ -3729,7 +3969,7 @@ color: #f2f4f3;
         <x>30</x>
         <y>20</y>
         <width>281</width>
-        <height>491</height>
+        <height>511</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -3742,7 +3982,7 @@ color: #f2f4f3;
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>20</y>
+         <y>30</y>
          <width>281</width>
          <height>51</height>
         </rect>
@@ -3792,9 +4032,9 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="ADC_btt_clamp">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>40</x>
          <y>250</y>
-         <width>181</width>
+         <width>201</width>
          <height>31</height>
         </rect>
        </property>
@@ -3835,9 +4075,9 @@ QPushButton:checked:hover {
       <widget class="QPushButton" name="ADC_btt_cut">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>40</x>
          <y>290</y>
-         <width>181</width>
+         <width>201</width>
          <height>31</height>
         </rect>
        </property>
@@ -3878,9 +4118,9 @@ QPushButton:checked:hover {
       <widget class="QPushButton" name="ADC_btt_placeSpring">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>40</x>
          <y>330</y>
-         <width>181</width>
+         <width>201</width>
          <height>31</height>
         </rect>
        </property>
@@ -3921,9 +4161,9 @@ QPushButton:checked:hover {
       <widget class="QPushButton" name="ADC_btt_resetAll">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>430</y>
-         <width>181</width>
+         <x>40</x>
+         <y>440</y>
+         <width>201</width>
          <height>31</height>
         </rect>
        </property>
@@ -3934,7 +4174,7 @@ QPushButton:checked:hover {
       <widget class="QLabel" name="ADC_indi_robotMoving">
        <property name="geometry">
         <rect>
-         <x>190</x>
+         <x>220</x>
          <y>90</y>
          <width>41</width>
          <height>41</height>
@@ -3951,8 +4191,8 @@ background-color: #4c4a48;</string>
       <widget class="QLabel" name="ADC_lbl_robotMoving">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>90</y>
+         <x>80</x>
+         <y>89</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -3973,9 +4213,9 @@ color: #E1E5EE;</string>
       <widget class="QSpinBox" name="ADC_num_trolley">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>40</x>
          <y>200</y>
-         <width>181</width>
+         <width>201</width>
          <height>41</height>
         </rect>
        </property>
@@ -3996,7 +4236,7 @@ color: #E1E5EE;</string>
         <x>330</x>
         <y>20</y>
         <width>281</width>
-        <height>491</height>
+        <height>511</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -4009,7 +4249,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>20</y>
+         <y>30</y>
          <width>281</width>
          <height>51</height>
         </rect>
@@ -4037,9 +4277,9 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="ASC_btt_clamp">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>40</x>
          <y>250</y>
-         <width>181</width>
+         <width>201</width>
          <height>31</height>
         </rect>
        </property>
@@ -4073,9 +4313,9 @@ QPushButton:checked:hover {
       <widget class="QPushButton" name="ASC_btt_cut">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>40</x>
          <y>290</y>
-         <width>181</width>
+         <width>201</width>
          <height>31</height>
         </rect>
        </property>
@@ -4116,9 +4356,9 @@ QPushButton:checked:hover {
       <widget class="QPushButton" name="ASC_btt_placeSpring">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>40</x>
          <y>330</y>
-         <width>181</width>
+         <width>201</width>
          <height>31</height>
         </rect>
        </property>
@@ -4159,9 +4399,9 @@ QPushButton:checked:hover {
       <widget class="QPushButton" name="ASC_btt_overwrSC">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>430</y>
-         <width>181</width>
+         <x>40</x>
+         <y>440</y>
+         <width>201</width>
          <height>31</height>
         </rect>
        </property>
@@ -4172,7 +4412,7 @@ QPushButton:checked:hover {
       <widget class="QLabel" name="ASC_indi_qProcessing">
        <property name="geometry">
         <rect>
-         <x>190</x>
+         <x>220</x>
          <y>90</y>
          <width>41</width>
          <height>41</height>
@@ -4189,9 +4429,9 @@ background-color: #4c4a48;</string>
       <widget class="QLabel" name="ASC_lbl_qProcessing">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>30</x>
          <y>84</y>
-         <width>131</width>
+         <width>181</width>
          <height>51</height>
         </rect>
        </property>
@@ -4202,8 +4442,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>QUEUE
-PROCESSING</string>
+        <string>QUEUE PROCESSING</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -4212,9 +4451,9 @@ PROCESSING</string>
       <widget class="QLineEdit" name="ASC_entry_SCLines">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>390</y>
-         <width>181</width>
+         <x>40</x>
+         <y>400</y>
+         <width>201</width>
          <height>31</height>
         </rect>
        </property>
@@ -4225,9 +4464,9 @@ PROCESSING</string>
       <widget class="QSpinBox" name="ASC_num_trolley">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>40</x>
          <y>200</y>
-         <width>181</width>
+         <width>201</width>
          <height>41</height>
         </rect>
        </property>
@@ -4241,7 +4480,7 @@ PROCESSING</string>
         <number>10</number>
        </property>
       </widget>
-      <widget class="QLabel" name="ADC_lbl_panning_2">
+      <widget class="QLabel" name="ASC_lbl_trolley">
        <property name="geometry">
         <rect>
          <x>40</x>
@@ -4263,7 +4502,7 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
-      <zorder>ADC_lbl_panning_2</zorder>
+      <zorder>ASC_lbl_trolley</zorder>
       <zorder>ASC_0_framelabel</zorder>
       <zorder>ASC_btt_clamp</zorder>
       <zorder>ASC_btt_cut</zorder>
@@ -4277,10 +4516,10 @@ color: #E1E5EE;</string>
      <widget class="QFrame" name="PUMP_frame">
       <property name="geometry">
        <rect>
-        <x>630</x>
+        <x>650</x>
         <y>20</y>
         <width>701</width>
-        <height>871</height>
+        <height>911</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -4561,7 +4800,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="PUMP_0_frameLabel">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>40</x>
          <y>20</y>
          <width>241</width>
          <height>51</height>
@@ -5120,7 +5359,7 @@ color: #E1E5EE;</string>
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>530</y>
+        <y>570</y>
         <width>581</width>
         <height>361</height>
        </rect>
@@ -5135,7 +5374,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>20</y>
+         <y>30</y>
          <width>161</width>
          <height>51</height>
         </rect>
@@ -5443,10 +5682,10 @@ QPushButton:checked:hover {
      <widget class="QFrame" name="LAH_frame">
       <property name="geometry">
        <rect>
-        <x>1350</x>
+        <x>1390</x>
         <y>20</y>
-        <width>561</width>
-        <height>221</height>
+        <width>501</width>
+        <height>321</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -5459,7 +5698,7 @@ QPushButton:checked:hover {
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>20</y>
+         <y>30</y>
          <width>241</width>
          <height>51</height>
         </rect>
@@ -5487,10 +5726,10 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="LAH_btt_active">
        <property name="geometry">
         <rect>
-         <x>340</x>
-         <y>40</y>
+         <x>280</x>
+         <y>30</y>
          <width>181</width>
-         <height>41</height>
+         <height>51</height>
         </rect>
        </property>
        <property name="font">
@@ -5530,8 +5769,8 @@ QPushButton:checked:hover {
       <widget class="QSpinBox" name="LAH_num_distance">
        <property name="geometry">
         <rect>
-         <x>360</x>
-         <y>130</y>
+         <x>300</x>
+         <y>120</y>
          <width>161</width>
          <height>41</height>
         </rect>
@@ -5543,7 +5782,7 @@ QPushButton:checked:hover {
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
        <property name="suffix">
-        <string>mm</string>
+        <string> mm</string>
        </property>
        <property name="minimum">
         <number>0</number>
@@ -5561,8 +5800,8 @@ QPushButton:checked:hover {
       <widget class="QLabel" name="LAH_lbl_distance">
        <property name="geometry">
         <rect>
-         <x>180</x>
-         <y>130</y>
+         <x>120</x>
+         <y>120</y>
          <width>171</width>
          <height>41</height>
         </rect>
@@ -5579,6 +5818,98 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
+      <widget class="QLabel" name="LAH_lbl_retractFactor">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>180</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>retract factor:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="LAH_float_retractFactor">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>180</y>
+         <width>161</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 16pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="maximum">
+        <double>10.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="LAH_lbl_prerunFactor">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>240</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>prerun factor:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="LAH_float_prerunFactor">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>240</y>
+         <width>161</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 16pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="maximum">
+        <double>10.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="SET_tab">
@@ -5591,7 +5922,7 @@ color: #E1E5EE;</string>
         <x>30</x>
         <y>20</y>
         <width>871</width>
-        <height>631</height>
+        <height>671</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -5606,8 +5937,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CONN_0_frameLabel">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>20</y>
+         <x>40</x>
+         <y>40</y>
          <width>341</width>
          <height>51</height>
         </rect>
@@ -5636,7 +5967,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>130</y>
+         <y>170</y>
          <width>791</width>
          <height>461</height>
         </rect>
@@ -5664,7 +5995,7 @@ QTabBar::tab:selected {
 }</string>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="CONN_ROB_tab">
         <attribute name="title">
@@ -7129,7 +7460,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>700</x>
-         <y>60</y>
+         <y>100</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -7156,9 +7487,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CONN_lbl_commForerun">
        <property name="geometry">
         <rect>
-         <x>560</x>
-         <y>70</y>
-         <width>131</width>
+         <x>530</x>
+         <y>110</y>
+         <width>161</width>
          <height>21</height>
         </rect>
        </property>
@@ -7178,9 +7509,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CONN_lbl_qProcessing">
        <property name="geometry">
         <rect>
-         <x>380</x>
-         <y>54</y>
-         <width>131</width>
+         <x>600</x>
+         <y>40</y>
+         <width>181</width>
          <height>51</height>
         </rect>
        </property>
@@ -7191,8 +7522,7 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>QUEUE
-PROCESSING</string>
+        <string>QUEUE PROCESSING</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -7201,8 +7531,8 @@ PROCESSING</string>
       <widget class="QLabel" name="CONN_indi_qProcessing">
        <property name="geometry">
         <rect>
-         <x>520</x>
-         <y>60</y>
+         <x>790</x>
+         <y>46</y>
          <width>41</width>
          <height>41</height>
         </rect>
@@ -7216,214 +7546,13 @@ background-color: #4c4a48;</string>
        </property>
       </widget>
      </widget>
-     <widget class="QFrame" name="SIB_frame">
-      <property name="geometry">
-       <rect>
-        <x>940</x>
-        <y>440</y>
-        <width>951</width>
-        <height>491</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <widget class="QLabel" name="SIB_0_frameLabel">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>10</y>
-         <width>101</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Bahnschrift</family>
-         <pointsize>22</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 22pt;
-padding: 0px;
-background-color: #5D707F;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>SIB</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="SIB_lbl_sib1">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>50</y>
-         <width>311</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5d707f;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>standard instruction block 1 (SIB1)</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-       <property name="buddy">
-        <cstring>SIB_entry_sib1</cstring>
-       </property>
-      </widget>
-      <widget class="QTextEdit" name="SIB_entry_sib2">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>216</y>
-         <width>871</width>
-         <height>101</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0 px;</string>
-       </property>
-       <property name="html">
-        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1400.0,1800.0,500.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[200,100,200,200],z50,tool0 EXT1200&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1400.0,1800.0,100.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[200,100,200,200],z0,tool0 EXT1200&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="acceptRichText">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="SIB_lbl_sib2">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>185</y>
-         <width>301</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5d707f;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>standard instruction block 2 (SIB2)</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-       <property name="buddy">
-        <cstring>SIB_entry_sib2</cstring>
-       </property>
-      </widget>
-      <widget class="QTextEdit" name="SIB_entry_sib1">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>80</y>
-         <width>871</width>
-         <height>101</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0 px;</string>
-       </property>
-       <property name="html">
-        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[-340.0,2060.0,1400.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[300,100,200,200],z100,tool0 EXT200&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[-340.0,2060.0,800.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[300,100,200,200],z0,tool0 EXT200&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="acceptRichText">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QTextEdit" name="SIB_entry_sib3">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>360</y>
-         <width>871</width>
-         <height>101</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0 px;</string>
-       </property>
-       <property name="html">
-        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[1153.4,3945.6,1297.05],[0.70620,0.02032,0.70771,0.00352],[,,,,,]],[100,50,50,50],z0,tool0 EXT0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="acceptRichText">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="SIB_lbl_sib3">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>330</y>
-         <width>301</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5d707f;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>standard instruction block 3 (SIB3)</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-       <property name="buddy">
-        <cstring>SIB_entry_sib2</cstring>
-       </property>
-      </widget>
-      <zorder>SIB_lbl_sib3</zorder>
-      <zorder>SIB_lbl_sib2</zorder>
-      <zorder>SIB_lbl_sib1</zorder>
-      <zorder>SIB_0_frameLabel</zorder>
-      <zorder>SIB_entry_sib2</zorder>
-      <zorder>SIB_entry_sib1</zorder>
-      <zorder>SIB_entry_sib3</zorder>
-     </widget>
      <widget class="QFrame" name="SET_frame">
       <property name="geometry">
        <rect>
         <x>940</x>
-        <y>20</y>
+        <y>30</y>
         <width>951</width>
-        <height>381</height>
+        <height>661</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -7438,9 +7567,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SET_0_frameLabel">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>10</y>
-         <width>281</width>
+         <x>50</x>
+         <y>30</y>
+         <width>311</width>
          <height>51</height>
         </rect>
        </property>
@@ -7461,38 +7590,15 @@ color: #E1E5EE;</string>
         <string>GENERAL SETTINGS</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="SET_lbl_logEntry">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>30</y>
-         <width>131</width>
-         <height>61</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 14pt;
-background-color: #5d707f;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>last
-log entry</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QSpinBox" name="SET_num_accelRamp_dc">
        <property name="geometry">
         <rect>
-         <x>470</x>
-         <y>210</y>
-         <width>131</width>
+         <x>500</x>
+         <y>190</y>
+         <width>171</width>
          <height>41</height>
         </rect>
        </property>
@@ -7524,10 +7630,10 @@ log entry</string>
       <widget class="QLabel" name="SET_lbl_accelRamp_dc">
        <property name="geometry">
         <rect>
-         <x>340</x>
-         <y>205</y>
-         <width>131</width>
-         <height>51</height>
+         <x>500</x>
+         <y>160</y>
+         <width>171</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -7537,11 +7643,10 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>DC acceleration
-ramp</string>
+        <string>DC acceleration:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_accelRamp_dc</cstring>
@@ -7550,10 +7655,10 @@ ramp</string>
       <widget class="QLabel" name="SET_lbl_volPerE">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>104</y>
-         <width>141</width>
-         <height>51</height>
+         <x>280</x>
+         <y>360</y>
+         <width>151</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -7563,20 +7668,19 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>extruded volume
-per mm</string>
+        <string>extruder flow:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
       <widget class="QLabel" name="SET_lbl_accelRamp_print">
        <property name="geometry">
         <rect>
-         <x>610</x>
-         <y>205</y>
-         <width>161</width>
-         <height>51</height>
+         <x>500</x>
+         <y>240</y>
+         <width>171</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -7586,11 +7690,10 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>printing
-acceleration ramp</string>
+        <string>print acceleration:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_accelRamp_print</cstring>
@@ -7599,10 +7702,10 @@ acceleration ramp</string>
       <widget class="QLabel" name="SET_lbl_transSpeed_print">
        <property name="geometry">
         <rect>
-         <x>630</x>
-         <y>105</y>
-         <width>141</width>
-         <height>51</height>
+         <x>60</x>
+         <y>240</y>
+         <width>171</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -7612,11 +7715,10 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>printing
-transition speed</string>
+        <string>print transitions:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_transSpeed_print</cstring>
@@ -7625,10 +7727,10 @@ transition speed</string>
       <widget class="QLabel" name="SET_lbl_frToMms">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>156</y>
-         <width>161</width>
-         <height>51</height>
+         <x>500</x>
+         <y>360</y>
+         <width>171</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -7638,19 +7740,18 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>GCode F-command 
-to mm/s</string>
+        <string>FR to mm/s:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
       <widget class="QSpinBox" name="SET_num_orientSpeed_print">
        <property name="geometry">
         <rect>
-         <x>770</x>
-         <y>160</y>
-         <width>131</width>
+         <x>280</x>
+         <y>270</y>
+         <width>171</width>
          <height>41</height>
         </rect>
        </property>
@@ -7682,10 +7783,10 @@ to mm/s</string>
       <widget class="QLabel" name="SET_lbl_zone">
        <property name="geometry">
         <rect>
-         <x>80</x>
-         <y>210</y>
-         <width>81</width>
-         <height>41</height>
+         <x>720</x>
+         <y>360</y>
+         <width>161</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -7695,10 +7796,10 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string> IO zone</string>
+        <string> IO zone:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_zone</cstring>
@@ -7707,9 +7808,9 @@ color: #E1E5EE;</string>
       <widget class="QSpinBox" name="SET_num_transSpeed_dc">
        <property name="geometry">
         <rect>
-         <x>470</x>
-         <y>110</y>
-         <width>131</width>
+         <x>60</x>
+         <y>190</y>
+         <width>171</width>
          <height>41</height>
         </rect>
        </property>
@@ -7741,9 +7842,9 @@ color: #E1E5EE;</string>
       <widget class="QSpinBox" name="SET_num_transSpeed_print">
        <property name="geometry">
         <rect>
-         <x>770</x>
-         <y>110</y>
-         <width>131</width>
+         <x>60</x>
+         <y>270</y>
+         <width>171</width>
          <height>41</height>
         </rect>
        </property>
@@ -7775,10 +7876,10 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SET_lbl_orientSpeed_dc">
        <property name="geometry">
         <rect>
-         <x>340</x>
-         <y>155</y>
-         <width>131</width>
-         <height>51</height>
+         <x>280</x>
+         <y>160</y>
+         <width>171</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -7788,44 +7889,21 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>DC orientation
-speed</string>
+        <string>DC orientation:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_orientSpeed_dc</cstring>
        </property>
       </widget>
-      <widget class="QLabel" name="SET_disp_logEntry">
-       <property name="geometry">
-        <rect>
-         <x>470</x>
-         <y>30</y>
-         <width>431</width>
-         <height>61</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">font-size: 10pt;</string>
-       </property>
-       <property name="text">
-        <string>no logfile created!</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
       <widget class="QSpinBox" name="SET_num_zone">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>210</y>
-         <width>151</width>
+         <x>720</x>
+         <y>390</y>
+         <width>161</width>
          <height>41</height>
         </rect>
        </property>
@@ -7854,10 +7932,10 @@ speed</string>
       <widget class="QLabel" name="SET_lbl_decelRamp_print">
        <property name="geometry">
         <rect>
-         <x>610</x>
-         <y>255</y>
+         <x>720</x>
+         <y>240</y>
          <width>161</width>
-         <height>51</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -7867,11 +7945,10 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>printing
-deceleration ramp</string>
+        <string>print deceleration:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_decelRamp_print</cstring>
@@ -7880,10 +7957,10 @@ deceleration ramp</string>
       <widget class="QLabel" name="SET_lbl_orientSpeed_print">
        <property name="geometry">
         <rect>
-         <x>620</x>
-         <y>155</y>
-         <width>151</width>
-         <height>51</height>
+         <x>280</x>
+         <y>240</y>
+         <width>171</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -7893,11 +7970,10 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>printing
-orientation speed</string>
+        <string>print orientation:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_orientSpeed_print</cstring>
@@ -7906,9 +7982,9 @@ orientation speed</string>
       <widget class="QSpinBox" name="SET_num_accelRamp_print">
        <property name="geometry">
         <rect>
-         <x>770</x>
-         <y>210</y>
-         <width>131</width>
+         <x>500</x>
+         <y>270</y>
+         <width>171</width>
          <height>41</height>
         </rect>
        </property>
@@ -7940,10 +8016,10 @@ orientation speed</string>
       <widget class="QLabel" name="SET_lbl_transSpeed_dc">
        <property name="geometry">
         <rect>
-         <x>340</x>
-         <y>105</y>
-         <width>131</width>
-         <height>51</height>
+         <x>60</x>
+         <y>160</y>
+         <width>171</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -7953,11 +8029,10 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>DC transition
-speed</string>
+        <string>DC transitions:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_transSpeed_dc</cstring>
@@ -7966,9 +8041,9 @@ speed</string>
       <widget class="QSpinBox" name="SET_num_decelRamp_print">
        <property name="geometry">
         <rect>
-         <x>770</x>
-         <y>260</y>
-         <width>131</width>
+         <x>720</x>
+         <y>270</y>
+         <width>161</width>
          <height>41</height>
         </rect>
        </property>
@@ -8000,9 +8075,9 @@ speed</string>
       <widget class="QSpinBox" name="SET_num_decelRamp_dc">
        <property name="geometry">
         <rect>
-         <x>470</x>
-         <y>260</y>
-         <width>131</width>
+         <x>720</x>
+         <y>190</y>
+         <width>161</width>
          <height>41</height>
         </rect>
        </property>
@@ -8034,10 +8109,10 @@ speed</string>
       <widget class="QLabel" name="SET_lbl_decelRamp_dc">
        <property name="geometry">
         <rect>
-         <x>340</x>
-         <y>255</y>
-         <width>131</width>
-         <height>51</height>
+         <x>720</x>
+         <y>160</y>
+         <width>161</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -8047,11 +8122,10 @@ background-color: #5d707f;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>DC deceleration
-ramp</string>
+        <string>DC deceleration:</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_decelRamp_dc</cstring>
@@ -8060,9 +8134,9 @@ ramp</string>
       <widget class="QSpinBox" name="SET_num_orientSpeed_dc">
        <property name="geometry">
         <rect>
-         <x>470</x>
-         <y>160</y>
-         <width>131</width>
+         <x>280</x>
+         <y>190</y>
+         <width>171</width>
          <height>41</height>
         </rect>
        </property>
@@ -8094,10 +8168,10 @@ ramp</string>
       <widget class="QPushButton" name="SET_btt_apply">
        <property name="geometry">
         <rect>
-         <x>540</x>
-         <y>330</y>
-         <width>161</width>
-         <height>31</height>
+         <x>500</x>
+         <y>80</y>
+         <width>171</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
@@ -8107,10 +8181,10 @@ ramp</string>
       <widget class="QPushButton" name="SET_btt_default">
        <property name="geometry">
         <rect>
-         <x>730</x>
-         <y>330</y>
-         <width>171</width>
-         <height>31</height>
+         <x>700</x>
+         <y>80</y>
+         <width>181</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
@@ -8120,9 +8194,9 @@ ramp</string>
       <widget class="QDoubleSpinBox" name="SET_float_frToMms">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>160</y>
-         <width>151</width>
+         <x>500</x>
+         <y>390</y>
+         <width>171</width>
          <height>41</height>
         </rect>
        </property>
@@ -8145,9 +8219,9 @@ ramp</string>
       <widget class="QDoubleSpinBox" name="SET_float_volPerMM">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>110</y>
-         <width>151</width>
+         <x>280</x>
+         <y>390</y>
+         <width>171</width>
          <height>41</height>
         </rect>
        </property>
@@ -8167,108 +8241,126 @@ ramp</string>
         <double>0.010000000000000</double>
        </property>
       </widget>
-     </widget>
-     <widget class="QFrame" name="SET_TE_frame">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>690</y>
-        <width>871</width>
-        <height>241</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <widget class="QLabel" name="SET_TE_0_framelabel">
+      <widget class="QDoubleSpinBox" name="SET_TE_float_p1VolFlow">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>341</width>
+         <x>500</x>
+         <y>570</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string> L/s</string>
+       </property>
+       <property name="decimals">
+        <number>3</number>
+       </property>
+       <property name="maximum">
+        <double>999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="SET_TE_1_fllwBhvr">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>470</y>
+         <width>191</width>
          <height>51</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <family>Bahnschrift</family>
-         <pointsize>22</pointsize>
+         <pointsize>14</pointsize>
         </font>
        </property>
        <property name="styleSheet">
         <string notr="true">border: 0px;
-font-size: 22pt;
+font-size: 14pt;
 padding: 0px;
 background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>ADVANCED SETTINGS</string>
+        <string>FOLLOW BEHAVIOUR
+(EXT TRAILING):</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="SET_TE_btt_apply">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>140</y>
-         <width>171</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>APPLY</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="SET_TE_btt_default">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>180</y>
-         <width>171</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>DEFAULT</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="SET_TE_lbl_fllwBhvrInterv">
-       <property name="geometry">
-        <rect>
-         <x>304</x>
-         <y>117</y>
-         <width>141</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5d707f;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>intervall</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="buddy">
-        <cstring>SET_num_zone</cstring>
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QSpinBox" name="SET_TE_num_fllwBhvrInterv">
        <property name="geometry">
         <rect>
-         <x>447</x>
-         <y>120</y>
-         <width>131</width>
+         <x>280</x>
+         <y>480</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string> mm</string>
+       </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>99999</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="displayIntegerBase">
+        <number>10</number>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="SET_TE_float_p2VolFlow">
+       <property name="geometry">
+        <rect>
+         <x>720</x>
+         <y>570</y>
+         <width>161</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string> L/s</string>
+       </property>
+       <property name="decimals">
+        <number>3</number>
+       </property>
+       <property name="maximum">
+        <double>999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="SET_TE_num_fllwBhvrSkip">
+       <property name="geometry">
+        <rect>
+         <x>500</x>
+         <y>480</y>
+         <width>171</width>
          <height>41</height>
         </rect>
        </property>
@@ -8300,10 +8392,10 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SET_TE_lbl_fllwBhvrSkip">
        <property name="geometry">
         <rect>
-         <x>314</x>
-         <y>167</y>
+         <x>500</x>
+         <y>450</y>
          <width>131</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -8316,52 +8408,90 @@ color: #E1E5EE;</string>
         <string>skip length</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
        <property name="buddy">
         <cstring>SET_num_zone</cstring>
        </property>
       </widget>
-      <widget class="QSpinBox" name="SET_TE_num_fllwBhvrSkip">
+      <widget class="QLabel" name="SET_TE_lbl_fllwBhvrInterv">
        <property name="geometry">
         <rect>
-         <x>447</x>
-         <y>170</y>
+         <x>280</x>
+         <y>450</y>
          <width>131</width>
-         <height>41</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true"/>
+        <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5d707f;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>intervall</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
-       <property name="suffix">
-        <string> mm</string>
+       <property name="buddy">
+        <cstring>SET_num_zone</cstring>
        </property>
-       <property name="minimum">
-        <number>0</number>
+      </widget>
+      <widget class="QLabel" name="SET_TE_lbl_p1VolFlow">
+       <property name="geometry">
+        <rect>
+         <x>500</x>
+         <y>540</y>
+         <width>131</width>
+         <height>31</height>
+        </rect>
        </property>
-       <property name="maximum">
-        <number>99999</number>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5d707f;
+color: #E1E5EE;</string>
        </property>
-       <property name="singleStep">
-        <number>10</number>
+       <property name="text">
+        <string>P1 volume flow</string>
        </property>
-       <property name="value">
-        <number>0</number>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
-       <property name="displayIntegerBase">
-        <number>10</number>
+      </widget>
+      <widget class="QLabel" name="SET_TE_lbl_retractSpeed">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>540</y>
+         <width>131</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5d707f;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>pump retract</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+       <property name="buddy">
+        <cstring>SET_num_zone</cstring>
        </property>
       </widget>
       <widget class="QSpinBox" name="SET_TE_num_retractSpeed">
        <property name="geometry">
         <rect>
-         <x>710</x>
-         <y>70</y>
-         <width>131</width>
+         <x>280</x>
+         <y>570</y>
+         <width>171</width>
          <height>41</height>
         </rect>
        </property>
@@ -8390,135 +8520,13 @@ color: #E1E5EE;</string>
         <number>10</number>
        </property>
       </widget>
-      <widget class="QLabel" name="SET_TE_lbl_retractSpeed">
+      <widget class="QLabel" name="SET_TE_1_pmpSettings">
        <property name="geometry">
         <rect>
-         <x>570</x>
-         <y>70</y>
-         <width>141</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5d707f;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>pump retract
-speed</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="buddy">
-        <cstring>SET_num_zone</cstring>
-       </property>
-      </widget>
-      <widget class="QDoubleSpinBox" name="SET_TE_float_p1VolFlow">
-       <property name="geometry">
-        <rect>
-         <x>710</x>
-         <y>120</y>
-         <width>131</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="suffix">
-        <string> L/s</string>
-       </property>
-       <property name="decimals">
-        <number>3</number>
-       </property>
-       <property name="maximum">
-        <double>999.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.100000000000000</double>
-       </property>
-      </widget>
-      <widget class="QLabel" name="SET_TE_lbl_p1VolFlow">
-       <property name="geometry">
-        <rect>
-         <x>580</x>
-         <y>120</y>
-         <width>131</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5d707f;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>P1 volume
-flow</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QDoubleSpinBox" name="SET_TE_float_p2VolFlow">
-       <property name="geometry">
-        <rect>
-         <x>710</x>
-         <y>170</y>
-         <width>131</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="suffix">
-        <string> L/s</string>
-       </property>
-       <property name="decimals">
-        <number>3</number>
-       </property>
-       <property name="maximum">
-        <double>999.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.100000000000000</double>
-       </property>
-      </widget>
-      <widget class="QLabel" name="SET_TE_lbl_p2VolFlow">
-       <property name="geometry">
-        <rect>
-         <x>580</x>
-         <y>170</y>
-         <width>131</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-font-size: 12pt;
-background-color: #5d707f;
-color: #E1E5EE;</string>
-       </property>
-       <property name="text">
-        <string>P2 volume
-flow</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="SET_TE_1_fllwBhvr">
-       <property name="geometry">
-        <rect>
-         <x>289</x>
-         <y>79</y>
-         <width>291</width>
-         <height>31</height>
+         <x>60</x>
+         <y>560</y>
+         <width>181</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="font">
@@ -8535,31 +8543,708 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>FOLLOW BEHAVIOUR (TRAILING):</string>
+        <string>SETTINGS FOR
+EXTRUDER FLOW:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="SET_TE_lbl_p2VolFlow">
+       <property name="geometry">
+        <rect>
+         <x>720</x>
+         <y>540</y>
+         <width>131</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 12pt;
+background-color: #5d707f;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>P2 volume flow</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
+      <widget class="QLabel" name="SET_TE_1_fllwBhvr_3">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>380</y>
+         <width>191</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 14pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>FILE IO
+SETTINGS:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
       <zorder>SET_TE_lbl_p1VolFlow</zorder>
-      <zorder>SET_TE_lbl_retractSpeed</zorder>
-      <zorder>SET_TE_0_framelabel</zorder>
-      <zorder>SET_TE_btt_apply</zorder>
-      <zorder>SET_TE_btt_default</zorder>
-      <zorder>SET_TE_lbl_fllwBhvrInterv</zorder>
-      <zorder>SET_TE_num_fllwBhvrInterv</zorder>
-      <zorder>SET_TE_lbl_fllwBhvrSkip</zorder>
-      <zorder>SET_TE_num_fllwBhvrSkip</zorder>
-      <zorder>SET_TE_num_retractSpeed</zorder>
-      <zorder>SET_TE_float_p1VolFlow</zorder>
-      <zorder>SET_TE_float_p2VolFlow</zorder>
       <zorder>SET_TE_lbl_p2VolFlow</zorder>
+      <zorder>SET_TE_lbl_fllwBhvrSkip</zorder>
+      <zorder>SET_TE_lbl_fllwBhvrInterv</zorder>
+      <zorder>SET_lbl_orientSpeed_print</zorder>
+      <zorder>SET_lbl_decelRamp_dc</zorder>
+      <zorder>SET_lbl_accelRamp_dc</zorder>
+      <zorder>SET_lbl_transSpeed_dc</zorder>
+      <zorder>SET_0_frameLabel</zorder>
+      <zorder>SET_num_accelRamp_dc</zorder>
+      <zorder>SET_lbl_volPerE</zorder>
+      <zorder>SET_lbl_accelRamp_print</zorder>
+      <zorder>SET_lbl_transSpeed_print</zorder>
+      <zorder>SET_lbl_frToMms</zorder>
+      <zorder>SET_num_orientSpeed_print</zorder>
+      <zorder>SET_lbl_zone</zorder>
+      <zorder>SET_num_transSpeed_dc</zorder>
+      <zorder>SET_num_transSpeed_print</zorder>
+      <zorder>SET_lbl_orientSpeed_dc</zorder>
+      <zorder>SET_num_zone</zorder>
+      <zorder>SET_lbl_decelRamp_print</zorder>
+      <zorder>SET_num_accelRamp_print</zorder>
+      <zorder>SET_num_decelRamp_print</zorder>
+      <zorder>SET_num_decelRamp_dc</zorder>
+      <zorder>SET_num_orientSpeed_dc</zorder>
+      <zorder>SET_btt_apply</zorder>
+      <zorder>SET_btt_default</zorder>
+      <zorder>SET_float_frToMms</zorder>
+      <zorder>SET_float_volPerMM</zorder>
+      <zorder>SET_TE_float_p1VolFlow</zorder>
       <zorder>SET_TE_1_fllwBhvr</zorder>
+      <zorder>SET_TE_num_fllwBhvrInterv</zorder>
+      <zorder>SET_TE_float_p2VolFlow</zorder>
+      <zorder>SET_TE_num_fllwBhvrSkip</zorder>
+      <zorder>SET_TE_lbl_retractSpeed</zorder>
+      <zorder>SET_TE_num_retractSpeed</zorder>
+      <zorder>SET_TE_1_pmpSettings</zorder>
+      <zorder>SET_TE_1_fllwBhvr_3</zorder>
+     </widget>
+     <widget class="QFrame" name="CHKR_frame">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>730</y>
+        <width>1861</width>
+        <height>191</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="CHKR_0_framelabel">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>30</y>
+         <width>241</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>22</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 22pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>CHK RANGE</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_y">
+       <property name="geometry">
+        <rect>
+         <x>810</x>
+         <y>120</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_lbl_x">
+       <property name="geometry">
+        <rect>
+         <x>640</x>
+         <y>30</y>
+         <width>31</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>X</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_disp_ext">
+       <property name="geometry">
+        <rect>
+         <x>1150</x>
+         <y>70</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0.0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_rx">
+       <property name="geometry">
+        <rect>
+         <x>1330</x>
+         <y>120</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string>°</string>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_disp_y">
+       <property name="geometry">
+        <rect>
+         <x>810</x>
+         <y>70</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0.0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="ZERO_lbl_z_disp_3">
+       <property name="geometry">
+        <rect>
+         <x>980</x>
+         <y>30</y>
+         <width>31</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>Z</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_lbl_rx">
+       <property name="geometry">
+        <rect>
+         <x>1330</x>
+         <y>30</y>
+         <width>41</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>RX</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_disp_x">
+       <property name="geometry">
+        <rect>
+         <x>640</x>
+         <y>70</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0.0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_disp_z">
+       <property name="geometry">
+        <rect>
+         <x>980</x>
+         <y>70</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0.0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="ZERO_lbl_yOrient_disp_3">
+       <property name="geometry">
+        <rect>
+         <x>1500</x>
+         <y>30</y>
+         <width>41</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>RY</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_lbl_ext">
+       <property name="geometry">
+        <rect>
+         <x>1150</x>
+         <y>30</y>
+         <width>51</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>EXT</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="ZERO_lbl_y_disp_3">
+       <property name="geometry">
+        <rect>
+         <x>810</x>
+         <y>30</y>
+         <width>31</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>Y</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_disp_rz">
+       <property name="geometry">
+        <rect>
+         <x>1670</x>
+         <y>70</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0.0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_rz">
+       <property name="geometry">
+        <rect>
+         <x>1670</x>
+         <y>120</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string>°</string>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_ry">
+       <property name="geometry">
+        <rect>
+         <x>1500</x>
+         <y>120</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string>°</string>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_disp_rx">
+       <property name="geometry">
+        <rect>
+         <x>1330</x>
+         <y>70</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0.0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_disp_ry">
+       <property name="geometry">
+        <rect>
+         <x>1500</x>
+         <y>70</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0.0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_z">
+       <property name="geometry">
+        <rect>
+         <x>980</x>
+         <y>120</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_ext">
+       <property name="geometry">
+        <rect>
+         <x>1150</x>
+         <y>120</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="ZERO_lbl_zOrient_disp_3">
+       <property name="geometry">
+        <rect>
+         <x>1670</x>
+         <y>30</y>
+         <width>41</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>RZ</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_x">
+       <property name="geometry">
+        <rect>
+         <x>640</x>
+         <y>120</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_lbl_set">
+       <property name="geometry">
+        <rect>
+         <x>580</x>
+         <y>120</y>
+         <width>61</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 11pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>set to:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="CHKR_btt_overwrite">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>120</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>OVERWRITE</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="CHKR_btt_default">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>120</y>
+         <width>181</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>DEFAULT</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_0_notice">
+       <property name="geometry">
+        <rect>
+         <x>240</x>
+         <y>53</y>
+         <width>301</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 11pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>all values in [mm] if not stated otherwise</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <zorder>ZERO_lbl_zOrient_disp_3</zorder>
+      <zorder>ZERO_lbl_y_disp_3</zorder>
+      <zorder>CHKR_lbl_ext</zorder>
+      <zorder>CHKR_0_framelabel</zorder>
+      <zorder>CHKR_float_y</zorder>
+      <zorder>CHKR_lbl_x</zorder>
+      <zorder>CHKR_disp_ext</zorder>
+      <zorder>CHKR_float_rx</zorder>
+      <zorder>CHKR_disp_y</zorder>
+      <zorder>ZERO_lbl_z_disp_3</zorder>
+      <zorder>CHKR_lbl_rx</zorder>
+      <zorder>CHKR_disp_x</zorder>
+      <zorder>CHKR_disp_z</zorder>
+      <zorder>ZERO_lbl_yOrient_disp_3</zorder>
+      <zorder>CHKR_disp_rz</zorder>
+      <zorder>CHKR_float_rz</zorder>
+      <zorder>CHKR_float_ry</zorder>
+      <zorder>CHKR_disp_rx</zorder>
+      <zorder>CHKR_disp_ry</zorder>
+      <zorder>CHKR_float_z</zorder>
+      <zorder>CHKR_float_ext</zorder>
+      <zorder>CHKR_float_x</zorder>
+      <zorder>CHKR_lbl_set</zorder>
+      <zorder>CHKR_btt_overwrite</zorder>
+      <zorder>CHKR_btt_default</zorder>
+      <zorder>CHKR_0_notice</zorder>
      </widget>
      <zorder>SET_frame</zorder>
-     <zorder>SIB_frame</zorder>
      <zorder>TCP_frame</zorder>
-     <zorder>SET_TE_frame</zorder>
+     <zorder>CHKR_frame</zorder>
     </widget>
     <widget class="QWidget" name="MONITOR_tab">
      <attribute name="title">
@@ -8859,7 +9544,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>240</y>
+         <y>260</y>
          <width>161</width>
          <height>41</height>
         </rect>
@@ -8875,7 +9560,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>80</x>
-         <y>180</y>
+         <y>200</y>
          <width>51</width>
          <height>41</height>
         </rect>
@@ -8896,7 +9581,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>80</x>
-         <y>420</y>
+         <y>440</y>
          <width>51</width>
          <height>41</height>
         </rect>
@@ -8917,7 +9602,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>480</y>
+         <y>500</y>
          <width>161</width>
          <height>41</height>
         </rect>
@@ -8933,7 +9618,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>80</x>
-         <y>480</y>
+         <y>500</y>
          <width>51</width>
          <height>41</height>
         </rect>
@@ -8954,7 +9639,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>70</x>
-         <y>360</y>
+         <y>380</y>
          <width>61</width>
          <height>41</height>
         </rect>
@@ -8975,7 +9660,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>80</x>
-         <y>300</y>
+         <y>320</y>
          <width>51</width>
          <height>41</height>
         </rect>
@@ -8996,7 +9681,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>420</y>
+         <y>440</y>
          <width>161</width>
          <height>41</height>
         </rect>
@@ -9012,7 +9697,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>300</y>
+         <y>320</y>
          <width>161</width>
          <height>41</height>
         </rect>
@@ -9028,7 +9713,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>70</x>
-         <y>120</y>
+         <y>140</y>
          <width>61</width>
          <height>41</height>
         </rect>
@@ -9049,7 +9734,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>360</y>
+         <y>380</y>
          <width>161</width>
          <height>41</height>
         </rect>
@@ -9065,7 +9750,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>90</x>
-         <y>240</y>
+         <y>260</y>
          <width>41</width>
          <height>41</height>
         </rect>
@@ -9086,7 +9771,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>120</y>
+         <y>140</y>
          <width>161</width>
          <height>41</height>
         </rect>
@@ -9102,7 +9787,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>180</y>
+         <y>200</y>
          <width>161</width>
          <height>41</height>
         </rect>
@@ -9118,7 +9803,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>381</x>
-         <y>120</y>
+         <y>140</y>
          <width>171</width>
          <height>41</height>
         </rect>
@@ -9143,7 +9828,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>180</y>
+         <y>200</y>
          <width>171</width>
          <height>41</height>
         </rect>
@@ -9168,7 +9853,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>240</y>
+         <y>260</y>
          <width>171</width>
          <height>41</height>
         </rect>
@@ -9193,7 +9878,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>300</y>
+         <y>320</y>
          <width>171</width>
          <height>41</height>
         </rect>
@@ -9218,7 +9903,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>360</y>
+         <y>380</y>
          <width>171</width>
          <height>41</height>
         </rect>
@@ -9243,7 +9928,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>420</y>
+         <y>440</y>
          <width>171</width>
          <height>41</height>
         </rect>
@@ -9268,7 +9953,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>480</y>
+         <y>500</y>
          <width>171</width>
          <height>41</height>
         </rect>
@@ -9292,8 +9977,8 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="ZERO_btt_newZero">
        <property name="geometry">
         <rect>
-         <x>380</x>
-         <y>57</y>
+         <x>381</x>
+         <y>80</y>
          <width>171</width>
          <height>41</height>
         </rect>
@@ -9306,7 +9991,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>550</y>
+         <y>560</y>
          <width>161</width>
          <height>41</height>
         </rect>
@@ -9319,7 +10004,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>320</x>
-         <y>550</y>
+         <y>560</y>
          <width>271</width>
          <height>41</height>
         </rect>
@@ -9349,7 +10034,7 @@ check loaded values before continuing!</string>
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>80</y>
+         <y>100</y>
          <width>151</width>
          <height>41</height>
         </rect>
@@ -9372,6 +10057,19 @@ color: #E1E5EE;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="ZERO_btt_loadDefault">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>30</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>LOAD DEFAULT</string>
        </property>
       </widget>
       <zorder>ZERO_0_notice_2</zorder>
@@ -9400,6 +10098,7 @@ color: #E1E5EE;</string>
       <zorder>ZERO_btt_newZero</zorder>
       <zorder>ZERO_btt_loadZeroFile</zorder>
       <zorder>ZERO_0_notice</zorder>
+      <zorder>ZERO_btt_loadDefault</zorder>
      </widget>
      <widget class="QFrame" name="TRANS_frame">
       <property name="geometry">
@@ -9730,16 +10429,54 @@ background-color: #4c4a48;</string>
      </widget>
     </widget>
    </widget>
+   <widget class="QLabel" name="lbl_logEntry">
+    <property name="geometry">
+     <rect>
+      <x>1281</x>
+      <y>30</y>
+      <width>161</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: 0px;
+font-size: 14pt;
+background-color: #4c4a48;
+color: #E1E5EE;</string>
+    </property>
+    <property name="text">
+     <string>last log entry</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="disp_logEntry">
+    <property name="geometry">
+     <rect>
+      <x>1450</x>
+      <y>20</y>
+      <width>431</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 9pt;</string>
+    </property>
+    <property name="text">
+     <string>no logfile created!</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
  </widget>
  <tabstops>
   <tabstop>tab</tabstop>
-  <tabstop>IO_btt_newFile</tabstop>
-  <tabstop>IO_btt_xyzextZero</tabstop>
-  <tabstop>IO_btt_orientZero</tabstop>
-  <tabstop>IO_num_addByID</tabstop>
-  <tabstop>IO_btt_addByID</tabstop>
-  <tabstop>IO_btt_loadFile</tabstop>
   <tabstop>SGLC_btt_sendFirstQComm</tabstop>
   <tabstop>SGLC_entry_gcodeSglComm</tabstop>
   <tabstop>SGLC_btt_gcodeSglComm</tabstop>
@@ -9781,14 +10518,14 @@ background-color: #4c4a48;</string>
   <tabstop>NC_float_y</tabstop>
   <tabstop>NC_float_z</tabstop>
   <tabstop>NC_float_ext</tabstop>
-  <tabstop>NC_float_xOrient</tabstop>
-  <tabstop>NC_float_yOrient</tabstop>
-  <tabstop>NC_float_zOrient</tabstop>
+  <tabstop>NC_float_rx</tabstop>
+  <tabstop>NC_float_ry</tabstop>
+  <tabstop>NC_float_rz</tabstop>
   <tabstop>NC_btt_getValues</tabstop>
   <tabstop>NC_btt_xyzSend</tabstop>
-  <tabstop>NC_btt_xyzExtSend</tabstop>
-  <tabstop>NC_btt_orientSend</tabstop>
-  <tabstop>NC_btt_orientZero</tabstop>
+  <tabstop>NC_btt_xyzextSend</tabstop>
+  <tabstop>NC_btt_rSend</tabstop>
+  <tabstop>NC_btt_rZero</tabstop>
   <tabstop>TERM_arr_terminal</tabstop>
   <tabstop>TERM_chk_autoScroll</tabstop>
   <tabstop>TERM_entry_gcodeInterp</tabstop>
@@ -9801,7 +10538,6 @@ background-color: #4c4a48;</string>
   <tabstop>CONN_ROB_btt_discon</tabstop>
   <tabstop>SET_float_volPerMM</tabstop>
   <tabstop>SET_float_frToMms</tabstop>
-  <tabstop>SET_TE_float_p2VolFlow</tabstop>
   <tabstop>SET_num_zone</tabstop>
   <tabstop>SET_num_transSpeed_dc</tabstop>
   <tabstop>SET_num_orientSpeed_dc</tabstop>
@@ -9813,9 +10549,6 @@ background-color: #4c4a48;</string>
   <tabstop>SET_num_decelRamp_print</tabstop>
   <tabstop>SET_btt_apply</tabstop>
   <tabstop>SET_btt_default</tabstop>
-  <tabstop>SIB_entry_sib1</tabstop>
-  <tabstop>SIB_entry_sib2</tabstop>
-  <tabstop>SIB_entry_sib3</tabstop>
   <tabstop>ICQ_arr_terminal</tabstop>
   <tabstop>ZERO_btt_newZero</tabstop>
   <tabstop>ZERO_float_x</tabstop>
