@@ -1803,8 +1803,8 @@ DEF_PUMP_VALID_COMMANDS = [
 DEF_ROB_BUFF_SIZE = 3000
 DEF_ROB_COMM_FR = 10
 DEF_ROB_COOR_CHK_RANGE = ( # to-do: better mapping
-    Coordinate(-1600.0, 1200.0, -895.0, 0.0, 0.0, 0.0, 0.0, 10.0),
-    Coordinate(3500.0, 2600.0, 2000.0, 360.0, 360.0, 360.0, 1.0, 3000.0),
+    Coordinate(-1600.0, 0.0, -895.0, 0.0, 0.0, -180.0, 0.0, 10.0),
+    Coordinate(4050.0, 2700.0, 1500.0, 360.0, 360.0, 120.0, 1.0, 3500.0),
 )
 DEF_ROB_TCP = {
     'ip': '192.168.125.1',
@@ -1818,7 +1818,7 @@ DEF_ROB_TCP = {
 # GENERAL DEFAULT SETTINGS
 DEF_DC_SPEED = SpeedVector()
 DEF_DC_ZERO = Coordinate(
-    -300.0, 1900.0, -895.0, 174.0, 0.0, 45.0, 0.0, 400.0,
+    -300.0, 1900.0, -895.0, 179.4, 0.0,-90.0, 0.0, 400.0,
 )
 DEF_ICQ_MAX_LINES = 200
 DEF_IO_FR_TO_TS = 0.1
@@ -1853,6 +1853,9 @@ IO_fr_to_ts = DEF_IO_FR_TO_TS
 IO_zone = DEF_IO_ZONE
 LOG_safe_path = Path()
 PRINSpeed = dcpy(DEF_PRIN_SPEED)
+RC_area = dcpy(DEF_ROB_COOR_CHK_RANGE)
+RC_max_base_dist = 3000
+RC_y_base_pos = 4100
 SC_curr_comm_id = 1
 SC_ext_trail = DEF_SC_EXT_TRAIL
 SC_q_prep_end = False

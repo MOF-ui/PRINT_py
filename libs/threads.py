@@ -530,7 +530,7 @@ class LoadFileWorker(QObject):
         global lfw_ext_trail
         global lfw_p_ctrl
         global lfw_range_chk
-        global lfw_xy_ext_chk
+        global lfw_base_dist_chk
         global lfw_running
         global lfw_pre_run_time
 
@@ -582,15 +582,27 @@ class LoadFileWorker(QObject):
 
         # range check
         if lfw_range_chk:
+            line = 0
             range_chk = ''
             for Entry in self._CommList:
+                line += 1
                 result, msg = fu.range_check(Entry)
                 if not result:
-                    range_chk += msg + r'\n'
+                    range_chk += f"Line {line}: {msg}\n"
         if range_chk != '':
             self.rangeChkWarning.emit(range_chk)
         
-        # xy ext check (to-do)
+        # base dist check
+        if lfw_base_dist_chk:
+            line = 0
+            base_dist_chk = ''
+            for Entry in self._CommList:
+                line += 1
+                result, msg = fu.base_dist_check(Entry)
+                if not result:
+                    base_dist_chk += f"Line {line}: {msg}\n"
+        if base_dist_chk != '':
+            self.rangeChkWarning.emit(base_dist_chk)
 
         # add to command queue
         du.SCQueue.add_queue(self._CommList)
@@ -732,6 +744,6 @@ lfw_line_id = 0
 lfw_ext_trail = True
 lfw_p_ctrl = False
 lfw_range_chk = True
-lfw_xy_ext_chk = True
+lfw_base_dist_chk = True
 lfw_running = False
 lfw_pre_run_time = 10

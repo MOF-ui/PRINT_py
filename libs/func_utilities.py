@@ -54,10 +54,33 @@ def range_check(target_entry:du.QEntry) -> tuple[bool, str]:
     for t_attr, rmin_attr, rmax_attr, name in zip(target, RangeMin, RangeMax, names):
         if not rmin_attr <= t_attr <= rmax_attr:
             msg =  (
-                f"Target out of range on axis {name.upper}: "
+                f"Target out of range on axis {name.upper()}: "
                 f"{t_attr} ({rmin_attr} - {rmax_attr})"
             )
             return False, msg
+    return True, ''
+
+
+def base_dist_check(target_entry:du.QEntry) -> tuple[bool, str]:
+    """check for unreachable X-EXT combinations;
+    assumes a moving coordinate system with the origin in rob2 basis;
+    relative to it, a point is always defined by x = X-EXT and b = y0-y
+    in world coordinates; a point is considered reachable, if its no
+    further from the moving origin than 3000 mm (as y=1100mm is 
+    reachable from a base point of 4100mm)"""
+    
+    target = target_entry.Coor1
+    x_dist = target.x - target.ext
+    y_dist = du.RC_y_base_pos - target.y
+    dist = m.sqrt(m.pow(x_dist, 2) + m.pow(y_dist, 2))
+    if dist > du.RC_max_base_dist:
+        msg = (
+            f"Targets base distance out of range: "
+            f"({dist} > {du.RC_max_base_dist})\n"
+            f"X - EXT = {x_dist}\n"
+            f"y0 - y = {y_dist}"
+        )
+        return False, msg
     return True, ''
 
 

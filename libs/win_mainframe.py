@@ -772,7 +772,7 @@ class Mainframe(PreMainframe):
             workers.lfw_ext_trail = ext_trail
             workers.lfw_p_ctrl = p_ctrl
             workers.lfw_range_chk = range_chk
-            workers.lfw_xy_ext_chk = xy_ext_chk
+            workers.lfw_base_dist_chk = xy_ext_chk
 
         if not testrun:
             self._LoadFileThread.start()
@@ -1062,15 +1062,21 @@ class Mainframe(PreMainframe):
         (in theory)"""
         # to-do: check for implausibile coor combinations
 
+        def raise_warn():
+            imp_warning = strd_dialog(msg, 'IMPLAUSIBILE TARGET')
+            imp_warning.exec()
+            return imp_warning.result()
+
         if self._testrun:
             return True
         res, msg = fu.range_check(entry)
-        if res:
-            return True
+        if not res:
+            return raise_warn(msg)
+        res, msg = fu.base_dist_check(entry)
+        if not res:
+            return raise_warn(msg)
+        return True
 
-        imp_warning = strd_dialog(msg, 'IMPLAUSIBILE TARGET')
-        imp_warning.exec()
-        return imp_warning.result()
 
 
     def home_command(self) -> None:
