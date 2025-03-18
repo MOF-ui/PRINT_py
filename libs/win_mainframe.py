@@ -252,6 +252,9 @@ class Mainframe(PreMainframe):
         self.ZERO_btt_loadZeroFile.pressed.connect(
             lambda: self.set_zero(axis=[1, 2, 3, 4, 5, 6, 8], source='file')
         )
+        self.ZERO_btt_loadDefault.pressed.connect(
+            lambda: self.set_zero(axis=[1,2,3,4,5,6,8], source='default')
+        )
 
 
     def connect_short_signals(self) -> None:
@@ -337,7 +340,9 @@ class Mainframe(PreMainframe):
             res = du.ROBTcp.connect()
 
             if isinstance(res, tuple):
-                # if successful, start threading and watchdog
+                # if successful, reset SC ID 
+                du.SC_curr_comm_id = 1
+                # start threading and watchdog
                 if not self._RoboCommThread.isRunning():
                     # restart if necessary; if so reconnect threads
                     self.connect_threads(slot)
@@ -620,6 +625,7 @@ class Mainframe(PreMainframe):
             self._LoadFileThread.destroyed.connect(self._LoadFileWorker.deleteLater)
             self._LoadFileWorker.convFailed.connect(self.load_file_failed)
             self._LoadFileWorker.convFinished.connect(self.load_file_finished)
+            self._LoadFileWorker.rangeChkWarning.connect(self.load_file_range_warning)
 
             # thread for communication with sensor array
             self.log_entry('THRT', 'initializing SensorComm thread..')
@@ -689,8 +695,8 @@ class Mainframe(PreMainframe):
             self.IO_disp_filename.setText('no file selected')
             du.IO_curr_filepath = None
             return
-        file = open(file_path, 'r')
-        txt = file.read()
+        with open(file_path, 'r') as file:
+            txt = file.read()
         file.close()
 
         # get number of commands and filament length
@@ -773,6 +779,13 @@ class Mainframe(PreMainframe):
             self.IO_btt_loadFile.setStyleSheet(
                 'font-size: 16pt; background-color: #a28230;'
             )
+    
+
+    def load_file_range_warning(self, txt:str) -> None:
+        """indicates range warning from loadFileWorker to user"""
+
+        range_warn = strd_dialog(txt, 'Range Warning')
+        range_warn.exec()
 
 
     def load_file_failed(self, txt:str) -> None:
@@ -1627,6 +1640,7 @@ if __name__ == '__main__':
     from ui.UI_mainframe_v6 import Ui_MainWindow
 
     logpath = fu.create_logfile()
+    du.PRH_url = f"http://{du.PRH_url}"
 
     # overwrite ROB_tcpip for testing, delete later
     du.ROBTcp.ip = 'localhost'

@@ -358,14 +358,18 @@ class RoboCommWorker(QObject):
         """
 
         num_send = 0
-
         # send commands until send_list is empty
         while len(du.ROB_send_list) > 0:
             Comm, direct_ctrl = du.ROB_send_list.pop(0)
 
             # check for type, ID overflow & live adjustments to tcp speed
             if not isinstance(Comm, du.QEntry):
-                err = ValueError(f"{Comm} is not an instance of QEntry!")
+                err = TypeError(f"{Comm} is not an instance of QEntry!")
+                self.sendElem.emit(Comm, False, err, direct_ctrl)
+                print(f"send error: {err}")
+                break
+            if Comm.id < 0:
+                err = ValueError(f"Command has negative ID: {Comm.id}!")
                 self.sendElem.emit(Comm, False, err, direct_ctrl)
                 print(f"send error: {err}")
                 break
@@ -400,7 +404,6 @@ class RoboCommWorker(QObject):
                         du.SCQueue.increment()
 
                 self.logEntry.emit('ROBO', f"send: {Comm}")
-
             else:
                 print(f" Message Error: {msg_len}")
                 self.sendElem.emit(Comm, False, msg_len, direct_ctrl)
@@ -516,6 +519,7 @@ class LoadFileWorker(QObject):
 
     convFinished = pyqtSignal(int, int, int)
     convFailed = pyqtSignal(str)
+    rangeChkWarning = pyqtSignal(str)
     _CommList = du.Queue()
 
 
@@ -578,10 +582,15 @@ class LoadFileWorker(QObject):
 
         # range check
         if lfw_range_chk:
+            range_chk = ''
             for Entry in self._CommList:
                 result, msg = fu.range_check(Entry)
                 if not result:
-                    return 
+                    range_chk += msg + r'\n'
+        if range_chk != '':
+            self.rangeChkWarning.emit(range_chk)
+        
+        # xy ext check (to-do)
 
         # add to command queue
         du.SCQueue.add_queue(self._CommList)

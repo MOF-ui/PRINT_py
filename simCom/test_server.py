@@ -78,7 +78,7 @@ def usr_input():
             print("Bye!")
             os._exit(1)
         elif "Offset:" in ans:
-            num = re.findall("\d+", ans)
+            num = re.findall(r'-?\d+', ans)
             print(num)
             try:
                 num = int(num[0])
@@ -86,7 +86,7 @@ def usr_input():
                 num = None
             if num is not None:
                 print("                                       ", end="\r")
-            if type(num) is int:
+            if type(num) == int:
                 id_offs = num
                 print(f"ID offset set to: {num}\ncommand:")
             else:

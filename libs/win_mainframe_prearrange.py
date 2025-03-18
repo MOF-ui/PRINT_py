@@ -455,6 +455,12 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     f"in sendCommand!"
                 ),
             )
+            if isinstance(num_send, ValueError):
+                usr_warn = strd_dialog(
+                    f"Command ID out of range: {num_send}!",
+                    'ID ERROR',
+                )
+                usr_warn.exec()
         self.CONN_ROB_disp_writeBuffer.setText(write_buffer)
         self.CONN_ROB_disp_bytesWritten.setText(str(num_send))
 
@@ -780,19 +786,22 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         with the robot, should happen only with on-the-fly restarts,
         theoretically
         """
-        
+
         if du.DC_rob_moving:
             return
-        
+
         new_sc_id = self.SID_num_overwrite.value()
         with QMutexLocker(GlobalMutex):
             id_dist = new_sc_id - du.SC_curr_comm_id
             du.SC_curr_comm_id = new_sc_id
             du.SCQueue.increment(id_dist)
-            last_rob_update = self.CONN_ROB_disp_readBuffer.text()
 
-        self.label_update_on_receive(data_string=last_rob_update)
-        self.log_entry('GNRL', f"User overwrote current comm ID to {du.SC_curr_comm_id}.")
+        self.label_update_on_receive(self.CONN_ROB_disp_readBuffer.text())
+        self.label_update_on_queue_change()
+        self.log_entry(
+            'GNRL',
+            f"User overwrote current comm ID to {du.SC_curr_comm_id}."
+        )
 
 
     def start_SCTRL_queue(self) -> None:
@@ -946,6 +955,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     f"failed to load ZERO data from {du.LOG_safe_path} due to {e}!"
                 )
                 return
+        elif source == 'default':
+            ZeroOverwrite = dcpy(du.DEF_DC_ZERO)
         else:
             ZeroOverwrite = dcpy(du.ROBTelem.Coor)
 
@@ -965,7 +976,6 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                 NewZero.rz = ZeroOverwrite.rz
             if 8 in axis:
                 NewZero.ext = ZeroOverwrite.ext
-
             with QMutexLocker(GlobalMutex):
                 du.DCCurrZero = NewZero
 

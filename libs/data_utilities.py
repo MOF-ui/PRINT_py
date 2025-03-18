@@ -808,7 +808,7 @@ class Queue:
 
     def increment(self, summand=1) -> None:
         """increments all QEntry.ID to handle DC commands send before the
-        queue
+        queue or ID overwrites
         """
 
         for i in self:
@@ -1817,6 +1817,9 @@ DEF_ROB_TCP = {
 
 # GENERAL DEFAULT SETTINGS
 DEF_DC_SPEED = SpeedVector()
+DEF_DC_ZERO = Coordinate(
+    -300.0, 1900.0, -895.0, 174.0, 0.0, 45.0, 0.0, 400.0,
+)
 DEF_ICQ_MAX_LINES = 200
 DEF_IO_FR_TO_TS = 0.1
 DEF_IO_ZONE = 10 # [mm]

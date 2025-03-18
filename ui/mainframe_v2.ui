@@ -6055,7 +6055,7 @@ QTabBar::tab:selected {
 }</string>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="CONN_ROB_tab">
         <attribute name="title">
@@ -9481,7 +9481,7 @@ color: #E1E5EE;</string>
         <string>OVERWRITE</string>
        </property>
       </widget>
-      <widget class="QSpinBox" name="SID_num_ovewrite">
+      <widget class="QSpinBox" name="SID_num_overwrite">
        <property name="geometry">
         <rect>
          <x>910</x>
