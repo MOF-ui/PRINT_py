@@ -1090,7 +1090,7 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.ZERO_float_ry.setValue(5)
         TestFrame.ZERO_float_rz.setValue(6)
         TestFrame.ZERO_float_ext.setValue(7)
-        TestFrame.set_zero([1, 2, 3, 4, 5, 6, 8], source='sys_monitor')
+        TestFrame.set_zero([1, 2, 3, 4, 5, 6, 8], source='user')
         self.assertEqual(du.DCCurrZero, du.Coordinate(1, 2, 3, 4, 5, 6, 7, 7))
 
         du.DCCurrZero = du.Coordinate()

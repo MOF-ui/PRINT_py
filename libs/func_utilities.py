@@ -50,7 +50,7 @@ def range_check(target_entry:du.QEntry) -> tuple[bool, str]:
 
     target = target_entry.Coor1
     names = target.attr_names
-    RangeMin, RangeMax = dcpy(du.DEF_ROB_COOR_CHK_RANGE)
+    RangeMin, RangeMax = dcpy(du.RC_area)
     for t_attr, rmin_attr, rmax_attr, name in zip(target, RangeMin, RangeMax, names):
         if not rmin_attr <= t_attr <= rmax_attr:
             msg =  (
@@ -75,10 +75,9 @@ def base_dist_check(target_entry:du.QEntry) -> tuple[bool, str]:
     dist = m.sqrt(m.pow(x_dist, 2) + m.pow(y_dist, 2))
     if dist > du.RC_max_base_dist:
         msg = (
-            f"Targets base distance out of range: "
-            f"({dist} > {du.RC_max_base_dist})\n"
-            f"X - EXT = {x_dist}\n"
-            f"y0 - y = {y_dist}"
+            f"Base distance out of range "
+            f"({round(dist, 2)}mm > {du.RC_max_base_dist}mm)! "
+            f"Vector: ({x_dist}, {y_dist})mm"
         )
         return False, msg
     return True, ''

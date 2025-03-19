@@ -8745,11 +8745,11 @@ color: #E1E5EE;</string>
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QDoubleSpinBox" name="CHKR_float_y">
+      <widget class="QDoubleSpinBox" name="CHKR_float_y_max">
        <property name="geometry">
         <rect>
-         <x>810</x>
-         <y>120</y>
+         <x>760</x>
+         <y>130</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -8759,6 +8759,9 @@ color: #E1E5EE;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="decimals">
+        <number>1</number>
        </property>
        <property name="minimum">
         <double>-9999.000000000000000</double>
@@ -8773,7 +8776,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_lbl_x">
        <property name="geometry">
         <rect>
-         <x>640</x>
+         <x>550</x>
          <y>30</y>
          <width>31</width>
          <height>41</height>
@@ -8794,11 +8797,14 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_disp_ext">
        <property name="geometry">
         <rect>
-         <x>1150</x>
-         <y>70</y>
+         <x>1120</x>
+         <y>30</y>
          <width>141</width>
          <height>41</height>
         </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size:12pt;</string>
        </property>
        <property name="text">
         <string>0.0</string>
@@ -8807,11 +8813,11 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QDoubleSpinBox" name="CHKR_float_rx">
+      <widget class="QDoubleSpinBox" name="CHKR_float_rx_max">
        <property name="geometry">
         <rect>
-         <x>1330</x>
-         <y>120</y>
+         <x>1310</x>
+         <y>130</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -8824,6 +8830,9 @@ color: #E1E5EE;</string>
        </property>
        <property name="suffix">
         <string>°</string>
+       </property>
+       <property name="decimals">
+        <number>1</number>
        </property>
        <property name="minimum">
         <double>-9999.000000000000000</double>
@@ -8838,11 +8847,14 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_disp_y">
        <property name="geometry">
         <rect>
-         <x>810</x>
-         <y>70</y>
+         <x>760</x>
+         <y>30</y>
          <width>131</width>
          <height>41</height>
         </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size:12pt;</string>
        </property>
        <property name="text">
         <string>0.0</string>
@@ -8854,7 +8866,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_lbl_z">
        <property name="geometry">
         <rect>
-         <x>980</x>
+         <x>910</x>
          <y>30</y>
          <width>31</width>
          <height>41</height>
@@ -8875,7 +8887,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_lbl_rx">
        <property name="geometry">
         <rect>
-         <x>1330</x>
+         <x>1270</x>
          <y>30</y>
          <width>41</width>
          <height>41</height>
@@ -8896,14 +8908,17 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_disp_x">
        <property name="geometry">
         <rect>
-         <x>640</x>
-         <y>70</y>
+         <x>580</x>
+         <y>30</y>
          <width>131</width>
          <height>41</height>
         </rect>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font-size:12pt;</string>
+       </property>
        <property name="text">
-        <string>0.0</string>
+        <string>-1600,0/4000,0</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -8912,11 +8927,14 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_disp_z">
        <property name="geometry">
         <rect>
-         <x>980</x>
-         <y>70</y>
+         <x>940</x>
+         <y>30</y>
          <width>131</width>
          <height>41</height>
         </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size:12pt;</string>
        </property>
        <property name="text">
         <string>0.0</string>
@@ -8928,7 +8946,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_lbl_ry">
        <property name="geometry">
         <rect>
-         <x>1500</x>
+         <x>1450</x>
          <y>30</y>
          <width>41</width>
          <height>41</height>
@@ -8949,7 +8967,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_lbl_ext">
        <property name="geometry">
         <rect>
-         <x>1150</x>
+         <x>1070</x>
          <y>30</y>
          <width>51</width>
          <height>41</height>
@@ -8970,7 +8988,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_lbl_y">
        <property name="geometry">
         <rect>
-         <x>810</x>
+         <x>730</x>
          <y>30</y>
          <width>31</width>
          <height>41</height>
@@ -8992,10 +9010,13 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>1670</x>
-         <y>70</y>
+         <y>30</y>
          <width>131</width>
          <height>41</height>
         </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size:12pt;</string>
        </property>
        <property name="text">
         <string>0.0</string>
@@ -9004,11 +9025,11 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QDoubleSpinBox" name="CHKR_float_rz">
+      <widget class="QDoubleSpinBox" name="CHKR_float_rz_max">
        <property name="geometry">
         <rect>
          <x>1670</x>
-         <y>120</y>
+         <y>130</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -9021,6 +9042,9 @@ color: #E1E5EE;</string>
        </property>
        <property name="suffix">
         <string>°</string>
+       </property>
+       <property name="decimals">
+        <number>1</number>
        </property>
        <property name="minimum">
         <double>-9999.000000000000000</double>
@@ -9032,11 +9056,11 @@ color: #E1E5EE;</string>
         <double>10.000000000000000</double>
        </property>
       </widget>
-      <widget class="QDoubleSpinBox" name="CHKR_float_ry">
+      <widget class="QDoubleSpinBox" name="CHKR_float_ry_max">
        <property name="geometry">
         <rect>
-         <x>1500</x>
-         <y>120</y>
+         <x>1490</x>
+         <y>130</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -9049,6 +9073,9 @@ color: #E1E5EE;</string>
        </property>
        <property name="suffix">
         <string>°</string>
+       </property>
+       <property name="decimals">
+        <number>1</number>
        </property>
        <property name="minimum">
         <double>-9999.000000000000000</double>
@@ -9063,11 +9090,14 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_disp_rx">
        <property name="geometry">
         <rect>
-         <x>1330</x>
-         <y>70</y>
+         <x>1310</x>
+         <y>30</y>
          <width>131</width>
          <height>41</height>
         </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size:12pt;</string>
        </property>
        <property name="text">
         <string>0.0</string>
@@ -9079,11 +9109,14 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_disp_ry">
        <property name="geometry">
         <rect>
-         <x>1500</x>
-         <y>70</y>
+         <x>1490</x>
+         <y>30</y>
          <width>131</width>
          <height>41</height>
         </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size:12pt;</string>
        </property>
        <property name="text">
         <string>0.0</string>
@@ -9092,11 +9125,11 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QDoubleSpinBox" name="CHKR_float_z">
+      <widget class="QDoubleSpinBox" name="CHKR_float_z_max">
        <property name="geometry">
         <rect>
-         <x>980</x>
-         <y>120</y>
+         <x>940</x>
+         <y>130</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -9106,6 +9139,9 @@ color: #E1E5EE;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="decimals">
+        <number>1</number>
        </property>
        <property name="minimum">
         <double>-9999.000000000000000</double>
@@ -9117,11 +9153,11 @@ color: #E1E5EE;</string>
         <double>10.000000000000000</double>
        </property>
       </widget>
-      <widget class="QDoubleSpinBox" name="CHKR_float_ext">
+      <widget class="QDoubleSpinBox" name="CHKR_float_ext_max">
        <property name="geometry">
         <rect>
-         <x>1150</x>
-         <y>120</y>
+         <x>1120</x>
+         <y>130</y>
          <width>141</width>
          <height>41</height>
         </rect>
@@ -9131,6 +9167,9 @@ color: #E1E5EE;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="decimals">
+        <number>1</number>
        </property>
        <property name="minimum">
         <double>-9999.000000000000000</double>
@@ -9145,7 +9184,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_lbl_rz">
        <property name="geometry">
         <rect>
-         <x>1670</x>
+         <x>1630</x>
          <y>30</y>
          <width>41</width>
          <height>41</height>
@@ -9163,11 +9202,11 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
        </property>
       </widget>
-      <widget class="QDoubleSpinBox" name="CHKR_float_x">
+      <widget class="QDoubleSpinBox" name="CHKR_float_x_max">
        <property name="geometry">
         <rect>
-         <x>640</x>
-         <y>120</y>
+         <x>580</x>
+         <y>130</y>
          <width>131</width>
          <height>41</height>
         </rect>
@@ -9177,6 +9216,9 @@ color: #E1E5EE;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="decimals">
+        <number>1</number>
        </property>
        <property name="minimum">
         <double>-9999.000000000000000</double>
@@ -9191,12 +9233,12 @@ color: #E1E5EE;</string>
         <double>0.000000000000000</double>
        </property>
       </widget>
-      <widget class="QLabel" name="CHKR_lbl_set">
+      <widget class="QLabel" name="CHKR_lbl_min">
        <property name="geometry">
         <rect>
-         <x>580</x>
-         <y>120</y>
-         <width>61</width>
+         <x>520</x>
+         <y>80</y>
+         <width>51</width>
          <height>41</height>
         </rect>
        </property>
@@ -9214,16 +9256,16 @@ background-color: #5D707F;
 color: #E1E5EE;</string>
        </property>
        <property name="text">
-        <string>set to:</string>
+        <string>MIN</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QPushButton" name="CHKR_btt_overwrite">
        <property name="geometry">
         <rect>
-         <x>300</x>
+         <x>280</x>
          <y>120</y>
          <width>171</width>
          <height>41</height>
@@ -9236,7 +9278,7 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="CHKR_btt_default">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>60</x>
          <y>120</y>
          <width>181</width>
          <height>41</height>
@@ -9249,8 +9291,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="CHKR_0_notice">
        <property name="geometry">
         <rect>
-         <x>240</x>
-         <y>53</y>
+         <x>210</x>
+         <y>51</y>
          <width>301</width>
          <height>20</height>
         </rect>
@@ -9275,14 +9317,252 @@ color: #E1E5EE;</string>
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_x_min">
+       <property name="geometry">
+        <rect>
+         <x>580</x>
+         <y>80</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_y_min">
+       <property name="geometry">
+        <rect>
+         <x>760</x>
+         <y>80</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="CHKR_lbl_max">
+       <property name="geometry">
+        <rect>
+         <x>520</x>
+         <y>130</y>
+         <width>51</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: 0px;
+font-size: 11pt;
+padding: 0px;
+background-color: #5D707F;
+color: #E1E5EE;</string>
+       </property>
+       <property name="text">
+        <string>MAX</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_z_min">
+       <property name="geometry">
+        <rect>
+         <x>940</x>
+         <y>80</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_ext_min">
+       <property name="geometry">
+        <rect>
+         <x>1120</x>
+         <y>80</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_rx_min">
+       <property name="geometry">
+        <rect>
+         <x>1310</x>
+         <y>80</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string>°</string>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_ry_min">
+       <property name="geometry">
+        <rect>
+         <x>1490</x>
+         <y>80</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string>°</string>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="CHKR_float_rz_min">
+       <property name="geometry">
+        <rect>
+         <x>1670</x>
+         <y>80</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 14pt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string>°</string>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>-9999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>10.000000000000000</double>
+       </property>
+      </widget>
+      <zorder>CHKR_lbl_min</zorder>
       <zorder>CHKR_lbl_rz</zorder>
       <zorder>CHKR_lbl_y</zorder>
       <zorder>CHKR_lbl_ext</zorder>
       <zorder>CHKR_0_framelabel</zorder>
-      <zorder>CHKR_float_y</zorder>
+      <zorder>CHKR_float_y_max</zorder>
       <zorder>CHKR_lbl_x</zorder>
       <zorder>CHKR_disp_ext</zorder>
-      <zorder>CHKR_float_rx</zorder>
+      <zorder>CHKR_float_rx_max</zorder>
       <zorder>CHKR_disp_y</zorder>
       <zorder>CHKR_lbl_z</zorder>
       <zorder>CHKR_lbl_rx</zorder>
@@ -9290,17 +9570,24 @@ color: #E1E5EE;</string>
       <zorder>CHKR_disp_z</zorder>
       <zorder>CHKR_lbl_ry</zorder>
       <zorder>CHKR_disp_rz</zorder>
-      <zorder>CHKR_float_rz</zorder>
-      <zorder>CHKR_float_ry</zorder>
+      <zorder>CHKR_float_rz_max</zorder>
+      <zorder>CHKR_float_ry_max</zorder>
       <zorder>CHKR_disp_rx</zorder>
       <zorder>CHKR_disp_ry</zorder>
-      <zorder>CHKR_float_z</zorder>
-      <zorder>CHKR_float_ext</zorder>
-      <zorder>CHKR_float_x</zorder>
-      <zorder>CHKR_lbl_set</zorder>
+      <zorder>CHKR_float_z_max</zorder>
+      <zorder>CHKR_float_ext_max</zorder>
+      <zorder>CHKR_float_x_max</zorder>
       <zorder>CHKR_btt_overwrite</zorder>
       <zorder>CHKR_btt_default</zorder>
       <zorder>CHKR_0_notice</zorder>
+      <zorder>CHKR_float_x_min</zorder>
+      <zorder>CHKR_float_y_min</zorder>
+      <zorder>CHKR_lbl_max</zorder>
+      <zorder>CHKR_float_z_min</zorder>
+      <zorder>CHKR_float_ext_min</zorder>
+      <zorder>CHKR_float_rx_min</zorder>
+      <zorder>CHKR_float_ry_min</zorder>
+      <zorder>CHKR_float_rz_min</zorder>
      </widget>
      <zorder>SET_frame</zorder>
      <zorder>TCP_frame</zorder>

@@ -435,7 +435,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         if no_error:
             write_buffer = command.print_short()
+            print(f"curr ID: {du.SC_curr_comm_id}; adding: {num_send}")
             du.SC_curr_comm_id += num_send
+            print(f"new ID: {du.SC_curr_comm_id}")
 
             if du.SC_curr_comm_id > du.DEF_ROB_BUFF_SIZE:
                 with QMutexLocker(GlobalMutex):
@@ -474,7 +476,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         if self._first_pos:
             du.ROBMovStartP = dcpy(du.ROBTelem.Coor)
             du.ROBMovEndP = dcpy(du.ROBTelem.Coor)
-            self.set_zero([1, 2, 3, 4, 5, 6, 8])
+            # self.set_zero([1, 2, 3, 4, 5, 6, 8])
             self._first_pos = False
 
         if telem.id != self._last_comm_id:
@@ -924,8 +926,43 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
 
     ##########################################################################
-    #                                SET ZERO                                #
+    #                             RANGE & ZERO                               #
     ##########################################################################
+
+    def set_range(self, source='') -> None:
+        """overwrites RC_area to custom or default"""
+
+        area_overwrite = dcpy(du.DEF_ROB_COOR_CHK_RANGE)
+        if source == 'user':
+            min_overwrite = du.Coordinate(
+                x=self.CHKR_float_x_min.value(),
+                y=self.CHKR_float_y_min.value(),
+                z=self.CHKR_float_z_min.value(),
+                rx=self.CHKR_float_rx_min.value(),
+                ry=self.CHKR_float_ry_min.value(),
+                rz=self.CHKR_float_rz_min.value(),
+                ext=self.CHKR_float_ext_min.value(),
+            )
+            max_overwrite = du.Coordinate(
+                x=self.CHKR_float_x_max.value(),
+                y=self.CHKR_float_y_max.value(),
+                z=self.CHKR_float_z_max.value(),
+                rx=self.CHKR_float_rx_max.value(),
+                ry=self.CHKR_float_ry_max.value(),
+                rz=self.CHKR_float_rz_max.value(),
+                ext=self.CHKR_float_ext_max.value(),
+            )
+            area_overwrite = [min_overwrite, max_overwrite]
+        
+        du.RC_area = dcpy(area_overwrite)
+        new_min, new_max = du.RC_area
+        self.CHKR_disp_x.setText(f"{new_min.x}/{new_max.x}")
+        self.CHKR_disp_y.setText(f"{new_min.y}/{new_max.y}")
+        self.CHKR_disp_z.setText(f"{new_min.z}/{new_max.z}")
+        self.CHKR_disp_rx.setText(f"{new_min.rx}/{new_max.rx}")
+        self.CHKR_disp_ry.setText(f"{new_min.ry}/{new_max.ry}")
+        self.CHKR_disp_rz.setText(f"{new_min.rz}/{new_max.rz}")
+        self.CHKR_disp_ext.setText(f"{new_min.ext}/{new_max.ext}")
 
 
     def set_zero(self, axis:list, source='') -> None:
@@ -934,7 +971,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         """
 
         NewZero = dcpy(du.DCCurrZero)
-        if source == 'sys_monitor':
+        if source == 'user':
             ZeroOverwrite = du.Coordinate(
                 x=self.ZERO_float_x.value(),
                 y=self.ZERO_float_y.value(),
@@ -987,6 +1024,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
 
 
+
+####################### WATCHDOG CLASS  #####################################
 
 class Watchdog(QObject):
     

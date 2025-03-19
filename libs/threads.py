@@ -201,7 +201,7 @@ class RoboCommWorker(QObject):
         """start timer, receive and send on timeout"""
 
         self.CommTimer = QTimer()
-        self.CommTimer.setInterval(10)
+        self.CommTimer.setInterval(100)
         self.CommTimer.timeout.connect(self.receive)
         self.CommTimer.timeout.connect(self.send)
         self.CommTimer.start()
@@ -410,7 +410,7 @@ class RoboCommWorker(QObject):
         
             # inform mainframe if command block was send successfully 
             if len(du.ROB_send_list) == 0:
-                self.sendElem.emit(Comm, res, num_send, direct_ctrl)
+                self.sendElem.emit(Comm, True, num_send, direct_ctrl)
 
 
     def _check_zero_dist(self) -> float | None:
@@ -579,30 +579,12 @@ class LoadFileWorker(QObject):
 
             # set the last entry to pMode=end
             self._CommList[len(self._CommList) - 1].p_mode = "end"
-
-        # range check
-        if lfw_range_chk:
-            line = 0
-            range_chk = ''
-            for Entry in self._CommList:
-                line += 1
-                result, msg = fu.range_check(Entry)
-                if not result:
-                    range_chk += f"Line {line}: {msg}\n"
-        if range_chk != '':
-            self.rangeChkWarning.emit(range_chk)
         
-        # base dist check
+        # entry checks
+        if lfw_range_chk:
+            self.check_routine(fu.range_check)
         if lfw_base_dist_chk:
-            line = 0
-            base_dist_chk = ''
-            for Entry in self._CommList:
-                line += 1
-                result, msg = fu.base_dist_check(Entry)
-                if not result:
-                    base_dist_chk += f"Line {line}: {msg}\n"
-        if base_dist_chk != '':
-            self.rangeChkWarning.emit(base_dist_chk)
+            self.check_routine(fu.base_dist_check)
 
         # add to command queue
         du.SCQueue.add_queue(self._CommList)
@@ -665,8 +647,30 @@ class LoadFileWorker(QObject):
                     return False, 0
                 id += 1
         return True, skips
+    
 
-
+    def check_routine(self, func):
+        """preformes a line-wise check, check function to be stated unter 
+        'func', needs to be a callable that returns (bool, str)"""
+        if not callable(func):
+            raise TypeError(f"{func} is not callable!")
+        line = 0
+        warnings = 0
+        chk_msg = ''
+        for Entry in self._CommList:
+            line += 1
+            result, msg = func(Entry)
+            if not result:
+                warnings += 1
+                chk_msg += f"Line {line}: {msg}\n"
+                if warnings >= du.DEF_WARN_MAX_RAISED:
+                    chk_msg += (
+                        f"Maximum number of warnings reached, "
+                        f"stopping check.."
+                    )
+                    break
+        if chk_msg != '':
+            self.rangeChkWarning.emit(chk_msg)
 
 
 

@@ -84,6 +84,8 @@ class Mainframe(PreMainframe):
 
         self.log_entry('GNRL', 'load default settings...')
         self.load_defaults(setup=True)
+        self.set_zero([1,2,3,4,5,6,8], 'default')
+        self.set_range()
 
         self.log_entry('GNRL', 'init threading...')
         if self._testrun:
@@ -210,6 +212,8 @@ class Mainframe(PreMainframe):
         self.CONN_num_commForerun.valueChanged.connect(lambda: self.mutex_setattr('robot_comm_fr'))
         self.SET_btt_apply.pressed.connect(self.apply_settings)
         self.SET_btt_default.pressed.connect(self.load_defaults)
+        self.CHKR_btt_default.pressed.connect(self.set_range)
+        self.CHKR_btt_overwrite.pressed.connect(lambda: self.set_range('user'))
         self.SID_btt_overwrite.pressed.connect(self.sc_id_overwrite)
 
         # SINGLE COMMAND
@@ -247,7 +251,7 @@ class Mainframe(PreMainframe):
 
         # ZERO
         self.ZERO_btt_newZero.pressed.connect(
-            lambda: self.set_zero(axis=[1, 2, 3, 4, 5, 6, 8], source='sys_monitor')
+            lambda: self.set_zero(axis=[1, 2, 3, 4, 5, 6, 8], source='user')
         )
         self.ZERO_btt_loadZeroFile.pressed.connect(
             lambda: self.set_zero(axis=[1, 2, 3, 4, 5, 6, 8], source='file')

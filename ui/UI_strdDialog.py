@@ -14,7 +14,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(877, 441)
+        Dialog.resize(866, 431)
+        Dialog.setMaximumSize(QtCore.QSize(1200, 800))
         Dialog.setStyleSheet(
             "border-radius: 5px;\n"
             'font-family: "Bahnschrift";\n'
@@ -24,8 +25,82 @@ class Ui_Dialog(object):
             "background-color: #4c4a48;\n"
             "color: #f2f4f3;"
         )
+        self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
+        self.verticalLayout.setObjectName("verticalLayout")
+        spacerItem = QtWidgets.QSpacerItem(
+            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
+        self.verticalLayout.addItem(spacerItem)
+        self.scrollArea = QtWidgets.QScrollArea(Dialog)
+        self.scrollArea.setMaximumSize(QtCore.QSize(1200, 800))
+        self.scrollArea.setStyleSheet(
+            "QScrollbar:vertical {\n"
+            "    background-color: #4c4a48;\n"
+            "    border-raduis: 4px;\n"
+            "}    \n"
+            "QScrollBar::handle:vertical {\n"
+            "    background-color: #ffba00;\n"
+            "    min-height: 5px;\n"
+            "    border-radius: 4px;\n"
+            "}\n"
+            "QScrollBar::sub-line:vertical {\n"
+            "    margin: 3px 0px 3px 0px;\n"
+            "    border-image: url(:/qss_icons/rc/up_arrow_disabled.png);\n"
+            "    height: 10px;\n"
+            "    width: 10px;\n"
+            "    subcontrol-position: top;\n"
+            "    subcontrol-origin: margin;\n"
+            "}\n"
+            "QScrollBar::add-line:vertical {\n"
+            "    margin: 3px 0px 3px 0px;\n"
+            "    border-image: url(:/qss_icons/rc/down_arrow_disabled.png);\n"
+            "   height: 10px;\n"
+            "   width: 10px;\n"
+            "   subcontrol-position: bottom;\n"
+            "   subcontrol-origin: margin;\n"
+            "}\n"
+            "QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+            "    background: none;\n"
+            "}\n"
+            "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+            "   background: none;\n"
+            "}"
+        )
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setObjectName("scrollArea")
+        self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 841, 326))
+        self.scrollAreaWidgetContents_2.setMaximumSize(QtCore.QSize(1200, 150000))
+        self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.label = QtWidgets.QLabel(self.scrollAreaWidgetContents_2)
+        self.label.setMaximumSize(QtCore.QSize(1200, 150000))
+        self.label.setAutoFillBackground(False)
+        self.label.setStyleSheet(
+            "border-radius: 5px;\n"
+            'font-family: "Bahnschrift";\n'
+            "font-size: 14pt;\n"
+            "padding: 2px;\n"
+            "padding-left: 5px;\n"
+            "background-color: #4c4a48;\n"
+            "color: #f2f4f3;"
+        )
+        self.label.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.label.setScaledContents(False)
+        self.label.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
+        )
+        self.label.setWordWrap(True)
+        self.label.setObjectName("label")
+        self.verticalLayout_2.addWidget(self.label)
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents_2)
+        self.verticalLayout.addWidget(self.scrollArea)
+        spacerItem1 = QtWidgets.QSpacerItem(
+            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
+        self.verticalLayout.addItem(spacerItem1)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
-        self.buttonBox.setGeometry(QtCore.QRect(490, 350, 341, 51))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift")
         font.setPointSize(14)
@@ -54,19 +129,11 @@ class Ui_Dialog(object):
             QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok
         )
         self.buttonBox.setObjectName("buttonBox")
-        self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(50, 50, 771, 261))
-        self.label.setStyleSheet(
-            "border-radius: 5px;\n"
-            'font-family: "Bahnschrift";\n'
-            "font-size: 14pt;\n"
-            "padding: 2px;\n"
-            "padding-left: 5px;\n"
-            "background-color: #4c4a48;\n"
-            "color: #f2f4f3;"
-        )
-        self.label.setWordWrap(True)
-        self.label.setObjectName("label")
+        self.verticalLayout.addWidget(self.buttonBox)
+        self.verticalLayout.setStretch(0, 1)
+        self.verticalLayout.setStretch(1, 25)
+        self.verticalLayout.setStretch(2, 1)
+        self.verticalLayout.setStretch(3, 5)
 
         self.retranslateUi(Dialog)
         self.buttonBox.accepted.connect(Dialog.accept)  # type: ignore
@@ -76,4 +143,4 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.label.setText(_translate("Dialog", "STARTING PRINT APP..."))
+        self.label.setText(_translate("Dialog", "NO INFORMATION PROGRAMMED"))

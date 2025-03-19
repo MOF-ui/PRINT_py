@@ -1836,6 +1836,7 @@ DEF_STT_VALID_TIME = 60 # [seconds]
 DEF_TERM_MAX_LINES = 300
 DEF_TOOL_TROL_RATIO = 500
 DEF_WD_TIMEOUT = 10000 # [ms]
+DEF_WARN_MAX_RAISED = 100
 
 
 ##########################     GLOBALS VARS     ##############################
@@ -1846,7 +1847,7 @@ CAM_urls = [
     'rtsp://admin:KameraNr1@192.168.178.38:554/ch1/main/av_stream',
 ]
 DC_rob_moving = False
-DCCurrZero = Coordinate()
+DCCurrZero = dcpy(DEF_DC_ZERO)
 DCSpeed = dcpy(DEF_DC_SPEED)
 IO_curr_filepath = None
 IO_fr_to_ts = DEF_IO_FR_TO_TS

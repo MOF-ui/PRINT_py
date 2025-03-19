@@ -11,6 +11,7 @@
 # python standard libraries
 import os
 import sys
+from pathlib import Path
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -60,7 +61,8 @@ class FileDialog(QFileDialog):
         self.setupUi(self)
         self.setWindowTitle(title)
         self.setFileMode(1)  # enum for 'ExistingFile'
-        self.setDirectory(r"C:\Users\Max\Downloads")
+        downloads_path = Path.home() / 'Downloads'
+        self.setDirectory(str(downloads_path))
         self.setNameFilters({'GCode files (*.gcode)', 'RAPID files (*.mod)'})
         self.selectNameFilter('GCode files (*.gcode)')
 
