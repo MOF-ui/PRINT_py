@@ -344,8 +344,14 @@ class Mainframe(PreMainframe):
             res = du.ROBTcp.connect()
 
             if isinstance(res, tuple):
-                # if successful, reset SC ID 
-                du.SC_curr_comm_id = 1
+                # if successful, reset SC ID, update command ids
+                with QMutexLocker(GlobalMutex):
+                    du.SC_curr_comm_id = 1
+                    for idx, entry in enumerate(du.SCQueue):
+                        # reset all IDs to [1, 2, ..]
+                        entry.id = idx + 1
+                self.label_update_on_receive('Sucessful reconnect.')
+                self.label_update_on_queue_change()
                 # start threading and watchdog
                 if not self._RoboCommThread.isRunning():
                     # restart if necessary; if so reconnect threads
@@ -1066,7 +1072,11 @@ class Mainframe(PreMainframe):
         (in theory)"""
         # to-do: check for implausibile coor combinations
 
-        def raise_warn():
+        def raise_warn(msg):
+            msg += (
+                f"\n\nOK\t--> drive to location anyways"
+                f"\nCancel\t--> stay at current location"
+            )
             imp_warning = strd_dialog(msg, 'IMPLAUSIBILE TARGET')
             imp_warning.exec()
             return imp_warning.result()
@@ -1103,6 +1113,7 @@ class Mainframe(PreMainframe):
             z=0,
         )
         if not self.coor_plausibility_check(Command):
+            self.switch_rob_moving(end=True)
             return
 
         self.log_entry('DCom', 'sending DC home command...')
@@ -1149,6 +1160,7 @@ class Mainframe(PreMainframe):
             z=0,
         )
         if not self.coor_plausibility_check(Command):
+            self.switch_rob_moving(end=True)
             return
 
         self.log_entry('DCom', f"sending DC command: ({Command})")
@@ -1192,6 +1204,7 @@ class Mainframe(PreMainframe):
             z=0,
         )
         if not self.coor_plausibility_check(Command):
+            self.switch_rob_moving(end=True)
             return
 
         self.log_entry('DCom', f"sending NC command: ({NewPos})")
@@ -1232,6 +1245,7 @@ class Mainframe(PreMainframe):
 
         Command.id = du.SC_curr_comm_id
         if not self.coor_plausibility_check(Command):
+            self.switch_rob_moving(end=True)
             return
 
         self.log_entry('DCom', f"sending GCode DC command: ({Command})")
@@ -1256,6 +1270,7 @@ class Mainframe(PreMainframe):
 
         Command.id = du.SC_curr_comm_id
         if not self.coor_plausibility_check(Command):
+            self.switch_rob_moving(end=True)
             return
 
         self.log_entry('DCom', f"sending RAPID DC command: ({Command})")

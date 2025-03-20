@@ -264,17 +264,25 @@ class RoboCommWorker(QObject):
                     f"TCP: {Telem.t_speed}"
                 )
 
-                # check for ID overflow, reduce SC_queue IDs 
+                # check for ID overflow, reduce SC_queue IDs
                 if Telem.id < du.ROBLastTelem.id:
-                    for x in du.SCQueue:
-                        x.id -= du.DEF_ROB_BUFF_SIZE
-                    # and clear ROBCommQueue entries with IDs
-                    # near DEF_ROB_BUFF_SIZE
-                    try:
-                        while du.ROBCommQueue[0].id > Telem.id:
-                            du.ROBCommQueue.pop_first_item()
-                    except:
-                        pass
+                    buff_size = du.DEF_ROB_BUFF_SIZE
+                    # avoid errors from SC_curr_comm_id resets:
+                    if all(entry.id > buff_size for entry in du.SCQueue):
+                        for x in du.SCQueue:
+                            x.id -= buff_size
+                        # and clear ROBCommQueue entries with IDs
+                        # near DEF_ROB_BUFF_SIZE
+                        try:
+                            while du.ROBCommQueue[0].id > Telem.id:
+                                du.ROBCommQueue.pop_first_item()
+                        except:
+                            pass
+                    # otherwise it has to be a SC_curr_comm_id reset,
+                    # indicate robot idle state
+                    else:
+                        du.ROBCommQueue.clear()
+                        self.endDcMoving.emit()
 
                 # delete all finished commands from ROB_commQueue
                 try:
@@ -309,10 +317,8 @@ class RoboCommWorker(QObject):
 
             # reset robMoving indicator if near end, skip if queue is processed
             if du.DC_rob_moving and not du.SC_q_processing:
-                check_dist = self._check_zero_dist()
-                if check_dist is not None:
-                    if check_dist < 1:
-                        self.endDcMoving.emit()
+                if self._check_target_reached():
+                    self.endDcMoving.emit()
 
 
     def check_queue(self) -> None:
@@ -327,10 +333,8 @@ class RoboCommWorker(QObject):
         # if qProcessing is ending, define end as being in 1mm range of
         # the last robtarget
         if du.SC_q_prep_end:
-            check_dist = self._check_zero_dist()
-            if check_dist is not None:
-                if check_dist < 1:
-                    self.endProcessing.emit()
+            if self._check_target_reached():
+                self.endProcessing.emit()
 
         # if qProcessing is active and not ending, pop first queue item if
         # robot is nearer than ROB_commFr; if no entries in SC_queue left,
@@ -373,13 +377,13 @@ class RoboCommWorker(QObject):
                 self.sendElem.emit(Comm, False, err, direct_ctrl)
                 print(f"send error: {err}")
                 break
+            while Comm.id > du.DEF_ROB_BUFF_SIZE:
+                Comm.id -= du.DEF_ROB_BUFF_SIZE
             # check for TCP speed overwrites
             if du.ROB_speed_overwrite >= 0.0:
                 Comm.Speed.ts = du.ROB_speed_overwrite
             else:
                 Comm.Speed.ts = int(Comm.Speed.ts * du.ROB_live_ad)
-            while Comm.id > du.DEF_ROB_BUFF_SIZE:
-                Comm.id -= du.DEF_ROB_BUFF_SIZE
 
             # if testrun, skip actually sending the message
             if testrun:
@@ -413,23 +417,26 @@ class RoboCommWorker(QObject):
                 self.sendElem.emit(Comm, True, num_send, direct_ctrl)
 
 
-    def _check_zero_dist(self) -> float | None:
+    def _check_target_reached(self) -> bool:
         """calculates distance between next entry in ROB_commQueue and current
         position; calculates 4 dimensional only to account for external axis
         movement (0,0,0,1) 
         """
 
-        if len(du.ROBCommQueue) == 1:
+        try:
             CurrCommTarget = dcpy(du.ROBCommQueue[0].Coor1)
             CurrCoor = dcpy(du.ROBTelem.Coor)
-            return m.sqrt(
+            target_dist =  m.sqrt(
                 m.pow(CurrCommTarget.x - CurrCoor.x, 2)
                 + m.pow(CurrCommTarget.y - CurrCoor.y, 2)
                 + m.pow(CurrCommTarget.z - CurrCoor.z, 2)
                 + m.pow(CurrCommTarget.ext - CurrCoor.ext, 2)
             )
-        else:
-            return None
+        except:
+            return True
+        if target_dist < du.CTRL_min_target_dist:
+            return True
+        return False
 
 
 

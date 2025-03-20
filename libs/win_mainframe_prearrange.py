@@ -435,10 +435,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         if no_error:
             write_buffer = command.print_short()
-            print(f"curr ID: {du.SC_curr_comm_id}; adding: {num_send}")
             du.SC_curr_comm_id += num_send
-            print(f"new ID: {du.SC_curr_comm_id}")
-
             if du.SC_curr_comm_id > du.DEF_ROB_BUFF_SIZE:
                 with QMutexLocker(GlobalMutex):
                     du.SC_curr_comm_id -= du.DEF_ROB_BUFF_SIZE

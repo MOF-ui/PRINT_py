@@ -1849,6 +1849,7 @@ CAM_urls = [
 DC_rob_moving = False
 DCCurrZero = dcpy(DEF_DC_ZERO)
 DCSpeed = dcpy(DEF_DC_SPEED)
+CTRL_min_target_dist = 1 # [mm]
 IO_curr_filepath = None
 IO_fr_to_ts = DEF_IO_FR_TO_TS
 IO_zone = DEF_IO_ZONE

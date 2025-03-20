@@ -54,8 +54,8 @@ def range_check(target_entry:du.QEntry) -> tuple[bool, str]:
     for t_attr, rmin_attr, rmax_attr, name in zip(target, RangeMin, RangeMax, names):
         if not rmin_attr <= t_attr <= rmax_attr:
             msg =  (
-                f"Target out of range on axis {name.upper()}: "
-                f"{t_attr} ({rmin_attr} - {rmax_attr})"
+                f"Target out of range on axis {name.upper()}:\t"
+                f"{t_attr} ∉ [{rmin_attr}, {rmax_attr}]"
             )
             return False, msg
     return True, ''
