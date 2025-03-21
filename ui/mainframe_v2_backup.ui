@@ -2063,6 +2063,9 @@ color: #E1E5EE;</string>
        <property name="suffix">
         <string>%</string>
        </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
        <property name="maximum">
         <number>300</number>
        </property>
@@ -2088,6 +2091,9 @@ color: #E1E5EE;</string>
        </property>
        <property name="suffix">
         <string>%</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
        </property>
        <property name="maximum">
         <number>300</number>
@@ -2187,6 +2193,9 @@ color: #E1E5EE;</string>
        </property>
        <property name="suffix">
         <string>%</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
        </property>
        <property name="maximum">
         <number>300</number>
@@ -10779,9 +10788,9 @@ background-color: #4c4a48;</string>
    <widget class="QLabel" name="lbl_logEntry">
     <property name="geometry">
      <rect>
-      <x>1281</x>
-      <y>30</y>
-      <width>161</width>
+      <x>1366</x>
+      <y>27</y>
+      <width>81</width>
       <height>31</height>
      </rect>
     </property>
@@ -10792,7 +10801,7 @@ background-color: #4c4a48;
 color: #E1E5EE;</string>
     </property>
     <property name="text">
-     <string>last log entry</string>
+     <string>LOG</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>

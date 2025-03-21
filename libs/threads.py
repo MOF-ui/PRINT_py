@@ -29,7 +29,7 @@ from PyQt5.QtGui import QImage, QPixmap
 import libs.data_utilities as du
 import libs.func_utilities as fu
 import libs.pump_utilities as pu
-from libs.win_mainframe_prearrange import GlobalMutex
+from libs.win_mainframe_prearrange import GlobalMutex, PmpMutex
 
 
 
@@ -71,12 +71,9 @@ class PumpCommWorker(QObject):
         """extra function needed to set global indicator 'PMP_comm_active'
         which is checked in win_mainframe.disconnect_tcp"""
 
-        with QMutexLocker(GlobalMutex):
-            du.PMP_comm_active = True
-        self.send()
-        self.receive()
-        with QMutexLocker(GlobalMutex):
-            du.PMP_comm_active = False
+        with QMutexLocker(PmpMutex):
+            self.send()
+            self.receive()
 
 
     def send(self) -> None:
@@ -88,12 +85,15 @@ class PumpCommWorker(QObject):
         
         # send to P1 and P2 & keepAlive both
         p1_speed, p2_speed, pinch = pu.get_pmp_speeds()
+        min_speed, max_speed = du.DEF_PUMP_CHK_RANGE
         for serial, speed, live_ad, speed_global, p_num in [
                 (du.PMP1Serial, p1_speed, 'PMP1_live_ad', 'PMP1_speed', 'P1'),
                 (du.PMP2Serial, p2_speed, 'PMP2_live_ad', 'PMP2_speed', 'P2'),
         ]:
             if serial.connected and speed is not None:
-                res = serial.set_speed(int(speed * getattr(du, live_ad)))
+                new_speed = speed * getattr(du, live_ad)
+                new_speed = fu.domain_clip(new_speed, min_speed, max_speed)
+                res = serial.set_speed(int(new_speed))
                 if res is not None:
                     with QMutexLocker(GlobalMutex):
                         setattr(du, speed_global, speed)
@@ -259,10 +259,7 @@ class RoboCommWorker(QObject):
             self.dataReceived.emit()
 
             with QMutexLocker(GlobalMutex):
-                fu.add_to_comm_protocol(
-                    f"RECV:    ID {Telem.id},   {Telem.Coor}   "
-                    f"TCP: {Telem.t_speed}"
-                )
+                fu.add_to_comm_protocol(f"RECV:    {Telem}")
 
                 # check for ID overflow, reduce SC_queue IDs
                 if Telem.id < du.ROBLastTelem.id:
@@ -382,8 +379,12 @@ class RoboCommWorker(QObject):
             # check for TCP speed overwrites
             if du.ROB_speed_overwrite >= 0.0:
                 Comm.Speed.ts = du.ROB_speed_overwrite
+                # limit reorientation speed to avoid damage
+                r_speed = (du.ROB_speed_overwrite / 2)
+                Comm.Speed.ors = min([r_speed, du.CTRL_max_r_speed])
             else:
                 Comm.Speed.ts = int(Comm.Speed.ts * du.ROB_live_ad)
+                Comm.Speed.ors = int(Comm.Speed.ors * du.ROB_live_ad)
 
             # if testrun, skip actually sending the message
             if testrun:
@@ -396,14 +397,7 @@ class RoboCommWorker(QObject):
                 with QMutexLocker(GlobalMutex):
                     num_send += 1
                     du.ROBCommQueue.append(Comm)
-                    fu.add_to_comm_protocol(
-                        f"SEND:    ID: {Comm.id}  MT: {Comm.mt}  PT: {Comm.pt} "
-                        f"\t|| COOR_1: {Comm.Coor1}"
-                        f"\n\t\t\t|| COOR_2: {Comm.Coor2}"
-                        f"\n\t\t\t|| SV:     {Comm.Speed} \t|| SBT: {Comm.sbt}   "
-                        f"SC: {Comm.sc}   Z: {Comm.z}"
-                        f"\n\t\t\t|| TOOL:   {Comm.Tool}"
-                    )
+                    fu.add_to_comm_protocol(f"SEND:    {Comm}")
                     if direct_ctrl:
                         du.SCQueue.increment()
 
@@ -423,17 +417,24 @@ class RoboCommWorker(QObject):
         movement (0,0,0,1) 
         """
 
-        try:
-            CurrCommTarget = dcpy(du.ROBCommQueue[0].Coor1)
+        # as long as there a more commands comming, target is not reached
+        command_num = len(du.ROBCommQueue)
+        if command_num > 1 or len(du.ROB_send_list) != 0:
+            return False
+        # otherwise calc distance to target
+        elif command_num == 1:
+            CurrTarget = dcpy(du.ROBCommQueue[0].Coor1)
             CurrCoor = dcpy(du.ROBTelem.Coor)
             target_dist =  m.sqrt(
-                m.pow(CurrCommTarget.x - CurrCoor.x, 2)
-                + m.pow(CurrCommTarget.y - CurrCoor.y, 2)
-                + m.pow(CurrCommTarget.z - CurrCoor.z, 2)
-                + m.pow(CurrCommTarget.ext - CurrCoor.ext, 2)
+                m.pow(CurrTarget.x - CurrCoor.x, 2)
+                + m.pow(CurrTarget.y - CurrCoor.y, 2)
+                + m.pow(CurrTarget.z - CurrCoor.z, 2)
+                + m.pow(CurrTarget.ext - CurrCoor.ext, 2)
             )
-        except:
+        # failsafe
+        else:
             return True
+
         if target_dist < du.CTRL_min_target_dist:
             return True
         return False

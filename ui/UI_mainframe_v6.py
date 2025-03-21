@@ -1109,6 +1109,7 @@ class Ui_MainWindow(object):
         self.SCTRL_num_liveAd_robot.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
+        self.SCTRL_num_liveAd_robot.setMinimum(1)
         self.SCTRL_num_liveAd_robot.setMaximum(300)
         self.SCTRL_num_liveAd_robot.setProperty("value", 100)
         self.SCTRL_num_liveAd_robot.setObjectName("SCTRL_num_liveAd_robot")
@@ -1118,6 +1119,7 @@ class Ui_MainWindow(object):
         self.SCTRL_num_liveAd_pump1.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
+        self.SCTRL_num_liveAd_pump1.setMinimum(1)
         self.SCTRL_num_liveAd_pump1.setMaximum(300)
         self.SCTRL_num_liveAd_pump1.setProperty("value", 100)
         self.SCTRL_num_liveAd_pump1.setObjectName("SCTRL_num_liveAd_pump1")
@@ -1154,6 +1156,7 @@ class Ui_MainWindow(object):
         self.SCTRL_num_liveAd_pump2.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
+        self.SCTRL_num_liveAd_pump2.setMinimum(1)
         self.SCTRL_num_liveAd_pump2.setMaximum(300)
         self.SCTRL_num_liveAd_pump2.setProperty("value", 100)
         self.SCTRL_num_liveAd_pump2.setObjectName("SCTRL_num_liveAd_pump2")
@@ -5129,7 +5132,7 @@ class Ui_MainWindow(object):
         self.TRANS_0_frameLabel.raise_()
         self.tab.addTab(self.MONITOR_tab, "")
         self.lbl_logEntry = QtWidgets.QLabel(self.mainframe)
-        self.lbl_logEntry.setGeometry(QtCore.QRect(1281, 30, 161, 31))
+        self.lbl_logEntry.setGeometry(QtCore.QRect(1366, 27, 81, 31))
         self.lbl_logEntry.setStyleSheet(
             "border: 0px;\n"
             "font-size: 14pt;\n"
@@ -5891,7 +5894,7 @@ class Ui_MainWindow(object):
             self.tab.indexOf(self.MONITOR_tab),
             _translate("MainWindow", "     SYSTEM MONITOR     "),
         )
-        self.lbl_logEntry.setText(_translate("MainWindow", "last log entry"))
+        self.lbl_logEntry.setText(_translate("MainWindow", "LOG"))
         self.disp_logEntry.setText(_translate("MainWindow", "no logfile created!"))
 
 

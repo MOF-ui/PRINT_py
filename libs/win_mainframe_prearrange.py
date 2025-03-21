@@ -780,16 +780,19 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     #                      COMMAND QUEUE HELP FUNCTIONS                      #
     ##########################################################################
 
-    def sc_id_overwrite(self) -> None:
+    def sc_id_overwrite(self, internal=False) -> None:
         """synchronize SC and ROB ID with this, if program falls out of sync
         with the robot, should happen only with on-the-fly restarts,
         theoretically
         """
 
-        if du.DC_rob_moving:
+        if du.DC_rob_moving or du.SC_q_processing:
             return
 
-        new_sc_id = self.SID_num_overwrite.value()
+        if internal:
+            new_sc_id = 1
+        else:
+            new_sc_id = self.SID_num_overwrite.value()
         with QMutexLocker(GlobalMutex):
             id_dist = new_sc_id - du.SC_curr_comm_id
             du.SC_curr_comm_id = new_sc_id
@@ -797,6 +800,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         self.label_update_on_receive(self.CONN_ROB_disp_readBuffer.text())
         self.label_update_on_queue_change()
+        if internal:
+            return
         self.log_entry(
             'GNRL',
             f"User overwrote current comm ID to {du.SC_curr_comm_id}."
@@ -812,6 +817,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         with QMutexLocker(GlobalMutex):
             du.SC_q_processing = True
             du.SC_q_prep_end = False
+        self.switch_rob_moving()
         self.log_entry("ComQ", "queue processing started")
 
         # update GUI
@@ -819,11 +825,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_indi_qProcessing.setStyleSheet(css)
         self.CONN_indi_qProcessing.setStyleSheet(css)
         self.ASC_indi_qProcessing.setStyleSheet(css)
-
         for widget in self.ASC_group:
             widget.setEnabled(False)
-        self.switch_rob_moving()
-
         self.label_update_on_queue_change()
 
 
@@ -841,11 +844,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                 du.SC_q_prep_end = False
                 du.SC_q_processing = False
             self.log_entry("ComQ", "queue processing stopped")
+            self.switch_rob_moving(end=True)
 
             self.label_update_on_queue_change()
-            self.switch_rob_moving(end=True)
             css = "border-radius: 20px; background-color: #4c4a48;"
-
             for widget in self.ASC_group:
                 widget.setEnabled(True)
 
@@ -1131,8 +1133,10 @@ class Watchdog(QObject):
 
 ##################################   MAIN  ###################################
 
-# mutual exclusion object, used to manage global data exchange
+# mutual exclusion objects,
+# used to manage global data exchange of modbus shutdown
 GlobalMutex = QMutex()
+PmpMutex = QMutex()
 
 # only do the following if run as main program
 if __name__ == "__main__":

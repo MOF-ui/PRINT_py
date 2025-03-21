@@ -87,7 +87,7 @@ class Coordinate:
 
         return (
             f"X: {self.x}   Y: {self.y}   Z: {self.z}   "
-            f"Rx: {self.rx}   Ry: {self.ry}   Rz: {self.rz}   "
+            f"RX: {self.rx}   RY: {self.ry}   RZ: {self.rz}   "
             f"Q: {self.q}   EXT: {self.ext}"
         )
 
@@ -515,12 +515,12 @@ class QEntry:
 
         return (
             f"ID: {self.id}  MT: {self.mt}  PT: {self.pt} "
-            f"\t|| COOR_1: {self.Coor1}"
-            f"\n\t\t|| COOR_2: {self.Coor2}"
-            f"\n\t\t|| SV:     {self.Speed} "
-            f"\t|| SBT: {self.sbt}   SC: {self.sc}   Z: {self.z}"
-            f"\n\t\t|| TOOL:   {self.Tool}"
-            f"\n\t\t|| PM/PR:  {self.p_mode}/{self.p_ratio}   "
+            f"\n  || COOR_1: {self.Coor1}"
+            f"\n  || COOR_2: {self.Coor2}"
+            f"\n  || SV:     {self.Speed}"
+            f"   || SBT: {self.sbt}   SC: {self.sc}   Z: {self.z}"
+            f"\n  || TOOL:   {self.Tool}"
+            f"\n  || PM/PR:  {self.p_mode}/{self.p_ratio}   "
             f"PIN: {self.pinch}"
         )
 
@@ -1022,10 +1022,7 @@ class RoboTelemetry:
     def __str__(self) -> str:
 
         return (
-            f"ID: {self.id}   X: {self.Coor.x}   Y: {self.Coor.y}   "
-            f"Z: {self.Coor.z}   Rx: {self.Coor.rx}   Ry: {self.Coor.ry}   "
-            f"Rz: {self.Coor.rz}   EXT:   {self.Coor.ext}   "
-            f"TOOL_SPEED: {self.t_speed}"
+            f"ID: {self.id}   COOR: {self.Coor}   TOOL_SPEED: {self.t_speed}"
         )
 
 
@@ -1777,6 +1774,7 @@ class RobConnection(TCPIP):
 # only if you know what your doing!)
 
 # MTEC P20 DEFAULT SETTINGS
+DEF_PUMP_CHK_RANGE = (-100.0, 100.0)
 DEF_PUMP_CLASS1 = 75.0
 DEF_PUMP_CLASS2 = 50.0
 DEF_PUMP_LPS = 0.5
@@ -1803,8 +1801,8 @@ DEF_PUMP_VALID_COMMANDS = [
 DEF_ROB_BUFF_SIZE = 3000
 DEF_ROB_COMM_FR = 10
 DEF_ROB_COOR_CHK_RANGE = ( # to-do: better mapping
-    Coordinate(-1600.0, 0.0, -895.0, 0.0, 0.0, -180.0, 0.0, 10.0),
-    Coordinate(4050.0, 2700.0, 1500.0, 360.0, 360.0, 120.0, 1.0, 3500.0),
+    Coordinate(-1600.0, 0.0, -895.0, 150.0, -30.0, -180.0, 0.0, 10.0),
+    Coordinate(4050.0, 2700.0, 1500.0, 210.0, 30.0, 120.0, 1.0, 3500.0),
 )
 DEF_ROB_TCP = {
     'ip': '192.168.125.1',
@@ -1818,7 +1816,7 @@ DEF_ROB_TCP = {
 # GENERAL DEFAULT SETTINGS
 DEF_DC_SPEED = SpeedVector()
 DEF_DC_ZERO = Coordinate(
-    -300.0, 1900.0, -895.0, 179.4, 0.0,-90.0, 0.0, 400.0,
+    -300.0, 1900.0, -895.0, 180, 0.0,-90.0, 0.0, 400.0,
 )
 DEF_ICQ_MAX_LINES = 200
 DEF_IO_FR_TO_TS = 0.1
@@ -1850,6 +1848,7 @@ DC_rob_moving = False
 DCCurrZero = dcpy(DEF_DC_ZERO)
 DCSpeed = dcpy(DEF_DC_SPEED)
 CTRL_min_target_dist = 1 # [mm]
+CTRL_max_r_speed = 50.0
 IO_curr_filepath = None
 IO_fr_to_ts = DEF_IO_FR_TO_TS
 IO_zone = DEF_IO_ZONE
@@ -1885,11 +1884,10 @@ PRH_connected = False
 PRH_url = '192.168.178.58:17'
 
 # MTEC P20 SETTINGS
-PMP_comm_active = False
 PMP_output_ratio = DEF_PUMP_OUTP_RATIO
 PMP_port = DEF_PUMP_SERIAL['port']
 PMP_retract_speed = DEF_PUMP_RETR_SPEED
-PMP_serial_def_bus = None  # is created after user input in win_mainframe
+PMPSerialDefBus = None  # is created after user input in win_mainframe
 PMP_speed = 0
 PMP_look_ahead = False
 PMP_look_ahead_dist = 50

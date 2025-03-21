@@ -32,13 +32,13 @@ class DataLibTest(unittest.TestCase):
         )
         self.assertEqual(
             str(TestCoor),
-            f"X: 1.2   Y: 3.4   Z: 5.6   Rx: 7.8   "
-            f"Ry: 9.11   Rz: 22.33   Q: 44.55   EXT: 66.77",
+            f"X: 1.2   Y: 3.4   Z: 5.6   RX: 7.8   "
+            f"RY: 9.11   RZ: 22.33   Q: 44.55   EXT: 66.77",
         )
         self.assertEqual(
             str(du.Coordinate()),
-            f"X: 0.0   Y: 0.0   Z: 0.0   Rx: 0.0   "
-            f"Ry: 0.0   Rz: 0.0   Q: 0.0   EXT: 0.0",
+            f"X: 0.0   Y: 0.0   Z: 0.0   RX: 0.0   "
+            f"RY: 0.0   RZ: 0.0   Q: 0.0   EXT: 0.0",
         )
 
         # __eq__ & __ne__
@@ -153,19 +153,19 @@ class DataLibTest(unittest.TestCase):
         )
         self.assertEqual(
             str(TestEntry),
-            f"ID: 1  MT: A  PT: B \t|| COOR_1: {TestCoor1}"
-            f"\n\t\t|| COOR_2: {TestCoor2}"
-            f"\n\t\t|| SV:     {TestVector} \t|| SBT: 7   SC: C   Z: 8"
-            f"\n\t\t|| TOOL:   {TestTool}"
-            f"\n\t\t|| PM/PR:  -1001/1.0   PIN: False",
+            f"ID: 1  MT: A  PT: B \n  || COOR_1: {TestCoor1}"
+            f"\n  || COOR_2: {TestCoor2}"
+            f"\n  || SV:     {TestVector}   || SBT: 7   SC: C   Z: 8"
+            f"\n  || TOOL:   {TestTool}"
+            f"\n  || PM/PR:  -1001/1.0   PIN: False",
         )
         self.assertEqual(
             str(du.QEntry()),
-            f"ID: 0  MT: L  PT: E \t|| COOR_1: {du.Coordinate()}"
-            f"\n\t\t|| COOR_2: {du.Coordinate()}"
-            f"\n\t\t|| SV:     {du.SpeedVector()} \t|| SBT: 0   SC: V   Z: 10"
-            f"\n\t\t|| TOOL:   {du.ToolCommand()}"
-            f"\n\t\t|| PM/PR:  -1001/1.0   PIN: False",
+            f"ID: 0  MT: L  PT: E \n  || COOR_1: {du.Coordinate()}"
+            f"\n  || COOR_2: {du.Coordinate()}"
+            f"\n  || SV:     {du.SpeedVector()}   || SBT: 0   SC: V   Z: 10"
+            f"\n  || TOOL:   {du.ToolCommand()}"
+            f"\n  || PM/PR:  -1001/1.0   PIN: False",
         )
 
         # __eq__ & __ne__
@@ -490,13 +490,13 @@ class DataLibTest(unittest.TestCase):
         TestTelem = du.RoboTelemetry(t_speed=1.1, id=2, Coor=TestCoor)
         self.assertEqual(
             str(TestTelem),
-            f"ID: 2   X: 3.0   Y: 3.0   Z: 3.0   Rx: 3.0   Ry: 3.0   "
-            f"Rz: 3.0   EXT:   3.0   TOOL_SPEED: 1.1",
+            f"ID: 2   COOR: X: 3.0   Y: 3.0   Z: 3.0   RX: 3.0   RY: 3.0   "
+            f"RZ: 3.0   Q: 3.0   EXT: 3.0   TOOL_SPEED: 1.1",
         )
         self.assertEqual(
             str(du.RoboTelemetry()),
-            f"ID: -1   X: 0.0   Y: 0.0   Z: 0.0   Rx: 0.0   Ry: 0.0   "
-            f"Rz: 0.0   EXT:   0.0   TOOL_SPEED: 0.0",
+            f"ID: -1   COOR: X: 0.0   Y: 0.0   Z: 0.0   RX: 0.0   RY: 0.0   "
+            f"RZ: 0.0   Q: 0.0   EXT: 0.0   TOOL_SPEED: 0.0",
         )
 
         # __eq__ & __ne__
