@@ -71,36 +71,38 @@ def look_ahead(p1_speed, p2_speed) -> tuple[float, float]:
     """determines the pump speed by looking at the next movement
     in the queue, retracts current pump"""
     try:
+        # get current and next command, if no p_ratio change
+        # check following commands, protocol path length & 
+        # break if to many commands with the same p_ratio
+        num_comm = 1
+        curr_pos = du.ROBTelem.Coor
         curr_comm = du.ROBCommQueue[0]
         next_comm = du.ROBCommQueue[1]
-        if (
-                not isinstance(curr_comm, du.QEntry)
-                or not isinstance(next_comm, du.QEntry)
+        dist = curr_pos.distance(curr_comm.Coor1)
+        while (
+                curr_comm.p_ratio == next_comm.p_ratio
+                and num_comm <= du.PMP_look_ahead_max_comms
         ):
-            raise TypeError
-        
-        if next_comm.p_ratio != curr_comm.p_ratio:
-            curr_pos = du.ROBTelem.Coor
-            tp_dist = m.sqrt(
-                m.pow(curr_comm.Coor1.x - curr_pos.x, 2)
-                + m.pow(curr_comm.Coor1.y - curr_pos.y, 2)
-                + m.pow(curr_comm.Coor1.z - curr_pos.z, 2)
-            )
-            if tp_dist < du.PMP_look_ahead_dist:
-                # reverse direction on currently running pump
-                # to reduce pressure in the hose system
-                next_speed = next_comm.p_mode
-                if -100 < next_speed < 100:
-                    next_p1_speed, next_p2_speed = speed_by_ratio(
-                        next_speed, next_comm.p_ratio
-                    )
-                    if p1_speed > 0:
-                        p1_speed = -p1_speed
-                        p2_speed = next_p2_speed
-                    elif p2_speed > 0:
-                        p1_speed = next_p1_speed
-                        p2_speed = -p2_speed
-    except Exception as e:
+            dist += curr_comm.Coor1.distance(next_comm.Coor1)
+            num_comm += 1
+            curr_comm = next_comm
+            next_comm = du.ROBCommQueue[num_comm]
+
+        if dist < du.PMP_look_ahead_dist:
+            # reverse direction on currently running pump
+            # to reduce pressure in the hose system
+            next_speed = next_comm.p_mode
+            if -100 < next_speed < 100:
+                next_p1_speed, next_p2_speed = speed_by_ratio(
+                    next_speed, next_comm.p_ratio
+                )
+                if p1_speed > 0:
+                    p1_speed = -p1_speed * du.PMP_look_ahead_retract
+                    p2_speed = next_p2_speed * du.PMP_look_ahead_prerun
+                elif p2_speed > 0:
+                    p1_speed = next_p1_speed * du.PMP_look_ahead_prerun
+                    p2_speed = -p2_speed * du.PMP_look_ahead_retract
+    except:
         pass
     
     return p1_speed, p2_speed

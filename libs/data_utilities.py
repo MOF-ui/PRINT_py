@@ -47,7 +47,7 @@ class Coordinate:
             external axis position
 
     METHODS:
-        __init__, __str__, __add__, __sub__, __round__, __eq__, __ne__
+        __init__, __str__, __add__, __sub__, __round__, __eq__, __ne__, distance
     """
 
     _iter_value = 0
@@ -203,7 +203,7 @@ class Coordinate:
                 return True
 
         elif other is not None:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'Coordinate'!"
             )
 
@@ -229,11 +229,24 @@ class Coordinate:
                 return True
 
         else:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'Coordinate'!"
             )
 
         return False
+    
+
+    def distance(self, other:'Coordinate') -> float:
+        """returns distance from self to other coordinate"""
+
+        if not isinstance(other, Coordinate):
+            return TypeError(f"{other} is not an instance of 'Coordinate'!")
+        
+        return m.sqrt(
+                m.pow(other.x - self.x, 2)
+                + m.pow(other.y - self.y, 2)
+                + m.pow(other.z - self.z, 2)
+            )
     
 
     @property
@@ -307,7 +320,7 @@ class SpeedVector:
                 return True
 
         elif other is not None:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'SpeedVector'!"
             )
 
@@ -329,7 +342,7 @@ class SpeedVector:
                 return True
 
         else:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'SpeedVector'!"
             )
 
@@ -403,7 +416,7 @@ class ToolCommand:
                 return True
 
         elif other is not None:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'ToolCommand'!"
             )
 
@@ -427,7 +440,7 @@ class ToolCommand:
                 return True
 
         else:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'ToolCommand'!"
             )
 
@@ -546,7 +559,7 @@ class QEntry:
                 return True
 
         elif other is not None:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'QEntry'!"
             )
 
@@ -577,7 +590,7 @@ class QEntry:
                 return True
 
         else:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'QEntry'!"
             )
 
@@ -706,7 +719,7 @@ class Queue:
             return True
 
         elif other is not None:
-            raise ValueError(f"{other} is not an instance of 'Queue'!")
+            raise TypeError(f"{other} is not an instance of 'Queue'!")
         
         return False
 
@@ -728,7 +741,7 @@ class Queue:
             return False
 
         else:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'Queue'!"
             )
 
@@ -1044,7 +1057,7 @@ class RoboTelemetry:
                 return True
 
         elif other is not None:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'RoboTelemetry'!"
             )
 
@@ -1065,7 +1078,7 @@ class RoboTelemetry:
                 return True
 
         else:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'RoboTelemetry'!"
             )
 
@@ -1129,7 +1142,7 @@ class PumpTelemetry:
                 return True
 
         elif other is not None:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance 'PumpTelemetry'!"
             )
 
@@ -1151,7 +1164,7 @@ class PumpTelemetry:
                 return True
 
         else:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance 'PumpTelemetry'!"
             )
 
@@ -1195,7 +1208,7 @@ class TSData:
         elif value is None:
             self.val = None
         else:
-            raise ValueError(f"new value can not be of type {type(value)}!")
+            raise TypeError(f"new value can not be of type {type(value)}!")
     
     
     def __eq__(self, other):
@@ -1206,7 +1219,7 @@ class TSData:
             if self.val == other:
                 return True
         else:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not comparable to {TSData}!"
             )
         return False
@@ -1220,7 +1233,7 @@ class TSData:
             if self.val != other:
                 return True
         else:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not comparable to {TSData}!"
             )
         return False
@@ -1388,7 +1401,7 @@ class DaqBlock:
                 return True
 
         elif other is not None:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'DaqBlock'!"
             )
 
@@ -1423,7 +1436,7 @@ class DaqBlock:
                 return True
 
         else:
-            raise ValueError(
+            raise TypeError(
                 f"{other} is not None or an instance of 'DaqBlock'!"
             )
 
@@ -1891,6 +1904,9 @@ PMPSerialDefBus = None  # is created after user input in win_mainframe
 PMP_speed = 0
 PMP_look_ahead = False
 PMP_look_ahead_dist = 50
+PMP_look_ahead_prerun = 1.0
+PMP_look_ahead_retract = 1.0
+PMP_look_ahead_max_comms = 10
 PMP1_liter_per_s = DEF_PUMP_LPS
 PMP1_live_ad = 1.0
 PMP1_modbus_id = '01'

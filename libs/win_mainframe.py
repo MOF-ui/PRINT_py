@@ -160,6 +160,8 @@ class Mainframe(PreMainframe):
         # LOOK AHEAD
         self.LAH_btt_active.pressed.connect(lambda: self.mutex_setattr('pmp_look_ahead'))
         self.LAH_num_distance.valueChanged.connect(lambda: self.mutex_setattr('pmp_look_ahead_dist'))
+        self.LAH_float_prerunFactor.valueChanged.connect(lambda: self.mutex_setattr('pmp_look_ahead_prerun'))
+        self.LAH_float_retractFactor.valueChanged.connect(lambda: self.mutex_setattr('pmp_look_ahead_retract'))
 
         # MIXER CONTROL
         self.PRH_btt_actWithPump.pressed.connect(lambda: self.mutex_setattr('mixer_act_w_pump'))
@@ -392,7 +394,7 @@ class Mainframe(PreMainframe):
                         self.connect_threads('PMP')
                         self._PumpCommThread.start()
 
-                    self._P1RecvWd.start()
+                    wd.start()
                     _action_on_success(
                         wd,
                         indi,
@@ -682,8 +684,7 @@ class Mainframe(PreMainframe):
 
         for wd in self.WD_group:
             wd.logEntry.connect(self.log_entry)
-            wd.criticalBite.connect(self.forced_stop_command)
-            wd.criticalBite.connect(self.stop_SCTRL_queue)
+            wd.criticalBite.connect(lambda: self.forced_stop_command(True))
             wd.disconnectDevice.connect(self.disconnect_device)
             wd.closeMainframe.connect(self.close)
 
@@ -1276,23 +1277,26 @@ class Mainframe(PreMainframe):
         self.log_entry('DCom', f"sending RAPID DC command: ({Command})")
 
 
-    def forced_stop_command(self) -> None:
+    def forced_stop_command(self, no_dialog=False) -> None:
         """send immediate stop to robot (buffer will be lost, but added to
         the queue again), gives command  to the actual sendCommand function
         """
 
-        Command = du.QEntry(id=1, mt='S')
-        if self._testrun:
-            return self.send_command(Command, dc=True)
-        fs_warning = strd_dialog(
-            f"WARNING!\n\nRobot will stop after current movement! "
-            f"OK to delete buffered commands on robot, "
-            f"Cancel to continue queue processing.",
-            'FORCED STOP COMMIT',
-        )
-        fs_warning.exec()
+        res = True
+        if not no_dialog:
+            Command = du.QEntry(id=1, mt='S')
+            if self._testrun:
+                return self.send_command(Command, dc=True)
+            fs_warning = strd_dialog(
+                f"WARNING!\n\nRobot will stop after current movement! "
+                f"OK to delete buffered commands on robot, "
+                f"Cancel to continue queue processing.",
+                'FORCED STOP COMMIT',
+            )
+            fs_warning.exec()
+            res = fs_warning.result()
 
-        if fs_warning.result():
+        if res or no_dialog:
             self.stop_SCTRL_queue()
             du.ROBTcp.send(Command) # bypass all queued commands
             self.pump_set_speed('0')
@@ -1439,7 +1443,7 @@ class Mainframe(PreMainframe):
         else:
             pinch_state = val
         try:
-            requests.post(f"{du.PRH_url}/pinch", data={'s': pinch_state})
+            requests.post(f"{du.PRH_url}/pinch", data={'s': pinch_state}, timeout=1)
         except requests.Timeout as e:
             log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
             self.log_entry('CONN', log_txt)

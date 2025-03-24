@@ -44,6 +44,8 @@ class PumpLibTest(unittest.TestCase):
     def test_look_ahead(self):
         """ """
 
+        du.PMP_look_ahead_prerun = 1.0
+        du.PMP_look_ahead_retract = 1.0
         # if no valid command comming up, return input
         du.ROBCommQueue.add(du.QEntry(Coor1=du.Coordinate(x=10), p_mode=10))
         du.ROBTelem = du.RoboTelemetry(Coor=du.Coordinate(x=8))
@@ -59,6 +61,29 @@ class PumpLibTest(unittest.TestCase):
             p_ratio=0.0,
         ))
         self.assertEqual(pu.look_ahead(10,0), (-10, 10))
+
+        # check if look ahead works over multiple entries by placing
+        # some inbetween with p_ratio=1
+        du.ROBCommQueue.add(du.QEntry(
+            id=2,
+            Coor1=du.Coordinate(x=11),
+            p_mode=10,
+            p_ratio=1.0,
+        ))
+        du.ROBCommQueue.add(du.QEntry(
+            id=3,
+            Coor1=du.Coordinate(x=12),
+            p_mode=10,
+            p_ratio=1.0,
+        ))
+        self.assertEqual(pu.look_ahead(10,0), (-10, 10))
+
+        # test factorization
+        du.PMP_look_ahead_prerun = 2.0
+        du.PMP_look_ahead_retract = 2.0
+        self.assertEqual(pu.look_ahead(10,0), (-20, 20))
+        du.PMP_look_ahead_prerun = 1.0
+        du.PMP_look_ahead_retract = 1.0
 
         # if we're further away, return input
         du.ROBTelem = du.RoboTelemetry(Coor=du.Coordinate(x=2))

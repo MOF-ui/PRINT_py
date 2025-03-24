@@ -45,12 +45,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestCoor == du.Coordinate())
         self.assertFalse(TestCoor == None)
         self.assertTrue(TestCoor == TestCoor)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestCoor == 5
         self.assertTrue(TestCoor != du.Coordinate())
         self.assertTrue(TestCoor != None)
         self.assertFalse(TestCoor != TestCoor)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestCoor != 5
 
         # __add__
@@ -96,12 +96,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestVector == du.SpeedVector())
         self.assertFalse(TestVector == None)
         self.assertTrue(TestVector == TestVector)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestVector == 5
         self.assertTrue(TestVector != du.SpeedVector())
         self.assertTrue(TestVector != None)
         self.assertFalse(TestVector != TestVector)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestVector != 5
 
         # __mul__ & __rmul__
@@ -129,12 +129,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestTool == du.ToolCommand())
         self.assertFalse(TestTool == None)
         self.assertTrue(TestTool == TestTool)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTool == 5
         self.assertTrue(TestTool != du.ToolCommand())
         self.assertTrue(TestTool != None)
         self.assertFalse(TestTool != TestTool)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTool != 5
 
 
@@ -172,12 +172,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestEntry == du.QEntry())
         self.assertFalse(TestEntry == None)
         self.assertTrue(TestEntry == TestEntry)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestEntry == 5
         self.assertTrue(TestEntry != du.QEntry())
         self.assertTrue(TestEntry != None)
         self.assertFalse(TestEntry != TestEntry)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestEntry != 5
 
         # print_short
@@ -233,12 +233,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestQueue == du.Queue())
         self.assertFalse(TestQueue == None)
         self.assertTrue(TestQueue == TestQueue)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestQueue == 5
         self.assertTrue(TestQueue != du.Queue())
         self.assertTrue(TestQueue != None)
         self.assertFalse(TestQueue != TestQueue)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestQueue != 5
 
         # last_entry
@@ -503,12 +503,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestTelem == du.RoboTelemetry())
         self.assertFalse(TestTelem == None)
         self.assertTrue(TestTelem == TestTelem)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTelem == 5
         self.assertTrue(TestTelem != du.RoboTelemetry())
         self.assertTrue(TestTelem != None)
         self.assertFalse(TestTelem != TestTelem)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTelem != 5
 
         # __round__ (and automatic ID conversion to int)
@@ -541,12 +541,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestTelem == du.PumpTelemetry())
         self.assertFalse(TestTelem == None)
         self.assertTrue(TestTelem == TestTelem)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTelem == 5
         self.assertTrue(TestTelem != du.PumpTelemetry())
         self.assertTrue(TestTelem != None)
         self.assertFalse(TestTelem != TestTelem)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTelem != 5
 
         # __round__
@@ -584,7 +584,7 @@ class DataLibTest(unittest.TestCase):
         self.assertEqual(TestC.ts_val, 4.3)
         TestC.ts_val = 6.7
         self.assertEqual(TestC.ts_val, 6.7)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestC.ts_val = 'A'
 
         # __eq__ & __ne__
@@ -661,12 +661,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestDqB == du.DaqBlock())
         self.assertFalse(TestDqB == None)
         self.assertTrue(TestDqB == TestDqB)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestDqB == 5
         self.assertTrue(TestDqB != du.DaqBlock())
         self.assertTrue(TestDqB != None)
         self.assertFalse(TestDqB != TestDqB)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestDqB != 5
         
         # store

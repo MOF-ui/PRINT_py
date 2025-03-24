@@ -93,7 +93,8 @@ class PumpCommWorker(QObject):
             if serial.connected and speed is not None:
                 new_speed = speed * getattr(du, live_ad)
                 new_speed = fu.domain_clip(new_speed, min_speed, max_speed)
-                res = serial.set_speed(int(new_speed))
+                new_speed = int(round(new_speed, 0))
+                res = serial.set_speed(new_speed)
                 if res is not None:
                     with QMutexLocker(GlobalMutex):
                         setattr(du, speed_global, speed)
@@ -101,9 +102,9 @@ class PumpCommWorker(QObject):
                     self.dataSend.emit(speed, res[0], res[1], p_num)
 
                 serial.keepAlive()
-        if pinch is not None:
+        if pinch is not None and du.PRH_connected:
             try:
-                ans = requests.post(f"{du.PRH_url}/pinch", data={'s': str(float(pinch))})
+                ans = requests.post(f"{du.PRH_url}/pinch", data={'s': str(float(pinch))}, timeout=0.1)
                 print(ans.text)
             except requests.Timeout as e:
                 log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
@@ -118,7 +119,7 @@ class PumpCommWorker(QObject):
                 mixer_speed = du.MIX_speed
             
             post_url = f"{du.PRH_url}/motor"
-            post_resp = requests.post(post_url, data={'s': mixer_speed})
+            post_resp = requests.post(post_url, data={'s': mixer_speed}, timeout=0.1)
             if post_resp.ok and f"RECV: " in post_resp.text:
                 with QMutexLocker(GlobalMutex):
                     du.MIX_last_speed = mixer_speed
@@ -142,6 +143,10 @@ class PumpCommWorker(QObject):
         ]:
             if serial.connected:
                 freq = serial.frequency
+                # override to reduce traffic on shared bus
+                # volt = -1.0
+                # amps = -1.0
+                # torq = -1.0
                 volt = serial.voltage
                 amps = serial.current
                 torq = serial.torque
@@ -171,7 +176,7 @@ class PumpCommWorker(QObject):
 
         # RECEIVE FROM PRINTHEAD (just ping to check)
         if du.PRH_connected:
-            ping_resp = requests.get(f"{du.PRH_url}/ping")
+            ping_resp = requests.get(f"{du.PRH_url}/ping", timeout=0.1)
             if ping_resp.ok and ping_resp.text == 'ack':
                 self.prhActive.emit()
 
