@@ -822,7 +822,7 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(
             TestFrame.CONN_ROB_disp_writeBuffer.text(),
             f"ID: 12 -- L, E -- COOR_1: X: 0.0   Y: 0.0   Z: 0.0   "
-            f"Rx: 0.0   Ry: 0.0   Rz: 0.0   Q: 0.0   EXT: 0.0 -- "
+            f"RX: 0.0   RY: 0.0   RZ: 0.0   Q: 0.0   EXT: 0.0 -- "
             f"SV: TS: 200   OS: 50   ACR: 50   DCR: 50 -- "
             f"PM/PR,PIN:  -1001/1.0, False",
         )
@@ -846,16 +846,11 @@ class MainframeWinTest(unittest.TestCase):
         """tests labelUpdate_onReceive as well"""
         global TestFrame
 
-        # primary function
+        # prep
         du.DCCurrZero = du.Coordinate()
-
-        # check first loop switch, Q is not set by roboRecv
         TestCoor = du.Coordinate(1, 2, 3, 4, 5, 6, 7, 8.8)
-        ResCoor = du.Coordinate(1, 2, 3, 4, 5, 6, 0, 8.8)
         du.ROBTelem = du.RoboTelemetry(0, 0, TestCoor)
-        self.assertEqual(du.DCCurrZero, du.Coordinate())
         TestFrame.robo_recv(raw_data_string='ABC', telem=du.RoboTelemetry())
-        self.assertEqual(du.DCCurrZero, ResCoor)
 
         # check loop run
         du.SC_curr_comm_id = 15
@@ -1090,7 +1085,7 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.ZERO_float_ry.setValue(5)
         TestFrame.ZERO_float_rz.setValue(6)
         TestFrame.ZERO_float_ext.setValue(7)
-        TestFrame.set_zero([1, 2, 3, 4, 5, 6, 8], source='sys_monitor')
+        TestFrame.set_zero([1, 2, 3, 4, 5, 6, 8], source='user')
         self.assertEqual(du.DCCurrZero, du.Coordinate(1, 2, 3, 4, 5, 6, 7, 7))
 
         du.DCCurrZero = du.Coordinate()

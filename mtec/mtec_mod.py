@@ -51,18 +51,16 @@ class MtecMod:
             
             self.connected = True
             self.temp_sendReady = True
-
             try:
                 if self.frequency is None:
-                    return False
+                    raise ConnectionError()
             except:
+                self.connected = False
                 return False
-
             return True
 
 
     def disconnect(self) -> None:
-        self.serial.close()
         self.connected = False
         self.temp_sendReady = False
 
@@ -176,6 +174,7 @@ class MtecMod:
         if self.calcCRC(command) != message_crc:
             # ToDo: bad CRC
             print("bad crc")
+            return False
 
         self.temp_valueBuffer.append(message_value)
         self.temp_sendReady = True

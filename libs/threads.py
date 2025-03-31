@@ -29,7 +29,7 @@ from PyQt5.QtGui import QImage, QPixmap
 import libs.data_utilities as du
 import libs.func_utilities as fu
 import libs.pump_utilities as pu
-from libs.win_mainframe_prearrange import GlobalMutex
+from libs.win_mainframe_prearrange import GlobalMutex, PmpMutex
 
 
 
@@ -71,12 +71,9 @@ class PumpCommWorker(QObject):
         """extra function needed to set global indicator 'PMP_comm_active'
         which is checked in win_mainframe.disconnect_tcp"""
 
-        with QMutexLocker(GlobalMutex):
-            du.PMP_comm_active = True
-        self.send()
-        self.receive()
-        with QMutexLocker(GlobalMutex):
-            du.PMP_comm_active = False
+        with QMutexLocker(PmpMutex):
+            self.send()
+            self.receive()
 
 
     def send(self) -> None:
@@ -88,12 +85,16 @@ class PumpCommWorker(QObject):
         
         # send to P1 and P2 & keepAlive both
         p1_speed, p2_speed, pinch = pu.get_pmp_speeds()
+        min_speed, max_speed = du.DEF_PUMP_CHK_RANGE
         for serial, speed, live_ad, speed_global, p_num in [
                 (du.PMP1Serial, p1_speed, 'PMP1_live_ad', 'PMP1_speed', 'P1'),
                 (du.PMP2Serial, p2_speed, 'PMP2_live_ad', 'PMP2_speed', 'P2'),
         ]:
             if serial.connected and speed is not None:
-                res = serial.set_speed(int(speed * getattr(du, live_ad)))
+                new_speed = speed * getattr(du, live_ad)
+                new_speed = fu.domain_clip(new_speed, min_speed, max_speed)
+                new_speed = int(round(new_speed, 0))
+                res = serial.set_speed(new_speed)
                 if res is not None:
                     with QMutexLocker(GlobalMutex):
                         setattr(du, speed_global, speed)
@@ -101,9 +102,9 @@ class PumpCommWorker(QObject):
                     self.dataSend.emit(speed, res[0], res[1], p_num)
 
                 serial.keepAlive()
-        if pinch is not None:
+        if pinch is not None and du.PRH_connected:
             try:
-                ans = requests.post(f"{du.PRH_url}/pinch", data={'s': str(float(pinch))})
+                ans = requests.post(f"{du.PRH_url}/pinch", data={'s': str(float(pinch))}, timeout=0.1)
                 print(ans.text)
             except requests.Timeout as e:
                 log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
@@ -118,7 +119,7 @@ class PumpCommWorker(QObject):
                 mixer_speed = du.MIX_speed
             
             post_url = f"{du.PRH_url}/motor"
-            post_resp = requests.post(post_url, data={'s': mixer_speed})
+            post_resp = requests.post(post_url, data={'s': mixer_speed}, timeout=0.1)
             if post_resp.ok and f"RECV: " in post_resp.text:
                 with QMutexLocker(GlobalMutex):
                     du.MIX_last_speed = mixer_speed
@@ -142,6 +143,10 @@ class PumpCommWorker(QObject):
         ]:
             if serial.connected:
                 freq = serial.frequency
+                # override to reduce traffic on shared bus
+                # volt = -1.0
+                # amps = -1.0
+                # torq = -1.0
                 volt = serial.voltage
                 amps = serial.current
                 torq = serial.torque
@@ -171,7 +176,7 @@ class PumpCommWorker(QObject):
 
         # RECEIVE FROM PRINTHEAD (just ping to check)
         if du.PRH_connected:
-            ping_resp = requests.get(f"{du.PRH_url}/ping")
+            ping_resp = requests.get(f"{du.PRH_url}/ping", timeout=0.1)
             if ping_resp.ok and ping_resp.text == 'ack':
                 self.prhActive.emit()
 
@@ -201,7 +206,7 @@ class RoboCommWorker(QObject):
         """start timer, receive and send on timeout"""
 
         self.CommTimer = QTimer()
-        self.CommTimer.setInterval(10)
+        self.CommTimer.setInterval(100)
         self.CommTimer.timeout.connect(self.receive)
         self.CommTimer.timeout.connect(self.send)
         self.CommTimer.start()
@@ -259,22 +264,27 @@ class RoboCommWorker(QObject):
             self.dataReceived.emit()
 
             with QMutexLocker(GlobalMutex):
-                fu.add_to_comm_protocol(
-                    f"RECV:    ID {Telem.id},   {Telem.Coor}   "
-                    f"TCP: {Telem.t_speed}"
-                )
+                fu.add_to_comm_protocol(f"RECV:    {Telem}")
 
-                # check for ID overflow, reduce SC_queue IDs 
+                # check for ID overflow, reduce SC_queue IDs
                 if Telem.id < du.ROBLastTelem.id:
-                    for x in du.SCQueue:
-                        x.id -= du.DEF_ROB_BUFF_SIZE
-                    # and clear ROBCommQueue entries with IDs
-                    # near DEF_ROB_BUFF_SIZE
-                    try:
-                        while du.ROBCommQueue[0].id > Telem.id:
-                            du.ROBCommQueue.pop_first_item()
-                    except:
-                        pass
+                    buff_size = du.DEF_ROB_BUFF_SIZE
+                    # avoid errors from SC_curr_comm_id resets:
+                    if all(entry.id > buff_size for entry in du.SCQueue):
+                        for x in du.SCQueue:
+                            x.id -= buff_size
+                        # and clear ROBCommQueue entries with IDs
+                        # near DEF_ROB_BUFF_SIZE
+                        try:
+                            while du.ROBCommQueue[0].id > Telem.id:
+                                du.ROBCommQueue.pop_first_item()
+                        except:
+                            pass
+                    # otherwise it has to be a SC_curr_comm_id reset,
+                    # indicate robot idle state
+                    else:
+                        du.ROBCommQueue.clear()
+                        self.endDcMoving.emit()
 
                 # delete all finished commands from ROB_commQueue
                 try:
@@ -309,10 +319,8 @@ class RoboCommWorker(QObject):
 
             # reset robMoving indicator if near end, skip if queue is processed
             if du.DC_rob_moving and not du.SC_q_processing:
-                check_dist = self._check_zero_dist()
-                if check_dist is not None:
-                    if check_dist < 1:
-                        self.endDcMoving.emit()
+                if self._check_target_reached():
+                    self.endDcMoving.emit()
 
 
     def check_queue(self) -> None:
@@ -327,10 +335,8 @@ class RoboCommWorker(QObject):
         # if qProcessing is ending, define end as being in 1mm range of
         # the last robtarget
         if du.SC_q_prep_end:
-            check_dist = self._check_zero_dist()
-            if check_dist is not None:
-                if check_dist < 1:
-                    self.endProcessing.emit()
+            if self._check_target_reached():
+                self.endProcessing.emit()
 
         # if qProcessing is active and not ending, pop first queue item if
         # robot is nearer than ROB_commFr; if no entries in SC_queue left,
@@ -373,13 +379,17 @@ class RoboCommWorker(QObject):
                 self.sendElem.emit(Comm, False, err, direct_ctrl)
                 print(f"send error: {err}")
                 break
+            while Comm.id > du.DEF_ROB_BUFF_SIZE:
+                Comm.id -= du.DEF_ROB_BUFF_SIZE
             # check for TCP speed overwrites
             if du.ROB_speed_overwrite >= 0.0:
                 Comm.Speed.ts = du.ROB_speed_overwrite
+                # limit reorientation speed to avoid damage
+                r_speed = (du.ROB_speed_overwrite / 2)
+                Comm.Speed.ors = min([r_speed, du.CTRL_max_r_speed])
             else:
                 Comm.Speed.ts = int(Comm.Speed.ts * du.ROB_live_ad)
-            while Comm.id > du.DEF_ROB_BUFF_SIZE:
-                Comm.id -= du.DEF_ROB_BUFF_SIZE
+                Comm.Speed.ors = int(Comm.Speed.ors * du.ROB_live_ad)
 
             # if testrun, skip actually sending the message
             if testrun:
@@ -392,14 +402,7 @@ class RoboCommWorker(QObject):
                 with QMutexLocker(GlobalMutex):
                     num_send += 1
                     du.ROBCommQueue.append(Comm)
-                    fu.add_to_comm_protocol(
-                        f"SEND:    ID: {Comm.id}  MT: {Comm.mt}  PT: {Comm.pt} "
-                        f"\t|| COOR_1: {Comm.Coor1}"
-                        f"\n\t\t\t|| COOR_2: {Comm.Coor2}"
-                        f"\n\t\t\t|| SV:     {Comm.Speed} \t|| SBT: {Comm.sbt}   "
-                        f"SC: {Comm.sc}   Z: {Comm.z}"
-                        f"\n\t\t\t|| TOOL:   {Comm.Tool}"
-                    )
+                    fu.add_to_comm_protocol(f"SEND:    {Comm}")
                     if direct_ctrl:
                         du.SCQueue.increment()
 
@@ -410,26 +413,36 @@ class RoboCommWorker(QObject):
         
             # inform mainframe if command block was send successfully 
             if len(du.ROB_send_list) == 0:
-                self.sendElem.emit(Comm, res, num_send, direct_ctrl)
+                self.sendElem.emit(Comm, True, num_send, direct_ctrl)
 
 
-    def _check_zero_dist(self) -> float | None:
+    def _check_target_reached(self) -> bool:
         """calculates distance between next entry in ROB_commQueue and current
         position; calculates 4 dimensional only to account for external axis
         movement (0,0,0,1) 
         """
 
-        if len(du.ROBCommQueue) == 1:
-            CurrCommTarget = dcpy(du.ROBCommQueue[0].Coor1)
+        # as long as there a more commands comming, target is not reached
+        command_num = len(du.ROBCommQueue)
+        if command_num > 1 or len(du.ROB_send_list) != 0:
+            return False
+        # otherwise calc distance to target
+        elif command_num == 1:
+            CurrTarget = dcpy(du.ROBCommQueue[0].Coor1)
             CurrCoor = dcpy(du.ROBTelem.Coor)
-            return m.sqrt(
-                m.pow(CurrCommTarget.x - CurrCoor.x, 2)
-                + m.pow(CurrCommTarget.y - CurrCoor.y, 2)
-                + m.pow(CurrCommTarget.z - CurrCoor.z, 2)
-                + m.pow(CurrCommTarget.ext - CurrCoor.ext, 2)
+            target_dist =  m.sqrt(
+                m.pow(CurrTarget.x - CurrCoor.x, 2)
+                + m.pow(CurrTarget.y - CurrCoor.y, 2)
+                + m.pow(CurrTarget.z - CurrCoor.z, 2)
+                + m.pow(CurrTarget.ext - CurrCoor.ext, 2)
             )
+        # failsafe
         else:
-            return None
+            return True
+
+        if target_dist < du.CTRL_min_target_dist:
+            return True
+        return False
 
 
 
@@ -579,30 +592,12 @@ class LoadFileWorker(QObject):
 
             # set the last entry to pMode=end
             self._CommList[len(self._CommList) - 1].p_mode = "end"
-
-        # range check
-        if lfw_range_chk:
-            line = 0
-            range_chk = ''
-            for Entry in self._CommList:
-                line += 1
-                result, msg = fu.range_check(Entry)
-                if not result:
-                    range_chk += f"Line {line}: {msg}\n"
-        if range_chk != '':
-            self.rangeChkWarning.emit(range_chk)
         
-        # base dist check
+        # entry checks
+        if lfw_range_chk:
+            self.check_routine(fu.range_check)
         if lfw_base_dist_chk:
-            line = 0
-            base_dist_chk = ''
-            for Entry in self._CommList:
-                line += 1
-                result, msg = fu.base_dist_check(Entry)
-                if not result:
-                    base_dist_chk += f"Line {line}: {msg}\n"
-        if base_dist_chk != '':
-            self.rangeChkWarning.emit(base_dist_chk)
+            self.check_routine(fu.base_dist_check)
 
         # add to command queue
         du.SCQueue.add_queue(self._CommList)
@@ -667,6 +662,28 @@ class LoadFileWorker(QObject):
         return True, line, skips
 
 
+    def check_routine(self, func):
+        """preformes a line-wise check, check function to be stated unter 
+        'func', needs to be a callable that returns (bool, str)"""
+        if not callable(func):
+            raise TypeError(f"{func} is not callable!")
+        line = 0
+        warnings = 0
+        chk_msg = ''
+        for Entry in self._CommList:
+            line += 1
+            result, msg = func(Entry)
+            if not result:
+                warnings += 1
+                chk_msg += f"Line {line}: {msg}\n"
+                if warnings >= du.DEF_WARN_MAX_RAISED:
+                    chk_msg += (
+                        f"Maximum number of warnings reached, "
+                        f"stopping check.."
+                    )
+                    break
+        if chk_msg != '':
+            self.rangeChkWarning.emit(chk_msg)
 
 
 

@@ -120,12 +120,15 @@ class ThreadsTest(unittest.TestCase):
 
         # checkRobCommZeroDist
         du.ROBCommQueue.clear()
-        self.assertIsNone(RCWorker._check_zero_dist())
+        self.assertTrue(RCWorker._check_target_reached())
 
         TestCoor3 = du.Coordinate(x=1, y=1, z=1, ext=1)
         du.ROBCommQueue.add(du.QEntry(Coor1=TestCoor3))
         du.ROBTelem.Coor = du.Coordinate()
-        self.assertEqual(RCWorker._check_zero_dist(), 2)
+        du.CTRL_min_target_dist = 3
+        self.assertTrue(RCWorker._check_target_reached())
+        du.CTRL_min_target_dist = 1
+        self.assertFalse(RCWorker._check_target_reached())
 
 
 #################################  MAIN  #####################################

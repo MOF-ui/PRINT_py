@@ -11,6 +11,7 @@
 import re
 import os
 import sys
+import serial
 import math as m
 import requests
 from copy import deepcopy as dcpy
@@ -50,12 +51,19 @@ def range_check(target_entry:du.QEntry) -> tuple[bool, str]:
 
     target = target_entry.Coor1
     names = target.attr_names
-    RangeMin, RangeMax = dcpy(du.DEF_ROB_COOR_CHK_RANGE)
+    RangeMin, RangeMax = dcpy(du.RC_area)
+    # axis RX points downwards at 180° or -180° (same effect)
+    # to avoid confusion, range_check is defined as 150° - 210°
+    # but since -150° is the same as 210°, I adjusted the check to
+    # accept it anyways by adding 360° to negative values
+    # to-do: find a better way to handle RX axis
+    if target.rx < 0.0:
+        target.rx += 360.0
     for t_attr, rmin_attr, rmax_attr, name in zip(target, RangeMin, RangeMax, names):
         if not rmin_attr <= t_attr <= rmax_attr:
             msg =  (
-                f"Target out of range on axis {name.upper()}: "
-                f"{t_attr} ({rmin_attr} - {rmax_attr})"
+                f"Target out of range on axis {name.upper()}:\t"
+                f"{t_attr} ∉ [{rmin_attr}, {rmax_attr}]"
             )
             return False, msg
     return True, ''
@@ -75,10 +83,9 @@ def base_dist_check(target_entry:du.QEntry) -> tuple[bool, str]:
     dist = m.sqrt(m.pow(x_dist, 2) + m.pow(y_dist, 2))
     if dist > du.RC_max_base_dist:
         msg = (
-            f"Targets base distance out of range: "
-            f"({dist} > {du.RC_max_base_dist})\n"
-            f"X - EXT = {x_dist}\n"
-            f"y0 - y = {y_dist}"
+            f"Base distance out of range "
+            f"({round(dist, 2)}mm > {du.RC_max_base_dist}mm)! "
+            f"Vector: ({round(x_dist, 1)}, {round(y_dist, 1)})mm"
         )
         return False, msg
     return True, ''
@@ -559,16 +566,16 @@ def connect_pump(p_num:int) -> None:
         p_num: number of pump to be connected
     """
 
-    if du.PMP_serial_def_bus is None:
-        du.PMP_serial_def_bus=du.serial.Serial(
+    if du.PMPSerialDefBus is None:
+        du.PMPSerialDefBus = serial.Serial(
             baudrate=du.DEF_PUMP_SERIAL['baud'],
             parity=du.DEF_PUMP_SERIAL['par'],
             stopbits=du.DEF_PUMP_SERIAL['stop'],
             bytesize=du.DEF_PUMP_SERIAL['size'],
             port=du.PMP_port,
         )
-        du.PMP1Serial.serial_default = du.PMP_serial_def_bus
-        du.PMP2Serial.serial_default = du.PMP_serial_def_bus
+        du.PMP1Serial.serial_default = du.PMPSerialDefBus
+        du.PMP2Serial.serial_default = du.PMPSerialDefBus
 
     match p_num:
         case 'P1':

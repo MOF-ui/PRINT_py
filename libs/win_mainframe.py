@@ -13,6 +13,7 @@ import os
 import re
 import sys
 import time
+import serial
 import requests
 from pathlib import Path
 from copy import deepcopy as dcpy
@@ -29,7 +30,8 @@ from PyQt5.QtWidgets import QApplication, QShortcut
 
 
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
-from libs.win_mainframe_prearrange import PreMainframe, Watchdog, GlobalMutex
+from libs.win_mainframe_prearrange import PreMainframe, Watchdog
+from libs.win_mainframe_prearrange import GlobalMutex, PmpMutex
 
 
 # import my own libs
@@ -84,6 +86,8 @@ class Mainframe(PreMainframe):
 
         self.log_entry('GNRL', 'load default settings...')
         self.load_defaults(setup=True)
+        self.set_zero([1,2,3,4,5,6,8], 'default')
+        self.set_range()
 
         self.log_entry('GNRL', 'init threading...')
         if self._testrun:
@@ -156,6 +160,8 @@ class Mainframe(PreMainframe):
         # LOOK AHEAD
         self.LAH_btt_active.pressed.connect(lambda: self.mutex_setattr('pmp_look_ahead'))
         self.LAH_num_distance.valueChanged.connect(lambda: self.mutex_setattr('pmp_look_ahead_dist'))
+        self.LAH_float_prerunFactor.valueChanged.connect(lambda: self.mutex_setattr('pmp_look_ahead_prerun'))
+        self.LAH_float_retractFactor.valueChanged.connect(lambda: self.mutex_setattr('pmp_look_ahead_retract'))
 
         # MIXER CONTROL
         self.PRH_btt_actWithPump.pressed.connect(lambda: self.mutex_setattr('mixer_act_w_pump'))
@@ -210,6 +216,8 @@ class Mainframe(PreMainframe):
         self.CONN_num_commForerun.valueChanged.connect(lambda: self.mutex_setattr('robot_comm_fr'))
         self.SET_btt_apply.pressed.connect(self.apply_settings)
         self.SET_btt_default.pressed.connect(self.load_defaults)
+        self.CHKR_btt_default.pressed.connect(self.set_range)
+        self.CHKR_btt_overwrite.pressed.connect(lambda: self.set_range('user'))
         self.SID_btt_overwrite.pressed.connect(self.sc_id_overwrite)
 
         # SINGLE COMMAND
@@ -247,7 +255,7 @@ class Mainframe(PreMainframe):
 
         # ZERO
         self.ZERO_btt_newZero.pressed.connect(
-            lambda: self.set_zero(axis=[1, 2, 3, 4, 5, 6, 8], source='sys_monitor')
+            lambda: self.set_zero(axis=[1, 2, 3, 4, 5, 6, 8], source='user')
         )
         self.ZERO_btt_loadZeroFile.pressed.connect(
             lambda: self.set_zero(axis=[1, 2, 3, 4, 5, 6, 8], source='file')
@@ -340,8 +348,14 @@ class Mainframe(PreMainframe):
             res = du.ROBTcp.connect()
 
             if isinstance(res, tuple):
-                # if successful, reset SC ID 
-                du.SC_curr_comm_id = 1
+                # if successful, reset SC ID, update command ids
+                with QMutexLocker(GlobalMutex):
+                    du.SC_curr_comm_id = 1
+                    for idx, entry in enumerate(du.SCQueue):
+                        # reset all IDs to [1, 2, ..]
+                        entry.id = idx + 1
+                self.label_update_on_receive('Sucessful reconnect.')
+                self.label_update_on_queue_change()
                 # start threading and watchdog
                 if not self._RoboCommThread.isRunning():
                     # restart if necessary; if so reconnect threads
@@ -372,13 +386,15 @@ class Mainframe(PreMainframe):
                 raise ConnectionError('TCP not supported, yet')
 
             else:
-                if fu.connect_pump(slot):
+                with QMutexLocker(PmpMutex):
+                    result = fu.connect_pump(slot)
+                if result:
                     if not self._PumpCommThread.isRunning():
                         # restart if necessary; if so reconnect threads
                         self.connect_threads('PMP')
                         self._PumpCommThread.start()
 
-                    self._P1RecvWd.start()
+                    wd.start()
                     _action_on_success(
                         wd,
                         indi,
@@ -507,20 +523,24 @@ class Mainframe(PreMainframe):
 
         # PUMP DISCONNECT
         def pmp_disconnect(
-                serial:MtecMod,
+                interface:MtecMod,
                 wd:Watchdog,
                 indi,
                 elem_group:list
         ) -> None:
-            if not serial.connected:
+            if not interface.connected:
                 return
             if not 'COM' in du.PMP_port:
                 raise ConnectionError('TCP not supported yet')
-            while du.PMP_comm_active: # finish communication first
-                time.sleep(0.005)
-
-            _action_on_success(wd, indi, elem_group)
-            serial.disconnect()
+            with QMutexLocker(PmpMutex):
+                interface.stop()
+                interface.disconnect()
+                _action_on_success(wd, indi, elem_group)
+            # close serial bus if both pumps are disconnect
+            if not du.PMP1Serial.connected and not du.PMP2Serial.connected:
+                if isinstance(du.PMPSerialDefBus, serial.Serial):
+                    du.PMPSerialDefBus.close()
+                    du.PMPSerialDefBus = None
         
         # PRH DISCONNECT
         def prh_disconnect() -> None:
@@ -664,8 +684,7 @@ class Mainframe(PreMainframe):
 
         for wd in self.WD_group:
             wd.logEntry.connect(self.log_entry)
-            wd.criticalBite.connect(self.forced_stop_command)
-            wd.criticalBite.connect(self.stop_SCTRL_queue)
+            wd.criticalBite.connect(lambda: self.forced_stop_command(True))
             wd.disconnectDevice.connect(self.disconnect_device)
             wd.closeMainframe.connect(self.close)
 
@@ -1062,7 +1081,11 @@ class Mainframe(PreMainframe):
         (in theory)"""
         # to-do: check for implausibile coor combinations
 
-        def raise_warn():
+        def raise_warn(msg):
+            msg += (
+                f"\n\nOK\t--> drive to location anyways"
+                f"\nCancel\t--> stay at current location"
+            )
             imp_warning = strd_dialog(msg, 'IMPLAUSIBILE TARGET')
             imp_warning.exec()
             return imp_warning.result()
@@ -1086,11 +1109,9 @@ class Mainframe(PreMainframe):
 
         if du.DC_rob_moving:
             return None
-        self.switch_rob_moving()
 
         read_mt = self.DC_drpd_moveType.currentText()
         mt = 'L' if (read_mt == 'LINEAR') else 'J'
-
         Command = du.QEntry(
             id=du.SC_curr_comm_id,
             mt=mt,
@@ -1098,11 +1119,12 @@ class Mainframe(PreMainframe):
             Speed=dcpy(du.DCSpeed),
             z=0,
         )
+
         if not self.coor_plausibility_check(Command):
             return
-
+        self.send_command(Command, dc=True)
+        self.switch_rob_moving()
         self.log_entry('DCom', 'sending DC home command...')
-        return self.send_command(Command, dc=True)
 
 
     def send_DC_command(self, axis:str, dir:str) -> None:
@@ -1112,17 +1134,17 @@ class Mainframe(PreMainframe):
 
         if du.DC_rob_moving:
             return None
-        self.switch_rob_moving()
-
-        step_width = self.DC_sld_stepWidth.value()
-        step_width = int(10 ** (step_width - 1)) # 1->1, 2->10, 3->100
-
-        if dir != '+' and dir != '-':
-            raise ValueError
-        if dir == '-':
-            step_width = -step_width
 
         NewPos = dcpy(du.ROBTelem.Coor)
+        step_width = self.DC_sld_stepWidth.value()
+        step_width = int(10 ** (step_width - 1)) # 1->1, 2->10, 3->100
+        match dir:
+            case '+':
+                pass
+            case '-':
+                step_width = -step_width
+            case _:
+                raise ValueError
         match axis:
             case 'X':
                 NewPos.x += step_width
@@ -1144,11 +1166,12 @@ class Mainframe(PreMainframe):
             Speed=dcpy(du.DCSpeed),
             z=0,
         )
+
         if not self.coor_plausibility_check(Command):
             return
-
+        self.send_command(Command, dc=True)
+        self.switch_rob_moving()
         self.log_entry('DCom', f"sending DC command: ({Command})")
-        return self.send_command(Command, dc=True)
 
 
     def send_NC_command(self, axis:list) -> None:
@@ -1158,11 +1181,8 @@ class Mainframe(PreMainframe):
 
         if du.DC_rob_moving or not isinstance(axis, list):
             return None
-        self.switch_rob_moving()
 
         NewPos = dcpy(du.ROBTelem.Coor)
-
-        # 7 is a placeholder for Q, which can not be set by hand
         if 1 in axis:
             NewPos.x = float(self.NC_float_x.value())
         if 2 in axis:
@@ -1175,6 +1195,7 @@ class Mainframe(PreMainframe):
             NewPos.ry = float(self.NC_float_ry.value())
         if 6 in axis:
             NewPos.rz = float(self.NC_float_rz.value())
+        # 7 is a placeholder for Q, which can not be set by hand
         if 8 in axis:
             NewPos.ext = float(self.NC_float_ext.value())
 
@@ -1187,11 +1208,12 @@ class Mainframe(PreMainframe):
             Speed=dcpy(du.DCSpeed),
             z=0,
         )
+
         if not self.coor_plausibility_check(Command):
             return
-
+        self.send_command(Command, dc=True)
+        self.switch_rob_moving()
         self.log_entry('DCom', f"sending NC command: ({NewPos})")
-        return self.send_command(Command, dc=True)
 
 
     def send_gcode_command(self) -> None:
@@ -1202,19 +1224,16 @@ class Mainframe(PreMainframe):
 
         if du.DC_rob_moving:
             return None
-        self.switch_rob_moving()
 
-        # get text
+        # get entry
         Speed = dcpy(du.DCSpeed)
         Pos = dcpy(du.ROBTelem.Coor)
         txt = self.TERM_entry_gcodeInterp.text()
-
-        # act according to GCode command
         Command, com_type = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
 
+        # check for special command types
         if com_type == 'G92':
             self.label_update_on_new_zero()
-
         elif com_type != 'G1' and com_type != 'G28':
             if com_type == ';':
                 pan_txt = f"leading semicolon interpreted as comment:\n{txt}"
@@ -1222,16 +1241,16 @@ class Mainframe(PreMainframe):
                 pan_txt = f"SYNTAX ERROR:\n{txt}"
             else:
                 pan_txt = f"{com_type}\n{txt}"
-
             self.TERM_entry_gcodeInterp.setText(pan_txt)
             return None
 
+        # send if standard G1 or G28 command
         Command.id = du.SC_curr_comm_id
         if not self.coor_plausibility_check(Command):
             return
-
+        self.send_command(Command, dc=True)
+        self.switch_rob_moving()
         self.log_entry('DCom', f"sending GCode DC command: ({Command})")
-        return self.send_command(Command, dc=True)
 
 
     def send_rapid_command(self) -> None:
@@ -1241,47 +1260,49 @@ class Mainframe(PreMainframe):
 
         if du.DC_rob_moving:
             return None
-        self.switch_rob_moving()
 
+        # get entry
         txt = self.TERM_entry_rapidInterp.text()
         Command = fu.rapid_to_qentry(txt)
-
         if isinstance(Command, Exception) or Command is None:
             self.TERM_entry_rapidInterp.setText(f"SYNTAX ERROR: {Command}\n" + txt)
             return None
 
+        # send if valid
         Command.id = du.SC_curr_comm_id
         if not self.coor_plausibility_check(Command):
             return
-
+        self.send_command(Command, dc=True)
+        self.switch_rob_moving()
         self.log_entry('DCom', f"sending RAPID DC command: ({Command})")
-        return self.send_command(Command, dc=True)
 
 
-    def forced_stop_command(self) -> None:
+    def forced_stop_command(self, no_dialog=False) -> None:
         """send immediate stop to robot (buffer will be lost, but added to
         the queue again), gives command  to the actual sendCommand function
         """
 
-        Command = du.QEntry(id=1, mt='S')
+        res = True
+        if not no_dialog:
+            Command = du.QEntry(id=1, mt='S')
+            if self._testrun:
+                return self.send_command(Command, dc=True)
+            fs_warning = strd_dialog(
+                f"WARNING!\n\nRobot will stop after current movement! "
+                f"OK to delete buffered commands on robot, "
+                f"Cancel to continue queue processing.",
+                'FORCED STOP COMMIT',
+            )
+            fs_warning.exec()
+            res = fs_warning.result()
 
-        if self._testrun:
-            return self.send_command(Command, dc=True)
-        fs_warning = strd_dialog(
-            f"WARNING!\n\nRobot will stop after current movement! "
-            f"OK to delete buffered commands on robot, "
-            f"Cancel to continue queue processing.",
-            'FORCED STOP COMMIT',
-        )
-        fs_warning.exec()
-
-        if fs_warning.result():
+        if res or no_dialog:
             self.stop_SCTRL_queue()
             du.ROBTcp.send(Command) # bypass all queued commands
-            # to-do: stop pump, pinch
             self.pump_set_speed('0')
             self.pinch_valve_toggle(internal=True, val=0)
 
+            # retrieve lost commands, clr buffer lists
             with QMutexLocker(GlobalMutex):
                 LostBuf = dcpy(du.ROBCommQueue)
                 for Entry in du.ROB_send_list:
@@ -1292,9 +1313,8 @@ class Mainframe(PreMainframe):
                 du.ROBCommQueue.clear()
                 du.ROB_send_list.clear()
 
-            self.label_update_on_queue_change()
+            self.sc_id_overwrite(internal=True)
             self.log_entry('SysC', f"FORCED STOP (user committed).")
-
         else:
             self.log_entry('SysC', f"user denied FS-Dialog, continuing...")
 
@@ -1305,7 +1325,6 @@ class Mainframe(PreMainframe):
         """
 
         Command = du.QEntry(id=1, mt='E')
-
         if directly:
             self.log_entry('SysC', "sending robot stop command directly")
             if du.SC_q_processing:
@@ -1313,7 +1332,6 @@ class Mainframe(PreMainframe):
             with QMutexLocker(GlobalMutex):
                 du.ROB_send_list.clear()
             return self.send_command(Command, dc=True)
-
         else:
             Command.id = 0
             du.SCQueue.add(Command)
@@ -1418,12 +1436,14 @@ class Mainframe(PreMainframe):
     def pinch_valve_toggle(self, internal=False, val=0.0) -> None:
         """no docstring yet"""
 
+        if not du.PRH_connected:
+            return
         if not internal:
             pinch_state = int(not self.PRH_btt_pinchValve.isChecked())
         else:
             pinch_state = val
         try:
-            requests.post(f"{du.PRH_url}/pinch", data={'s': pinch_state})
+            requests.post(f"{du.PRH_url}/pinch", data={'s': pinch_state}, timeout=1)
         except requests.Timeout as e:
             log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
             self.log_entry('CONN', log_txt)

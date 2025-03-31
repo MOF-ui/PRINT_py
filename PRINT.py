@@ -53,6 +53,7 @@ import libs.func_utilities as fu
 
 arg_len = len(sys.argv)
 arg1 = ''
+skip_dialog = False
 
 if arg_len == 2:
     arg1 = sys.argv[1]
@@ -62,24 +63,31 @@ if arg_len == 2:
             at.run_all()
             exit()
         case 'local':
+            du.PRH_url = f"http://{du.PRH_url}"
             du.ROBTcp.ip = 'localhost'
             du.PRH_url = f"http://{du.PRH_url}"
             dev_avail = True<<4
+            skip_dialog = True
         case 'overwrite':
+            du.PRH_url = f"http://{du.PRH_url}"
             du.ROBTcp.ip = '192.168.125.1'
             du.ROBTcp.port = '10001'
             du.PRH_url = f"http://{du.PRH_url}"
             dev_avail = True<<4
+            skip_dialog = True
         case _: 
             raise KeyError(f"{arg1} is not a valid argument for PRINT.py!")
 
 elif arg_len > 2:
-    raise KeyError(f"PRINT.py got too many arguments!")
+    raise KeyError(
+        f"PRINT.py got too many arguments! "
+        f"Expected less than 3, got {arg_len}"
+    )
 
 
 ################################    SETUP    #################################
 
-if arg1 != 'local' and arg1 != 'overwrite':
+if not skip_dialog:
     # ask user if default TCP (or USB) connection parameters are to be used,
     # otherwise set new ones
     ret, dev_avail, rob_set, p_port, prh_url, db_url = conn_dialog(
@@ -117,9 +125,10 @@ if arg1 != 'local' and arg1 != 'overwrite':
 # create logfile and get path
 logpath = fu.create_logfile()
 print(
-    f"PRINT_py started.\n"
+    f"\n"
+    f"-------------- PRINT_py --------------.\n"
+    f"starting with arguments: {sys.argv}\n"
     f"Writing log at {logpath}.\n"
-    f"Got command line arguments: {sys.argv}"
 )
 
 # start the UI and show the window to user

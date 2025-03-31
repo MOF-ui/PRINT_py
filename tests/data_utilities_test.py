@@ -32,25 +32,25 @@ class DataLibTest(unittest.TestCase):
         )
         self.assertEqual(
             str(TestCoor),
-            f"X: 1.2   Y: 3.4   Z: 5.6   Rx: 7.8   "
-            f"Ry: 9.11   Rz: 22.33   Q: 44.55   EXT: 66.77",
+            f"X: 1.2   Y: 3.4   Z: 5.6   RX: 7.8   "
+            f"RY: 9.11   RZ: 22.33   Q: 44.55   EXT: 66.77",
         )
         self.assertEqual(
             str(du.Coordinate()),
-            f"X: 0.0   Y: 0.0   Z: 0.0   Rx: 0.0   "
-            f"Ry: 0.0   Rz: 0.0   Q: 0.0   EXT: 0.0",
+            f"X: 0.0   Y: 0.0   Z: 0.0   RX: 0.0   "
+            f"RY: 0.0   RZ: 0.0   Q: 0.0   EXT: 0.0",
         )
 
         # __eq__ & __ne__
         self.assertFalse(TestCoor == du.Coordinate())
         self.assertFalse(TestCoor == None)
         self.assertTrue(TestCoor == TestCoor)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestCoor == 5
         self.assertTrue(TestCoor != du.Coordinate())
         self.assertTrue(TestCoor != None)
         self.assertFalse(TestCoor != TestCoor)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestCoor != 5
 
         # __add__
@@ -96,12 +96,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestVector == du.SpeedVector())
         self.assertFalse(TestVector == None)
         self.assertTrue(TestVector == TestVector)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestVector == 5
         self.assertTrue(TestVector != du.SpeedVector())
         self.assertTrue(TestVector != None)
         self.assertFalse(TestVector != TestVector)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestVector != 5
 
         # __mul__ & __rmul__
@@ -129,12 +129,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestTool == du.ToolCommand())
         self.assertFalse(TestTool == None)
         self.assertTrue(TestTool == TestTool)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTool == 5
         self.assertTrue(TestTool != du.ToolCommand())
         self.assertTrue(TestTool != None)
         self.assertFalse(TestTool != TestTool)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTool != 5
 
 
@@ -153,31 +153,31 @@ class DataLibTest(unittest.TestCase):
         )
         self.assertEqual(
             str(TestEntry),
-            f"ID: 1  MT: A  PT: B \t|| COOR_1: {TestCoor1}"
-            f"\n\t\t|| COOR_2: {TestCoor2}"
-            f"\n\t\t|| SV:     {TestVector} \t|| SBT: 7   SC: C   Z: 8"
-            f"\n\t\t|| TOOL:   {TestTool}"
-            f"\n\t\t|| PM/PR:  -1001/1.0   PIN: False",
+            f"ID: 1  MT: A  PT: B \n  || COOR_1: {TestCoor1}"
+            f"\n  || COOR_2: {TestCoor2}"
+            f"\n  || SV:     {TestVector}   || SBT: 7   SC: C   Z: 8"
+            f"\n  || TOOL:   {TestTool}"
+            f"\n  || PM/PR:  -1001/1.0   PIN: False",
         )
         self.assertEqual(
             str(du.QEntry()),
-            f"ID: 0  MT: L  PT: E \t|| COOR_1: {du.Coordinate()}"
-            f"\n\t\t|| COOR_2: {du.Coordinate()}"
-            f"\n\t\t|| SV:     {du.SpeedVector()} \t|| SBT: 0   SC: V   Z: 10"
-            f"\n\t\t|| TOOL:   {du.ToolCommand()}"
-            f"\n\t\t|| PM/PR:  -1001/1.0   PIN: False",
+            f"ID: 0  MT: L  PT: E \n  || COOR_1: {du.Coordinate()}"
+            f"\n  || COOR_2: {du.Coordinate()}"
+            f"\n  || SV:     {du.SpeedVector()}   || SBT: 0   SC: V   Z: 10"
+            f"\n  || TOOL:   {du.ToolCommand()}"
+            f"\n  || PM/PR:  -1001/1.0   PIN: False",
         )
 
         # __eq__ & __ne__
         self.assertFalse(TestEntry == du.QEntry())
         self.assertFalse(TestEntry == None)
         self.assertTrue(TestEntry == TestEntry)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestEntry == 5
         self.assertTrue(TestEntry != du.QEntry())
         self.assertTrue(TestEntry != None)
         self.assertFalse(TestEntry != TestEntry)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestEntry != 5
 
         # print_short
@@ -233,12 +233,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestQueue == du.Queue())
         self.assertFalse(TestQueue == None)
         self.assertTrue(TestQueue == TestQueue)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestQueue == 5
         self.assertTrue(TestQueue != du.Queue())
         self.assertTrue(TestQueue != None)
         self.assertFalse(TestQueue != TestQueue)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestQueue != 5
 
         # last_entry
@@ -490,25 +490,25 @@ class DataLibTest(unittest.TestCase):
         TestTelem = du.RoboTelemetry(t_speed=1.1, id=2, Coor=TestCoor)
         self.assertEqual(
             str(TestTelem),
-            f"ID: 2   X: 3.0   Y: 3.0   Z: 3.0   Rx: 3.0   Ry: 3.0   "
-            f"Rz: 3.0   EXT:   3.0   TOOL_SPEED: 1.1",
+            f"ID: 2   COOR: X: 3.0   Y: 3.0   Z: 3.0   RX: 3.0   RY: 3.0   "
+            f"RZ: 3.0   Q: 3.0   EXT: 3.0   TOOL_SPEED: 1.1",
         )
         self.assertEqual(
             str(du.RoboTelemetry()),
-            f"ID: -1   X: 0.0   Y: 0.0   Z: 0.0   Rx: 0.0   Ry: 0.0   "
-            f"Rz: 0.0   EXT:   0.0   TOOL_SPEED: 0.0",
+            f"ID: -1   COOR: X: 0.0   Y: 0.0   Z: 0.0   RX: 0.0   RY: 0.0   "
+            f"RZ: 0.0   Q: 0.0   EXT: 0.0   TOOL_SPEED: 0.0",
         )
 
         # __eq__ & __ne__
         self.assertFalse(TestTelem == du.RoboTelemetry())
         self.assertFalse(TestTelem == None)
         self.assertTrue(TestTelem == TestTelem)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTelem == 5
         self.assertTrue(TestTelem != du.RoboTelemetry())
         self.assertTrue(TestTelem != None)
         self.assertFalse(TestTelem != TestTelem)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTelem != 5
 
         # __round__ (and automatic ID conversion to int)
@@ -541,12 +541,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestTelem == du.PumpTelemetry())
         self.assertFalse(TestTelem == None)
         self.assertTrue(TestTelem == TestTelem)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTelem == 5
         self.assertTrue(TestTelem != du.PumpTelemetry())
         self.assertTrue(TestTelem != None)
         self.assertFalse(TestTelem != TestTelem)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestTelem != 5
 
         # __round__
@@ -584,7 +584,7 @@ class DataLibTest(unittest.TestCase):
         self.assertEqual(TestC.ts_val, 4.3)
         TestC.ts_val = 6.7
         self.assertEqual(TestC.ts_val, 6.7)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestC.ts_val = 'A'
 
         # __eq__ & __ne__
@@ -661,12 +661,12 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(TestDqB == du.DaqBlock())
         self.assertFalse(TestDqB == None)
         self.assertTrue(TestDqB == TestDqB)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestDqB == 5
         self.assertTrue(TestDqB != du.DaqBlock())
         self.assertTrue(TestDqB != None)
         self.assertFalse(TestDqB != TestDqB)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TestDqB != 5
         
         # store
