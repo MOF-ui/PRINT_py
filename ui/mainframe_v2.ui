@@ -382,7 +382,7 @@ QTabBar::tab:!selected:hover {
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
-      <string>     FILE IMPORT     </string>
+      <string>   FILE IMPORT  </string>
      </attribute>
      <widget class="QFrame" name="IO_frame">
       <property name="geometry">
@@ -1225,7 +1225,7 @@ color: #E1E5EE;</string>
       <string notr="true"/>
      </property>
      <attribute name="title">
-      <string>     PRINTING     </string>
+      <string>  PRINTING   </string>
      </attribute>
      <widget class="QFrame" name="SGLC_frame">
       <property name="geometry">
@@ -1520,7 +1520,7 @@ p, li { white-space: pre-wrap; }
          <x>40</x>
          <y>130</y>
          <width>271</width>
-         <height>51</height>
+         <height>71</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -1634,9 +1634,9 @@ processing</string>
       <widget class="QLabel" name="SCTRL_lbl_robCommID">
        <property name="geometry">
         <rect>
-         <x>95</x>
+         <x>55</x>
          <y>283</y>
-         <width>91</width>
+         <width>131</width>
          <height>31</height>
         </rect>
        </property>
@@ -1671,9 +1671,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SCTRL_lbl_progCommID">
        <property name="geometry">
         <rect>
-         <x>65</x>
+         <x>45</x>
          <y>333</y>
-         <width>121</width>
+         <width>141</width>
          <height>31</height>
         </rect>
        </property>
@@ -2371,7 +2371,7 @@ color: #E1E5EE;</string>
     </widget>
     <widget class="QWidget" name="DIRECT_tab">
      <attribute name="title">
-      <string>     DIRECT CONTROL     </string>
+      <string>   DIRECT CONTROL   </string>
      </attribute>
      <widget class="QFrame" name="DC_frame">
       <property name="geometry">
@@ -2396,7 +2396,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>40</x>
          <y>18</y>
-         <width>231</width>
+         <width>201</width>
          <height>51</height>
         </rect>
        </property>
@@ -2832,9 +2832,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="DC_disp_x">
        <property name="geometry">
         <rect>
-         <x>370</x>
+         <x>360</x>
          <y>370</y>
-         <width>71</width>
+         <width>91</width>
          <height>51</height>
         </rect>
        </property>
@@ -2848,9 +2848,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="DC_disp_y">
        <property name="geometry">
         <rect>
-         <x>520</x>
+         <x>510</x>
          <y>370</y>
-         <width>71</width>
+         <width>91</width>
          <height>51</height>
         </rect>
        </property>
@@ -2864,9 +2864,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="DC_disp_z">
        <property name="geometry">
         <rect>
-         <x>670</x>
+         <x>660</x>
          <y>370</y>
-         <width>71</width>
+         <width>91</width>
          <height>51</height>
         </rect>
        </property>
@@ -2880,9 +2880,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="DC_disp_ext">
        <property name="geometry">
         <rect>
-         <x>820</x>
+         <x>810</x>
          <y>370</y>
-         <width>71</width>
+         <width>91</width>
          <height>51</height>
         </rect>
        </property>
@@ -2968,7 +2968,7 @@ font-size: 14pt;</string>
       <widget class="QLabel" name="DC_0_notice">
        <property name="geometry">
         <rect>
-         <x>270</x>
+         <x>240</x>
          <y>40</y>
          <width>131</width>
          <height>20</height>
@@ -3046,7 +3046,7 @@ color: #E1E5EE;</string>
         <rect>
          <x>40</x>
          <y>30</y>
-         <width>331</width>
+         <width>291</width>
          <height>51</height>
         </rect>
        </property>
@@ -3073,9 +3073,9 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="NC_btt_xyzSend">
        <property name="geometry">
         <rect>
-         <x>723</x>
+         <x>710</x>
          <y>140</y>
-         <width>181</width>
+         <width>201</width>
          <height>41</height>
         </rect>
        </property>
@@ -3086,9 +3086,9 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="NC_btt_xyzextSend">
        <property name="geometry">
         <rect>
-         <x>723</x>
+         <x>710</x>
          <y>190</y>
-         <width>181</width>
+         <width>201</width>
          <height>41</height>
         </rect>
        </property>
@@ -3099,9 +3099,9 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="NC_btt_rSend">
        <property name="geometry">
         <rect>
-         <x>723</x>
+         <x>710</x>
          <y>280</y>
-         <width>181</width>
+         <width>201</width>
          <height>41</height>
         </rect>
        </property>
@@ -3112,9 +3112,9 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="NC_btt_rZero">
        <property name="geometry">
         <rect>
-         <x>723</x>
+         <x>710</x>
          <y>330</y>
-         <width>181</width>
+         <width>201</width>
          <height>41</height>
         </rect>
        </property>
@@ -3125,7 +3125,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_disp_ext">
        <property name="geometry">
         <rect>
-         <x>530</x>
+         <x>523</x>
          <y>140</y>
          <width>121</width>
          <height>41</height>
@@ -3141,7 +3141,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_lbl_ext">
        <property name="geometry">
         <rect>
-         <x>530</x>
+         <x>523</x>
          <y>110</y>
          <width>121</width>
          <height>31</height>
@@ -3163,7 +3163,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_lbl_z">
        <property name="geometry">
         <rect>
-         <x>390</x>
+         <x>383</x>
          <y>110</y>
          <width>121</width>
          <height>31</height>
@@ -3185,7 +3185,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_disp_z">
        <property name="geometry">
         <rect>
-         <x>390</x>
+         <x>383</x>
          <y>140</y>
          <width>121</width>
          <height>41</height>
@@ -3201,7 +3201,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_disp_x">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>103</x>
          <y>140</y>
          <width>121</width>
          <height>41</height>
@@ -3217,7 +3217,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_lbl_x">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>103</x>
          <y>110</y>
          <width>121</width>
          <height>31</height>
@@ -3239,7 +3239,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_disp_y">
        <property name="geometry">
         <rect>
-         <x>250</x>
+         <x>243</x>
          <y>140</y>
          <width>121</width>
          <height>41</height>
@@ -3255,7 +3255,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_lbl_y">
        <property name="geometry">
         <rect>
-         <x>250</x>
+         <x>243</x>
          <y>110</y>
          <width>121</width>
          <height>31</height>
@@ -3277,7 +3277,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_lbl_set">
        <property name="geometry">
         <rect>
-         <x>36</x>
+         <x>29</x>
          <y>196</y>
          <width>71</width>
          <height>31</height>
@@ -3299,7 +3299,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_lbl_rz">
        <property name="geometry">
         <rect>
-         <x>390</x>
+         <x>383</x>
          <y>250</y>
          <width>121</width>
          <height>31</height>
@@ -3321,7 +3321,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_lbl_ry">
        <property name="geometry">
         <rect>
-         <x>250</x>
+         <x>243</x>
          <y>250</y>
          <width>121</width>
          <height>31</height>
@@ -3343,7 +3343,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_lbl_rx">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>103</x>
          <y>250</y>
          <width>121</width>
          <height>31</height>
@@ -3365,7 +3365,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_disp_rx">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>103</x>
          <y>280</y>
          <width>121</width>
          <height>41</height>
@@ -3381,7 +3381,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_disp_ry">
        <property name="geometry">
         <rect>
-         <x>250</x>
+         <x>243</x>
          <y>280</y>
          <width>121</width>
          <height>41</height>
@@ -3397,7 +3397,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_disp_rz">
        <property name="geometry">
         <rect>
-         <x>390</x>
+         <x>383</x>
          <y>280</y>
          <width>121</width>
          <height>41</height>
@@ -3413,7 +3413,7 @@ color: #E1E5EE;</string>
       <widget class="QDoubleSpinBox" name="NC_float_x">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>103</x>
          <y>190</y>
          <width>121</width>
          <height>41</height>
@@ -3432,7 +3432,7 @@ color: #E1E5EE;</string>
       <widget class="QDoubleSpinBox" name="NC_float_y">
        <property name="geometry">
         <rect>
-         <x>250</x>
+         <x>243</x>
          <y>190</y>
          <width>121</width>
          <height>41</height>
@@ -3451,7 +3451,7 @@ color: #E1E5EE;</string>
       <widget class="QDoubleSpinBox" name="NC_float_ext">
        <property name="geometry">
         <rect>
-         <x>530</x>
+         <x>523</x>
          <y>190</y>
          <width>121</width>
          <height>41</height>
@@ -3470,7 +3470,7 @@ color: #E1E5EE;</string>
       <widget class="QDoubleSpinBox" name="NC_float_z">
        <property name="geometry">
         <rect>
-         <x>390</x>
+         <x>383</x>
          <y>190</y>
          <width>121</width>
          <height>41</height>
@@ -3489,7 +3489,7 @@ color: #E1E5EE;</string>
       <widget class="QDoubleSpinBox" name="NC_float_rz">
        <property name="geometry">
         <rect>
-         <x>390</x>
+         <x>383</x>
          <y>330</y>
          <width>121</width>
          <height>41</height>
@@ -3511,7 +3511,7 @@ color: #E1E5EE;</string>
       <widget class="QDoubleSpinBox" name="NC_float_ry">
        <property name="geometry">
         <rect>
-         <x>250</x>
+         <x>243</x>
          <y>330</y>
          <width>121</width>
          <height>41</height>
@@ -3533,7 +3533,7 @@ color: #E1E5EE;</string>
       <widget class="QDoubleSpinBox" name="NC_float_rx">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>103</x>
          <y>330</y>
          <width>121</width>
          <height>41</height>
@@ -3555,9 +3555,9 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="NC_btt_getValues">
        <property name="geometry">
         <rect>
-         <x>723</x>
+         <x>710</x>
          <y>60</y>
-         <width>181</width>
+         <width>201</width>
          <height>41</height>
         </rect>
        </property>
@@ -3568,8 +3568,8 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_0_notice">
        <property name="geometry">
         <rect>
-         <x>380</x>
-         <y>52</y>
+         <x>330</x>
+         <y>51</y>
          <width>301</width>
          <height>20</height>
         </rect>
@@ -3597,7 +3597,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="NC_lbl_set_2">
        <property name="geometry">
         <rect>
-         <x>37</x>
+         <x>30</x>
          <y>334</y>
          <width>71</width>
          <height>31</height>
@@ -4021,7 +4021,7 @@ color: #f2f4f3;
       <bool>false</bool>
      </property>
      <attribute name="title">
-      <string>     PRINTHEAD &amp;&amp; PUMP     </string>
+      <string>   PRINTHEAD &amp;&amp; PUMP   </string>
      </attribute>
      <widget class="QFrame" name="ADC_frame">
       <property name="geometry">
@@ -4967,9 +4967,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="PUMP_lbl_pump1">
        <property name="geometry">
         <rect>
-         <x>40</x>
+         <x>20</x>
          <y>624</y>
-         <width>81</width>
+         <width>101</width>
          <height>30</height>
         </rect>
        </property>
@@ -4989,9 +4989,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="PUMP_lbl_pump2">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>674</y>
-         <width>91</width>
+         <width>101</width>
          <height>30</height>
         </rect>
        </property>
@@ -5974,7 +5974,7 @@ color: #E1E5EE;</string>
     </widget>
     <widget class="QWidget" name="SET_tab">
      <attribute name="title">
-      <string>     SETTINGS     </string>
+      <string>   SETTINGS   </string>
      </attribute>
      <widget class="QFrame" name="TCP_frame">
       <property name="geometry">
@@ -9308,7 +9308,7 @@ color: #E1E5EE;</string>
     </widget>
     <widget class="QWidget" name="MONITOR_tab">
      <attribute name="title">
-      <string>     SYSTEM MONITOR     </string>
+      <string>   SYSTEM MONITOR   </string>
      </attribute>
      <widget class="QFrame" name="ICQ_frame">
       <property name="geometry">
@@ -9397,9 +9397,9 @@ color: #f2f4f3;
       <widget class="QLabel" name="SID_lbl_robID">
        <property name="geometry">
         <rect>
-         <x>500</x>
+         <x>480</x>
          <y>60</y>
-         <width>101</width>
+         <width>111</width>
          <height>41</height>
         </rect>
        </property>
@@ -9418,7 +9418,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SID_disp_robID">
        <property name="geometry">
         <rect>
-         <x>610</x>
+         <x>600</x>
          <y>60</y>
          <width>101</width>
          <height>41</height>
@@ -9434,7 +9434,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SID_disp_progID">
        <property name="geometry">
         <rect>
-         <x>800</x>
+         <x>790</x>
          <y>60</y>
          <width>101</width>
          <height>41</height>
@@ -9450,7 +9450,7 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="SID_lbl_progID">
        <property name="geometry">
         <rect>
-         <x>710</x>
+         <x>700</x>
          <y>60</y>
          <width>81</width>
          <height>41</height>
@@ -9471,9 +9471,9 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="SID_btt_overwrite">
        <property name="geometry">
         <rect>
-         <x>1030</x>
+         <x>1020</x>
          <y>60</y>
-         <width>121</width>
+         <width>131</width>
          <height>41</height>
         </rect>
        </property>
@@ -9484,7 +9484,7 @@ color: #E1E5EE;</string>
       <widget class="QSpinBox" name="SID_num_overwrite">
        <property name="geometry">
         <rect>
-         <x>910</x>
+         <x>900</x>
          <y>60</y>
          <width>111</width>
          <height>41</height>
