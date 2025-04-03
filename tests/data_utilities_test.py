@@ -757,7 +757,7 @@ class DataLibTest(unittest.TestCase):
         """test RobConnection class, handles connection data und functions"""
 
         # send
-        TestRobCon = du.RobConnection()
+        TestRobCon = du.RoboConnection()
     
         ans0, ans1 = TestRobCon.send(du.QEntry(id=1))
         self.assertFalse(ans0)

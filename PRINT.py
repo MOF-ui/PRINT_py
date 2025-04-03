@@ -51,31 +51,37 @@ import libs.func_utilities as fu
 
 #######################    COMMAND LINE ARGUMENTS    #########################
 
+print(
+    f"\n\n\n"
+    f"-------------- PRINT_py --------------\n"
+    f"starting with arguments: {sys.argv}\n"
+)
+
 arg_len = len(sys.argv)
 arg1 = ''
 skip_dialog = False
+dev_avail = True<<4
 
 if arg_len == 2:
     arg1 = sys.argv[1]
     match arg1:
         case 'test':
+            print(f"MODE: TEST\n")
             import tests.all_test as at
             at.run_all()
             exit()
         case 'local':
+            print(f"MODE: LOCAL\n")
             du.PRH_url = f"http://{du.PRH_url}"
             du.ROBTcp.ip = 'localhost'
-            du.PRH_url = f"http://{du.PRH_url}"
-            dev_avail = True<<4
             skip_dialog = True
         case 'overwrite':
+            print(f"dialog skipped..\n")
             du.PRH_url = f"http://{du.PRH_url}"
             du.ROBTcp.ip = '192.168.125.1'
             du.ROBTcp.port = '10001'
-            du.PRH_url = f"http://{du.PRH_url}"
-            dev_avail = True<<4
             skip_dialog = True
-        case _: 
+        case _:
             raise KeyError(f"{arg1} is not a valid argument for PRINT.py!")
 
 elif arg_len > 2:
@@ -124,12 +130,11 @@ if not skip_dialog:
 
 # create logfile and get path
 logpath = fu.create_logfile()
-print(
-    f"\n"
-    f"-------------- PRINT_py --------------.\n"
-    f"starting with arguments: {sys.argv}\n"
-    f"Writing log at {logpath}.\n"
-)
+print(f"writing log at: {logpath}")
+print(f"connecting: ", end='')
+for i in range(0, 5):
+    print(f"{dev_avail>>i & 1}", end='')
+print('\n')
 
 # start the UI and show the window to user
 # leave following 2 lines here so app doesnt include the remnant of a
@@ -141,3 +146,5 @@ win = Mainframe(logpath, dev_avail)
 win.show()
 app.exec()
 # sys.exit(app.exec())
+
+print(f"-------------- FINISHED --------------\n\n")

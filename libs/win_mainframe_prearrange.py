@@ -35,6 +35,7 @@ from ui.UI_mainframe_v6 import Ui_MainWindow
 from libs.win_daq import daq_window
 from libs.win_cam_cap import cam_cap_window
 from libs.win_dialogs import strd_dialog
+import libs.global_var as g
 import libs.data_utilities as du
 import libs.func_utilities as fu
 
@@ -274,33 +275,33 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             match flag:
                 case 'robot_live_ad':
                     new_val = self.SCTRL_num_liveAd_robot.value() / 100.0
-                    du.ROB_live_ad = new_val
+                    g.ROB_live_ad = new_val
                 case 'robot_comm_fr':
-                    du.ROB_comm_fr = self.CONN_num_commForerun.value()
+                    g.ROB_comm_fr = self.CONN_num_commForerun.value()
                 case 'mixer_act_w_pump':
                     new_val = not self.PRH_btt_actWithPump.isChecked()
-                    du.PRH_act_with_pump = new_val
+                    g.PRH_act_with_pump = new_val
                 case 'pmp_out_ratio':
                     new_val = 1 - (self.PUMP_sld_outputRatio.value() / 100.0)
-                    du.PMP_output_ratio = new_val
+                    g.PMP_output_ratio = new_val
                 case 'mms_overwrite':
                     if self.SCTRL_btt_mmsOverwrite.isChecked():
                         new_val = self.SCTRL_num_mmsOverwrite.value()
                     else:
                         new_val = -1
-                    du.ROB_speed_overwrite = new_val
+                    g.ROB_speed_overwrite = new_val
                 case 'pmp_look_ahead':
                     new_val = not self.LAH_btt_active.isChecked()
-                    du.PMP_look_ahead = new_val
+                    g.PMP_look_ahead = new_val
                 case 'pmp_look_ahead_dist':
                     new_val = self.LAH_num_distance.value()
-                    du.PMP_look_ahead_dist = new_val
+                    g.PMP_look_ahead_dist = new_val
                 case 'pmp_look_ahead_prerun':
                     new_val = self.LAH_float_prerunFactor.value()
-                    du.PMP_look_ahead_prerun = new_val
+                    g.PMP_look_ahead_prerun = new_val
                 case 'pmp_look_ahead_retract':
                     new_val = self.LAH_float_retractFactor.value()
-                    du.PMP_look_ahead_retract = new_val
+                    g.PMP_look_ahead_retract = new_val
                 case _:
                     raise KeyError(f"'{flag}' is not a defined flag")
 
@@ -309,72 +310,77 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         """load default settings to settings display"""
 
         with QMutexLocker(GlobalMutex):
-            du.SC_vol_per_m = self.SET_float_volPerMM.value()
-            du.IO_fr_to_ts = self.SET_float_frToMms.value()
-            du.IO_zone = self.SET_num_zone.value()
-            du.DCSpeed.ts = self.SET_num_transSpeed_dc.value()
-            du.DCSpeed.ors = self.SET_num_orientSpeed_dc.value()
-            du.DCSpeed.acr = self.SET_num_accelRamp_dc.value()
-            du.DCSpeed.dcr = self.SET_num_decelRamp_dc.value()
-            du.PRINSpeed.ts = self.SET_num_transSpeed_print.value()
-            du.PRINSpeed.ors = self.SET_num_orientSpeed_print.value()
-            du.PRINSpeed.acr = self.SET_num_accelRamp_print.value()
-            du.PRINSpeed.dcr = self.SET_num_decelRamp_print.value()
-            du.SC_ext_trail = (
+            g.SC_vol_per_m = self.SET_float_volPerMM.value()
+            g.IO_fr_to_ts = self.SET_float_frToMms.value()
+            g.IO_zone = self.SET_num_zone.value()
+            g.DCSpeed.ts = self.SET_num_transSpeed_dc.value()
+            g.DCSpeed.ors = self.SET_num_orientSpeed_dc.value()
+            g.DCSpeed.acr = self.SET_num_accelRamp_dc.value()
+            g.DCSpeed.dcr = self.SET_num_decelRamp_dc.value()
+            g.SCSpeed.ts = self.SET_num_transSpeed_print.value()
+            g.SCSpeed.ors = self.SET_num_orientSpeed_print.value()
+            g.SCSpeed.acr = self.SET_num_accelRamp_print.value()
+            g.SCSpeed.dcr = self.SET_num_decelRamp_print.value()
+            g.SC_ext_trail = (
                 self.SET_num_followInterv.value(),
                 self.SET_num_followSkip.value(),
             )
-            du.PMP_retract_speed = self.SET_num_retractSpeed.value()
-            du.PMP1_liter_per_s = self.SET_float_p1Flow.value()
-            du.PMP2_liter_per_s = self.SET_float_p2Flow.value()
+            g.PMP_retract_speed = self.SET_num_retractSpeed.value()
+            g.PMP1_liter_per_s = self.SET_float_p1Flow.value()
+            g.PMP2_liter_per_s = self.SET_float_p2Flow.value()
 
         self.log_entry(
             'SETS',
-            f"General settings updated -- VolPerMM: {du.SC_vol_per_m}"
-            f", FR2TS: {du.IO_fr_to_ts}, IOZ: {du.IO_zone}"
-            f", PrinTS: {du.PRINSpeed.ts}, PrinOS: {du.PRINSpeed.ors}"
-            f", PrinACR: {du.PRINSpeed.acr} PrinDCR: {du.PRINSpeed.dcr}"
-            f", DCTS: {du.DCSpeed.ts}, DCOS: {du.DCSpeed.ors}"
-            f", DCACR: {du.DCSpeed.acr}, DCDCR: {du.DCSpeed.dcr}, "
-            f"FB_inter: {du.SC_ext_trail[0]}, "
-            f"FB_skip: {du.SC_ext_trail[1]}, "
-            f"PmpRS: {du.PMP_retract_speed}, "
-            f"Pmp1LPS: {du.PMP1_liter_per_s}, "
-            f"Pmp2LPS: {du.PMP2_liter_per_s}"
+            f"General settings updated -- VolPerMM: {g.SC_vol_per_m}"
+            f", FR2TS: {g.IO_fr_to_ts}, IOZ: {g.IO_zone}"
+            f", PrinTS: {g.SCSpeed.ts}, PrinOS: {g.SCSpeed.ors}"
+            f", PrinACR: {g.SCSpeed.acr} PrinDCR: {g.SCSpeed.dcr}"
+            f", DCTS: {g.DCSpeed.ts}, DCOS: {g.DCSpeed.ors}"
+            f", DCACR: {g.DCSpeed.acr}, DCDCR: {g.DCSpeed.dcr}, "
+            f"FB_inter: {g.SC_ext_trail[0]}, "
+            f"FB_skip: {g.SC_ext_trail[1]}, "
+            f"PmpRS: {g.PMP_retract_speed}, "
+            f"Pmp1LPS: {g.PMP1_liter_per_s}, "
+            f"Pmp2LPS: {g.PMP2_liter_per_s}"
         )
 
 
     def load_defaults(self, setup=False) -> None:
         """load default general settings to user display"""
 
-        self.SET_float_volPerMM.setValue(du.DEF_SC_VOL_PER_M)
-        self.SET_float_frToMms.setValue(du.DEF_IO_FR_TO_TS)
-        self.SET_num_zone.setValue(du.DEF_IO_ZONE)
-        self.SET_num_transSpeed_dc.setValue(du.DEF_DC_SPEED.ts)
-        self.SET_num_orientSpeed_dc.setValue(du.DEF_DC_SPEED.ors)
-        self.SET_num_accelRamp_dc.setValue(du.DEF_DC_SPEED.acr)
-        self.SET_num_decelRamp_dc.setValue(du.DEF_DC_SPEED.dcr)
-        self.SET_num_transSpeed_print.setValue(du.DEF_PRIN_SPEED.ts)
-        self.SET_num_orientSpeed_print.setValue(du.DEF_PRIN_SPEED.ors)
-        self.SET_num_accelRamp_print.setValue(du.DEF_PRIN_SPEED.acr)
-        self.SET_num_decelRamp_print.setValue(du.DEF_PRIN_SPEED.dcr)
-        self.SET_num_followInterv.setValue(du.DEF_SC_EXT_TRAIL[0])
-        self.SET_num_followSkip.setValue(du.DEF_SC_EXT_TRAIL[1])
-        self.SET_float_p1Flow.setValue(du.DEF_PUMP_LPS)
-        self.SET_float_p2Flow.setValue(du.DEF_PUMP_LPS)
-        self.SET_num_retractSpeed.setValue(int(du.DEF_PUMP_RETR_SPEED))
+        if (
+                not isinstance(g.DC_SPEED, du.SpeedVector)
+                or not isinstance(g.SC_SPEED, du.SpeedVector)
+            ):
+            raise TypeError(f"Speeds of type: {type(g.DC_SPEED)}, {g.SC_SPEED}!")
+        self.SET_float_volPerMM.setValue(g.SC_VOL_PER_M)
+        self.SET_float_frToMms.setValue(g.IO_FR_TO_TS)
+        self.SET_num_zone.setValue(g.IO_ZONE)
+        self.SET_num_transSpeed_dc.setValue(g.DC_SPEED.ts)
+        self.SET_num_orientSpeed_dc.setValue(g.DC_SPEED.ors)
+        self.SET_num_accelRamp_dc.setValue(g.DC_SPEED.acr)
+        self.SET_num_decelRamp_dc.setValue(g.DC_SPEED.dcr)
+        self.SET_num_transSpeed_print.setValue(g.SC_SPEED.ts)
+        self.SET_num_orientSpeed_print.setValue(g.SC_SPEED.ors)
+        self.SET_num_accelRamp_print.setValue(g.SC_SPEED.acr)
+        self.SET_num_decelRamp_print.setValue(g.SC_SPEED.dcr)
+        self.SET_num_followInterv.setValue(g.SC_EXT_TRAIL[0])
+        self.SET_num_followSkip.setValue(g.SC_EXT_TRAIL[1])
+        self.SET_float_p1Flow.setValue(g.PMP_LPS)
+        self.SET_float_p2Flow.setValue(g.PMP_LPS)
+        self.SET_num_retractSpeed.setValue(int(g.PMP_RETR_SPEED))
 
         if not setup:
             self.log_entry(
                 "SETS", "User reset general properties to default values."
             )
         else:
-            self.CONN_num_commForerun.setValue(du.DEF_ROB_COMM_FR)
+            self.CONN_num_commForerun.setValue(g.DEF_ROB_COMM_FR)
             self.load_ADC_defaults()
-            self.ASC_num_trolley.setValue(du.DEF_PRH_TROLLEY)
-            self.ASC_btt_clamp.setChecked(du.DEF_PRH_CLAMP)
-            self.ASC_btt_cut.setChecked(du.DEF_PRH_CUT)
-            self.ASC_btt_placeSpring.setChecked(du.DEF_PRH_PLACE_SPR)
+            self.ASC_num_trolley.setValue(g.DEF_PRH_TROLLEY)
+            self.ASC_btt_clamp.setChecked(g.DEF_PRH_CLAMP)
+            self.ASC_btt_cut.setChecked(g.DEF_PRH_CUT)
+            self.ASC_btt_placeSpring.setChecked(g.DEF_PRH_PLACE_SPR)
 
 
     def load_ADC_defaults(self, send_changes=False) -> None:
@@ -384,10 +390,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         for widget in self.ADC_group:
             widget.blockSignals(True)
 
-        self.ADC_num_trolley.setValue(du.DEF_PRH_TROLLEY)
-        self.ADC_btt_clamp.setChecked(du.DEF_PRH_CLAMP)
-        self.ADC_btt_cut.setChecked(du.DEF_PRH_CUT)
-        self.ADC_btt_placeSpring.setChecked(du.DEF_PRH_PLACE_SPR)
+        self.ADC_num_trolley.setValue(g.DEF_PRH_TROLLEY)
+        self.ADC_btt_clamp.setChecked(g.DEF_PRH_CLAMP)
+        self.ADC_btt_cut.setChecked(g.DEF_PRH_CUT)
+        self.ADC_btt_placeSpring.setChecked(g.DEF_PRH_PLACE_SPR)
         if send_changes:
             self.adc_user_change()
 
@@ -407,19 +413,19 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         user to see, should not change during runtime"""
 
         # ROBOT
-        self.CONN_ROB_disp_ip.setText(du.ROBTcp.ip)
-        self.CONN_ROB_disp_port.setText(str(du.ROBTcp.port))
-        self.CONN_ROB_disp_rwTo.setText(str(du.ROBTcp.rw_tout))
-        self.CONN_ROB_disp_connTo.setText(str(du.ROBTcp.c_tout))
-        self.CONN_ROB_disp_bytesToRead.setText(str(du.ROBTcp.r_bl))
+        self.CONN_ROB_disp_ip.setText(g.ROBTcp.ip)
+        self.CONN_ROB_disp_port.setText(str(g.ROBTcp.port))
+        self.CONN_ROB_disp_rwTo.setText(str(g.ROBTcp.rw_tout))
+        self.CONN_ROB_disp_connTo.setText(str(g.ROBTcp.c_tout))
+        self.CONN_ROB_disp_bytesToRead.setText(str(g.ROBTcp.r_bl))
         # P1
-        self.CONN_PUMP1_disp_port.setText(du.PMP_port)
-        self.CONN_PUMP1_disp_modbId.setText(du.PMP1_modbus_id)
+        self.CONN_PUMP1_disp_port.setText(g.PMP_port)
+        self.CONN_PUMP1_disp_modbId.setText(g.PMP1_MODBUS_ID)
         # P2
-        self.CONN_PUMP2_disp_port.setText(du.PMP_port)
-        self.CONN_PUMP2_disp_modbId.setText(du.PMP2_modbus_id)
+        self.CONN_PUMP2_disp_port.setText(g.PMP_port)
+        self.CONN_PUMP2_disp_modbId.setText(g.PMP2_MODBUS_ID)
         # PRH
-        _, ip, port = du.PRH_url.split(':')
+        _, ip, port = g.PRH_url.split(':')
         self.CONN_PRH_disp_ip.setText(ip)
         self.CONN_PRH_disp_port.setText(port)
 
@@ -441,10 +447,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         if no_error:
             write_buffer = command.print_short()
-            du.SC_curr_comm_id += num_send
-            if du.SC_curr_comm_id > du.DEF_ROB_BUFF_SIZE:
+            g.SC_curr_comm_id += num_send
+            if g.SC_curr_comm_id > g.DEF_ROB_BUFF_SIZE:
                 with QMutexLocker(GlobalMutex):
-                    du.SC_curr_comm_id -= du.DEF_ROB_BUFF_SIZE
+                    g.SC_curr_comm_id -= g.DEF_ROB_BUFF_SIZE
 
             log_txt = 'DC' if dc else 'SC'
             log_txt = f"{num_send} {log_txt} command(s) send"
@@ -477,17 +483,17 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         # set the fist given position to zero as this is usually the standard
         # position for Rob2, take current ID
         if self._first_pos:
-            du.ROBMovStartP = dcpy(du.ROBTelem.Coor)
-            du.ROBMovEndP = dcpy(du.ROBTelem.Coor)
+            g.ROBMovStartP = dcpy(g.ROBTelem.Coor)
+            g.ROBMovEndP = dcpy(g.ROBTelem.Coor)
             # self.set_zero([1, 2, 3, 4, 5, 6, 8])
             self._first_pos = False
 
         if telem.id != self._last_comm_id:
             log_txt = f"ID {telem.id},   {telem.Coor}   ToolSpeed: {telem.t_speed}"
             
-            if du.PMP1Serial.connected:
+            if g.PMP1Serial.connected:
                 log_txt += f"   PMP1: {self._LastP1Telem}"
-            if du.PMP2Serial.connected:
+            if g.PMP2Serial.connected:
                 log_txt += f"   PMP2: {self._LastP2Telem}"
 
             self.log_entry("RTel", log_txt)
@@ -529,7 +535,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     self.CONN_PUMP1_disp_readBuffer,
                     self.CONN_PUMP1_disp_bytesToRead,
                 ]
-                p_send(displays, du.PMP1_speed, 1)
+                p_send(displays, g.PMP1_speed, 1)
 
             case 'P2':
                 displays = [
@@ -538,7 +544,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     self.CONN_PUMP2_disp_readBuffer,
                     self.CONN_PUMP2_disp_bytesToRead,
                 ]
-                p_send(displays, du.PMP2_speed, 2)
+                p_send(displays, g.PMP2_speed, 2)
 
             case _:
                 raise KeyError(
@@ -546,13 +552,13 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                 )
 
         # keep track of PUMP_speed in case of user overwrite:
-        if du.PMP1Serial.connected and du.PMP2Serial.connected:
+        if g.PMP1Serial.connected and g.PMP2Serial.connected:
             curr_total, p1_ratio = fu.calc_pump_ratio(
-                du.PMP1_speed, du.PMP2_speed
+                g.PMP1_speed, g.PMP2_speed
             )
             with QMutexLocker(GlobalMutex):
-                du.PMP_speed = curr_total
-                du.PMP_output_ratio = p1_ratio
+                g.PMP_speed = curr_total
+                g.PMP_output_ratio = p1_ratio
 
         else:
             curr_total = new_speed
@@ -585,7 +591,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     self.PUMP_disp_ampsP1,
                     self.PUMP_disp_torqP1
                 ]
-                p_recv(displays, du.STTDataBlock.Pump1, '_LastP1Telem')
+                p_recv(displays, g.STTDataBlock.Pump1, '_LastP1Telem')
 
             case 'P2':
                 displays = [
@@ -594,7 +600,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     self.PUMP_disp_ampsP2,
                     self.PUMP_disp_torqP2
                 ]
-                p_recv(displays, du.STTDataBlock.Pump2, '_LastP2Telem')
+                p_recv(displays, g.STTDataBlock.Pump2, '_LastP2Telem')
 
             case _:
                 raise KeyError(
@@ -619,14 +625,14 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         data from robot
         """
 
-        Pos = du.ROBTelem.Coor
-        Zero = du.DCCurrZero
-        rob_id = du.ROBTelem.id
-        com_id = du.SC_curr_comm_id
-        Start = du.ROBMovStartP
-        End = du.ROBMovEndP
+        Pos = g.ROBTelem.Coor
+        Zero = g.ROBCurrZero
+        rob_id = g.ROBTelem.id
+        com_id = g.SC_curr_comm_id
+        Start = g.ROBMovStartP
+        End = g.ROBMovEndP
         try:
-            prog_id = du.SCQueue[0].id
+            prog_id = g.SCQueue[0].id
         except AttributeError:
             prog_id = com_id
 
@@ -635,7 +641,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.SCTRL_disp_buffComms.setText(str(prog_id - rob_id))
         self.SCTRL_disp_robCommID.setText(str(rob_id))
         self.SCTRL_disp_progCommID.setText(str(prog_id))
-        self.SCTRL_disp_elemInQ.setText(str(len(du.SCQueue)))
+        self.SCTRL_disp_elemInQ.setText(str(len(g.SCQueue)))
 
         # DIRECT CONTROL
         self.DC_disp_x.setText(str(round(Pos.x - Zero.x, 3)))
@@ -653,7 +659,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.NC_disp_ext.setText(f"{Pos.ext}")
 
         # TERMINAL
-        self.TERM_disp_tcpSpeed.setText(str(du.ROBTelem.t_speed))
+        self.TERM_disp_tcpSpeed.setText(str(g.ROBTelem.t_speed))
         self.TERM_disp_robCommID.setText(str(rob_id))
         self.TERM_disp_progCommID.setText(str(prog_id))
 
@@ -688,12 +694,12 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         # update command lists and buffer size displays
         self.label_update_on_queue_change()
         self.label_update_on_terminal_change()
-        self.SCTRL_disp_elemInQ.setText(str(len(du.SCQueue)))
+        self.SCTRL_disp_elemInQ.setText(str(len(g.SCQueue)))
 
         try:
-            rob_id = du.ROBTelem.id if (du.ROBTelem.id != -1) else 0
+            rob_id = g.ROBTelem.id if (g.ROBTelem.id != -1) else 0
             self.SCTRL_disp_buffComms.setText(
-                str(du.SCQueue[0].id - rob_id - 1)
+                str(g.SCQueue[0].id - rob_id - 1)
             )
         except AttributeError:
             pass
@@ -720,8 +726,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         from Queue
         """
 
-        list_to_display = du.SCQueue.display()
-        max_len = du.DEF_SC_MAX_LINES
+        list_to_display = g.SCQueue.display()
+        max_len = g.DEF_SC_MAX_LINES
         length = len(list_to_display)
         overlen = length - max_len
 
@@ -741,12 +747,12 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         """show when data was send or received, update ICQ"""
 
         self.TERM_arr_terminal.clear()
-        self.TERM_arr_terminal.addItems(du.TERM_log)
+        self.TERM_arr_terminal.addItems(g.TERM_log)
         if self.TERM_chk_autoScroll.isChecked():
             self.TERM_arr_terminal.scrollToBottom()
 
-        list_to_display = du.ROBCommQueue.display()
-        max_len = du.DEF_ICQ_MAX_LINES
+        list_to_display = g.ROBCommQueue.display()
+        max_len = g.DEF_ICQ_MAX_LINES
         length = len(list_to_display)
         overlen = length - max_len
 
@@ -765,21 +771,21 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     def label_update_on_new_zero(self) -> None:
         """show when DC_zero has changed"""
 
-        self.ZERO_disp_x.setText(str(du.DCCurrZero.x))
-        self.ZERO_disp_y.setText(str(du.DCCurrZero.y))
-        self.ZERO_disp_z.setText(str(du.DCCurrZero.z))
-        self.ZERO_disp_rx.setText(str(du.DCCurrZero.rx))
-        self.ZERO_disp_ry.setText(str(du.DCCurrZero.ry))
-        self.ZERO_disp_rz.setText(str(du.DCCurrZero.rz))
-        self.ZERO_disp_ext.setText(str(du.DCCurrZero.ext))
+        self.ZERO_disp_x.setText(str(g.ROBCurrZero.x))
+        self.ZERO_disp_y.setText(str(g.ROBCurrZero.y))
+        self.ZERO_disp_z.setText(str(g.ROBCurrZero.z))
+        self.ZERO_disp_rx.setText(str(g.ROBCurrZero.rx))
+        self.ZERO_disp_ry.setText(str(g.ROBCurrZero.ry))
+        self.ZERO_disp_rz.setText(str(g.ROBCurrZero.rz))
+        self.ZERO_disp_ext.setText(str(g.ROBCurrZero.ext))
 
-        self.ZERO_float_x.setValue(du.DCCurrZero.x)
-        self.ZERO_float_y.setValue(du.DCCurrZero.y)
-        self.ZERO_float_z.setValue(du.DCCurrZero.z)
-        self.ZERO_float_rx.setValue(du.DCCurrZero.rx)
-        self.ZERO_float_ry.setValue(du.DCCurrZero.ry)
-        self.ZERO_float_rz.setValue(du.DCCurrZero.rz)
-        self.ZERO_float_ext.setValue(du.DCCurrZero.ext)
+        self.ZERO_float_x.setValue(g.ROBCurrZero.x)
+        self.ZERO_float_y.setValue(g.ROBCurrZero.y)
+        self.ZERO_float_z.setValue(g.ROBCurrZero.z)
+        self.ZERO_float_rx.setValue(g.ROBCurrZero.rx)
+        self.ZERO_float_ry.setValue(g.ROBCurrZero.ry)
+        self.ZERO_float_rz.setValue(g.ROBCurrZero.rz)
+        self.ZERO_float_ext.setValue(g.ROBCurrZero.ext)
 
 
     ##########################################################################
@@ -792,7 +798,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         theoretically
         """
 
-        if du.DC_rob_moving or du.SC_q_processing:
+        if g.DC_rob_moving or g.SC_q_processing:
             return
 
         if internal:
@@ -800,9 +806,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         else:
             new_sc_id = self.SID_num_overwrite.value()
         with QMutexLocker(GlobalMutex):
-            id_dist = new_sc_id - du.SC_curr_comm_id
-            du.SC_curr_comm_id = new_sc_id
-            du.SCQueue.increment(id_dist)
+            id_dist = new_sc_id - g.SC_curr_comm_id
+            g.SC_curr_comm_id = new_sc_id
+            g.SCQueue.increment(id_dist)
 
         self.label_update_on_receive(self.CONN_ROB_disp_readBuffer.text())
         self.label_update_on_queue_change()
@@ -810,7 +816,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             return
         self.log_entry(
             'GNRL',
-            f"User overwrote current comm ID to {du.SC_curr_comm_id}."
+            f"User overwrote current comm ID to {g.SC_curr_comm_id}."
         )
 
 
@@ -821,8 +827,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         # set parameters
         with QMutexLocker(GlobalMutex):
-            du.SC_q_processing = True
-            du.SC_q_prep_end = False
+            g.SC_q_processing = True
+            g.SC_q_prep_end = False
         self.switch_rob_moving()
         self.log_entry("ComQ", "queue processing started")
 
@@ -842,13 +848,13 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         if prep_end:
             css = "border-radius: 20px; background-color: #ffda1e;"
-            du.SC_q_prep_end = True
+            g.SC_q_prep_end = True
 
         else:
             with QMutexLocker(GlobalMutex):
-                du.PMP_speed = 0
-                du.SC_q_prep_end = False
-                du.SC_q_processing = False
+                g.PMP_speed = 0
+                g.SC_q_prep_end = False
+                g.SC_q_processing = False
             self.log_entry("ComQ", "queue processing stopped")
             self.switch_rob_moving(end=True)
 
@@ -868,9 +874,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         with QMutexLocker(GlobalMutex):
             if partial:
-                du.SCQueue.clear(all=False, id=self.SCTRL_entry_clrByID.text())
+                g.SCQueue.clear(all=False, id=self.SCTRL_entry_clrByID.text())
             else:
-                du.SCQueue.clear(all=True)
+                g.SCQueue.clear(all=True)
 
         if not partial:
             self.log_entry("ComQ", "queue emptied by user")
@@ -892,13 +898,13 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         spinboxes
         """
 
-        self.NC_float_x.setValue(du.ROBTelem.Coor.x)
-        self.NC_float_y.setValue(du.ROBTelem.Coor.y)
-        self.NC_float_z.setValue(du.ROBTelem.Coor.z)
-        self.NC_float_rx.setValue(du.ROBTelem.Coor.rx)
-        self.NC_float_ry.setValue(du.ROBTelem.Coor.ry)
-        self.NC_float_rz.setValue(du.ROBTelem.Coor.rz)
-        self.NC_float_ext.setValue(du.ROBTelem.Coor.ext)
+        self.NC_float_x.setValue(g.ROBTelem.Coor.x)
+        self.NC_float_y.setValue(g.ROBTelem.Coor.y)
+        self.NC_float_z.setValue(g.ROBTelem.Coor.z)
+        self.NC_float_rx.setValue(g.ROBTelem.Coor.rx)
+        self.NC_float_ry.setValue(g.ROBTelem.Coor.ry)
+        self.NC_float_rz.setValue(g.ROBTelem.Coor.rz)
+        self.NC_float_ext.setValue(g.ROBTelem.Coor.ext)
 
 
     def switch_rob_moving(self, end=False) -> None:
@@ -906,7 +912,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         with QMutexLocker(GlobalMutex):
             if end:
-                du.DC_rob_moving = False
+                g.DC_rob_moving = False
                 button_toggle = True
                 self.DC_indi_robotMoving.setStyleSheet(
                     "border-radius: 25px; background-color: #4c4a48;"
@@ -915,7 +921,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     "border-radius: 20px; background-color: #4c4a48;"
                 )
             else:
-                du.DC_rob_moving = True
+                g.DC_rob_moving = True
                 button_toggle = False
                 self.DC_indi_robotMoving.setStyleSheet(
                     "border-radius: 25px; background-color: #00aaff;"
@@ -937,7 +943,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     def set_range(self, source='') -> None:
         """overwrites RC_area to custom or default"""
 
-        area_overwrite = dcpy(du.DEF_ROB_COOR_CHK_RANGE)
+        area_overwrite = dcpy(g.DEF_ROB_COOR_CHK_RANGE)
         if source == 'user':
             min_overwrite = du.Coordinate(
                 x=self.CHKR_float_x_min.value(),
@@ -959,8 +965,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             )
             area_overwrite = [min_overwrite, max_overwrite]
         
-        du.RC_area = dcpy(area_overwrite)
-        new_min, new_max = du.RC_area
+        g.ROB_safe_range = dcpy(area_overwrite)
+        new_min, new_max = g.ROB_safe_range
         self.CHKR_disp_x.setText(f"{new_min.x}/{new_max.x}")
         self.CHKR_disp_y.setText(f"{new_min.y}/{new_max.y}")
         self.CHKR_disp_z.setText(f"{new_min.z}/{new_max.z}")
@@ -975,7 +981,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         exclusion blocks
         """
 
-        NewZero = dcpy(du.DCCurrZero)
+        NewZero = dcpy(g.ROBCurrZero)
         if source == 'user':
             ZeroOverwrite = du.Coordinate(
                 x=self.ZERO_float_x.value(),
@@ -988,19 +994,19 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             )
         elif source == 'file':
             try:
-                with open(du.LOG_safe_path, 'r') as save_file:
+                with open(g.LOG_safe_path, 'r') as save_file:
                     zero_vals = save_file.read().split('_')
                     ZeroOverwrite = du.Coordinate(zero_vals)
             except Exception as e:
                 self.log_entry(
                     'ZERO',
-                    f"failed to load ZERO data from {du.LOG_safe_path} due to {e}!"
+                    f"failed to load ZERO data from {g.LOG_safe_path} due to {e}!"
                 )
                 return
         elif source == 'default':
-            ZeroOverwrite = dcpy(du.DEF_DC_ZERO)
+            ZeroOverwrite = dcpy()
         else:
-            ZeroOverwrite = dcpy(du.ROBTelem.Coor)
+            ZeroOverwrite = dcpy(g.ROBTelem.Coor)
 
         if axis:
             # 7 is a placeholder for Q, which can not be set by hand
@@ -1019,12 +1025,12 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             if 8 in axis:
                 NewZero.ext = ZeroOverwrite.ext
             with QMutexLocker(GlobalMutex):
-                du.DCCurrZero = NewZero
+                g.ROBCurrZero = NewZero
 
         self.label_update_on_new_zero()
         self.log_entry(
             'ZERO',
-            f"current zero position updated: ({du.DCCurrZero})"
+            f"current zero position updated: ({g.ROBCurrZero})"
         )
 
 
@@ -1051,13 +1057,13 @@ class Watchdog(QObject):
         super().__init__()
         self._name = name
         self._device = device
-        if not hasattr(du, device):
+        if not hasattr(g, device):
             raise AttributeError(f"{device} doesn't exist in data_utilities!")
         self._token = token
         self._critical = operation_critical
         self._timer = QTimer()
         self._timer.setSingleShot(True)
-        self._timer.setInterval(du.DEF_WD_TIMEOUT) 
+        self._timer.setInterval(g.WD_TIMEOUT) 
         self._timer.timeout.connect(self.bite)
 
 
@@ -1087,7 +1093,7 @@ class Watchdog(QObject):
         """infrom user on any biting WD, log info"""
 
         # stop critical operations, build user text
-        if du.SC_q_processing and self._critical:
+        if g.SC_q_processing and self._critical:
             wd_txt = (
                 f"Watchdog {self.name} has bitten! Stopping script control & "
                 f"forwarding forced-stop to robot!"
@@ -1156,8 +1162,8 @@ if __name__ == "__main__":
     logpath = fu.create_logfile()
 
     # overwrite ROB_tcpip for testing, delete later
-    du.ROBTcp.ip = "localhost"
-    du.ROBTcp.port = 10001
+    g.ROBTcp.ip = "localhost"
+    g.ROBTcp.port = 10001
 
     # start the UI and assign to app
     app = 0  # leave that here so app doesnt include the remnant of a previous QApplication instance

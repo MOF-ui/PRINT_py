@@ -30,6 +30,7 @@ import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
 
 # import my own libs
+import libs.global_var as g
 import libs.data_utilities as du
 from libs.win_dialogs import strd_dialog
 
@@ -67,7 +68,7 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         self._ClockTimer.start()
 
         self._DBTimer = QTimer()
-        self._DBTimer.setInterval(1000 * du.DB_log_interval) #[s] -> [ms]
+        self._DBTimer.setInterval(1000 * g.DB_log_interval) #[s] -> [ms]
         self._DBTimer.timeout.connect(self.to_influx_db)
         self._DBTimer.start()
 
@@ -78,19 +79,19 @@ class DAQWindow(QWidget, Ui_DAQWindow):
 
         # database setup
         self._Database = influxdb_client.InfluxDBClient(
-                url=du.DB_url,
-                token=du.DB_token,
-                org=du.DB_org,
+                url=g.DB_url,
+                token=g.DB_token,
+                org=g.DB_org,
                 timeout=500
             )
         daq_starttime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        self._db_bucket = daq_starttime + "__" + du.DB_session 
+        self._db_bucket = daq_starttime + "__" + g.DB_session 
         self.db_connection = self._Database.write_api(
             write_options=SYNCHRONOUS
         )
 
         # default display setup
-        self.PATH_disp_path.setText(du.DB_url)
+        self.PATH_disp_path.setText(g.DB_url)
 
 
     def time_update(self) -> None:
@@ -103,44 +104,44 @@ class DAQWindow(QWidget, Ui_DAQWindow):
     def data_update(self) -> None:
         """data label update, signal from robo_recv"""
 
-        self.BASIC_disp_ambTemp.setText(f"{du.STTDataBlock.amb_temp} °C")
-        self.BASIC_disp_ambHum.setText(f"{du.STTDataBlock.amb_humidity} rH")
+        self.BASIC_disp_ambTemp.setText(f"{g.DBDataBlock.amb_temp} °C")
+        self.BASIC_disp_ambHum.setText(f"{g.DBDataBlock.amb_humidity} rH")
         self.BASIC_disp_delivPumpTemp.setText(
-            f"{du.STTDataBlock.msp_temp} °C"
+            f"{g.DBDataBlock.msp_temp} °C"
         )
         self.BASIC_disp_delivPumpPress.setText(
-            f"{du.STTDataBlock.msp_press} °C"
+            f"{g.DBDataBlock.msp_press} °C"
         )
-        self.BASIC_disp_robBaseTemp.setText(f"{du.STTDataBlock.rb_temp} °C")
-        self.BASIC_disp_2kPumpTemp.setText(f"{du.STTDataBlock.imp_temp} °C")
-        self.BASIC_disp_2kPumpPress.setText(f"{du.STTDataBlock.imp_press} °C")
+        self.BASIC_disp_robBaseTemp.setText(f"{g.DBDataBlock.rb_temp} °C")
+        self.BASIC_disp_2kPumpTemp.setText(f"{g.DBDataBlock.imp_temp} °C")
+        self.BASIC_disp_2kPumpPress.setText(f"{g.DBDataBlock.imp_press} °C")
 
-        self.MOT_disp_pump1Freq.setText(f"{du.STTDataBlock.Pump1.freq} Hz")
-        self.MOT_disp_pump2Freq.setText(f"{du.STTDataBlock.Pump2.freq} Hz")
-        self.MOT_disp_pump1Volt.setText(f"{du.STTDataBlock.Pump1.volt} V")
-        self.MOT_disp_pump2Volt.setText(f"{du.STTDataBlock.Pump2.volt} V")
-        self.MOT_disp_pump1Amps.setText(f"{du.STTDataBlock.Pump1.amps} A")
-        self.MOT_disp_pump2Amps.setText(f"{du.STTDataBlock.Pump2.amps} A")
-        self.MOT_disp_pump1Torq.setText(f"{du.STTDataBlock.Pump1.torq} Nm")
-        self.MOT_disp_pump2Torq.setText(f"{du.STTDataBlock.Pump2.torq} Nm")
-        self.MOT_disp_admPumpFreq.setText(f"{du.STTDataBlock.asp_freq} Hz")
-        self.MOT_disp_admPumpAmps.setText(f"{du.STTDataBlock.asp_amps} A")
-        self.MOT_disp_2kPumpFreq.setText(f"{du.STTDataBlock.imp_freq} Hz")
-        self.MOT_disp_2kPumpAmps.setText(f"{du.STTDataBlock.imp_amps} A")
+        self.MOT_disp_pump1Freq.setText(f"{g.DBDataBlock.Pump1.freq} Hz")
+        self.MOT_disp_pump2Freq.setText(f"{g.DBDataBlock.Pump2.freq} Hz")
+        self.MOT_disp_pump1Volt.setText(f"{g.DBDataBlock.Pump1.volt} V")
+        self.MOT_disp_pump2Volt.setText(f"{g.DBDataBlock.Pump2.volt} V")
+        self.MOT_disp_pump1Amps.setText(f"{g.DBDataBlock.Pump1.amps} A")
+        self.MOT_disp_pump2Amps.setText(f"{g.DBDataBlock.Pump2.amps} A")
+        self.MOT_disp_pump1Torq.setText(f"{g.DBDataBlock.Pump1.torq} Nm")
+        self.MOT_disp_pump2Torq.setText(f"{g.DBDataBlock.Pump2.torq} Nm")
+        self.MOT_disp_admPumpFreq.setText(f"{g.DBDataBlock.asp_freq} Hz")
+        self.MOT_disp_admPumpAmps.setText(f"{g.DBDataBlock.asp_amps} A")
+        self.MOT_disp_2kPumpFreq.setText(f"{g.DBDataBlock.imp_freq} Hz")
+        self.MOT_disp_2kPumpAmps.setText(f"{g.DBDataBlock.imp_amps} A")
 
-        self.ROB_disp_id.setText(f"{du.STTDataBlock.Robo.id}")
-        self.ROB_disp_tcpSpeed.setText(f"{du.STTDataBlock.Robo.t_speed} mm/s")
-        self.ROB_disp_xPos.setText(f"{du.STTDataBlock.Robo.Coor.x} mm")
-        self.ROB_disp_yPos.setText(f"{du.STTDataBlock.Robo.Coor.y} mm")
-        self.ROB_disp_zPos.setText(f"{du.STTDataBlock.Robo.Coor.z} mm")
-        self.ROB_disp_xOri.setText(f"{du.STTDataBlock.Robo.Coor.rx} mm")
-        self.ROB_disp_yOri.setText(f"{du.STTDataBlock.Robo.Coor.ry} mm")
-        self.ROB_disp_zOri.setText(f"{du.STTDataBlock.Robo.Coor.rz} mm")
-        self.ROB_disp_extPos.setText(f"{du.STTDataBlock.Robo.Coor.ext}  mm")
+        self.ROB_disp_id.setText(f"{g.DBDataBlock.Robo.id}")
+        self.ROB_disp_tcpSpeed.setText(f"{g.DBDataBlock.Robo.t_speed} mm/s")
+        self.ROB_disp_xPos.setText(f"{g.DBDataBlock.Robo.Coor.x} mm")
+        self.ROB_disp_yPos.setText(f"{g.DBDataBlock.Robo.Coor.y} mm")
+        self.ROB_disp_zPos.setText(f"{g.DBDataBlock.Robo.Coor.z} mm")
+        self.ROB_disp_xOri.setText(f"{g.DBDataBlock.Robo.Coor.rx} mm")
+        self.ROB_disp_yOri.setText(f"{g.DBDataBlock.Robo.Coor.ry} mm")
+        self.ROB_disp_zOri.setText(f"{g.DBDataBlock.Robo.Coor.rz} mm")
+        self.ROB_disp_extPos.setText(f"{g.DBDataBlock.Robo.Coor.ext}  mm")
 
 
     def new_path(self) -> None:
-        """write new path to du.DB_url"""
+        """write new path to g.DB_url"""
         
         # no Mutex as DB_url is only read in other functions
         new_url = self.PATH_entry_newPath.text()
@@ -154,22 +155,22 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         commit_dialog.exec()
 
         if commit_dialog.result() == 1:
-            du.DB_url = new_url
+            g.DB_url = new_url
 
             #restart DB client with new url
             self._Database.close()
             self._Database = influxdb_client.InfluxDBClient(
-                    url=du.DB_url,
-                    token=du.DB_token,
-                    org=du.DB_org
+                    url=g.DB_url,
+                    token=g.DB_token,
+                    org=g.DB_org
                 )
             self.db_connection = self._Database.write_api(
                 write_options=SYNCHRONOUS
             )
 
             # display
-            self.PATH_disp_path.setText(du.DB_url)
-            self.logEntry.emit('DAQW', f"user set DB path to {du.DB_url}")
+            self.PATH_disp_path.setText(g.DB_url)
+            self.logEntry.emit('DAQW', f"user set DB path to {g.DB_url}")
     
 
     def db_on_off(self, error_indi=False) -> None:
@@ -212,42 +213,42 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         now = datetime.now().strftime('%Y-%m-%d    %H:%M:%S')
         DBEntry = influxdb_client\
             .Point(now)\
-            .tag("session:", du.DB_session)\
-            .field("Amb. temp.", du.STTDataBlock.amb_temp)\
-            .field("Amb. humid.", du.STTDataBlock.amb_humidity)\
-            .field("MSP temp.", du.STTDataBlock.msp_temp)\
-            .field("MSP press.", du.STTDataBlock.msp_press)\
-            .field("ASP freq.", du.STTDataBlock.asp_freq)\
-            .field("ASP amps.", du.STTDataBlock.asp_amps)\
-            .field("RB temp.", du.STTDataBlock.rb_temp)\
-            .field("IMP temp.", du.STTDataBlock.imp_temp)\
-            .field("IMP press.", du.STTDataBlock.imp_press)\
-            .field("IMP freq.", du.STTDataBlock.imp_freq)\
-            .field("IMP amps.", du.STTDataBlock.imp_amps)\
+            .tag("session:", g.DB_session)\
+            .field("Amb. temp.", g.DBDataBlock.amb_temp)\
+            .field("Amb. humid.", g.DBDataBlock.amb_humidity)\
+            .field("MSP temp.", g.DBDataBlock.msp_temp)\
+            .field("MSP press.", g.DBDataBlock.msp_press)\
+            .field("ASP freq.", g.DBDataBlock.asp_freq)\
+            .field("ASP amps.", g.DBDataBlock.asp_amps)\
+            .field("RB temp.", g.DBDataBlock.rb_temp)\
+            .field("IMP temp.", g.DBDataBlock.imp_temp)\
+            .field("IMP press.", g.DBDataBlock.imp_press)\
+            .field("IMP freq.", g.DBDataBlock.imp_freq)\
+            .field("IMP amps.", g.DBDataBlock.imp_amps)\
             \
-            .field("P1 freq.", du.STTDataBlock.Pump1.freq)\
-            .field("P1 volt", du.STTDataBlock.Pump1.volt)\
-            .field("P1 amps.", du.STTDataBlock.Pump1.amps)\
-            .field("P1 torq.", du.STTDataBlock.Pump1.torq)\
-            .field("P2 freq.", du.STTDataBlock.Pump2.freq)\
-            .field("P2 volt", du.STTDataBlock.Pump2.volt)\
-            .field("P2 amps.", du.STTDataBlock.Pump2.amps)\
-            .field("P2 torq.", du.STTDataBlock.Pump2.torq)\
+            .field("P1 freq.", g.DBDataBlock.Pump1.freq)\
+            .field("P1 volt", g.DBDataBlock.Pump1.volt)\
+            .field("P1 amps.", g.DBDataBlock.Pump1.amps)\
+            .field("P1 torq.", g.DBDataBlock.Pump1.torq)\
+            .field("P2 freq.", g.DBDataBlock.Pump2.freq)\
+            .field("P2 volt", g.DBDataBlock.Pump2.volt)\
+            .field("P2 amps.", g.DBDataBlock.Pump2.amps)\
+            .field("P2 torq.", g.DBDataBlock.Pump2.torq)\
             \
-            .field("ROB ID", du.STTDataBlock.Robo.id)\
-            .field("ROB TCP", du.STTDataBlock.Robo.t_speed)\
-            .field("ROB X", du.STTDataBlock.Robo.Coor.x)\
-            .field("ROB Y", du.STTDataBlock.Robo.Coor.y)\
-            .field("ROB Z", du.STTDataBlock.Robo.Coor.z)\
-            .field("ROB RX", du.STTDataBlock.Robo.Coor.rx)\
-            .field("ROB RY", du.STTDataBlock.Robo.Coor.ry)\
-            .field("ROB RZ", du.STTDataBlock.Robo.Coor.rz)\
-            .field("ROB EXT", du.STTDataBlock.Robo.Coor.ext)
+            .field("ROB ID", g.DBDataBlock.Robo.id)\
+            .field("ROB TCP", g.DBDataBlock.Robo.t_speed)\
+            .field("ROB X", g.DBDataBlock.Robo.Coor.x)\
+            .field("ROB Y", g.DBDataBlock.Robo.Coor.y)\
+            .field("ROB Z", g.DBDataBlock.Robo.Coor.z)\
+            .field("ROB RX", g.DBDataBlock.Robo.Coor.rx)\
+            .field("ROB RY", g.DBDataBlock.Robo.Coor.ry)\
+            .field("ROB RZ", g.DBDataBlock.Robo.Coor.rz)\
+            .field("ROB EXT", g.DBDataBlock.Robo.Coor.ext)
         
         try: #to-do: write a non-blocking entry post routine, this one waits for 500ms timeout
             self.db_connection.write(
                 bucket=self._db_bucket,
-                org=du.DB_org,
+                org=g.DB_org,
                 record=DBEntry
             )
         except Exception as err:

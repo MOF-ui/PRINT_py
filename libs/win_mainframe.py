@@ -38,6 +38,7 @@ from libs.win_mainframe_prearrange import GlobalMutex, PmpMutex
 from libs.win_dialogs import strd_dialog, file_dialog
 from libs.pump_utilities import default_mode as PU_def_mode
 import libs.threads as workers
+import libs.global_var as g
 import libs.data_utilities as du
 import libs.func_utilities as fu
 
@@ -234,7 +235,7 @@ class Mainframe(PreMainframe):
             )
         )
         self.SGLC_btt_sendFirstQComm.pressed.connect(
-            lambda: self.send_command(du.SCQueue.pop_first_item())
+            lambda: self.send_command(g.SCQueue.pop_first_item())
         )
         self.SGLC_btt_gcodeSglComm.pressed.connect(self.add_gcode_sgl)
         self.SGLC_btt_rapidSglComm.pressed.connect(self.add_rapid_sgl)
@@ -292,7 +293,7 @@ class Mainframe(PreMainframe):
         # SCRIPT CONTROL
         self._ctrl_alt_S.activated.connect(self.start_SCTRL_queue)
         self._ctrl_A.activated.connect(lambda: self.stop_SCTRL_queue(prep_end=True))
-        self._ctrl_F.activated.connect(lambda: self.send_command(du.SCQueue.pop_first_item()))
+        self._ctrl_F.activated.connect(lambda: self.send_command(g.SCQueue.pop_first_item()))
         self._ctrl_Raute.activated.connect(lambda: self.clr_queue(partial=False))
         self._ctrl_Q.activated.connect(self.forced_stop_command)
         self._ctrl_alt_I.activated.connect(self.sc_id_overwrite)
@@ -343,15 +344,15 @@ class Mainframe(PreMainframe):
 
         # ROBOT CONNECTION
         def rob_connect() -> bool:
-            ip = du.ROBTcp.ip
-            port = du.ROBTcp.port
-            res = du.ROBTcp.connect()
+            ip = g.ROBTcp.ip
+            port = g.ROBTcp.port
+            res = g.ROBTcp.connect()
 
             if isinstance(res, tuple):
                 # if successful, reset SC ID, update command ids
                 with QMutexLocker(GlobalMutex):
-                    du.SC_curr_comm_id = 1
-                    for idx, entry in enumerate(du.SCQueue):
+                    g.SC_curr_comm_id = 1
+                    for idx, entry in enumerate(g.SCQueue):
                         # reset all IDs to [1, 2, ..]
                         entry.id = idx + 1
                 self.label_update_on_receive('Sucessful reconnect.')
@@ -382,7 +383,7 @@ class Mainframe(PreMainframe):
                 indi,
                 elem_group:list
         ) -> bool:
-            if not 'COM' in du.PMP_port:
+            if not 'COM' in g.PMP_port:
                 raise ConnectionError('TCP not supported, yet')
 
             else:
@@ -400,7 +401,7 @@ class Mainframe(PreMainframe):
                         indi,
                         elem_group,
                         f"connected to {slot} as inverter "
-                        f"{serial.settings_inverter_id} at {du.PMP_port}",
+                        f"{serial.settings_inverter_id} at {g.PMP_port}",
                     )
                     return True
 
@@ -414,17 +415,17 @@ class Mainframe(PreMainframe):
             # if the microcontroller is running
             # if request is valid, consider it "connected"
             try:
-                ping_resp = requests.get(f"{du.PRH_url}/ping", timeout=3)
+                ping_resp = requests.get(f"{g.PRH_url}/ping", timeout=3)
                 if not ping_resp.ok or ping_resp.text != 'ack':
                     raise ValueError
             except (requests.Timeout, ValueError) as err:
-                log_txt = f"printhead controller not present at {du.PRH_url}!"
+                log_txt = f"printhead controller not present at {g.PRH_url}!"
                 self.log_entry('CONN', log_txt)
                 print(log_txt)
                 return False
             
             with QMutexLocker(GlobalMutex):
-                du.PRH_connected = True
+                g.PRH_connected = True
             if not self._PumpCommThread.isRunning():
                 # restart if necessary; if so reconnect threads
                 self.connect_threads('PMP')
@@ -434,7 +435,7 @@ class Mainframe(PreMainframe):
                 self._PRHRecvWd,
                 self.CONN_PRH_indi_connected,
                 self.PRH_group,
-                f"mixer controller found at {du.PRH_url}",
+                f"mixer controller found at {g.PRH_url}",
             )
             return True
 
@@ -444,14 +445,14 @@ class Mainframe(PreMainframe):
                 return rob_connect()
             case 'P1':
                 return pmp_connect(
-                    du.PMP1Serial,
+                    g.PMP1Serial,
                     self._P1RecvWd,
                     self.CONN_PUMP1_indi_connected,
                     self.PMP1_group
                 )
             case 'P2':
                 return pmp_connect(
-                    du.PMP2Serial,
+                    g.PMP2Serial,
                     self._P2RecvWd,
                     self.CONN_PUMP2_indi_connected,
                     self.PMP2_group
@@ -474,18 +475,18 @@ class Mainframe(PreMainframe):
 
         # save current settings to file
         def _save_reset_positions() -> None:
-            Zero = dcpy(du.DCCurrZero)
+            Zero = dcpy(g.ROBCurrZero)
             self.log_entry('SAFE', f"Last robot positions:")
             self.log_entry('SAFE', f"zero: {Zero}")
-            self.log_entry('SAFE', f"curr: {du.ROBTelem.Coor}")
-            self.log_entry('SAFE', f"rel: {du.ROBTelem.Coor - du.DCCurrZero}")
-            self.log_entry('SAFE', f"last active ID was: {du.ROBTelem.id}")
+            self.log_entry('SAFE', f"curr: {g.ROBTelem.Coor}")
+            self.log_entry('SAFE', f"rel: {g.ROBTelem.Coor - g.ROBCurrZero}")
+            self.log_entry('SAFE', f"last active ID was: {g.ROBTelem.id}")
             with QMutexLocker(GlobalMutex):
-                du.ROBCommQueue.clear()
-                du.ROB_send_list.clear()
+                g.ROBCommQueue.clear()
+                g.ROB_send_list.clear()
             self.switch_rob_moving(end=True)
             try:
-                with open(du.LOG_safe_path, 'x') as save_file:
+                with open(g.LOG_safe_path, 'x') as save_file:
                     save_file.write(
                         f"{Zero.x}_{Zero.y}_{Zero.z}_{Zero.rx}_{Zero.ry}_"
                         f"{Zero.rz}_{Zero.q}_{Zero.ext}"
@@ -504,18 +505,18 @@ class Mainframe(PreMainframe):
         
         # ROBOT DISCONNECT
         def rob_disconnect() -> None:
-            if not du.ROBTcp.connected:
+            if not g.ROBTcp.connected:
                 return
 
             # send stop command to robot; stop threading & watchdog
-            du.ROBTcp.send(du.QEntry(id=du.SC_curr_comm_id, mt='E'))
+            g.ROBTcp.send(du.QEntry(id=g.SC_curr_comm_id, mt='E'))
             _action_on_success(
                 self._RobRecvWd,
                 self.CONN_ROB_indi_connected,
                 self.ROB_group
             )
             self._RoboCommThread.quit()
-            du.ROBTcp.close()
+            g.ROBTcp.close()
 
             # safe data & wait for thread:
             _save_reset_positions()
@@ -530,26 +531,26 @@ class Mainframe(PreMainframe):
         ) -> None:
             if not interface.connected:
                 return
-            if not 'COM' in du.PMP_port:
+            if not 'COM' in g.PMP_port:
                 raise ConnectionError('TCP not supported yet')
             with QMutexLocker(PmpMutex):
                 interface.stop()
                 interface.disconnect()
                 _action_on_success(wd, indi, elem_group)
             # close serial bus if both pumps are disconnect
-            if not du.PMP1Serial.connected and not du.PMP2Serial.connected:
-                if isinstance(du.PMPSerialDefBus, serial.Serial):
-                    du.PMPSerialDefBus.close()
-                    du.PMPSerialDefBus = None
+            if not g.PMP1Serial.connected and not g.PMP2Serial.connected:
+                if isinstance(g.PMPSerialDefBus, serial.Serial):
+                    g.PMPSerialDefBus.close()
+                    g.PMPSerialDefBus = None
         
         # PRH DISCONNECT
         def prh_disconnect() -> None:
-            if not du.PRH_connected:
+            if not g.PRH_connected:
                 return
             
             # no need to inform the server, just switch global toggle
             with QMutexLocker(GlobalMutex):
-                du.PRH_connected = False
+                g.PRH_connected = False
             _action_on_success(
                 self._PRHRecvWd,
                 self.CONN_PRH_indi_connected,
@@ -562,14 +563,14 @@ class Mainframe(PreMainframe):
                 rob_disconnect()
             case 'P1':
                 pmp_disconnect(
-                    du.PMP1Serial,
+                    g.PMP1Serial,
                     self._P1RecvWd,
                     self.CONN_PUMP1_indi_connected,
                     self.PMP1_group
                 )
             case 'P2':
                 pmp_disconnect(
-                    du.PMP2Serial,
+                    g.PMP2Serial,
                     self._P2RecvWd,
                     self.CONN_PUMP2_indi_connected,
                     self.PMP2_group
@@ -712,7 +713,7 @@ class Mainframe(PreMainframe):
 
         if not isinstance(file_path, Path):
             self.IO_disp_filename.setText('no file selected')
-            du.IO_curr_filepath = None
+            g.IO_curr_filepath = None
             return
         with open(file_path, 'r') as file:
             txt = file.read()
@@ -730,14 +731,14 @@ class Mainframe(PreMainframe):
                 'F-IO',
                 f"Error while opening {file_path} file: {comm_num}"
             )
-            du.IO_curr_filepath = None
+            g.IO_curr_filepath = None
             return
         if res == 'empty':
             self.IO_disp_filename.setText('FILE EMPTY!')
             return
 
         # display data
-        fil_vol = round(fil_length * du.SC_vol_per_m, 1)
+        fil_vol = round(fil_length * g.SC_vol_per_m, 1)
         self.IO_disp_filename.setText(file_path.name)
         self.IO_disp_commNum.setText(f"{comm_num}")
         self.IO_disp_ignoredLines.setText(f"{skips}")
@@ -751,7 +752,7 @@ class Mainframe(PreMainframe):
                 f"{skips} lines skipted, {fil_length}m filament, {fil_vol}L"
             ),
         )
-        du.IO_curr_filepath = file_path
+        g.IO_curr_filepath = file_path
 
 
     def load_file(self, lf_at_id=False, testrun=False) -> None:
@@ -767,7 +768,7 @@ class Mainframe(PreMainframe):
         p_ctrl = self.IO_chk_autoPCtrl.isChecked()
         range_chk = self.IO_chk_rangeChk.isChecked()
         xy_ext_chk = self.IO_chk_xyextChk.isChecked()
-        fpath = du.IO_curr_filepath
+        fpath = g.IO_curr_filepath
 
         if fpath is None or not (
                 fpath.suffix == '.gcode' or fpath.suffix == '.mod'
@@ -834,7 +835,7 @@ class Mainframe(PreMainframe):
         # update labels, log entry if you made it here
         self.label_update_on_queue_change()
         self.label_update_on_new_zero()
-        self.SCTRL_disp_elemInQ.setText(str(len(du.SCQueue)))
+        self.SCTRL_disp_elemInQ.setText(str(len(g.SCQueue)))
         self.IO_num_addByID.setValue(line_id)
         self.IO_lbl_loadFile.setText('... conversion successful')
 
@@ -877,16 +878,16 @@ class Mainframe(PreMainframe):
         """
 
         # get text and position BEFORE PLANNED COMMAND EXECUTION
-        Speed = dcpy(du.PRINSpeed)
+        Speed = dcpy(g.SCSpeed)
 
         try:
             if not at_id:
-                Pos = dcpy(du.SCQueue.last_entry().Coor1)
+                Pos = dcpy(g.SCQueue.last_entry().Coor1)
             else:
-                Pos = dcpy(du.SCQueue.entry_before_id(id).Coor1)
+                Pos = dcpy(g.SCQueue.entry_before_id(id).Coor1)
 
         except AttributeError:
-            Pos = du.DCCurrZero
+            Pos = g.ROBCurrZero
 
         if not from_file:
             txt = self.SGLC_entry_gcodeSglComm.toPlainText()
@@ -894,7 +895,7 @@ class Mainframe(PreMainframe):
             txt = file_txt
 
         # act according to GCode command
-        Entry, command = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
+        Entry, command = fu.gcode_to_qentry(Pos, Speed, g.IO_zone, txt)
 
         if command != 'G1' and command != 'G28' and command != 'G92':
             if command == ';':
@@ -921,7 +922,7 @@ class Mainframe(PreMainframe):
             Entry.id = id
 
         with QMutexLocker(GlobalMutex):
-            res = du.SCQueue.add(Entry)
+            res = g.SCQueue.add(Entry)
         if res == ValueError:
             if not from_file:
                 self.SGLC_entry_gcodeSglComm.setText(f"VALUE ERROR: \n {txt}")
@@ -979,7 +980,7 @@ class Mainframe(PreMainframe):
             Entry.id = id
 
         with QMutexLocker(GlobalMutex):
-            res = du.SCQueue.add(Entry)
+            res = g.SCQueue.add(Entry)
         if res == ValueError:
             if not from_file:
                 self.SGLC_entry_rapidSglComm.setText(f"VALUE ERROR: \n {txt}")
@@ -1011,13 +1012,13 @@ class Mainframe(PreMainframe):
         ]
         txt = sib_entry[num].toPlainText()
 
-        if (len(du.SCQueue) == 0) or not at_end:
+        if (len(g.SCQueue) == 0) or not at_end:
             try:
-                line_id = du.SCQueue[0].id
+                line_id = g.SCQueue[0].id
             except AttributeError:
-                line_id = du.ROBTelem.id + 1
+                line_id = g.ROBTelem.id + 1
         else:
-            line_id = du.SCQueue.last_entry().id + 1
+            line_id = g.SCQueue.last_entry().id + 1
 
         if line_id < 1: line_id = 1
         line_id_start = line_id
@@ -1107,16 +1108,16 @@ class Mainframe(PreMainframe):
         actual sendCommand function
         """
 
-        if du.DC_rob_moving:
+        if g.DC_rob_moving:
             return None
 
         read_mt = self.DC_drpd_moveType.currentText()
         mt = 'L' if (read_mt == 'LINEAR') else 'J'
         Command = du.QEntry(
-            id=du.SC_curr_comm_id,
+            id=g.SC_curr_comm_id,
             mt=mt,
-            Coor1=dcpy(du.DCCurrZero),
-            Speed=dcpy(du.DCSpeed),
+            Coor1=dcpy(g.ROBCurrZero),
+            Speed=dcpy(g.DCSpeed),
             z=0,
         )
 
@@ -1132,10 +1133,10 @@ class Mainframe(PreMainframe):
         the actual sendCommand function
         """
 
-        if du.DC_rob_moving:
+        if g.DC_rob_moving:
             return None
 
-        NewPos = dcpy(du.ROBTelem.Coor)
+        NewPos = dcpy(g.ROBTelem.Coor)
         step_width = self.DC_sld_stepWidth.value()
         step_width = int(10 ** (step_width - 1)) # 1->1, 2->10, 3->100
         match dir:
@@ -1160,10 +1161,10 @@ class Mainframe(PreMainframe):
         read_mt = self.DC_drpd_moveType.currentText()
         mt = 'L' if (read_mt == 'LINEAR') else 'J'
         Command = du.QEntry(
-            id=du.SC_curr_comm_id,
+            id=g.SC_curr_comm_id,
             mt=mt,
             Coor1=NewPos,
-            Speed=dcpy(du.DCSpeed),
+            Speed=dcpy(g.DCSpeed),
             z=0,
         )
 
@@ -1179,10 +1180,10 @@ class Mainframe(PreMainframe):
         to the actual sendCommand function
         """
 
-        if du.DC_rob_moving or not isinstance(axis, list):
+        if g.DC_rob_moving or not isinstance(axis, list):
             return None
 
-        NewPos = dcpy(du.ROBTelem.Coor)
+        NewPos = dcpy(g.ROBTelem.Coor)
         if 1 in axis:
             NewPos.x = float(self.NC_float_x.value())
         if 2 in axis:
@@ -1202,10 +1203,10 @@ class Mainframe(PreMainframe):
         read_mt = self.DC_drpd_moveType.currentText()
         mt = 'L' if (read_mt == 'LINEAR') else 'J'
         Command = du.QEntry(
-            id=du.SC_curr_comm_id,
+            id=g.SC_curr_comm_id,
             mt=mt,
             Coor1=NewPos,
-            Speed=dcpy(du.DCSpeed),
+            Speed=dcpy(g.DCSpeed),
             z=0,
         )
 
@@ -1222,14 +1223,14 @@ class Mainframe(PreMainframe):
         DONT do that if no X, Y, Z or EXT position is given
         """
 
-        if du.DC_rob_moving:
+        if g.DC_rob_moving:
             return None
 
         # get entry
-        Speed = dcpy(du.DCSpeed)
-        Pos = dcpy(du.ROBTelem.Coor)
+        Speed = dcpy(g.DCSpeed)
+        Pos = dcpy(g.ROBTelem.Coor)
         txt = self.TERM_entry_gcodeInterp.text()
-        Command, com_type = fu.gcode_to_qentry(Pos, Speed, du.IO_zone, txt)
+        Command, com_type = fu.gcode_to_qentry(Pos, Speed, g.IO_zone, txt)
 
         # check for special command types
         if com_type == 'G92':
@@ -1245,7 +1246,7 @@ class Mainframe(PreMainframe):
             return None
 
         # send if standard G1 or G28 command
-        Command.id = du.SC_curr_comm_id
+        Command.id = g.SC_curr_comm_id
         if not self.coor_plausibility_check(Command):
             return
         self.send_command(Command, dc=True)
@@ -1258,7 +1259,7 @@ class Mainframe(PreMainframe):
         absolute coordinates or relative to 'pHome' (DC_currZero)
         """
 
-        if du.DC_rob_moving:
+        if g.DC_rob_moving:
             return None
 
         # get entry
@@ -1269,7 +1270,7 @@ class Mainframe(PreMainframe):
             return None
 
         # send if valid
-        Command.id = du.SC_curr_comm_id
+        Command.id = g.SC_curr_comm_id
         if not self.coor_plausibility_check(Command):
             return
         self.send_command(Command, dc=True)
@@ -1298,20 +1299,20 @@ class Mainframe(PreMainframe):
 
         if res or no_dialog:
             self.stop_SCTRL_queue()
-            du.ROBTcp.send(Command) # bypass all queued commands
+            g.ROBTcp.send(Command) # bypass all queued commands
             self.pump_set_speed('0')
             self.pinch_valve_toggle(internal=True, val=0)
 
             # retrieve lost commands, clr buffer lists
             with QMutexLocker(GlobalMutex):
-                LostBuf = dcpy(du.ROBCommQueue)
-                for Entry in du.ROB_send_list:
+                LostBuf = dcpy(g.ROBCommQueue)
+                for Entry in g.ROB_send_list:
                     if Entry[0].mt != 'S':
                         LostBuf.append(Entry[0])
-                du.SC_curr_comm_id = du.ROBTelem.id
-                du.SCQueue = LostBuf + du.SCQueue
-                du.ROBCommQueue.clear()
-                du.ROB_send_list.clear()
+                g.SC_curr_comm_id = g.ROBTelem.id
+                g.SCQueue = LostBuf + g.SCQueue
+                g.ROBCommQueue.clear()
+                g.ROB_send_list.clear()
 
             self.sc_id_overwrite(internal=True)
             self.log_entry('SysC', f"FORCED STOP (user committed).")
@@ -1327,14 +1328,14 @@ class Mainframe(PreMainframe):
         Command = du.QEntry(id=1, mt='E')
         if directly:
             self.log_entry('SysC', "sending robot stop command directly")
-            if du.SC_q_processing:
+            if g.SC_q_processing:
                 self.stop_SCTRL_queue()
             with QMutexLocker(GlobalMutex):
-                du.ROB_send_list.clear()
+                g.ROB_send_list.clear()
             return self.send_command(Command, dc=True)
         else:
             Command.id = 0
-            du.SCQueue.add(Command)
+            g.SCQueue.add(Command)
             self.log_entry('SysC', 'added robot stop command to queue')
             return None
 
@@ -1347,8 +1348,8 @@ class Mainframe(PreMainframe):
         """passing new commands to RoboCommWorker"""
 
         # error catching for fast-clicking users
-        if len(du.ROB_send_list) != 0:
-            LastCom,_ = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        if len(g.ROB_send_list) != 0:
+            LastCom,_ = g.ROB_send_list[len(g.ROB_send_list) - 1]
             if command.id <= LastCom.id:
                 command.id = LastCom.id + 1
         
@@ -1359,7 +1360,7 @@ class Mainframe(PreMainframe):
         
         # pass command to sendList
         with QMutexLocker(GlobalMutex):
-            du.ROB_send_list.append((command, dc))
+            g.ROB_send_list.append((command, dc))
 
 
     ##########################################################################
@@ -1372,36 +1373,36 @@ class Mainframe(PreMainframe):
         with QMutexLocker(GlobalMutex):
             match flag:
                 case '1':
-                    du.PMP_speed += 1
+                    g.PMP_speed += 1
                 case '-1':
-                    du.PMP_speed -= 1
+                    g.PMP_speed -= 1
                 case '10':
-                    du.PMP_speed += 10
+                    g.PMP_speed += 10
                 case '-10':
-                    du.PMP_speed -= 10
+                    g.PMP_speed -= 10
                 case '25':
-                    du.PMP_speed += 25
+                    g.PMP_speed += 25
                 case '-25':
-                    du.PMP_speed -= 25
+                    g.PMP_speed -= 25
                 case '0':
-                    du.PMP_speed = 0
+                    g.PMP_speed = 0
                 case 'r':
-                    du.PMP_speed *= -1
+                    g.PMP_speed *= -1
                 case 'c1':
-                    du.PMP1_live_ad = (
+                    g.PMP1_live_ad = (
                         self.SCTRL_num_liveAd_pump1.value() / 100.0
                     )
                 case 'c2':
-                    du.PMP2_live_ad = (
+                    g.PMP2_live_ad = (
                         self.SCTRL_num_liveAd_pump2.value() / 100.0
                     )
                 case 's1':
-                    du.PMP1_user_speed = self.PUMP_num_setSpeedP1.value()
+                    g.PMP1_user_speed = self.PUMP_num_setSpeedP1.value()
                 case 's2':
-                    du.PMP2_user_speed = self.PUMP_num_setSpeedP2.value()
+                    g.PMP2_user_speed = self.PUMP_num_setSpeedP2.value()
                 case 'def':
-                    if len(du.ROBCommQueue) != 0:
-                        du.PMP_speed = PU_def_mode(du.ROBCommQueue[0])
+                    if len(g.ROBCommQueue) != 0:
+                        g.PMP_speed = PU_def_mode(g.ROBCommQueue[0])
                     else:
                         userInfo = strd_dialog(
                             'No current command!',
@@ -1410,7 +1411,7 @@ class Mainframe(PreMainframe):
                         userInfo.exec()
 
                 case _:
-                    du.PMP_speed = self.PUMP_num_setSpeed.value()
+                    g.PMP_speed = self.PUMP_num_setSpeed.value()
 
 
     def pump_script_overwrite(self) -> None:
@@ -1428,24 +1429,24 @@ class Mainframe(PreMainframe):
 
         # overwrite
         with QMutexLocker(GlobalMutex):
-            for i in range(len(du.SCQueue)):
-                du.SCQueue[i].p_mode = 'default'
+            for i in range(len(g.SCQueue)):
+                g.SCQueue[i].p_mode = 'default'
         return
 
 
     def pinch_valve_toggle(self, internal=False, val=0.0) -> None:
         """no docstring yet"""
 
-        if not du.PRH_connected:
+        if not g.PRH_connected:
             return
         if not internal:
             pinch_state = int(not self.PRH_btt_pinchValve.isChecked())
         else:
             pinch_state = val
         try:
-            requests.post(f"{du.PRH_url}/pinch", data={'s': pinch_state}, timeout=1)
+            requests.post(f"{g.PRH_url}/pinch", data={'s': pinch_state}, timeout=1)
         except requests.Timeout as e:
-            log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
+            log_txt = f"post to pinch valve failed! {g.PRH_url} not present!"
             self.log_entry('CONN', log_txt)
             print(log_txt)
 
@@ -1466,7 +1467,7 @@ class Mainframe(PreMainframe):
                 speed = float(self.PRH_num_setSpeed.value())
 
         with QMutexLocker(GlobalMutex):
-            du.MIX_speed = speed
+            g.MIX_speed = speed
 
 
     ##########################################################################
@@ -1488,15 +1489,15 @@ class Mainframe(PreMainframe):
     def adc_user_change(self) -> None:
         """send changes to Amcon, if user commits them"""
 
-        if du.DC_rob_moving:
+        if g.DC_rob_moving:
             return None
 
-        Pos = dcpy(du.ROBTelem.Coor)
+        Pos = dcpy(g.ROBTelem.Coor)
         Tool = self.prh_read_user_input('ADC')
         Command = du.QEntry(
-            id=du.SC_curr_comm_id,
+            id=g.SC_curr_comm_id,
             Coor1=Pos,
-            Speed=dcpy(du.DCSpeed),
+            Speed=dcpy(g.DCSpeed),
             z=0,
             Tool=Tool,
         )
@@ -1533,13 +1534,13 @@ class Mainframe(PreMainframe):
 
         def overwrite(i:int, tool:du.ToolCommand) -> bool:
             try:
-                j = du.SCQueue.id_pos(i + id_start)
+                j = g.SCQueue.id_pos(i + id_start)
             except AttributeError:
                 return False
-            du.SCQueue[j].Tool.trolley_steps = tool.trolley_steps
-            du.SCQueue[j].Tool.clamp = tool.clamp
-            du.SCQueue[j].Tool.cut = tool.cut
-            du.SCQueue[j].Tool.place_spring = tool.place_spring
+            g.SCQueue[j].Tool.trolley_steps = tool.trolley_steps
+            g.SCQueue[j].Tool.clamp = tool.clamp
+            g.SCQueue[j].Tool.cut = tool.cut
+            g.SCQueue[j].Tool.place_spring = tool.place_spring
             return True
 
 
@@ -1558,7 +1559,7 @@ class Mainframe(PreMainframe):
             usr_txt = 'Invalid command in SC lines.'
 
         try:
-            SC_first = du.SCQueue[0].id
+            SC_first = g.SCQueue[0].id
         except AttributeError:
             usr_txt = 'SC queue contains no commands, nothing was done.'
 
@@ -1600,12 +1601,34 @@ class Mainframe(PreMainframe):
                 overwrite(0, Tool)
             id_range = id_start
 
-        check_entry = du.SCQueue.id_pos(id_start)
-        Tool = du.SCQueue[check_entry].Tool
+        check_entry = g.SCQueue.id_pos(id_start)
+        Tool = g.SCQueue[check_entry].Tool
         self.log_entry(
             'ACON',
             f"{id_range} SC commands overwritten; settings: ({Tool})"
         )
+    
+
+
+    def amcon_trolley_zero(self) -> None:
+        """sets trolley to zero position"""
+            
+        if g.DC_rob_moving or g.SC_q_processing:
+            return None
+
+        Pos = dcpy(g.ROBTelem.Coor)
+        Tool = self.prh_read_user_input('ADC')
+        Tool.trolley_calibrate = g.DEF
+        Command = du.QEntry(
+            id=g.SC_curr_comm_id,
+            Coor1=Pos,
+            Speed=dcpy(g.DCSpeed),
+            z=0,
+            Tool=Tool,
+        )
+        self.log_entry('ACON', f"updating tool status by user: ({Tool})")
+        ans = self.send_command(Command, dc=True)
+        return ans
 
 
     ##########################################################################
@@ -1666,11 +1689,11 @@ if __name__ == '__main__':
     from ui.UI_mainframe_v6 import Ui_MainWindow
 
     logpath = fu.create_logfile()
-    du.PRH_url = f"http://{du.PRH_url}"
+    g.PRH_url = f"http://{g.PRH_url}"
 
     # overwrite ROB_tcpip for testing, delete later
-    du.ROBTcp.ip = 'localhost'
-    du.ROBTcp.port = 10001
+    g.ROBTcp.ip = 'localhost'
+    g.ROBTcp.port = 10001
 
     # start the UI and assign to app
     app = 0  # leave that here so app doesnt include the remnant of a previous QApplication instance

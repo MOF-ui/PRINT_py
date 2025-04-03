@@ -51,7 +51,7 @@ def range_check(target_entry:du.QEntry) -> tuple[bool, str]:
 
     target = target_entry.Coor1
     names = target.attr_names
-    RangeMin, RangeMax = dcpy(du.RC_area)
+    RangeMin, RangeMax = dcpy(du.ROB_safe_range)
     # axis RX points downwards at 180° or -180° (same effect)
     # to avoid confusion, range_check is defined as 150° - 210°
     # but since -150° is the same as 210°, I adjusted the check to
@@ -569,9 +569,9 @@ def connect_pump(p_num:int) -> None:
     if du.PMPSerialDefBus is None:
         du.PMPSerialDefBus = serial.Serial(
             baudrate=du.DEF_PUMP_SERIAL['baud'],
-            parity=du.DEF_PUMP_SERIAL['par'],
-            stopbits=du.DEF_PUMP_SERIAL['stop'],
-            bytesize=du.DEF_PUMP_SERIAL['size'],
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_TWO,
+            bytesize=serial.EIGHTBITS,
             port=du.PMP_port,
         )
         du.PMP1Serial.serial_default = du.PMPSerialDefBus

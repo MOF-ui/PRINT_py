@@ -11,7 +11,7 @@
 import re
 import os
 import sys
-import serial
+import yaml
 import socket
 import struct
 import math as m
@@ -27,11 +27,14 @@ sys.path.append(parent_dir)
 # import interface for Toshiba frequency modulator by M-TEC
 from mtec.mtec_mod import MtecMod
 
+# import my own libs
+import libs.global_var as g
+
 
 
 ############################     CLASSES      ################################
 
-class Coordinate:
+class Coordinate(yaml.YAMLObject):
     """standard 7-axis coordinate block (8 attributes, as quaterion
     positioning is possible); initialization by value list is also possible
     in form of 'du.Coordinate([x, y, z, rx, ry, rz, q, ext])'
@@ -47,9 +50,12 @@ class Coordinate:
             external axis position
 
     METHODS:
-        __init__, __str__, __add__, __sub__, __round__, __eq__, __ne__, distance
+        __add__, __eq__, __init__, __ne__, __repr__, __round__, __str__, __sub__
+        
+        distance:
+            returns distance from self to other coordinate
     """
-
+    yaml_tag = u'!Coordinate'
     _iter_value = 0
     _attr_names = ['x', 'y', 'z', 'rx', 'ry', 'rz', 'q', 'ext']
 
@@ -64,7 +70,6 @@ class Coordinate:
             q=0.0,
             ext=0.0
     ) -> None:
-        
         if isinstance(x, list):
             if len(x) != 8:
                 raise ValueError(f"length of {x} does not fit attribute list")
@@ -72,7 +77,6 @@ class Coordinate:
                 ext, q, rz, ry, rx = x[7], x[6], x[5], x[4], x[3]
                 y, z = x[2], x[1]
                 x = x[0]
-
         self.x = float(x)
         self.y = float(y)
         self.z = float(z)
@@ -84,7 +88,6 @@ class Coordinate:
 
 
     def __str__(self) -> str:
-
         return (
             f"X: {self.x}   Y: {self.y}   Z: {self.z}   "
             f"RX: {self.rx}   RY: {self.ry}   RZ: {self.rz}   "
@@ -96,7 +99,6 @@ class Coordinate:
         """round everything to 2 digits because less than 10µm accuracy is
         just pointless with a meter-large robot
         """
-
         if isinstance(summand, Coordinate):
             res = Coordinate(
                 (self.x + summand.x),
@@ -109,7 +111,6 @@ class Coordinate:
                 (self.ext + summand.ext),
             )
             return round(res, 2)
-
         else:
             res = Coordinate(
                 (self.x + summand),
@@ -125,18 +126,14 @@ class Coordinate:
 
 
     def __iter__(self) -> 'Coordinate':
-        
         self._iter_val = 0
         return self
     
 
     def __next__(self) -> float:
-        
         val = self._iter_value
-
         if val >= len(self._attr_names):
             raise StopIteration
-        
         self._iter_value = val + 1
         return getattr(self, self._attr_names[val])
     
@@ -145,7 +142,6 @@ class Coordinate:
         """round everything to 2 digits because less than 10µm accuracy is
         just pointless with a meter-large robot
         """
-
         if isinstance(subtrahend, Coordinate):
             res = Coordinate(
                 (self.x - subtrahend.x),
@@ -158,7 +154,6 @@ class Coordinate:
                 (self.ext - subtrahend.ext),
             )
             return round(res, 2)
-
         else:
             res = Coordinate(
                 (self.x - subtrahend),
@@ -174,7 +169,6 @@ class Coordinate:
 
 
     def __round__(self, digits) -> 'Coordinate':
-
         return Coordinate(
             round(self.x, digits),
             round(self.y, digits),
@@ -188,7 +182,6 @@ class Coordinate:
 
 
     def __eq__(self, other) -> bool:
-
         if isinstance(other, Coordinate):
             if (
                 self.x == other.x
@@ -201,20 +194,16 @@ class Coordinate:
                 and self.ext == other.ext
             ):
                 return True
-
         elif other is not None:
             raise TypeError(
                 f"{other} is not None or an instance of 'Coordinate'!"
             )
-
         return False
 
 
     def __ne__(self, other) -> bool:
-
         if other is None:
             return True
-        
         elif isinstance(other, Coordinate):
             if (
                 self.x != other.x
@@ -227,27 +216,38 @@ class Coordinate:
                 or self.ext != other.ext
             ):
                 return True
-
         else:
             raise TypeError(
                 f"{other} is not None or an instance of 'Coordinate'!"
             )
-
         return False
     
 
-    def distance(self, other:'Coordinate') -> float:
-        """returns distance from self to other coordinate"""
+    def __repr__(self) -> str:
+        return "%s(x=%r, y=%r, z=%r, rx=%r, ry=%r, rz=%r, q=%r, ext=%r)" % (
+            self.__class__.__name__,
+            self.x,
+            self.y,
+            self.z,
+            self.rx,
+            self.ry,
+            self.rz,
+            self.q,
+            self.ext,
+        )
+    
 
+    def distance(self, other:'Coordinate') -> float:
+        """returns distance from self to other coordinate
+        """
         if not isinstance(other, Coordinate):
             return TypeError(f"{other} is not an instance of 'Coordinate'!")
-        
         return m.sqrt(
                 m.pow(other.x - self.x, 2)
                 + m.pow(other.y - self.y, 2)
                 + m.pow(other.z - self.z, 2)
             )
-    
+
 
     @property
     def attr_names(self):
@@ -255,7 +255,7 @@ class Coordinate:
 
 
 
-class SpeedVector:
+class SpeedVector(yaml.YAMLObject):
     """standard speed vector (4 attributes).
 
     ATTRIBUTES:
@@ -269,12 +269,11 @@ class SpeedVector:
             orientation speed
 
     METHODS:
-        __init__, __str__, __mul__, __rmul__, __eq__, __ne__
+        __eq__, __init__, __mul__, __ne__, __repr__, __rmul__, __str__
     """
-
+    yaml_tag = u'!SpeedVector'
 
     def __init__(self, acr=50, dcr=50, ts=200, ors=50) -> None:
-
         self.acr = int(round(acr, 0))
         self.dcr = int(round(dcr, 0))
         self.ts = int(round(ts, 0))
@@ -282,7 +281,6 @@ class SpeedVector:
 
 
     def __str__(self) -> str:
-
         return (
             f"TS: {self.ts}   OS: {self.ors}   "
             f"ACR: {self.acr}   DCR: {self.dcr}"
@@ -293,7 +291,6 @@ class SpeedVector:
         """round everything to 2 digits because less than 10µm accuracy is
         just pointless with a meter-large robot
         """
-
         res = SpeedVector(
             ts=int(round(self.ts * other, 0)),
             ors=int(round(self.ors * other, 0)),
@@ -304,12 +301,10 @@ class SpeedVector:
 
 
     def __rmul__(self, other) -> 'SpeedVector':
-
         return self.__mul__(other)
 
 
     def __eq__(self, other) -> bool:
-
         if isinstance(other, SpeedVector):
             if (
                 self.acr == other.acr
@@ -318,20 +313,16 @@ class SpeedVector:
                 and self.ors == other.ors
             ):
                 return True
-
         elif other is not None:
             raise TypeError(
                 f"{other} is not None or an instance of 'SpeedVector'!"
             )
-
         return False
 
 
     def __ne__(self, other) -> bool:
-
         if other is None:
             return True
-        
         elif isinstance(other, SpeedVector):
             if (
                 self.acr != other.acr
@@ -340,17 +331,25 @@ class SpeedVector:
                 or self.ors != other.ors
             ):
                 return True
-
         else:
             raise TypeError(
                 f"{other} is not None or an instance of 'SpeedVector'!"
             )
-
         return False
+    
+
+    def __repr__(self) -> str:
+        return "%s(acr=%r, dcr=%r, ts=%r, ors=%r)" % (
+            self.__class__.__name__,
+            self.acr,
+            self.dcr,
+            self.ts,
+            self.ors,
+        )
 
 
 
-class ToolCommand:
+class ToolCommand():
     """standard tool command according to Jonas' protocol
 
     ATTRIBUTES:
@@ -371,9 +370,8 @@ class ToolCommand:
             >0: robot stops for >0 seconds
 
     METHODS:
-        __def__, __str__, __eq__, __ne__
+        __def__, __eq__, __ne__, __str__, __repr__
     """
-
 
     def __init__(
         self,
@@ -384,8 +382,8 @@ class ToolCommand:
         load_spring=False,
         wait=0,
     ) -> None:
-
         self.trolley_steps = int(trolley_steps)
+        self.trolley_calibrate = 0
         self.clamp = bool(clamp)
         self.cut = bool(cut)
         self.place_spring = bool(place_spring)
@@ -394,7 +392,6 @@ class ToolCommand:
 
 
     def __str__(self) -> str:
-
         return (
             f"TRL: {self.trolley_steps}   PS: {self.place_spring}   "
             f"LS: {self.load_spring}   CUT: {self.cut}   CL: {self.clamp}   "
@@ -403,7 +400,6 @@ class ToolCommand:
 
 
     def __eq__(self, other) -> bool:
-
         if isinstance(other, ToolCommand):
             if (
                 self.trolley_steps == other.trolley_steps
@@ -414,20 +410,16 @@ class ToolCommand:
                 and self.wait == other.wait
             ):
                 return True
-
         elif other is not None:
             raise TypeError(
                 f"{other} is not None or an instance of 'ToolCommand'!"
             )
-
         return False
 
 
     def __ne__(self, other) -> bool:
-
         if other is None:
             return True
-        
         elif isinstance(other, ToolCommand):
             if (
                 self.trolley_steps != other.trolley_steps
@@ -445,6 +437,19 @@ class ToolCommand:
             )
 
         return False
+    
+
+    def __repr__(self) -> str:
+        return "%s(trolley_steps=%r, clamp=%r, cut=%r, place_spring=%r, " \
+            "load_spring=%r, wait=%r)" % (
+                self.__class__.__name__,
+                self.trolley_steps,
+                self.clamp,
+                self.cut,
+                self.place_spring,
+                self.load_spring,
+                self.wait,
+            )
 
 
 
@@ -483,7 +488,7 @@ class QEntry:
             option for dual pump printing
 
     METHODS:
-        __init__, __str__, __eq__, __ne__
+        __eq__, __init__, __ne__, __str__, __repr__
 
         print_short:
             prints only most important parameters
@@ -506,7 +511,6 @@ class QEntry:
         p_ratio=1.0,
         pinch=False,
     ) -> None:
-
         self.id = int(id)
         self.mt = str(mt)
         self.pt = str(pt)
@@ -525,7 +529,6 @@ class QEntry:
 
 
     def __str__(self) -> str:
-
         return (
             f"ID: {self.id}  MT: {self.mt}  PT: {self.pt} "
             f"\n  || COOR_1: {self.Coor1}"
@@ -539,7 +542,6 @@ class QEntry:
 
 
     def __eq__(self, other) -> bool:
-
         if isinstance(other, QEntry):
             if (
                 self.id == other.id
@@ -557,20 +559,16 @@ class QEntry:
                 and self.pinch == other.pinch
             ):
                 return True
-
         elif other is not None:
             raise TypeError(
                 f"{other} is not None or an instance of 'QEntry'!"
             )
-
         return False
 
 
     def __ne__(self, other) -> bool:
-
         if other is None:
             return True
-        
         elif isinstance(other, QEntry):
             if (
                 self.id != other.id
@@ -588,23 +586,41 @@ class QEntry:
                 or self.pinch != other.pinch
             ):
                 return True
-
         else:
             raise TypeError(
                 f"{other} is not None or an instance of 'QEntry'!"
             )
-
         return False
 
 
     def print_short(self) -> str:
-        """prints only most important parameters, saving display space"""
-
+        """prints only most important parameters, saving display space
+        """
         return (
             f"ID: {self.id} -- {self.mt}, {self.pt} -- "
             f"COOR_1: {self.Coor1} -- SV: {self.Speed} -- "
             f"PM/PR,PIN:  {self.p_mode}/{self.p_ratio}, {self.pinch}"
         )
+    
+
+    def __repr__(self) -> str:
+        return "%s(id=%r, mt=%r, pt=%r, Coor1=%r, Coor2=%r, Speed=%r, sbt=%r, " \
+        "sc=%r, z=%r, Tool=%r, p_mode=%r, p_ratio=%r, pinch=%r)" % (
+                self.__class__.__name__,
+                self.id,
+                self.mt,
+                self.pt,
+                self.Coor1,
+                self.Coor2,
+                self.Speed,
+                self.sbt,
+                self.sc,
+                self.z,
+                self.Tool,
+                self.p_mode,
+                self.p_ratio,
+                self.pinch,
+            )
 
 
 
@@ -617,8 +633,8 @@ class Queue:
             QEntry.id
 
     METHODS:
-        __add__, __init__, __iter__, __getitem__, __len__, __next__,
-        __str__, __eq__
+        __add__, __eq__, __init__, __iter__, __getitem__, __len__, __ne__,
+        __next__, __repr__, __str__
 
         last_entry:
             returns last entry
@@ -647,12 +663,10 @@ class Queue:
         pop_first_item:
             returns and deletes the QEntry at index 0
     """
-
     _iter_value = 0
 
 
     def __add__(self, other) -> 'Queue':
-
         if not isinstance(other, Queue):
             raise ValueError(f"{other} is not an instance of 'Queue'!")
         self.add_queue(other)
@@ -660,12 +674,10 @@ class Queue:
 
 
     def __init__(self, queue=None) -> None:
-
         self._queue = [] if (queue is None) else queue
 
 
     def __getitem__(self, i) -> QEntry | None:
-
         try:
             return self._queue[i]
         except IndexError:
@@ -673,84 +685,74 @@ class Queue:
     
 
     def __iter__(self) -> 'Queue':
-
         self._iter_value = 0
         return self
 
 
     def __len__(self) -> int:
-
         return len(self._queue)
     
 
     def __next__(self) -> QEntry:
-        
         val = self._iter_value
-
         if val >= len(self):
             raise StopIteration
-        
         self._iter_value = val + 1
         return self[val]
 
 
     def __str__(self) -> str:
-
         if len(self) != 0:
             ans = ''
             for x in self._queue:
                 ans += f'{x}\n'
             return ans
-        
         return 'Queue is empty!'
 
 
     def __eq__(self, other) -> bool:
-
         if isinstance(other, Queue):
             length = len(self)
             if length != len(other):
                 return False
-
             for elem in range(length):
                 if self[elem] != other[elem]:
                     return False
-
             return True
-
         elif other is not None:
             raise TypeError(f"{other} is not an instance of 'Queue'!")
-        
         return False
 
 
     def __ne__(self, other) -> bool:
-
         if other is None:
             return True
-        
         elif isinstance(other, Queue):
             length = len(self)
             if length != len(other):
                 return True
-
             for elem in range(length):
                 if self[elem] != other[elem]:
                     return True
-
             return False
-
         else:
             raise TypeError(
                 f"{other} is not None or an instance of 'Queue'!"
             )
+    
+
+    def __repr__(self) -> str:
+        ret = "%s(" % (self.__class__.__name__)
+        for id, elem in enumerate(range(len(self))):
+            ret += "element %r: %r," % (id, self[elem])
+        ret += ")"
+        return ret
 
 
     def last_entry(self) -> QEntry | None:
         """returns last item in queue (surprise!), returns None if queue
         is empty
         """
-
         if len(self) == 0:
             return None
         return self._queue[len(self) - 1]
@@ -760,10 +762,8 @@ class Queue:
         """return queue entry index(!) at given ID, not the entry itself,
         returns None if no such entry
         """
-
         length = len(self)
         i = 0
-
         if length <= 0:
             return None
 
@@ -775,7 +775,6 @@ class Queue:
 
         if i < 0 or i >= length:
             return None
-
         return i
 
 
@@ -783,10 +782,8 @@ class Queue:
         """return queue entry before (index - 1) a specific ID, raises
         AttributeError if no such entry
         """
-
         length = len(self)
         i = 0
-
         if length <= 0:
             raise AttributeError
 
@@ -798,16 +795,14 @@ class Queue:
 
         if i < 1 or i >= length:
             raise AttributeError
-
         return self[i - 1]
 
 
     def display(self) -> list[str]:
-        """returns queue as a str list (uses QEntry.print_short())"""
-
+        """returns queue as a str list (uses QEntry.print_short())
+        """
         if len(self) != 0:
             ans = []
-
             for x in self:
                 if not isinstance(x, QEntry):
                     raise ValueError(
@@ -823,7 +818,6 @@ class Queue:
         """increments all QEntry.ID to handle DC commands send before the
         queue or ID overwrites
         """
-
         for i in self:
             i.id += int(summand)
 
@@ -833,7 +827,6 @@ class Queue:
         QEntry in queue according to the ID given, threadCall option allows
         the first ID to be 0
         """
-
         new_entry = dcpy(entry)
         last_item = len(self) - 1
         if not isinstance(new_entry, QEntry):
@@ -848,7 +841,6 @@ class Queue:
 
         last_id = self[last_item].id
         first_id = self[0].id
-
         if new_entry.id == 0 or new_entry.id > last_id:
             if thread_call and new_entry.id == 0:
                 self.increment()
@@ -856,10 +848,8 @@ class Queue:
             else:
                 new_entry.id = last_id + 1
                 self._queue.append(new_entry)
-
         elif new_entry.id < 0:
             return ValueError
-
         else:
             if new_entry.id < first_id:
                 new_entry.id = first_id
@@ -877,7 +867,6 @@ class Queue:
         """adds another queue, hopefully less time-consuming than a for loop
         with self.add
         """
-
         new_list = dcpy(add_queue)
         if not isinstance(new_list, Queue):
             return ValueError(f"{new_list} is not an instance of 'Queue'!")
@@ -898,14 +887,11 @@ class Queue:
         len_new_list = len(new_list)
         last_id = self[last_item].id
         first_id = self[0].id
-
         if (nl_first_id > last_id + 1) or (nl_first_id == 0):
             new_list.increment(last_id + 1 - nl_first_id)
-            nl_first_id = last_id + 1
-            
+            nl_first_id = last_id + 1     
         if nl_first_id == (last_id + 1):
             self._queue.extend(new_list._queue)
-        
         else:
             if nl_first_id < first_id:
                 new_list.increment(first_id - nl_first_id)
@@ -920,7 +906,6 @@ class Queue:
         """other than '.add' this simply appends an entry indifferently
         to its ID
         """
-
         new_entry = dcpy(entry)
         self._queue.append(new_entry)
         return None
@@ -930,11 +915,9 @@ class Queue:
         """deletes single or multiple QEntry from queue, adjusts following
         ID accordingly
         """
-
         if all:
             self._queue = []
             return
-
         if len(self) == 0:
             return
 
@@ -942,7 +925,6 @@ class Queue:
         id_num = len(ids)
         first_id = self[0].id
         last_id = self[len(self) - 1].id
-
         match id_num:
             case 1:
                 id1 = int(ids[0])
@@ -960,7 +942,6 @@ class Queue:
                 while i < len(self):
                     self[i].id -= 1
                     i += 1
-
             case 2:
                 id1, id2 = int(ids[0]), int(ids[1])
                 if (
@@ -981,25 +962,22 @@ class Queue:
                         i += 1
                 
                 # dont get confused, I'm iterating for the num of entries to
-                # delete, but I'm always deleting the i-th entry as the stack
-                # moves along
+                # delete, but I'm always deleting the same i-th entry as the
+                # stack moves along
                 for n in range(id_dist):
                     self._queue.__delitem__(i)
-
                 while i < len(self):
                     self[i].id -= id_dist
                     i += 1
-
             case _:
                 return
 
 
     def pop_first_item(self) -> QEntry | Exception:
-        """returns and deletes the QEntry at index 0"""
-
+        """returns and deletes the QEntry at index 0
+        """
         if len(self) <= 0:
             return BufferError('Queue empty!')
-
         entry = self[0]
         self._queue.__delitem__(0)
         return entry
@@ -1019,12 +997,11 @@ class RoboTelemetry:
             current coordinate of the TCP, see Coordinates class
 
     METHODS:
-        __init__, __str__, __round__, __eq__
+        __eq__, __init__, __ne__, __repr__, __round__, __str__
     """
 
 
     def __init__(self, t_speed=0.0, id=-1, Coor=None) -> None:
-
         self.t_speed = float(t_speed)
         self.id = int(id)
 
@@ -1033,21 +1010,18 @@ class RoboTelemetry:
 
 
     def __str__(self) -> str:
-
         return (
             f"ID: {self.id}   COOR: {self.Coor}   TOOL_SPEED: {self.t_speed}"
         )
 
 
     def __round__(self, digits) -> 'RoboTelemetry':
-
         return RoboTelemetry(
             round(self.t_speed, digits), self.id, round(self.Coor, digits)
         )
 
 
     def __eq__(self, other) -> bool:
-
         if isinstance(other, RoboTelemetry):
             if (
                 self.t_speed == other.t_speed
@@ -1055,20 +1029,16 @@ class RoboTelemetry:
                 and self.Coor == other.Coor
             ):
                 return True
-
         elif other is not None:
             raise TypeError(
                 f"{other} is not None or an instance of 'RoboTelemetry'!"
             )
-
         return False
 
 
     def __ne__(self, other) -> bool:
-
         if other is None:
             return True
-        
         elif isinstance(other, RoboTelemetry):
             if (
                 self.t_speed != other.t_speed
@@ -1076,13 +1046,20 @@ class RoboTelemetry:
                 or self.Coor != other.Coor
             ):
                 return True
-
         else:
             raise TypeError(
                 f"{other} is not None or an instance of 'RoboTelemetry'!"
             )
-
         return False
+    
+
+    def __repr__(self) -> str:
+        return "%s(id=%r, t_speed=%r, Coor=%r)" % (
+                self.__class__.__name__,
+                self.id,
+                self.t_speed,
+                self.Coor,
+            )
 
 
 
@@ -1100,12 +1077,11 @@ class PumpTelemetry:
             torque, probably in Nm
 
     METHODS:
-        __init__, __str__, __round__, __eq__
+        __eq__, __init__, __ne__, __repr__, __round__, __str__
     """
 
 
     def __init__(self, freq=0.0, volt=0.0, amps=0.0, torq=0.0) -> None:
-
         self.freq = float(freq)
         self.volt = float(volt)
         self.amps = float(amps)
@@ -1113,7 +1089,6 @@ class PumpTelemetry:
 
 
     def __str__(self) -> str:
-
         return (
             f"FREQ: {self.freq}   VOLT: {self.volt}   "
             f"AMPS: {self.amps}   TORQ: {self.torq}"
@@ -1121,7 +1096,6 @@ class PumpTelemetry:
 
 
     def __round__(self, digits) -> 'PumpTelemetry':
-
         return PumpTelemetry(
             round(self.freq, digits),
             round(self.volt, digits),
@@ -1131,7 +1105,6 @@ class PumpTelemetry:
 
 
     def __eq__(self, other) -> bool:
-
         if isinstance(other, PumpTelemetry):
             if (
                 self.freq == other.freq
@@ -1140,20 +1113,16 @@ class PumpTelemetry:
                 and self.torq == other.torq
             ):
                 return True
-
         elif other is not None:
             raise TypeError(
                 f"{other} is not None or an instance 'PumpTelemetry'!"
             )
-
         return False
 
 
     def __ne__(self, other) -> bool:
-
         if other is None:
             return True
-        
         elif isinstance(other, PumpTelemetry):
             if (
                 self.freq != other.freq
@@ -1162,13 +1131,22 @@ class PumpTelemetry:
                 or self.torq != other.torq
             ):
                 return True
-
         else:
             raise TypeError(
                 f"{other} is not None or an instance 'PumpTelemetry'!"
             )
-
         return False
+    
+
+    def __repr__(self) -> str:
+        return "%s(freq=%r, volt=%r, amps=%r, torq=%r)" % (
+                self.__class__.__name__,
+                self.freq,
+                self.volt,
+                self.amps,
+                self.torq,
+            )
+
 
 
 class TSData:
@@ -1184,7 +1162,7 @@ class TSData:
             user_defined time, the value remains valid
 
     METHODS:
-        __init__, __get__, __set__, __eq__, __ne__, __str__
+        __eq__, __init__, __get__, __ne__, __repr__, __set__, __str__
     """
 
     def __init__(self, val=0.0) -> None:
@@ -1241,7 +1219,13 @@ class TSData:
 
     def __str__(self) -> str:
         return f"{self.__get__(self, None)}"
+    
 
+    def __repr__(self) -> str:
+        return "%s(val=%r)" % (
+                self.__class__.__name__,
+                self.val
+            )
 
 
 
@@ -1294,13 +1278,12 @@ class DaqBlock:
             the nozzle
 
     METHODS:
-        __init__, __str__, __eq__,
+        __eq__, __init__, __ne__, __repr__, __str__
 
         store:
             Stores data according to key and sub_key, mutual exclusion needs to
             be called beforehand, as values are stored in global variables.
     """
-
     amb_temp = TSData()
     amb_humidity = TSData()
     rb_temp = TSData()
@@ -1336,8 +1319,6 @@ class DaqBlock:
             phc_fdist=0.0,
             phc_edist=0.0,
     ) -> None:
-        global DEF_STT_VALID_TIME
-
         self.amb_temp = TSData(amb_temp)
         self.amb_humidity = TSData(amb_humidity)
         self.rb_temp = TSData(rb_temp)
@@ -1352,7 +1333,7 @@ class DaqBlock:
         self.phc_aircon = TSData(phc_aircon)
         self.phc_fdist = TSData(phc_fdist)
         self.phc_edist = TSData(phc_edist)
-        self.valid_time = DEF_STT_VALID_TIME
+        self.valid_time = int(g.DB_valid_time)
 
         # handle those beasty mutables
         self.Robo = RoboTelemetry() if (Robo is None) else Robo
@@ -1361,7 +1342,6 @@ class DaqBlock:
 
 
     def __str__(self) -> str:
-
         return (
             f"Amb. temp.: {self.amb_temp}    Amb. humid.: {self.amb_humidity}"
             f"    RB temp.: {self.rb_temp}    MSP temp.: {self.msp_temp}    "
@@ -1377,7 +1357,6 @@ class DaqBlock:
 
 
     def __eq__(self, other) -> bool:
-
         if isinstance(other, DaqBlock):
             if (
                 self.amb_temp == other.amb_temp
@@ -1399,20 +1378,16 @@ class DaqBlock:
                 and self.phc_edist == other.phc_edist
             ):
                 return True
-
         elif other is not None:
             raise TypeError(
                 f"{other} is not None or an instance of 'DaqBlock'!"
             )
-
         return False
 
 
     def __ne__(self, other) -> bool:
-
         if other is None:
             return True
-        
         elif isinstance(other, DaqBlock):
             if (
                 self.amb_temp != other.amb_temp
@@ -1434,13 +1409,37 @@ class DaqBlock:
                 or self.phc_edist != other.phc_edist
             ):
                 return True
-
         else:
             raise TypeError(
                 f"{other} is not None or an instance of 'DaqBlock'!"
             )
-
         return False
+    
+
+    def __repr__(self) -> str:
+        return "%s(amb_temp=%r, amb_hum=%r, msp_temp=%r, rb_temp=%r, " \
+        "imp_temp=%r, msp_press=%r, imp_press=%r, Pump1=%r, Pump2=%r, " \
+        "asp_freq=%r, asp_amps=%r, imp_freq=%r, imp_amps=%r, Robo=%r, " \
+        "phc_aircon=%r, phc_fdist=%r, phc_edist=%r)" % (
+                self.__class__.__name__,
+                self.amb_temp,
+                self.amb_humidity,
+                self.msp_temp,
+                self.rb_temp,
+                self.imp_temp,
+                self.msp_press,
+                self.imp_press,
+                self.Pump1,
+                self.Pump2,
+                self.asp_freq,
+                self.asp_amps,
+                self.imp_freq,
+                self.imp_amps,
+                self.Robo,
+                self.phc_aircon,
+                self.phc_fdist,
+                self.phc_edist,
+            )
 
 
     def store(self, data:tuple, key:str, sub_key:str) -> None:
@@ -1457,7 +1456,6 @@ class DaqBlock:
             sub_key:
                 inferior key in du.SEN_dict, specifying parameter type
         """
-
         val, val_age = data
         if val_age > self.valid_time.seconds: 
             return
@@ -1499,7 +1497,6 @@ class DaqBlock:
                 raise KeyError(
                     f"no storage reserved for {key} in du.STTDataBlock!"
                 )
-            
         return None
     
     
@@ -1663,7 +1660,7 @@ class TCPIP:
 
 
 
-class RobConnection(TCPIP):
+class RoboConnection(TCPIP):
     """sets robot specific send/receive operations, inherits from TCPIP class,
     overwrites send & receive functions
 
@@ -1776,211 +1773,3 @@ class RobConnection(TCPIP):
         Telem.Coor.rz = struct.unpack('<f', data[28:32])[0]
         Telem.Coor.ext = struct.unpack('<f', data[32:36])[0]
         return Telem, data
-
-
-
-
-#########################     GLOBALS CONST     #############################
-
-# defaut connection settings (the byte length for writing to the robot
-# wont be user setable for safety reasons, it can only be changed here, but 
-# only if you know what your doing!)
-
-# MTEC P20 DEFAULT SETTINGS
-DEF_PUMP_CHK_RANGE = (-100.0, 100.0)
-DEF_PUMP_CLASS1 = 75.0
-DEF_PUMP_CLASS2 = 50.0
-DEF_PUMP_LPS = 0.5
-DEF_PUMP_RETR_SPEED = -50.0 # [%]
-DEF_PUMP_SERIAL = {
-    'baud': 19200,
-    'par': serial.PARITY_NONE,
-    'stop': serial.STOPBITS_TWO,
-    'size': serial.EIGHTBITS,
-    'port': 'COM3',
-}
-DEF_PUMP_OUTP_RATIO = 1.0
-DEF_PUMP_NO_USER_SPEED = -999
-DEF_PUMP_VALID_COMMANDS = [
-    -1001, # = no p_mode
-    1001, # default mode
-    1002, # start profile
-    1003, # end profile
-    1101, # class 1 profile
-    1102, # class 2 profile
-]
-
-# ROBOT DEFAULT SETTINGS
-DEF_ROB_BUFF_SIZE = 3000
-DEF_ROB_COMM_FR = 10
-DEF_ROB_COOR_CHK_RANGE = ( # to-do: better mapping
-    Coordinate(-1600.0, 0.0, -895.0, 150.0, -30.0, -180.0, 0.0, 10.0),
-    Coordinate(4050.0, 2700.0, 1500.0, 210.0, 30.0, 120.0, 1.0, 3500.0),
-)
-DEF_ROB_TCP = {
-    'ip': '192.168.125.1',
-    'port': 10001,
-    'c_tout': 60000,
-    'rw_tout': 5,
-    'r_bl': 36,
-    'w_bl': 151,
-}
-
-# GENERAL DEFAULT SETTINGS
-DEF_DC_SPEED = SpeedVector()
-DEF_DC_ZERO = Coordinate(
-    -300.0, 1900.0, -895.0, 180, 0.0,-90.0, 0.0, 400.0,
-)
-DEF_ICQ_MAX_LINES = 200
-DEF_IO_FR_TO_TS = 0.1
-DEF_IO_ZONE = 10 # [mm]
-DEF_PRH_CLAMP = False
-DEF_PRH_CUT = False
-DEF_PRH_PLACE_SPR = False
-DEF_PRH_TROLLEY = 0
-DEF_PRH_WAIT = 0
-DEF_PRIN_SPEED = SpeedVector()
-DEF_SC_EXT_TRAIL = (5, 2) # [mm]
-DEF_SC_MAX_LINES = 400
-DEF_SC_VOL_PER_M = 0.4  # [L/m] calculated for 1m of 4cm x 1cm high filament
-DEF_STT_VALID_TIME = 60 # [seconds]
-DEF_TERM_MAX_LINES = 300
-DEF_TOOL_TROL_RATIO = 500
-DEF_WD_TIMEOUT = 10000 # [ms]
-DEF_WARN_MAX_RAISED = 100
-
-
-##########################     GLOBALS VARS     ##############################
-
-# GENERAL SETTINGS
-CAM_urls = [
-    'rtsp://admin:KameraNr4@192.168.178.51:554/ch1/main/av_stream',
-    'rtsp://admin:KameraNr1@192.168.178.38:554/ch1/main/av_stream',
-]
-DC_rob_moving = False
-DCCurrZero = dcpy(DEF_DC_ZERO)
-DCSpeed = dcpy(DEF_DC_SPEED)
-CTRL_min_target_dist = 1 # [mm]
-CTRL_max_r_speed = 50.0
-IO_curr_filepath = None
-IO_fr_to_ts = DEF_IO_FR_TO_TS
-IO_zone = DEF_IO_ZONE
-LOG_safe_path = Path()
-PRINSpeed = dcpy(DEF_PRIN_SPEED)
-RC_area = dcpy(DEF_ROB_COOR_CHK_RANGE)
-RC_max_base_dist = 3000
-RC_y_base_pos = 4100
-SC_curr_comm_id = 1
-SC_ext_trail = DEF_SC_EXT_TRAIL
-SC_q_prep_end = False
-SC_q_processing = False
-SC_vol_per_m = DEF_SC_VOL_PER_M
-SCBreakPoint = Coordinate() # to-do: write routine to stop at predefined point during SC using this Coordinate + decide if useful
-SCQueue = Queue()
-STTDataBlock = DaqBlock()
-TERM_log = []
-TOOL_trol_ratio = DEF_TOOL_TROL_RATIO
-
-# DATABASE SETTINGS
-DB_log_interval = 10
-DB_org = 'MC3DB'
-DB_session = 'not set'
-DB_token = None
-DB_url = '192.168.178.50:8086'
-
-# PRINTHEAD SETTINGS
-PRH_act_with_pump = False
-MIX_last_speed = 0.0
-MIX_max_speed = 300.0 # [rpm]
-MIX_speed = 0.0
-PRH_connected = False
-PRH_url = '192.168.178.58:17'
-
-# MTEC P20 SETTINGS
-PMP_output_ratio = DEF_PUMP_OUTP_RATIO
-PMP_port = DEF_PUMP_SERIAL['port']
-PMP_retract_speed = DEF_PUMP_RETR_SPEED
-PMPSerialDefBus = None  # is created after user input in win_mainframe
-PMP_speed = 0
-PMP_look_ahead = False
-PMP_look_ahead_dist = 50
-PMP_look_ahead_prerun = 1.0
-PMP_look_ahead_retract = 1.0
-PMP_look_ahead_max_comms = 10
-PMP1_liter_per_s = DEF_PUMP_LPS
-PMP1_live_ad = 1.0
-PMP1_modbus_id = '01'
-PMP1_speed = 0
-PMP1_user_speed = DEF_PUMP_NO_USER_SPEED
-PMP1LastTelem = PumpTelemetry()
-PMP1Serial = MtecMod(None, PMP1_modbus_id)
-PMP2_liter_per_s = DEF_PUMP_LPS
-PMP2_live_ad = 1.0
-PMP2_modbus_id = '02'
-PMP2_speed = 0
-PMP2_user_speed = DEF_PUMP_NO_USER_SPEED
-
-PMP2LastTelem = PumpTelemetry()
-PMP2Serial = MtecMod(None, PMP2_modbus_id)
-
-# ROBOT SETTINGS
-ROB_comm_fr = DEF_ROB_COMM_FR
-ROB_live_ad = 1.0
-ROB_send_list = []
-ROB_speed_overwrite = -1
-ROBCommQueue = Queue()
-ROBLastTelem = RoboTelemetry()
-ROBMovStartP = Coordinate()
-ROBMovEndP = Coordinate()
-ROBTelem = RoboTelemetry()
-ROBTcp = RobConnection(
-    DEF_ROB_TCP['ip'],
-    DEF_ROB_TCP['port'],
-    DEF_ROB_TCP['c_tout'],
-    DEF_ROB_TCP['rw_tout'],
-    DEF_ROB_TCP['r_bl'],
-    DEF_ROB_TCP['w_bl'],
-)
-
-# SENSOR ARRAY SETTINGS
-SEN_timeout = 0.5
-SEN_dict = { # add available datasources here
-    'amb': { # AMBient
-        'ip': '192.168.178.36:17',
-        'err': False,
-        'temp': False,
-        'humid': False,
-    },
-    'asp': { # Admixture Supply Pump
-        'ip': '',
-        'err': False,
-        'freq': False,
-        'amps': False,
-    },
-    'rb': { # Robot Base
-        'ip': '',
-        'err': False,
-        'temp': False,
-    },
-    'msp': { # Main Supply Pump
-        'ip': '192.168.178.36:17',
-        'err': False,
-        'temp': True,
-        'pressure': False,
-    },
-    'imp': { # Inline Mixing Pump
-        'ip': '',
-        'err': False,
-        'temp': False,
-        'pressure': False,
-        'freq': False,
-        'amps': False
-    },
-    'phc': { # Print Head Controller
-        'ip': '',
-        'err': False,
-        'aircon': False,
-        'fdist': False,
-        'edist': False
-    }
-}

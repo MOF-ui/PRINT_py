@@ -1,0 +1,114 @@
+# defaut connection settings (the byte length for writing to the robot
+# wont be user setable for safety reasons, it can only be changed here, but 
+# only if you know what your doing!)
+
+# MTEC P20 DEFAULT SETTINGS
+PMP:
+    SAFE_RANGE: !!python/tuple [-100.0, 100.0]
+    CLASS1: 75.0
+    CLASS2: 50.0
+    LOOK_AHEAD_DIST: 50.0 # [mm]
+    LOOK_AHEAD_MAX_COMMS: 10
+    LOOK_AHEAD_PRERUN: 1.0
+    LOOK_AHEAD_RETRACT: 1.0
+    LPS: 0.5
+    P1_MODBUS_ID: '01'
+    P2_MODBUS_ID: '02'
+    RETRACT_SPEED: -50.0 # [%]
+    SERIAL:
+        BAUD: 19200
+        PORT: 'COM3'
+    OUTP_RATIO: 1.0
+    NO_USER_SPEED: -999
+    VALID_COMMANDS:
+        - -1001 # = no p_mode
+        - 1001 # default mode
+        - 1002 # start profile
+        - 1003 # end profile
+        - 1101 # class 1 profile
+        - 1102 # class 2 profile
+
+# ROBOT DEFAULT SETTINGS
+ROBOT:
+    BASE_Y_POS: 4100.0 # [mm]
+    BUFF_SIZE: 3000
+    COMMAND_FORERUN: 10
+    MAX_BASE_DIST: 3000.0 # [mm]
+    MAX_ROTATION_SPEED: 50.0 # [deg/s]
+    MIN_TARGET_DIST: 1.0 # [mm]
+    SAFE_RANGE_MIN:
+        !Coordinate
+        x: -1600.0
+        y: 0.0
+        z: -895.0
+        rx: 150.0
+        ry: -30.0
+        rz: -180.0
+        q: 0.0
+        ext: 10.0
+    SAFE_RANGE_MAX:
+        !Coordinate
+        x: 4050.0
+        y: 2700.0
+        z: 1500.0
+        rx: 210.0
+        ry: 30.0
+        rz: 120.0
+        q: 1.0
+        ext: 3500.0
+    TCP:
+        ip: '192.168.125.1'
+        port: 10001
+        c_tout: 60000 # [ms]
+        rw_tout: 5 # [ms]
+        r_bl: 36 # [bytes]
+        w_bl: 151 # [bytes]
+    ZERO: 
+        !Coordinate
+        x: -300.0
+        y: 1900.0
+        z: -895.0
+        rx: 180
+        ry: 0.0
+        rz: -90.0
+        q: 0.0
+        ext: 400.0
+
+# GENERAL DEFAULT SETTINGS
+SPEED:
+    DIRECT:
+        !SpeedVector
+        acr: 50.0
+        dcr: 50.0
+        ts: 200.0
+        ors: 50.0
+    SCRIPT:
+        !SpeedVector
+        acr: 50.0
+        dcr: 50.0
+        ts: 200.0
+        ors: 50.0
+MAX_LINES:
+    SC: 400
+    TERMINAL: 300
+    ICQ: 200
+    WARN_RAISED: 100
+IO:
+    FR_TO_TS: 0.1
+    ZONE: 10 # [mm]
+PRINTHEAD:
+    CLAMP: False
+    CUT: False
+    PLACE_SPR: False
+    TROLL_RATIO: 500
+    TROLL_CALIBRATE: 99 # ID
+    TROLLEY: 0
+    WAIT: 0
+SC:
+    EXT_TRAIL: !!python/tuple [5, 2] # [mm]
+    VOL_PER_M: 0.4 # [L/m] calculated for 1m of 4cm x 1cm high filament
+DATABASE:
+    LOG_INTERVAL: 10 # [seconds]
+    VALID_TIME: 60 # [seconds]
+WATCHDOG:
+    TIMEOUT: 10000 # [ms]

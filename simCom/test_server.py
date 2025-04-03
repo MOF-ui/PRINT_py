@@ -213,10 +213,10 @@ while toggle:
                 RecvEntry.Tool.trolley_steps = struct.unpack("<i", data[99:103])[0]
                 cutter_id = struct.unpack("<i", data[103:107])[0]
                 cutter = struct.unpack("<i", data[107:111])[0]
-                cut_id = struct.unpack("<i", data[111:115])[0]
-                cut = struct.unpack("<i", data[115:119])[0]
-                ls_id = struct.unpack("<i", data[119:123])[0]
-                RecvEntry.Tool.load_spring = struct.unpack("<i", data[123:127])[0]
+                ls_id = struct.unpack("<i", data[111:115])[0]
+                RecvEntry.Tool.load_spring = struct.unpack("<i", data[115:119])[0]
+                cut_id = struct.unpack("<i", data[119:123])[0]
+                RecvEntry.Tool.cut = struct.unpack("<i", data[123:127])[0]
                 ps_id = struct.unpack("<i", data[127:131])[0]
                 RecvEntry.Tool.place_spring = struct.unpack("<i", data[131:135])[0]
                 clamp_id = struct.unpack("<i", data[135:139])[0]
@@ -227,7 +227,7 @@ while toggle:
                 print(
                     f"received:\n{RecvEntry}\n"
                     f"additional: {troll_id}, {cutter_id}/{cutter}, "
-                    f"{cut_id}/{cut}, {ls_id}, {ps_id}, {clamp_id}, {wait_id}\n"
+                    f"{cut_id}, {ls_id}, {ps_id}, {clamp_id}, {wait_id}\n"
                 )
                 print('command: ', end='')
                 if CommandList[0].id > RecvEntry.id:
