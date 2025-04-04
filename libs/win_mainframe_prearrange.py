@@ -348,11 +348,6 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     def load_defaults(self, setup=False) -> None:
         """load default general settings to user display"""
 
-        if (
-                not isinstance(g.DC_SPEED, du.SpeedVector)
-                or not isinstance(g.SC_SPEED, du.SpeedVector)
-            ):
-            raise TypeError(f"Speeds of type: {type(g.DC_SPEED)}, {g.SC_SPEED}!")
         self.SET_float_volPerMM.setValue(g.SC_VOL_PER_M)
         self.SET_float_frToMms.setValue(g.IO_FR_TO_TS)
         self.SET_num_zone.setValue(g.IO_ZONE)
@@ -375,12 +370,12 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                 "SETS", "User reset general properties to default values."
             )
         else:
-            self.CONN_num_commForerun.setValue(g.DEF_ROB_COMM_FR)
+            self.CONN_num_commForerun.setValue(g.ROB_COMM_FR)
             self.load_ADC_defaults()
-            self.ASC_num_trolley.setValue(g.DEF_PRH_TROLLEY)
-            self.ASC_btt_clamp.setChecked(g.DEF_PRH_CLAMP)
-            self.ASC_btt_cut.setChecked(g.DEF_PRH_CUT)
-            self.ASC_btt_placeSpring.setChecked(g.DEF_PRH_PLACE_SPR)
+            self.ASC_num_trolley.setValue(g.PRH_DEFAULT.trolley_steps)
+            self.ASC_btt_clamp.setChecked(g.PRH_DEFAULT.clamp)
+            self.ASC_btt_cut.setChecked(g.PRH_DEFAULT.cut)
+            self.ASC_btt_placeSpring.setChecked(g.PRH_DEFAULT.place_spring)
 
 
     def load_ADC_defaults(self, send_changes=False) -> None:
@@ -390,10 +385,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         for widget in self.ADC_group:
             widget.blockSignals(True)
 
-        self.ADC_num_trolley.setValue(g.DEF_PRH_TROLLEY)
-        self.ADC_btt_clamp.setChecked(g.DEF_PRH_CLAMP)
-        self.ADC_btt_cut.setChecked(g.DEF_PRH_CUT)
-        self.ADC_btt_placeSpring.setChecked(g.DEF_PRH_PLACE_SPR)
+        self.ADC_num_trolley.setValue(g.PRH_DEFAULT.trolley_steps)
+        self.ADC_btt_clamp.setChecked(g.PRH_DEFAULT.clamp)
+        self.ADC_btt_cut.setChecked(g.PRH_DEFAULT.cut)
+        self.ADC_btt_placeSpring.setChecked(g.PRH_DEFAULT.place_spring)
         if send_changes:
             self.adc_user_change()
 
@@ -448,9 +443,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         if no_error:
             write_buffer = command.print_short()
             g.SC_curr_comm_id += num_send
-            if g.SC_curr_comm_id > g.DEF_ROB_BUFF_SIZE:
+            if g.SC_curr_comm_id > g.ROB_BUFFER_SIZE:
                 with QMutexLocker(GlobalMutex):
-                    g.SC_curr_comm_id -= g.DEF_ROB_BUFF_SIZE
+                    g.SC_curr_comm_id -= g.ROB_BUFFER_SIZE
 
             log_txt = 'DC' if dc else 'SC'
             log_txt = f"{num_send} {log_txt} command(s) send"
@@ -591,7 +586,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     self.PUMP_disp_ampsP1,
                     self.PUMP_disp_torqP1
                 ]
-                p_recv(displays, g.STTDataBlock.Pump1, '_LastP1Telem')
+                p_recv(displays, g.DBDataBlock.Pump1, '_LastP1Telem')
 
             case 'P2':
                 displays = [
@@ -600,7 +595,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     self.PUMP_disp_ampsP2,
                     self.PUMP_disp_torqP2
                 ]
-                p_recv(displays, g.STTDataBlock.Pump2, '_LastP2Telem')
+                p_recv(displays, g.DBDataBlock.Pump2, '_LastP2Telem')
 
             case _:
                 raise KeyError(
@@ -727,7 +722,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         """
 
         list_to_display = g.SCQueue.display()
-        max_len = g.DEF_SC_MAX_LINES
+        max_len = g.SC_MAX_LINES
         length = len(list_to_display)
         overlen = length - max_len
 
@@ -752,7 +747,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self.TERM_arr_terminal.scrollToBottom()
 
         list_to_display = g.ROBCommQueue.display()
-        max_len = g.DEF_ICQ_MAX_LINES
+        max_len = g.ICQ_MAX_LINES
         length = len(list_to_display)
         overlen = length - max_len
 
@@ -943,7 +938,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     def set_range(self, source='') -> None:
         """overwrites RC_area to custom or default"""
 
-        area_overwrite = dcpy(g.DEF_ROB_COOR_CHK_RANGE)
+        area_overwrite = dcpy(g.ROB_SAFE_RANGE)
         if source == 'user':
             min_overwrite = du.Coordinate(
                 x=self.CHKR_float_x_min.value(),
@@ -994,17 +989,17 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             )
         elif source == 'file':
             try:
-                with open(g.LOG_safe_path, 'r') as save_file:
+                with open(g.CTRL_log_path, 'r') as save_file:
                     zero_vals = save_file.read().split('_')
                     ZeroOverwrite = du.Coordinate(zero_vals)
             except Exception as e:
                 self.log_entry(
                     'ZERO',
-                    f"failed to load ZERO data from {g.LOG_safe_path} due to {e}!"
+                    f"failed to load ZERO data from {g.CTRL_log_path} due to {e}!"
                 )
                 return
         elif source == 'default':
-            ZeroOverwrite = dcpy()
+            ZeroOverwrite = dcpy(g.ROB_ZERO)
         else:
             ZeroOverwrite = dcpy(g.ROBTelem.Coor)
 

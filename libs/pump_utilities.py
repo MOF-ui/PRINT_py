@@ -20,6 +20,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 # import my own libs
+import libs.global_var as g
 import libs.data_utilities as du
 import libs.func_utilities as fu
 
@@ -33,23 +34,23 @@ def get_pmp_speeds() -> tuple[int, int, bool | None]:
     """
     global last_speed
 
-    if du.SC_q_processing:
+    if g.SC_q_processing:
         ans = calc_speed()
         if ans is None:
             return None
         p1_speed, p2_speed, pinch = ans
     else: 
-        p1_speed, p2_speed = speed_by_ratio(du.PMP_speed, du.PMP_output_ratio)
+        p1_speed, p2_speed = speed_by_ratio(g.PMP_speed, g.PMP_output_ratio)
         pinch = None #to-do: implement pinch
 
     # look for user overwrite, no mutex, as changing
     # global PUMP_user_speed would not harm the process
-    if du.PMP1_user_speed != du.DEF_PUMP_NO_USER_SPEED:
-        p1_speed = du.PMP1_user_speed
-        du.PMP1_user_speed = du.DEF_PUMP_NO_USER_SPEED
-    if du.PMP2_user_speed != du.DEF_PUMP_NO_USER_SPEED:
-        p2_speed = du.PMP2_user_speed
-        du.PMP2_user_speed = du.DEF_PUMP_NO_USER_SPEED
+    if g.PMP1_user_speed != g.PMP_NO_USER_SPEED:
+        p1_speed = g.PMP1_user_speed
+        g.PMP1_user_speed = g.PMP_NO_USER_SPEED
+    if g.PMP2_user_speed != g.PMP_NO_USER_SPEED:
+        p2_speed = g.PMP2_user_speed
+        g.PMP2_user_speed = g.PMP_NO_USER_SPEED
     
     last_speed = (p1_speed + p2_speed)
     return p1_speed, p2_speed, pinch
@@ -59,7 +60,7 @@ def speed_by_ratio(t_speed, ratio) -> tuple[float, float]:
     """calculates the speed of the pumps according to the given ratio"""
 
     # get speed
-    if du.PMP1Serial.connected and du.PMP2Serial.connected:
+    if g.PMP1Serial.connected and g.PMP2Serial.connected:
         p1_speed = t_speed * ratio
         p2_speed = t_speed * (1.0 - ratio)
     else:
@@ -75,20 +76,20 @@ def look_ahead(p1_speed, p2_speed) -> tuple[float, float]:
         # check following commands, protocol path length & 
         # break if to many commands with the same p_ratio
         num_comm = 1
-        curr_pos = du.ROBTelem.Coor
-        curr_comm = du.ROBCommQueue[0]
-        next_comm = du.ROBCommQueue[1]
+        curr_pos = g.ROBTelem.Coor
+        curr_comm = g.ROBCommQueue[0]
+        next_comm = g.ROBCommQueue[1]
         dist = curr_pos.distance(curr_comm.Coor1)
         while (
                 curr_comm.p_ratio == next_comm.p_ratio
-                and num_comm <= du.PMP_look_ahead_max_comms
+                and num_comm <= g.PMP_look_ahead_max_comms
         ):
             dist += curr_comm.Coor1.distance(next_comm.Coor1)
             num_comm += 1
             curr_comm = next_comm
-            next_comm = du.ROBCommQueue[num_comm]
+            next_comm = g.ROBCommQueue[num_comm]
 
-        if dist < du.PMP_look_ahead_dist:
+        if dist < g.PMP_look_ahead_dist:
             # reverse direction on currently running pump
             # to reduce pressure in the hose system
             next_speed = next_comm.p_mode
@@ -97,11 +98,11 @@ def look_ahead(p1_speed, p2_speed) -> tuple[float, float]:
                     next_speed, next_comm.p_ratio
                 )
                 if p1_speed > 0:
-                    p1_speed = -p1_speed * du.PMP_look_ahead_retract
-                    p2_speed = next_p2_speed * du.PMP_look_ahead_prerun
+                    p1_speed = -p1_speed * g.PMP_look_ahead_retract
+                    p2_speed = next_p2_speed * g.PMP_look_ahead_prerun
                 elif p2_speed > 0:
-                    p1_speed = next_p1_speed * du.PMP_look_ahead_prerun
-                    p2_speed = -p2_speed * du.PMP_look_ahead_retract
+                    p1_speed = next_p1_speed * g.PMP_look_ahead_prerun
+                    p2_speed = -p2_speed * g.PMP_look_ahead_retract
     except:
         pass
     
@@ -122,7 +123,7 @@ def calc_speed() -> tuple[int | None, int, bool]:
     p_ratio = 1.0
     pinch = False
     try:
-        curr_comm = du.ROBCommQueue[0]
+        curr_comm = g.ROBCommQueue[0]
     except IndexError:
         curr_comm = None
 
@@ -136,10 +137,10 @@ def calc_speed() -> tuple[int | None, int, bool]:
             preceeding_speed = last_speed
 
     speed = None
-    if p_mode in du.DEF_PUMP_VALID_COMMANDS:
+    if p_mode in g.PMP_VALID_COMMANDS:
         match p_mode:
             case -1001:
-                speed = du.PMP_speed
+                speed = g.PMP_speed
             case 1001:
                 speed = default_mode(command=curr_comm)
             case 1002:
@@ -147,9 +148,9 @@ def calc_speed() -> tuple[int | None, int, bool]:
             case 1003:
                 speed = profile_mode(command=curr_comm, profile=END_SUPP_PTS)
             case 1101:
-                speed = du.DEF_PUMP_CLASS1
+                speed = g.PMP_CLASS1
             case 1102:
-                speed = du.DEF_PUMP_CLASS2
+                speed = g.PMP_CLASS2
             case _:
                 speed = 0
     if -100 <= p_mode <= 100:
@@ -158,7 +159,7 @@ def calc_speed() -> tuple[int | None, int, bool]:
         return None
 
     p1_speed, p2_speed = speed_by_ratio(speed, p_ratio)
-    if du.PMP_look_ahead:
+    if g.PMP_look_ahead:
         p1_speed, p2_speed = look_ahead(p1_speed, p2_speed)
 
     # check value domain for speed
@@ -182,11 +183,11 @@ def default_mode(command=None) -> float | None:
         Comm = command
 
     # determine current volume output:
-    lps = (du.PMP1_liter_per_s * du.PMP_output_ratio) + (
-        du.PMP2_liter_per_s * (1.0 - du.PMP_output_ratio)
+    lps = (g.PMP1_liter_per_s * g.PMP_output_ratio) + (
+        g.PMP2_liter_per_s * (1.0 - g.PMP_output_ratio)
     )
     # [%] =      ( [mm/s]       * [L/m]           * [m/mm]/ [L/s])*100.0
-    speed = float(Comm.Speed.ts * du.SC_vol_per_m * 0.001 / lps) * 100.0
+    speed = float(Comm.Speed.ts * g.SC_vol_per_m * 0.001 / lps) * 100.0
 
     return speed
 
@@ -218,7 +219,7 @@ def profile_mode(command=None, profile=None) -> float | None:
     speed = default_mode(Comm)
     # as more complex pump scripts should only apply to linear movements,
     # the remaining travel distance can be calculated using pythagoras
-    curr = dcpy(du.ROBTelem.Coor)
+    curr = dcpy(g.ROBTelem.Coor)
     dist_remaining = m.sqrt(
         m.pow(Comm.Coor1.x - curr.x, 2)
         + m.pow(Comm.Coor1.y - curr.y, 2)
@@ -249,7 +250,7 @@ def profile_mode(command=None, profile=None) -> float | None:
         time_0 = prev_set['until']
         base_0 = get_base_speed(prev_set['base'], speed)
     else:
-        strt = dcpy(du.ROBMovStartP)
+        strt = dcpy(g.ROBMovStartP)
         dist_total = m.sqrt(
             m.pow(Comm.Coor1.x - strt.x, 2)
             + m.pow(Comm.Coor1.y - strt.y, 2)
@@ -294,16 +295,16 @@ def get_base_speed(base='default', fallback=0.0) -> float | None:
         case 'default':
             base_speed = fallback
         case 'retract':
-            base_speed = du.PMP_retract_speed
+            base_speed = g.PMP_retract_speed
         case 'conn':
 
             try:
-                next_comm = du.ROBCommQueue[1]
-                lps = (du.PMP1_liter_per_s * du.PMP_output_ratio) + (
-                    du.PMP2_liter_per_s * (1.0 - du.PMP_output_ratio)
+                next_comm = g.ROBCommQueue[1]
+                lps = (g.PMP1_liter_per_s * g.PMP_output_ratio) + (
+                    g.PMP2_liter_per_s * (1.0 - g.PMP_output_ratio)
                 )
 
-                base_speed = next_comm.Speed.ts * du.SC_vol_per_m * 0.001 / lps
+                base_speed = next_comm.Speed.ts * g.SC_vol_per_m * 0.001 / lps
                 base_speed = float(base_speed *100)
 
             except AttributeError:

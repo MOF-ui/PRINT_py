@@ -27,9 +27,6 @@ sys.path.append(parent_dir)
 # import interface for Toshiba frequency modulator by M-TEC
 from mtec.mtec_mod import MtecMod
 
-# import my own libs
-import libs.global_var as g
-
 
 
 ############################     CLASSES      ################################
@@ -85,6 +82,27 @@ class Coordinate(yaml.YAMLObject):
         self.rz = float(rz)
         self.q = float(q)
         self.ext = float(ext)
+    
+
+    @classmethod
+    def from_class(cls, coor:'Coordinate') -> 'Coordinate':
+        """returns a new Coordinate object with the same values as the given
+        one
+        """
+        if not isinstance(coor, Coordinate):
+            raise TypeError(
+                f"{coor} is not an instance of 'Coordinate'!"
+            )
+        return cls(
+            coor.x,
+            coor.y,
+            coor.z,
+            coor.rx,
+            coor.ry,
+            coor.rz,
+            coor.q,
+            coor.ext,
+        )
 
 
     def __str__(self) -> str:
@@ -278,6 +296,23 @@ class SpeedVector(yaml.YAMLObject):
         self.dcr = int(round(dcr, 0))
         self.ts = int(round(ts, 0))
         self.ors = int(round(ors, 0))
+    
+
+    @classmethod
+    def from_class(cls, vector:'SpeedVector') -> 'SpeedVector':
+        """returns a new SpeedVector object with the same values as the given
+        one
+        """
+        if not isinstance(vector, SpeedVector):
+            raise TypeError(
+                f"{vector} is not an instance of 'SpeedVector'!"
+            )
+        return cls(
+            vector.acr,
+            vector.dcr,
+            vector.ts,
+            vector.ors,
+        )
 
 
     def __str__(self) -> str:
@@ -349,7 +384,7 @@ class SpeedVector(yaml.YAMLObject):
 
 
 
-class ToolCommand():
+class ToolCommand(yaml.YAMLObject):
     """standard tool command according to Jonas' protocol
 
     ATTRIBUTES:
@@ -372,6 +407,7 @@ class ToolCommand():
     METHODS:
         __def__, __eq__, __ne__, __str__, __repr__
     """
+    yaml_tag = u'!ToolCommand'
 
     def __init__(
         self,
@@ -389,6 +425,25 @@ class ToolCommand():
         self.place_spring = bool(place_spring)
         self.load_spring = bool(load_spring)
         self.wait = int(wait)
+    
+
+    @classmethod
+    def from_class(cls, tool:'ToolCommand') -> 'ToolCommand':
+        """returns a new ToolCommand object with the same values as the given
+        one
+        """
+        if not isinstance(tool, ToolCommand):
+            raise TypeError(
+                f"{tool} is not an instance of 'ToolCommand'!"
+            )
+        return cls(
+            tool.trolley_steps,
+            tool.clamp,
+            tool.cut,
+            tool.place_spring,
+            tool.load_spring,
+            tool.wait,
+        )
 
 
     def __str__(self) -> str:
@@ -822,7 +877,7 @@ class Queue:
             i.id += int(summand)
 
 
-    def add(self, entry:QEntry, thread_call=False) -> None | Exception:
+    def add(self, entry:QEntry, curr_id=-1, thread_call=False) -> None | Exception:
         """adds a new QEntry to queue, checks if QEntry.ID makes sense, places
         QEntry in queue according to the ID given, threadCall option allows
         the first ID to be 0
@@ -830,12 +885,13 @@ class Queue:
         new_entry = dcpy(entry)
         last_item = len(self) - 1
         if not isinstance(new_entry, QEntry):
-            return ValueError('entry is not an instance of QEntry')
+            return TypeError('entry is not an instance of QEntry')
+        if curr_id != -1 and not thread_call:
+            raise ValueError(f"curr_id=-1 not allowed outside thread_calls!")
 
         if last_item < 0:
-            global SC_curr_comm_id
             if not thread_call:
-                new_entry.id = SC_curr_comm_id
+                new_entry.id = curr_id
             self._queue.append(new_entry)
             return None
 
@@ -876,11 +932,12 @@ class Queue:
             return err
 
         last_item = len(self) - 1
-        # if current queue is empty
+        # if current queue is empty, start with the first ID of the new list
         if last_item < 0:
-            global SC_curr_comm_id
-            if nl_first_id != SC_curr_comm_id:
-                new_list.increment(SC_curr_comm_id - nl_first_id)
+            # can also overwrite added lists first ID to SC_curr_comm_id
+            # but importing would create circular import
+            # if nl_first_id != SC_curr_comm_id:
+            #     new_list.increment(SC_curr_comm_id - nl_first_id)
             self._queue.extend(new_list._queue)
             return
 
@@ -1318,6 +1375,7 @@ class DaqBlock:
             phc_aircon=0.0,
             phc_fdist=0.0,
             phc_edist=0.0,
+            valid_time=60,
     ) -> None:
         self.amb_temp = TSData(amb_temp)
         self.amb_humidity = TSData(amb_humidity)
@@ -1333,7 +1391,7 @@ class DaqBlock:
         self.phc_aircon = TSData(phc_aircon)
         self.phc_fdist = TSData(phc_fdist)
         self.phc_edist = TSData(phc_edist)
-        self.valid_time = int(g.DB_valid_time)
+        self.valid_time = int(valid_time)
 
         # handle those beasty mutables
         self.Robo = RoboTelemetry() if (Robo is None) else Robo
@@ -1513,7 +1571,7 @@ class DaqBlock:
 
 
 
-class TCPIP:
+class TCPSocket (yaml.YAMLObject):
     """setup class for TCP/IP connection, provides all functions concerning
     the connection
 
@@ -1532,7 +1590,7 @@ class TCPIP:
             data block length to write
 
     METHODS:
-        __init__, __str__
+        __init__, ,__repr__, __str__
 
         connect:
             tries to connect to the IP and PORT given, returns errors if
@@ -1544,7 +1602,7 @@ class TCPIP:
         close:
             close TCP/IP connection
     """
-
+    yaml_tag = u'!TCPSocket'
 
     def __init__(
             self,
@@ -1565,6 +1623,25 @@ class TCPIP:
 
         self.connected = False
         self._Socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+
+    @classmethod
+    def from_class(cls, sock:'TCPSocket') -> 'TCPSocket':
+        """returns a new Coordinate object with the same values as the given
+        one
+        """
+        if not isinstance(sock, TCPSocket):
+            raise TypeError(
+                f"{sock} is not an instance of 'TCPSocket'!"
+            )
+        return cls(
+            sock.ip,
+            sock.port,
+            sock.c_tout,
+            sock.rw_tout,
+            sock.r_bl,
+            sock.w_bl,
+        )
 
 
     def __str__(self) -> str:
@@ -1574,6 +1651,18 @@ class TCPIP:
             f"C_TOUT: {self.c_tout}   RW_TOUT: {self.rw_tout}   "
             f"R_BL: {self.r_bl}   W_BL: {self.w_bl}"
         )
+    
+    def __repr__(self) -> str:
+        return "%s(ip=%r, port=%r, c_tout=%r, rw_tout=%r, " \
+        "r_bl=%r, w_bl=%r)" % (
+                self.__class__.__name__,
+                self.ip,
+                self.port,
+                self.c_tout,
+                self.rw_tout,
+                self.r_bl,
+                self.w_bl,
+            )
 
 
     def set_params(self, param_dict) -> None:
@@ -1660,7 +1749,7 @@ class TCPIP:
 
 
 
-class RoboConnection(TCPIP):
+class RoboConnection(TCPSocket):
     """sets robot specific send/receive operations, inherits from TCPIP class,
     overwrites send & receive functions
 

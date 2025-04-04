@@ -45,7 +45,7 @@ from PyQt5.QtWidgets import QApplication
 # import my own libs and UIs
 from libs.win_dialogs import strd_dialog, conn_dialog
 from libs.win_mainframe import Mainframe
-import libs.data_utilities as du
+import libs.global_var as g
 import libs.func_utilities as fu
 
 
@@ -72,14 +72,14 @@ if arg_len == 2:
             exit()
         case 'local':
             print(f"MODE: LOCAL\n")
-            du.PRH_url = f"http://{du.PRH_url}"
-            du.ROBTcp.ip = 'localhost'
+            g.PRH_url = f"http://{g.PRH_url}"
+            g.ROBTcp.ip = 'localhost'
             skip_dialog = True
         case 'overwrite':
             print(f"dialog skipped..\n")
-            du.PRH_url = f"http://{du.PRH_url}"
-            du.ROBTcp.ip = '192.168.125.1'
-            du.ROBTcp.port = '10001'
+            g.PRH_url = f"http://{g.PRH_url}"
+            g.ROBTcp.ip = '192.168.125.1'
+            g.ROBTcp.port = '10001'
             skip_dialog = True
         case _:
             raise KeyError(f"{arg1} is not a valid argument for PRINT.py!")
@@ -104,17 +104,17 @@ if not skip_dialog:
         print(f"User choose to abort setup! Exiting..")
         exit()
     else:
-        du.ROBTcp.set_params(rob_set)
-        du.PMP_port = p_port
-        du.PRH_url = prh_url
-        du.DB_url = db_url
+        g.ROBTcp.set_params(rob_set)
+        g.PMP_port = p_port
+        g.PRH_url = prh_url
+        g.DB_url = db_url
 
 
     # get the go from user
     welc_text = (
         f"STARTING PRINT APP...\n\nYou're about to establish "
-        f"a TCP connection with the robot at {du.ROBTcp.ip}.\n"
-        f"This can take up to {du.ROBTcp.c_tout} s. You may begin.\n\n"
+        f"a TCP connection with the robot at {g.ROBTcp.ip}.\n"
+        f"This can take up to {g.ROBTcp.c_tout} s. You may begin.\n\n"
     )
     ret = strd_dialog(
         welc_text,

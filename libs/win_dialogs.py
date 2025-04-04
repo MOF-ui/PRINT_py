@@ -26,7 +26,7 @@ from ui.UI_connDialog import Ui_CONN
 from ui.UI_strdDialog import Ui_Dialog
 
 # import my own libs
-import libs.data_utilities as du
+import libs.global_var as g
 
 
 
@@ -111,19 +111,19 @@ class ConnDialog(QDialog, Ui_CONN):
 
     def set_default(self) -> None:
         # ROBOT
-        self.ROB_entry_ip.setText(du.DEF_ROB_TCP['ip'])
-        self.ROB_entry_port.setText(str(du.DEF_ROB_TCP['port']))
-        self.ROB_num_connTo.setValue(du.DEF_ROB_TCP['c_tout'])
-        self.ROB_num_rwTo.setValue(du.DEF_ROB_TCP['rw_tout'])
+        self.ROB_entry_ip.setText(g.ROB_TCP.ip)
+        self.ROB_entry_port.setText(f"{g.ROB_TCP.port}")
+        self.ROB_num_connTo.setValue(int(g.ROB_TCP.c_tout))
+        self.ROB_num_rwTo.setValue(int(g.ROB_TCP.rw_tout))
         # PMPs
-        self.P1_entry_port.setText(du.DEF_PUMP_SERIAL['port'])
-        self.P2_entry_port.setText(du.DEF_PUMP_SERIAL['port'])
+        self.P1_entry_port.setText(f"{g.PMP_SERIAL_PORT}")
+        self.P2_entry_port.setText(f"{g.PMP_SERIAL_PORT}")
         # PRH
-        ip, port = du.PRH_url.split(':')
+        ip, port = g.PRH_url.split(':')
         self.PRH_entry_ip.setText(ip)
         self.PRH_entry_port.setText(port)
         # DB
-        ip, port = du.DB_url.split(':')
+        ip, port = g.DB_url.split(':')
         self.DB_entry_ip.setText(ip)
         self.DB_entry_port.setText(port)
 
@@ -140,8 +140,8 @@ class ConnDialog(QDialog, Ui_CONN):
         self.rob_set['port'] = self.ROB_entry_port.text()
         self.rob_set['c_tout'] = self.ROB_num_connTo.value() / 1000
         self.rob_set['rw_tout'] = self.ROB_num_rwTo.value() / 1000
-        self.rob_set['r_bl'] = du.DEF_ROB_TCP['r_bl']
-        self.rob_set['w_bl'] = du.DEF_ROB_TCP['w_bl']
+        self.rob_set['r_bl'] = g.ROB_TCP.r_bl
+        self.rob_set['w_bl'] = g.ROB_TCP.w_bl
         # PMPs
         p_port = self.P1_entry_port.text()
         if p_port != self.P2_entry_port.text():

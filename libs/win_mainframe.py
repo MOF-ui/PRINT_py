@@ -486,7 +486,7 @@ class Mainframe(PreMainframe):
                 g.ROB_send_list.clear()
             self.switch_rob_moving(end=True)
             try:
-                with open(g.LOG_safe_path, 'x') as save_file:
+                with open(g.CTRL_log_path, 'x') as save_file:
                     save_file.write(
                         f"{Zero.x}_{Zero.y}_{Zero.z}_{Zero.rx}_{Zero.ry}_"
                         f"{Zero.rz}_{Zero.q}_{Zero.ext}"
@@ -922,7 +922,7 @@ class Mainframe(PreMainframe):
             Entry.id = id
 
         with QMutexLocker(GlobalMutex):
-            res = g.SCQueue.add(Entry)
+            res = g.SCQueue.add(Entry, g.SC_curr_comm_id)
         if res == ValueError:
             if not from_file:
                 self.SGLC_entry_gcodeSglComm.setText(f"VALUE ERROR: \n {txt}")
@@ -980,7 +980,7 @@ class Mainframe(PreMainframe):
             Entry.id = id
 
         with QMutexLocker(GlobalMutex):
-            res = g.SCQueue.add(Entry)
+            res = g.SCQueue.add(Entry, g.SC_curr_comm_id)
         if res == ValueError:
             if not from_file:
                 self.SGLC_entry_rapidSglComm.setText(f"VALUE ERROR: \n {txt}")
@@ -1335,7 +1335,7 @@ class Mainframe(PreMainframe):
             return self.send_command(Command, dc=True)
         else:
             Command.id = 0
-            g.SCQueue.add(Command)
+            g.SCQueue.add(Command, g.SC_curr_comm_id)
             self.log_entry('SysC', 'added robot stop command to queue')
             return None
 
@@ -1618,7 +1618,7 @@ class Mainframe(PreMainframe):
 
         Pos = dcpy(g.ROBTelem.Coor)
         Tool = self.prh_read_user_input('ADC')
-        Tool.trolley_calibrate = g.DEF
+        Tool.trolley_calibrate = g.PRH_TROLL_CALIBRATE
         Command = du.QEntry(
             id=g.SC_curr_comm_id,
             Coor1=Pos,

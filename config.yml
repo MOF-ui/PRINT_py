@@ -31,7 +31,7 @@ PMP:
 # ROBOT DEFAULT SETTINGS
 ROBOT:
     BASE_Y_POS: 4100.0 # [mm]
-    BUFF_SIZE: 3000
+    BUFFER_SIZE: 3000
     COMMAND_FORERUN: 10
     MAX_BASE_DIST: 3000.0 # [mm]
     MAX_ROTATION_SPEED: 50.0 # [deg/s]
@@ -56,14 +56,15 @@ ROBOT:
         rz: 120.0
         q: 1.0
         ext: 3500.0
-    TCP:
+    TCP_SOCKET:
+        !TCPSocket
         ip: '192.168.125.1'
         port: 10001
         c_tout: 60000 # [ms]
         rw_tout: 5 # [ms]
         r_bl: 36 # [bytes]
         w_bl: 151 # [bytes]
-    ZERO: 
+    ZERO:
         !Coordinate
         x: -300.0
         y: 1900.0
@@ -74,7 +75,20 @@ ROBOT:
         q: 0.0
         ext: 400.0
 
-# GENERAL DEFAULT SETTINGS
+# PRINTHEAD DEFAULT SETTINGS
+PRINTHEAD:
+    TROLL_CALIBRATE: 99 # ID
+    TROLL_RATIO: 500
+    DEFAULT:
+        !ToolCommand
+        trolley_steps: 0
+        clamp: False
+        cut: False
+        place_spring: False
+        load_spring: False
+        wait: 0
+
+# SPEED SETTINGS
 SPEED:
     DIRECT:
         !SpeedVector
@@ -88,26 +102,21 @@ SPEED:
         dcr: 50.0
         ts: 200.0
         ors: 50.0
+
+# GENERAL DEFAULT SETTINGS
 MAX_LINES:
-    SC: 400
+    SCRIPT: 400
     TERMINAL: 300
     ICQ: 200
     WARN_RAISED: 100
 IO:
     FR_TO_TS: 0.1
     ZONE: 10 # [mm]
-PRINTHEAD:
-    CLAMP: False
-    CUT: False
-    PLACE_SPR: False
-    TROLL_RATIO: 500
-    TROLL_CALIBRATE: 99 # ID
-    TROLLEY: 0
-    WAIT: 0
 SC:
     EXT_TRAIL: !!python/tuple [5, 2] # [mm]
     VOL_PER_M: 0.4 # [L/m] calculated for 1m of 4cm x 1cm high filament
 DATABASE:
+    URL: '192.168.178.50:8086'
     LOG_INTERVAL: 10 # [seconds]
     VALID_TIME: 60 # [seconds]
 WATCHDOG:

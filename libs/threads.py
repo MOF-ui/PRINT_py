@@ -26,6 +26,7 @@ from PyQt5.QtCore import QObject, QTimer, pyqtSignal, QMutexLocker
 from PyQt5.QtGui import QImage, QPixmap
 
 # import my own libs
+import libs.global_var as g 
 import libs.data_utilities as du
 import libs.func_utilities as fu
 import libs.pump_utilities as pu
@@ -85,10 +86,10 @@ class PumpCommWorker(QObject):
         
         # send to P1 and P2 & keepAlive both
         p1_speed, p2_speed, pinch = pu.get_pmp_speeds()
-        min_speed, max_speed = du.DEF_PUMP_CHK_RANGE
+        min_speed, max_speed = g.PMP_SAFE_RANGE
         for serial, speed, live_ad, speed_global, p_num in [
-                (du.PMP1Serial, p1_speed, 'PMP1_live_ad', 'PMP1_speed', 'P1'),
-                (du.PMP2Serial, p2_speed, 'PMP2_live_ad', 'PMP2_speed', 'P2'),
+                (g.PMP1Serial, p1_speed, 'PMP1_live_ad', 'PMP1_speed', 'P1'),
+                (g.PMP2Serial, p2_speed, 'PMP2_live_ad', 'PMP2_speed', 'P2'),
         ]:
             if serial.connected and speed is not None:
                 new_speed = speed * getattr(du, live_ad)
@@ -102,27 +103,27 @@ class PumpCommWorker(QObject):
                     self.dataSend.emit(speed, res[0], res[1], p_num)
 
                 serial.keepAlive()
-        if pinch is not None and du.PRH_connected:
+        if pinch is not None and g.PRH_connected:
             try:
-                ans = requests.post(f"{du.PRH_url}/pinch", data={'s': str(float(pinch))}, timeout=0.1)
+                ans = requests.post(f"{g.PRH_url}/pinch", data={'s': str(float(pinch))}, timeout=0.1)
                 print(ans.text)
             except requests.Timeout as e:
-                log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
+                log_txt = f"post to pinch valve failed! {g.PRH_url} not present!"
                 self.logEntry.emit('CONN', log_txt)
                 print(log_txt)
 
         # SEND TO MIXER
-        if du.PRH_connected and du.MIX_last_speed != du.MIX_speed:
-            if du.PRH_act_with_pump:
-                mixer_speed = du.MIX_max_speed * (p1_speed + p2_speed) / (2 * 100.0)
+        if g.PRH_connected and g.MIX_last_speed != g.MIX_speed:
+            if g.PRH_act_with_pump:
+                mixer_speed = g.MIX_max_speed * (p1_speed + p2_speed) / (2 * 100.0)
             else:
-                mixer_speed = du.MIX_speed
+                mixer_speed = g.MIX_speed
             
-            post_url = f"{du.PRH_url}/motor"
+            post_url = f"{g.PRH_url}/motor"
             post_resp = requests.post(post_url, data={'s': mixer_speed}, timeout=0.1)
             if post_resp.ok and f"RECV: " in post_resp.text:
                 with QMutexLocker(GlobalMutex):
-                    du.MIX_last_speed = mixer_speed
+                    g.MIX_last_speed = mixer_speed
                 print(f"MIX: {mixer_speed}; resp: {post_resp.text}")
                 self.dataMixerSend.emit(mixer_speed)            
 
@@ -132,14 +133,14 @@ class PumpCommWorker(QObject):
         from pump, pass to mainframe
         """
 
-        # for serial,_ in [(du.PMP1Serial, None),(du.PMP2Serial, None)]:
+        # for serial,_ in [(g.PMP1Serial, None),(g.PMP2Serial, None)]:
         #     if serial.connected:
         #         print(f"P2 freq: {serial.frequency}")
 
         # RECEIVE FROM PUMPS:
         for serial, last_telem, speed_global, stt_attr, p_num in [
-                (du.PMP1Serial, 'PMP1LastTelem', 'PMP1_speed', 'Pump1', 'P1'),
-                (du.PMP2Serial, 'PMP2LastTelem', 'PMP2_speed', 'Pump2', 'P2'),
+                (g.PMP1Serial, 'PMP1LastTelem', 'PMP1_speed', 'Pump1', 'P1'),
+                (g.PMP2Serial, 'PMP2LastTelem', 'PMP2_speed', 'Pump2', 'P2'),
         ]:
             if serial.connected:
                 freq = serial.frequency
@@ -171,12 +172,12 @@ class PumpCommWorker(QObject):
                     if Telem != getattr(du, last_telem):
                         with QMutexLocker(GlobalMutex):
                             setattr(du, last_telem, Telem)
-                            setattr(du.STTDataBlock, stt_attr, Telem)
+                            setattr(g.DBDataBlock, stt_attr, Telem)
                         self.dataRecv.emit(Telem, p_num)
 
         # RECEIVE FROM PRINTHEAD (just ping to check)
-        if du.PRH_connected:
-            ping_resp = requests.get(f"{du.PRH_url}/ping", timeout=0.1)
+        if g.PRH_connected:
+            ping_resp = requests.get(f"{g.PRH_url}/ping", timeout=0.1)
             if ping_resp.ok and ping_resp.text == 'ack':
                 self.prhActive.emit()
 
@@ -236,12 +237,12 @@ class RoboCommWorker(QObject):
             self.logEntry.emit('RTel', err_txt)
             with QMutexLocker(GlobalMutex):
                 fu.add_to_comm_protocol(f"RECV:    {err_txt}")
-            if du.SC_q_processing:
+            if g.SC_q_processing:
                 self.endProcessing.emit()
             else:
                 self.endDcMoving.emit()
 
-        Telem, raw_data = du.ROBTcp.receive()
+        Telem, raw_data = g.ROBTcp.receive()
         if isinstance(Telem, Exception):
             # inform user if error occured in websocket connection (ignore timeouts)
             if(
@@ -253,7 +254,7 @@ class RoboCommWorker(QObject):
         elif Telem.id < 0:
             # handle robot internal error catching
             try:
-                LastPos = du.ROBCommQueue[0].Coor1
+                LastPos = g.ROBCommQueue[0].Coor1
             except:
                 LastPos = 'POSITION NOT RETRIEVABLE'
             err_handler(f"given position out of reach! last given pos: {LastPos}")
@@ -267,58 +268,58 @@ class RoboCommWorker(QObject):
                 fu.add_to_comm_protocol(f"RECV:    {Telem}")
 
                 # check for ID overflow, reduce SC_queue IDs
-                if Telem.id < du.ROBLastTelem.id:
-                    buff_size = du.DEF_ROB_BUFF_SIZE
+                if Telem.id < g.ROBLastTelem.id:
+                    buff_size = g.ROB_BUFFER_SIZE
                     # avoid errors from SC_curr_comm_id resets:
-                    if all(entry.id > buff_size for entry in du.SCQueue):
-                        for x in du.SCQueue:
+                    if all(entry.id > buff_size for entry in g.SCQueue):
+                        for x in g.SCQueue:
                             x.id -= buff_size
                         # and clear ROBCommQueue entries with IDs
                         # near DEF_ROB_BUFF_SIZE
                         try:
-                            while du.ROBCommQueue[0].id > Telem.id:
-                                du.ROBCommQueue.pop_first_item()
+                            while g.ROBCommQueue[0].id > Telem.id:
+                                g.ROBCommQueue.pop_first_item()
                         except:
                             pass
                     # otherwise it has to be a SC_curr_comm_id reset,
                     # indicate robot idle state
                     else:
-                        du.ROBCommQueue.clear()
+                        g.ROBCommQueue.clear()
                         self.endDcMoving.emit()
 
                 # delete all finished commands from ROB_commQueue
                 try:
-                    while du.ROBCommQueue[0].id < Telem.id:
-                        du.ROBCommQueue.pop_first_item()
+                    while g.ROBCommQueue[0].id < Telem.id:
+                        g.ROBCommQueue.pop_first_item()
                 except AttributeError:
                     pass
 
                 # refresh data only if new
-                if Telem != du.ROBLastTelem:
+                if Telem != g.ROBLastTelem:
                     # check if robot is processing a new command
                     # (length check to skip in first loop)
                     if (
-                            Telem.id != du.ROBLastTelem.id
-                            and len(du.ROBCommQueue) > 0
+                            Telem.id != g.ROBLastTelem.id
+                            and len(g.ROBCommQueue) > 0
                         ):
-                        du.ROBMovStartP = du.ROBMovEndP
-                        du.ROBMovEndP = dcpy(du.ROBCommQueue[0].Coor1)
+                        g.ROBMovStartP = g.ROBMovEndP
+                        g.ROBMovEndP = dcpy(g.ROBCommQueue[0].Coor1)
 
                     # set new values to globals
-                    du.ROBTelem = dcpy(Telem)
-                    du.ROBLastTelem = dcpy(Telem)
+                    g.ROBTelem = dcpy(Telem)
+                    g.ROBLastTelem = dcpy(Telem)
 
                     # prep database entry
                     STTEntry = dcpy(Telem)
-                    STTEntry.Coor -= du.DCCurrZero
-                    du.STTDataBlock.Robo = dcpy(STTEntry) 
+                    STTEntry.Coor -= g.ROBCurrZero
+                    g.DBDataBlock.Robo = dcpy(STTEntry) 
                     self.dataUpdated.emit(str(raw_data), Telem)
                     
                     # print
                     print(f"RECV:    {Telem}")
 
             # reset robMoving indicator if near end, skip if queue is processed
-            if du.DC_rob_moving and not du.SC_q_processing:
+            if g.DC_rob_moving and not g.SC_q_processing:
                 if self._check_target_reached():
                     self.endDcMoving.emit()
 
@@ -328,26 +329,26 @@ class RoboCommWorker(QObject):
         space
         """
 
-        len_sc = len(du.SCQueue)
-        len_rob = len(du.ROBCommQueue)
-        rob_id = du.ROBTelem.id
+        len_sc = len(g.SCQueue)
+        len_rob = len(g.ROBCommQueue)
+        rob_id = g.ROBTelem.id
 
         # if qProcessing is ending, define end as being in 1mm range of
         # the last robtarget
-        if du.SC_q_prep_end:
+        if g.SC_q_prep_end:
             if self._check_target_reached():
                 self.endProcessing.emit()
 
         # if qProcessing is active and not ending, pop first queue item if
         # robot is nearer than ROB_commFr; if no entries in SC_queue left,
         # end qProcessing (immediately if ROB_commQueue is empty as well)
-        elif du.SC_q_processing:
+        elif g.SC_q_processing:
             if len_sc > 0:
                 with QMutexLocker(GlobalMutex):
                     try:
-                        while (rob_id + du.ROB_comm_fr) >= du.SCQueue[0].id:
-                            comm_tuple = (du.SCQueue.pop_first_item(), False)
-                            du.ROB_send_list.append(comm_tuple)
+                        while (rob_id + g.ROB_comm_fr) >= g.SCQueue[0].id:
+                            comm_tuple = (g.SCQueue.pop_first_item(), False)
+                            g.ROB_send_list.append(comm_tuple)
                     except AttributeError:
                         pass
 
@@ -365,8 +366,8 @@ class RoboCommWorker(QObject):
 
         num_send = 0
         # send commands until send_list is empty
-        while len(du.ROB_send_list) > 0:
-            Comm, direct_ctrl = du.ROB_send_list.pop(0)
+        while len(g.ROB_send_list) > 0:
+            Comm, direct_ctrl = g.ROB_send_list.pop(0)
 
             # check for type, ID overflow & live adjustments to tcp speed
             if not isinstance(Comm, du.QEntry):
@@ -379,32 +380,32 @@ class RoboCommWorker(QObject):
                 self.sendElem.emit(Comm, False, err, direct_ctrl)
                 print(f"send error: {err}")
                 break
-            while Comm.id > du.DEF_ROB_BUFF_SIZE:
-                Comm.id -= du.DEF_ROB_BUFF_SIZE
+            while Comm.id > g.ROB_BUFFER_SIZE:
+                Comm.id -= g.ROB_BUFFER_SIZE
             # check for TCP speed overwrites
-            if du.ROB_speed_overwrite >= 0.0:
-                Comm.Speed.ts = du.ROB_speed_overwrite
+            if g.ROB_speed_overwrite >= 0.0:
+                Comm.Speed.ts = g.ROB_speed_overwrite
                 # limit reorientation speed to avoid damage
-                r_speed = (du.ROB_speed_overwrite / 2)
-                Comm.Speed.ors = min([r_speed, du.CTRL_max_r_speed])
+                r_speed = (g.ROB_speed_overwrite / 2)
+                Comm.Speed.ors = min([r_speed, g.ROB_max_r_speed])
             else:
-                Comm.Speed.ts = int(Comm.Speed.ts * du.ROB_live_ad)
-                Comm.Speed.ors = int(Comm.Speed.ors * du.ROB_live_ad)
+                Comm.Speed.ts = int(Comm.Speed.ts * g.ROB_live_ad)
+                Comm.Speed.ors = int(Comm.Speed.ors * g.ROB_live_ad)
 
             # if testrun, skip actually sending the message
             if testrun:
                 res, msg_len = True, 159
             else:
-                res, msg_len = du.ROBTcp.send(Comm)
+                res, msg_len = g.ROBTcp.send(Comm)
 
             # see if sending was successful
             if res:
                 with QMutexLocker(GlobalMutex):
                     num_send += 1
-                    du.ROBCommQueue.append(Comm)
+                    g.ROBCommQueue.append(Comm)
                     fu.add_to_comm_protocol(f"SEND:    {Comm}")
                     if direct_ctrl:
-                        du.SCQueue.increment()
+                        g.SCQueue.increment()
 
                 self.logEntry.emit('ROBO', f"send: {Comm}")
             else:
@@ -412,7 +413,7 @@ class RoboCommWorker(QObject):
                 self.sendElem.emit(Comm, False, msg_len, direct_ctrl)
         
             # inform mainframe if command block was send successfully 
-            if len(du.ROB_send_list) == 0:
+            if len(g.ROB_send_list) == 0:
                 self.sendElem.emit(Comm, True, num_send, direct_ctrl)
 
 
@@ -423,13 +424,13 @@ class RoboCommWorker(QObject):
         """
 
         # as long as there a more commands comming, target is not reached
-        command_num = len(du.ROBCommQueue)
-        if command_num > 1 or len(du.ROB_send_list) != 0:
+        command_num = len(g.ROBCommQueue)
+        if command_num > 1 or len(g.ROB_send_list) != 0:
             return False
         # otherwise calc distance to target
         elif command_num == 1:
-            CurrTarget = dcpy(du.ROBCommQueue[0].Coor1)
-            CurrCoor = dcpy(du.ROBTelem.Coor)
+            CurrTarget = dcpy(g.ROBCommQueue[0].Coor1)
+            CurrCoor = dcpy(g.ROBTelem.Coor)
             target_dist =  m.sqrt(
                 m.pow(CurrTarget.x - CurrCoor.x, 2)
                 + m.pow(CurrTarget.y - CurrCoor.y, 2)
@@ -440,7 +441,7 @@ class RoboCommWorker(QObject):
         else:
             return True
 
-        if target_dist < du.CTRL_min_target_dist:
+        if target_dist < g.ROB_min_target_dist:
             return True
         return False
 
@@ -499,7 +500,7 @@ class SensorCommWorker(QObject):
                         loc['err'] = False
 
                         with QMutexLocker(GlobalMutex):
-                            du.STTDataBlock.store(latest_data, key, sub_key)
+                            g.DBDataBlock.store(latest_data, key, sub_key)
 
                     elif data is not None:
                         # log recurring error from one location only once
@@ -517,8 +518,8 @@ class SensorCommWorker(QObject):
             return None
 
         # main cycle
-        for key in du.SEN_dict:
-            loc_request(du.SEN_dict[key], key)
+        for key in g.SEN_dict:
+            loc_request(g.SEN_dict[key], key)
 
         self.cycleDone.emit()
 
@@ -600,7 +601,7 @@ class LoadFileWorker(QObject):
             self.check_routine(fu.base_dist_check)
 
         # add to command queue
-        du.SCQueue.add_queue(self._CommList)
+        g.SCQueue.add_queue(self._CommList)
         self.convFinished.emit(line_id, start_id, skips)
         lfw_running = False
 
@@ -609,15 +610,15 @@ class LoadFileWorker(QObject):
         """row-wise conversion from GCode"""
 
         skips = 0
-        Speed = dcpy(du.PRINSpeed)
+        Speed = dcpy(g.SCSpeed)
         # file import always starts from home, regardless of current pos:
-        LastPos = du.DCCurrZero
+        LastPos = g.ROBCurrZero
 
         for row in rows:
             Entry, command = fu.gcode_to_qentry(
                 LastPos,
                 Speed,
-                du.IO_zone,
+                g.IO_zone,
                 row,
                 lfw_ext_trail
             )
@@ -676,7 +677,7 @@ class LoadFileWorker(QObject):
             if not result:
                 warnings += 1
                 chk_msg += f"Line {line}: {msg}\n"
-                if warnings >= du.DEF_WARN_MAX_RAISED:
+                if warnings >= g.WARN_MAX_RAISED:
                     chk_msg += (
                         f"Maximum number of warnings reached, "
                         f"stopping check.."
@@ -700,7 +701,7 @@ class IPCamWorker(QObject):
         """create capture timer and fill active streams according to 
         given URLs"""
 
-        for url in du.CAM_urls:
+        for url in g.CAM_urls:
             self.cam_streams.append(cv2.VideoCapture(url, cv2.CAP_FFMPEG,))
         
         self.CapTimer = QTimer()

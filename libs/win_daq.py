@@ -31,7 +31,6 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 
 # import my own libs
 import libs.global_var as g
-import libs.data_utilities as du
 from libs.win_dialogs import strd_dialog
 
 

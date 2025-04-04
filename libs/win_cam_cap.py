@@ -29,9 +29,6 @@ from ui.UI_cam_cap import Ui_CamCapWindow
 import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-# import my own libs
-import libs.data_utilities as du
-
 
 
 ###########################     DAQ CLASS      ###############################

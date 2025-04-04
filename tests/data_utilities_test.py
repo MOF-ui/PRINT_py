@@ -200,9 +200,9 @@ class DataLibTest(unittest.TestCase):
         EmptyQueue = du.Queue()
         TestCoor = du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)
         TestQueue = du.Queue()
-        TestQueue.add(du.QEntry())
-        TestQueue.add(du.QEntry(id=10, Coor1=TestCoor))
-        TestQueue.add(du.QEntry(id=2, Coor1=TestCoor+1))
+        TestQueue.add(du.QEntry(), g.SC_curr_comm_id)
+        TestQueue.add(du.QEntry(id=10, Coor1=TestCoor), g.SC_curr_comm_id)
+        TestQueue.add(du.QEntry(id=2, Coor1=TestCoor+1), g.SC_curr_comm_id)
         TestStrs = [
             f"{du.QEntry(id=1)}\n",
             f"{du.QEntry(id=2, Coor1=TestCoor+1)}\n",
@@ -295,9 +295,9 @@ class DataLibTest(unittest.TestCase):
         )
 
         # add
-        self.assertEqual(TestQueue.add(du.QEntry(id=-1)), ValueError)
-        TestQueue.add(du.QEntry(id=0, Coor1=TestCoor+2))
-        TestQueue.add(du.QEntry(id=9, Coor1=TestCoor+3))
+        self.assertEqual(TestQueue.add(du.QEntry(id=-1), g.SC_curr_comm_id), ValueError)
+        TestQueue.add(du.QEntry(id=0, Coor1=TestCoor+2), g.SC_curr_comm_id)
+        TestQueue.add(du.QEntry(id=9, Coor1=TestCoor+3), g.SC_curr_comm_id)
         self.assertEqual(
             TestQueue.display(),
             [
@@ -689,8 +689,8 @@ class DataLibTest(unittest.TestCase):
         """test TCPIP class, handles connection data und functions"""
 
         # __init__ & __str__
-        TestTCPIP = du.TCPIP()
-        InitTestTCPIP = du.TCPIP(
+        TestTCPIP = du.TCPSocket()
+        InitTestTCPIP = du.TCPSocket(
             ip="1.1.1.1",
             port=2222,
             c_tout=3.3,

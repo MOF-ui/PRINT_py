@@ -25,6 +25,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 # import my own libs
+import libs.global_var as g
 import libs.data_utilities as du
 
 
@@ -51,7 +52,7 @@ def range_check(target_entry:du.QEntry) -> tuple[bool, str]:
 
     target = target_entry.Coor1
     names = target.attr_names
-    RangeMin, RangeMax = dcpy(du.ROB_safe_range)
+    RangeMin, RangeMax = dcpy(g.ROB_safe_range)
     # axis RX points downwards at 180° or -180° (same effect)
     # to avoid confusion, range_check is defined as 150° - 210°
     # but since -150° is the same as 210°, I adjusted the check to
@@ -79,12 +80,12 @@ def base_dist_check(target_entry:du.QEntry) -> tuple[bool, str]:
     
     target = target_entry.Coor1
     x_dist = target.x - target.ext
-    y_dist = du.RC_y_base_pos - target.y
+    y_dist = g.ROB_BASE_Y_POS - target.y
     dist = m.sqrt(m.pow(x_dist, 2) + m.pow(y_dist, 2))
-    if dist > du.RC_max_base_dist:
+    if dist > g.ROB_MAX_BASE_DIST:
         msg = (
             f"Base distance out of range "
-            f"({round(dist, 2)}mm > {du.RC_max_base_dist}mm)! "
+            f"({round(dist, 2)}mm > {g.ROB_MAX_BASE_DIST}mm)! "
             f"Vector: ({round(x_dist, 1)}, {round(y_dist, 1)})mm"
         )
         return False, msg
@@ -263,7 +264,7 @@ def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
     # set pump settings
     p_mode = re_short(None, txt, -1001, find_coor='PMP')
     p_mode = int(float(p_mode))
-    if -100 <= p_mode <= 100 or p_mode in du.DEF_PUMP_VALID_COMMANDS:
+    if -100 <= p_mode <= 100 or p_mode in g.PMP_VALID_COMMANDS:
         entry.p_mode = p_mode
     else:
         p_mode = -1001 # = no pump mode given
@@ -276,7 +277,7 @@ def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
 
     # set tool settings
     troll_steps = re_short(None, txt, 0, find_coor='TRL')
-    entry.Tool.trolley_steps = int(float(troll_steps) * du.TOOL_trol_ratio)
+    entry.Tool.trolley_steps = int(float(troll_steps) * g.PRH_trol_ratio)
     clamp = re_short(None, txt, 0, find_coor='TCL')
     entry.Tool.clamp = bool(int(clamp))
     cut = re_short(None, txt, 0, find_coor='TCU')
@@ -321,7 +322,7 @@ def gcode_to_qentry(
     # handle mutuables here
     pos = dcpy(mut_pos)
     speed = dcpy(mut_speed)
-    zero = dcpy(du.DCCurrZero)
+    zero = dcpy(g.ROBCurrZero)
 
     if not isinstance(pos, du.Coordinate):
         raise ValueError(f"{pos} is not an instance of Coordinate!")
@@ -348,8 +349,8 @@ def gcode_to_qentry(
                     # calculate following position of external axis
                     if entry.Coor1.x > 0:
                         entry.Coor1.ext = (
-                            int(entry.Coor1.x / du.SC_ext_trail[0])
-                            * du.SC_ext_trail[1]
+                            int(entry.Coor1.x / g.SC_ext_trail[0])
+                            * g.SC_ext_trail[1]
                         )
                         entry.Coor1.ext += zero.ext
 
@@ -386,7 +387,7 @@ def gcode_to_qentry(
             fr = re_short(None, txt, speed.ts, find_coor='F')
             if fr != speed.ts:
                 fr = float(fr.replace(',', '.'))
-                entry.Speed.ts = int(fr * du.IO_fr_to_ts)
+                entry.Speed.ts = int(fr * g.IO_fr_to_ts)
 
             ext = re_short(None, txt, pos.ext, find_coor='EXT')
             if ext != pos.ext:
@@ -411,13 +412,13 @@ def gcode_to_qentry(
 
         case 'G92':
             if 'X0' in txt:
-                du.DCCurrZero.x = pos.x
+                g.ROBCurrZero.x = pos.x
             if 'Y0' in txt:
-                du.DCCurrZero.y = pos.y
+                g.ROBCurrZero.y = pos.y
             if 'Z0' in txt:
-                du.DCCurrZero.z = pos.z
+                g.ROBCurrZero.z = pos.z
             if 'EXT0' in txt:
-                du.DCCurrZero.ext = pos.ext
+                g.ROBCurrZero.ext = pos.ext
             return None, command
 
         case ';':
@@ -460,15 +461,15 @@ def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
         # look for relative coordinates
         if 'Offs' in txt:
             res_coor = [
-                du.DCCurrZero.x + float(decimals[0]),
-                du.DCCurrZero.y + float(decimals[1]),
-                du.DCCurrZero.z + float(decimals[2]),
-                du.DCCurrZero.rx,
-                du.DCCurrZero.ry,
-                du.DCCurrZero.rz,
-                du.DCCurrZero.q,
+                g.ROBCurrZero.x + float(decimals[0]),
+                g.ROBCurrZero.y + float(decimals[1]),
+                g.ROBCurrZero.z + float(decimals[2]),
+                g.ROBCurrZero.rx,
+                g.ROBCurrZero.ry,
+                g.ROBCurrZero.rz,
+                g.ROBCurrZero.q,
             ]
-            ext = du.DCCurrZero.ext
+            ext = g.ROBCurrZero.ext
 
         # or standard robtarget
         else:
@@ -491,8 +492,8 @@ def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
         if ext_from_file is None:
             if ext_trail:
                 ext_from_file = (
-                    int(entry.Coor1.x / du.SC_ext_trail[0])
-                    * du.SC_ext_trail[1]
+                    int(entry.Coor1.x / g.SC_ext_trail[0])
+                    * g.SC_ext_trail[1]
                 )
         else:
             ext_from_file = float(ext_from_file)
@@ -504,7 +505,7 @@ def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
         entry.Speed.ors = int(float(res_speed[1]))
         entry.Speed.acr = int(float(res_speed[2]))
         entry.Speed.dcr = int(float(res_speed[3]))
-        zone = re_short([r'z\d+'], txt, du.IO_zone)
+        zone = re_short([r'z\d+'], txt, g.IO_zone)
         entry.z = int(zone[1:])
 
         # rounding everything to 2 decimals causes inaccuarcy on quaternions
@@ -526,7 +527,7 @@ def create_logfile() -> Path | None:
         desk = os.environ['USERPROFILE']
         log_path = desk / Path('Desktop/PRINT_py_log')
         log_path.mkdir(parents=True, exist_ok=True)
-        du.LOG_safe_path = Path(log_path / Path('ZERO.zrf'))
+        g.CTRL_log_path = Path(log_path / Path('ZERO.zrf'))
 
         time = datetime.now().strftime('%Y-%m-%d_%H%M%S')
 
@@ -551,10 +552,10 @@ def add_to_comm_protocol(txt:str) -> None:
         txt: str to appear as terminal entry
     """
 
-    du.TERM_log.append(txt)
+    g.TERM_log.append(txt)
 
-    if len(du.TERM_log) > du.DEF_TERM_MAX_LINES:
-        du.TERM_log.__delitem__(0)
+    if len(g.TERM_log) > g.TERM_MAX_LINES:
+        g.TERM_log.__delitem__(0)
 
 
 def connect_pump(p_num:int) -> None:
@@ -566,22 +567,22 @@ def connect_pump(p_num:int) -> None:
         p_num: number of pump to be connected
     """
 
-    if du.PMPSerialDefBus is None:
-        du.PMPSerialDefBus = serial.Serial(
-            baudrate=du.DEF_PUMP_SERIAL['baud'],
+    if g.PMPSerialDefBus is None:
+        g.PMPSerialDefBus = serial.Serial(
+            baudrate=g.PMP_SERIAL_BAUD['baud'],
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_TWO,
             bytesize=serial.EIGHTBITS,
-            port=du.PMP_port,
+            port=g.PMP_port,
         )
-        du.PMP1Serial.serial_default = du.PMPSerialDefBus
-        du.PMP2Serial.serial_default = du.PMPSerialDefBus
+        g.PMP1Serial.serial_default = g.PMPSerialDefBus
+        g.PMP2Serial.serial_default = g.PMPSerialDefBus
 
     match p_num:
         case 'P1':
-            ret = du.PMP1Serial.connect()
+            ret = g.PMP1Serial.connect()
         case 'P2':
-            ret = du.PMP2Serial.connect()
+            ret = g.PMP2Serial.connect()
         case _:
             raise ValueError(f"wrong pNum given: {p_num}")
     
@@ -628,7 +629,7 @@ def sensor_req(
     """
 
     try:
-        ans = requests.get(f"http://{ip}/{key}", timeout=du.SEN_timeout)
+        ans = requests.get(f"http://{ip}/{key}", timeout=g.SEN_timeout)
         ans.raise_for_status()
     except Exception as err:
         return ValueError(f"request failed: {err}!")

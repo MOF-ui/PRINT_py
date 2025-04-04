@@ -232,7 +232,7 @@ while toggle:
                 print('command: ', end='')
                 if CommandList[0].id > RecvEntry.id:
                     CommandList.clear()
-                CommandList.add(RecvEntry)
+                CommandList.add(RecvEntry, 1)
 
     a = input("Connection closed...  Wait for reconnect? Y/N\n")
     if a != "Y":
