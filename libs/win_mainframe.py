@@ -132,10 +132,11 @@ class Mainframe(PreMainframe):
 
         # AMCON CONTROL
         self.ADC_btt_resetAll.pressed.connect(lambda: self.load_ADC_defaults(send_changes=True))
-        self.ADC_num_trolley.valueChanged.connect(self.adc_user_change)
-        self.ADC_btt_clamp.released.connect(self.adc_user_change)
-        self.ADC_btt_cut.released.connect(self.adc_user_change)
-        self.ADC_btt_placeSpring.released.connect(self.adc_user_change)
+        for elem in self.ADC_group:
+            try:
+                elem.released.connect(self.adc_user_change)
+            except AttributeError:
+                elem.valueChanged.connect(self.adc_user_change)
         self.ASC_btt_overwrSC.released.connect(self.amcon_script_overwrite)
 
         # DIRECT CONTROL
@@ -878,16 +879,21 @@ class Mainframe(PreMainframe):
         """
 
         # get text and position BEFORE PLANNED COMMAND EXECUTION
-        Speed = dcpy(g.SCSpeed)
-
         try:
             if not at_id:
-                Pos = dcpy(g.SCQueue.last_entry().Coor1)
+                LastEntry = dcpy(g.SCQueue.last_entry())
+                if LastEntry is None:
+                    raise AttributeError
+                LastEntry.id = 0
             else:
-                Pos = dcpy(g.SCQueue.entry_before_id(id).Coor1)
-
+                LastEntry = dcpy(g.SCQueue.entry_before_id(id))
         except AttributeError:
-            Pos = g.ROBCurrZero
+            LastEntry = du.QEntry(
+                id=0,
+                Coor1=g.ROBCurrZero,
+                Speed=g.SCSpeed,
+                z=g.IO_zone
+            )
 
         if not from_file:
             txt = self.SGLC_entry_gcodeSglComm.toPlainText()
@@ -895,39 +901,35 @@ class Mainframe(PreMainframe):
             txt = file_txt
 
         # act according to GCode command
-        Entry, command = fu.gcode_to_qentry(Pos, Speed, g.IO_zone, txt)
-
+        Entry, command = fu.gcode_to_qentry(LastEntry, txt, False)
+        err_txt = ''
         if command != 'G1' and command != 'G28' and command != 'G92':
             if command == ';':
-                pan_txt = f"leading semicolon interpreted as comment:\n{txt}"
-
+                err_txt = f"leading semicolon interpreted as comment:\n{txt}"
             elif Entry is None:
-                pan_txt = f"SYNTAX ERROR:\n{txt}"
-
+                err_txt = f"SYNTAX ERROR:\n{txt}"
             else:
-                if not from_file:
-                    self.SGLC_entry_gcodeSglComm.setText(f"{command}\n{txt}")
-                return Entry, command
-
-            if not from_file:
-                self.SGLC_entry_gcodeSglComm.setText(pan_txt)
-            return Entry, command
-
+                err_txt = f"{command}\n{txt}"
         elif command == 'G92':
             self.label_update_on_new_zero()
+            return Entry, command
+
+        if not self.coor_plausibility_check(Entry):
+            err_txt = f"POSITION UNREACHABLE:\n{txt}"
+        if err_txt != '':
+            if not from_file:
+                self.SGLC_entry_gcodeSglComm.setText(err_txt)
             return Entry, command
 
         # set command ID if given, sorting is done later by 'Queue' class
         if at_id:
             Entry.id = id
-
         with QMutexLocker(GlobalMutex):
             res = g.SCQueue.add(Entry, g.SC_curr_comm_id)
         if res == ValueError:
             if not from_file:
                 self.SGLC_entry_gcodeSglComm.setText(f"VALUE ERROR: \n {txt}")
             return ValueError, ''
-
         if not from_file:
             self.log_entry(
                 'ComQ',
@@ -959,26 +961,24 @@ class Mainframe(PreMainframe):
             txt = file_txt
 
         Entry = fu.rapid_to_qentry(txt)
-
+        err_txt = ''
         if Entry is None:
+            err_txt = (
+                f"ERROR: no detectable move-type "
+                f"or missing 'EXT' in:\n{txt}"
+            )
+        if isinstance(Entry, Exception):
+            err_txt = f"SYNTAX ERROR: {Entry}\n{txt}"
+        if not self.coor_plausibility_check(Entry):
+            err_txt = f"COORDINATE ERROR:\n {txt}"
+        if err_txt != '':
             if not from_file:
-                self.SGLC_entry_rapidSglComm.setText(
-                    f"ERROR: no detectable move-type "
-                    f"or missing 'EXT' in:\n {txt}"
-                )
+                self.SGLC_entry_rapidSglComm.setText(err_txt)
             return Entry
         
-        if isinstance(Entry, Exception):
-            if not from_file:
-                self.SGLC_entry_rapidSglComm.setText(
-                    f"SYNTAX ERROR: {Entry}\n {txt}"
-                )
-            return Entry
-
         # set command ID if given, sorting is done later by 'Queue' class
         if at_id:
             Entry.id = id
-
         with QMutexLocker(GlobalMutex):
             res = g.SCQueue.add(Entry, g.SC_curr_comm_id)
         if res == ValueError:
@@ -1227,10 +1227,14 @@ class Mainframe(PreMainframe):
             return None
 
         # get entry
-        Speed = dcpy(g.DCSpeed)
-        Pos = dcpy(g.ROBTelem.Coor)
+        CurrEntry = du.QEntry(
+            id=g.SC_curr_comm_id,
+            Coor1=dcpy(g.ROBTelem.Coor),
+            Speed=dcpy(g.DCSpeed),
+            z=g.IO_zone,
+        )
         txt = self.TERM_entry_gcodeInterp.text()
-        Command, com_type = fu.gcode_to_qentry(Pos, Speed, g.IO_zone, txt)
+        Command, com_type = fu.gcode_to_qentry(CurrEntry, txt, False)
 
         # check for special command types
         if com_type == 'G92':
@@ -1246,7 +1250,6 @@ class Mainframe(PreMainframe):
             return None
 
         # send if standard G1 or G28 command
-        Command.id = g.SC_curr_comm_id
         if not self.coor_plausibility_check(Command):
             return
         self.send_command(Command, dc=True)
@@ -1483,6 +1486,12 @@ class Mainframe(PreMainframe):
         RetTool.clamp = bool(group[1].isChecked())
         RetTool.cut = bool(group[2].isChecked())
         RetTool.place_spring = bool(group[3].isChecked())
+        RetTool.load_spring = bool(group[4].isChecked())
+        if panel == 'ADC':
+            if self.ADC_btt_calibrate.isChecked():
+                RetTool.trolley_calibrate = g.PRH_TROLL_CALIBRATE
+            else:
+                RetTool.trolley_calibrate = 0
         return RetTool
 
 
@@ -1504,27 +1513,6 @@ class Mainframe(PreMainframe):
 
         self.log_entry('ACON', f"updating tool status by user: ({Tool})")
         ans = self.send_command(Command, dc=True)
-        if Command.Tool.place_spring:
-            # if spring is placed, reload it
-            for widget in self.ADC_group:
-                widget.setEnabled(False)
-            self.log_entry('ACON', f"reloading..")
-            time.sleep(0.5)
-            Command.Tool.place_spring = False
-            Command.id += 1
-            self.send_command(Command, dc=True)
-            time.sleep(0.5)
-            Command.Tool.load_spring = True
-            Command.id += 1
-            self.send_command(Command, dc=True)
-            time.sleep(0.5)
-            Command.Tool.load_spring = False
-            Command.id += 1
-            ans = self.send_command(Command, dc=True)
-            self.log_entry('ACON', f"reloading done.")
-            for widget in self.ADC_group:
-                widget.setEnabled(True)
-        
         return ans
             
 
@@ -1607,28 +1595,6 @@ class Mainframe(PreMainframe):
             'ACON',
             f"{id_range} SC commands overwritten; settings: ({Tool})"
         )
-    
-
-
-    def amcon_trolley_zero(self) -> None:
-        """sets trolley to zero position"""
-            
-        if g.DC_rob_moving or g.SC_q_processing:
-            return None
-
-        Pos = dcpy(g.ROBTelem.Coor)
-        Tool = self.prh_read_user_input('ADC')
-        Tool.trolley_calibrate = g.PRH_TROLL_CALIBRATE
-        Command = du.QEntry(
-            id=g.SC_curr_comm_id,
-            Coor1=Pos,
-            Speed=dcpy(g.DCSpeed),
-            z=0,
-            Tool=Tool,
-        )
-        self.log_entry('ACON', f"updating tool status by user: ({Tool})")
-        ans = self.send_command(Command, dc=True)
-        return ans
 
 
     ##########################################################################

@@ -45,6 +45,11 @@ class Coordinate(yaml.YAMLObject):
             additional var for fourth quaternion coordinate
         ext:
             external axis position
+    
+    CLASS METHODS:
+        from_class:
+            returns a new Coordinate object with the same values as the given
+            one
 
     METHODS:
         __add__, __eq__, __init__, __ne__, __repr__, __round__, __str__, __sub__
@@ -285,6 +290,11 @@ class SpeedVector(yaml.YAMLObject):
             transition speed
         os:
             orientation speed
+    
+    CLASS METHODS:
+        from_class:
+            returns a new SpeedVector object with the same values as the given
+            one
 
     METHODS:
         __eq__, __init__, __mul__, __ne__, __repr__, __rmul__, __str__
@@ -724,6 +734,8 @@ class Queue:
     def __add__(self, other) -> 'Queue':
         if not isinstance(other, Queue):
             raise ValueError(f"{other} is not an instance of 'Queue'!")
+        if len(self) == 0:
+            return other
         self.add_queue(other)
         return self
 
@@ -886,7 +898,7 @@ class Queue:
         last_item = len(self) - 1
         if not isinstance(new_entry, QEntry):
             return TypeError('entry is not an instance of QEntry')
-        if curr_id != -1 and not thread_call:
+        if curr_id == -1 and not thread_call:
             raise ValueError(f"curr_id=-1 not allowed outside thread_calls!")
 
         if last_item < 0:
@@ -919,7 +931,7 @@ class Queue:
         return None
 
 
-    def add_queue(self, add_queue:'Queue') -> None | Exception:
+    def add_queue(self, add_queue:'Queue', curr_id=-1) -> None | Exception:
         """adds another queue, hopefully less time-consuming than a for loop
         with self.add
         """
@@ -934,10 +946,8 @@ class Queue:
         last_item = len(self) - 1
         # if current queue is empty, start with the first ID of the new list
         if last_item < 0:
-            # can also overwrite added lists first ID to SC_curr_comm_id
-            # but importing would create circular import
-            # if nl_first_id != SC_curr_comm_id:
-            #     new_list.increment(SC_curr_comm_id - nl_first_id)
+            if nl_first_id != curr_id:
+                new_list.increment(curr_id - nl_first_id)
             self._queue.extend(new_list._queue)
             return
 
@@ -1588,6 +1598,10 @@ class TCPSocket (yaml.YAMLObject):
             data block length to read
         w_bl:
             data block length to write
+    
+    CLASS METHODS:
+        from_class:
+            returns a new TCPSocket object with the same values as the given one
 
     METHODS:
         __init__, ,__repr__, __str__
@@ -1627,7 +1641,7 @@ class TCPSocket (yaml.YAMLObject):
 
     @classmethod
     def from_class(cls, sock:'TCPSocket') -> 'TCPSocket':
-        """returns a new Coordinate object with the same values as the given
+        """returns a new TCPSocket object with the same values as the given
         one
         """
         if not isinstance(sock, TCPSocket):
@@ -1724,7 +1738,6 @@ class TCPSocket (yaml.YAMLObject):
         """receive according to class attributes"""
 
         data = ''
-
         try:
             while len(data) < self.r_bl:
                 data = self._Socket.recv(self.r_bl)
@@ -1755,6 +1768,10 @@ class RoboConnection(TCPSocket):
 
     ATTRIBUTES:
         inherited from ~TCPIP class
+    
+    CLASS METHODS:
+        from_class:
+            returns a new RC object with the same values as the given one
 
     METHODS (redefinition of ~TCPIP methods):
         send:
@@ -1764,6 +1781,28 @@ class RoboConnection(TCPSocket):
             receives and unpacks data from robot, returns it as RobTelemetry
             object
     """
+    
+
+    @classmethod
+    def from_class(cls, sock:'RoboConnection') -> 'RoboConnection':
+        """returns a new RC object with the same values as the given
+        RC or TCPSocket class
+        """
+        if (
+                not isinstance(sock, RoboConnection)
+                and not isinstance(sock, TCPSocket)
+            ):
+            raise TypeError(
+                f"{sock} is no instance of 'RoboConnection' or 'TCPSocket!"
+            )
+        return cls(
+            sock.ip,
+            sock.port,
+            sock.c_tout,
+            sock.rw_tout,
+            sock.r_bl,
+            sock.w_bl,
+        )
 
 
     def send(self, entry) -> tuple[bool, int | Exception]:
@@ -1806,7 +1845,7 @@ class RoboConnection(TCPSocket):
                 entry.sbt,
                 bytes(entry.sc, 'utf-8'),
                 entry.z,
-                0, # ID int, always 0
+                entry.Tool.trolley_calibrate, # ID for trolley calibration
                 entry.Tool.trolley_steps,
                 0,
                 # byte for cutter position, but simply coupled to cutting here 

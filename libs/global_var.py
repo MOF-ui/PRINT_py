@@ -12,6 +12,7 @@ import os
 import sys
 import yaml
 from pathlib import Path
+from copy import deepcopy as dcpy
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -44,7 +45,7 @@ PMP_NO_USER_SPEED = int(cfg['PMP']['NO_USER_SPEED'])
 PMP_RETR_SPEED = float(cfg['PMP']['RETRACT_SPEED'])
 PMP_SAFE_RANGE = tuple(cfg['PMP']['SAFE_RANGE'])
 PMP_SERIAL_BAUD = int(cfg['PMP']['SERIAL']['BAUD'])
-PMP_SERIAL_PORT = cfg['PMP']['SERIAL']['PORT']
+PMP_SERIAL_PORT = str(cfg['PMP']['SERIAL']['PORT'])
 PMP_VALID_COMMANDS = list(cfg['PMP']['VALID_COMMANDS'])
 PMP1_MODBUS_ID = str(cfg['PMP']['P1_MODBUS_ID'])
 PMP2_MODBUS_ID = str(cfg['PMP']['P2_MODBUS_ID'])
@@ -76,7 +77,7 @@ CAM_urls = [
 
 # direct movement control
 DC_rob_moving = False
-DCSpeed = DC_SPEED
+DCSpeed = dcpy(DC_SPEED)
 
 # general control properties
 CTRL_log_path = Path()
@@ -94,7 +95,7 @@ SC_q_processing = False
 SC_vol_per_m = SC_VOL_PER_M
 SCBreakPoint = Coordinate() # to-do: write routine to stop at predefined point during SC using this Coordinate + decide if useful
 SCQueue = Queue()
-SCSpeed = SC_SPEED
+SCSpeed = dcpy(SC_SPEED)
 
 # terminal
 TERM_log = []
@@ -116,6 +117,7 @@ PRH_act_with_pump = False
 PRH_connected = False
 PRH_trol_ratio = cfg['PRINTHEAD']['TROLL_RATIO']
 PRH_url = '192.168.178.58:17'
+PRH_status = dcpy(PRH_DEFAULT)
 
 # general pump settings
 PMP_port = PMP_SERIAL_PORT
@@ -148,16 +150,16 @@ ROB_comm_fr = ROB_COMM_FR
 ROB_live_ad = 1.0
 ROB_max_r_speed = cfg['ROBOT']['MAX_ROTATION_SPEED']
 ROB_min_target_dist = cfg['ROBOT']['MIN_TARGET_DIST']
-ROB_safe_range = ROB_SAFE_RANGE
+ROB_safe_range = dcpy(ROB_SAFE_RANGE)
 ROB_send_list = []
 ROB_speed_overwrite = -1
 ROBCommQueue = Queue()
-ROBCurrZero = ROB_ZERO
+ROBCurrZero = dcpy(ROB_ZERO)
 ROBLastTelem = RoboTelemetry()
 ROBMovStartP = Coordinate()
 ROBMovEndP = Coordinate()
 ROBTelem = RoboTelemetry()
-ROBTcp = ROB_TCP
+ROBTcp = RoboConnection.from_class(ROB_TCP)
 
 # sensor array
 SEN_timeout = 0.5

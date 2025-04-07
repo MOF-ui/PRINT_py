@@ -4080,7 +4080,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>170</y>
+         <y>150</y>
          <width>191</width>
          <height>31</height>
         </rect>
@@ -4102,7 +4102,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>250</y>
+         <y>230</y>
          <width>201</width>
          <height>31</height>
         </rect>
@@ -4145,7 +4145,7 @@ QPushButton:checked:hover {
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>290</y>
+         <y>270</y>
          <width>201</width>
          <height>31</height>
         </rect>
@@ -4188,7 +4188,7 @@ QPushButton:checked:hover {
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>330</y>
+         <y>310</y>
          <width>201</width>
          <height>31</height>
         </rect>
@@ -4283,7 +4283,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>200</y>
+         <y>180</y>
          <width>201</width>
          <height>41</height>
         </rect>
@@ -4296,6 +4296,92 @@ color: #E1E5EE;</string>
        </property>
        <property name="singleStep">
         <number>10</number>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="ADC_btt_loadSpring">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>350</y>
+         <width>201</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>14</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+	background-color: #40a6a8;
+}
+
+QPushButton:checked {
+	background-color: #61fcff;
+}
+
+QPushButton:hover {
+	border: 2px solid #abfbff;
+}
+
+QPushButton:checked:hover {
+	border: 2px solid #40a6a8;
+}</string>
+       </property>
+       <property name="text">
+        <string>LOAD SPRING</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="ADC_btt_calibrate">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>390</y>
+         <width>201</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>14</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+	background-color: #40a6a8;
+}
+
+QPushButton:checked {
+	background-color: #61fcff;
+}
+
+QPushButton:hover {
+	border: 2px solid #abfbff;
+}
+
+QPushButton:checked:hover {
+	border: 2px solid #40a6a8;
+}</string>
+       </property>
+       <property name="text">
+        <string>CALIBRATE</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
       </widget>
      </widget>
@@ -4347,7 +4433,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>250</y>
+         <y>230</y>
          <width>201</width>
          <height>31</height>
         </rect>
@@ -4383,7 +4469,7 @@ QPushButton:checked:hover {
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>290</y>
+         <y>270</y>
          <width>201</width>
          <height>31</height>
         </rect>
@@ -4426,7 +4512,7 @@ QPushButton:checked:hover {
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>330</y>
+         <y>310</y>
          <width>201</width>
          <height>31</height>
         </rect>
@@ -4534,7 +4620,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>200</y>
+         <y>180</y>
          <width>201</width>
          <height>41</height>
         </rect>
@@ -4553,7 +4639,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>170</y>
+         <y>150</y>
          <width>191</width>
          <height>31</height>
         </rect>
@@ -4571,6 +4657,49 @@ color: #E1E5EE;</string>
         <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
        </property>
       </widget>
+      <widget class="QPushButton" name="ASC_btt_loadSpring">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>350</y>
+         <width>201</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Bahnschrift</family>
+         <pointsize>14</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+	background-color: #40a6a8;
+}
+
+QPushButton:checked {
+	background-color: #61fcff;
+}
+
+QPushButton:hover {
+	border: 2px solid #abfbff;
+}
+
+QPushButton:checked:hover {
+	border: 2px solid #40a6a8;
+}</string>
+       </property>
+       <property name="text">
+        <string>LOAD SPRING</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
       <zorder>ASC_lbl_trolley</zorder>
       <zorder>ASC_0_framelabel</zorder>
       <zorder>ASC_btt_clamp</zorder>
@@ -4581,6 +4710,7 @@ color: #E1E5EE;</string>
       <zorder>ASC_lbl_qProcessing</zorder>
       <zorder>ASC_entry_SCLines</zorder>
       <zorder>ASC_num_trolley</zorder>
+      <zorder>ASC_btt_loadSpring</zorder>
      </widget>
      <widget class="QFrame" name="PUMP_frame">
       <property name="geometry">

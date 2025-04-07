@@ -17,6 +17,7 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
+import libs.global_var as g
 import libs.data_utilities as du
 import libs.win_mainframe as mf
 
@@ -52,30 +53,32 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.ADC_btt_cut.setChecked(True)
         TestFrame.ADC_btt_placeSpring.setChecked(False)
 
+        g.SC_curr_comm_id = 1
         TestFrame.adc_user_change()
         TestTool = du.ToolCommand(11, True, True, False, False, 0)
-        command,_ = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command,_ = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(command, du.QEntry(id=1, z=0, Tool=TestTool))
 
-        du.SC_curr_comm_id = 1
-        TestFrame.ADC_num_trolley.setValue(du.DEF_PRH_TROLLEY)
-        TestFrame.ADC_btt_clamp.setChecked(du.DEF_PRH_CLAMP)
-        TestFrame.ADC_btt_cut.setChecked(du.DEF_PRH_CUT)
-        TestFrame.ADC_btt_placeSpring.setChecked(du.DEF_PRH_PLACE_SPR)
+        g.SC_curr_comm_id = 1
+        TestFrame.ADC_num_trolley.setValue(g.PRH_DEFAULT.trolley_steps)
+        TestFrame.ADC_btt_clamp.setChecked(g.PRH_DEFAULT.clamp)
+        TestFrame.ADC_btt_cut.setChecked(g.PRH_DEFAULT.cut)
+        TestFrame.ADC_btt_placeSpring.setChecked(g.PRH_DEFAULT.place_spring)
 
         TestFrame.ADC_num_trolley.blockSignals(False)
         for widget in ACON_btt_group:
             widget.blockSignals(False)
 
-        du.ROBCommQueue.clear()
-        du.ROB_send_list.clear()
+        g.ROBCommQueue.clear()
+        g.ROB_send_list.clear()
 
 
     def test_add_gcode_sgl(self):
         global TestFrame
+        self.maxDiff = 2000
 
-        du.SCQueue.clear()
-        du.DCCurrZero = du.Coordinate()
+        g.SCQueue.clear()
+        g.ROBCurrZero = du.Coordinate()
 
         # G1
         TestCoor1 = du.Coordinate(x=1, y=2.2, ext=3)
@@ -83,16 +86,16 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.SGLC_entry_gcodeSglComm.setText('G1 X1 Y2.2 EXT3 F40')
         TestFrame.add_gcode_sgl()
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [du.QEntry(id=1, Coor1=TestCoor1, Speed=TestVec).print_short()],
         )
 
         TestFrame.SGLC_entry_gcodeSglComm.setText('G1 X1')
-        du.DCCurrZero = du.Coordinate(x=1, y=1)
+        g.ROBCurrZero = du.Coordinate(x=1, y=1)
         TestFrame.add_gcode_sgl(at_id=True, id=1)
         TestCoor2 = du.Coordinate(x=2, y=1)
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [
                 du.QEntry(id=1, Coor1=TestCoor2).print_short(),
                 du.QEntry(id=2, Coor1=TestCoor1, Speed=TestVec).print_short(),
@@ -107,7 +110,7 @@ class MainframeWinTest(unittest.TestCase):
         )
         TestCoor3 = du.Coordinate(x=2, y=1, z=1)
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [
                 du.QEntry(id=1, Coor1=TestCoor2).print_short(),
                 du.QEntry(id=2, Coor1=TestCoor3).print_short(),
@@ -121,18 +124,16 @@ class MainframeWinTest(unittest.TestCase):
             from_file=True,
             file_txt='G1 X1.2'
         )
-        TestCoor4 = du.Coordinate(x=2.2, y=2.2, ext=0)
+        TestCoor4 = du.Coordinate(x=2.2, y=2.2, ext=3)
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [
-                
                 du.QEntry(id=1, Coor1=TestCoor2).print_short(),
                 du.QEntry(id=2, Coor1=TestCoor3).print_short(),
                 du.QEntry(id=3, Coor1=TestCoor1, Speed=TestVec).print_short(),
-                du.QEntry(id=4, Coor1=TestCoor4).print_short(),
-                # here, the external axis is set to 0, as a change in X 
-                # activates the recalculation of the appropriate EXT position 
-                # in UTIL.gcodeToQEntry using UTIL.SC_extFllwBhvr
+                du.QEntry(id=4, Coor1=TestCoor4, Speed=TestVec).print_short(),
+                # positioning and speed settings always relative to preceding
+                # command
             ],
         )
 
@@ -143,7 +144,7 @@ class MainframeWinTest(unittest.TestCase):
             from_file=True,
             file_txt='G92 Y0 EXT0'
         )
-        self.assertEqual(du.DCCurrZero, du.Coordinate(x=1, y=2.2))
+        self.assertEqual(g.ROBCurrZero, du.Coordinate(x=1, y=2.2, ext=3))
 
         TestFrame.add_gcode_sgl(
             at_id=False,
@@ -152,13 +153,13 @@ class MainframeWinTest(unittest.TestCase):
             file_txt='G28 Y0 EXT0'
         )
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [
                 du.QEntry(id=1, Coor1=TestCoor2).print_short(),
                 du.QEntry(id=2, Coor1=TestCoor3).print_short(),
                 du.QEntry(id=3, Coor1=TestCoor1, Speed=TestVec).print_short(),
-                du.QEntry(id=4, Coor1=TestCoor4).print_short(),
-                du.QEntry(id=5, Coor1=TestCoor4).print_short(),
+                du.QEntry(id=4, Coor1=TestCoor4, Speed=TestVec).print_short(),
+                du.QEntry(id=5, Coor1=TestCoor4, Speed=TestVec).print_short(),
             ],
         )
 
@@ -168,16 +169,16 @@ class MainframeWinTest(unittest.TestCase):
             from_file=True,
             file_txt='G92 X0 Z0'
         )
-        self.assertEqual(du.DCCurrZero, du.Coordinate(x=2, y=2.2, z=1, ext=0))
+        self.assertEqual(g.ROBCurrZero, du.Coordinate(x=2, y=2.2, z=1, ext=3))
 
-        du.DCCurrZero = du.Coordinate()
-        du.SCQueue.clear()
+        g.ROBCurrZero = du.Coordinate()
+        g.SCQueue.clear()
 
 
     def test_add_rapid_sgl(self):
         global TestFrame
 
-        du.DCCurrZero = du.Coordinate()
+        g.ROBCurrZero = du.Coordinate()
         TestFrame.SGLC_entry_rapidSglComm.setText(
             f"MoveL [[1.0,2.2,0.0][0.0,0.0,0.0,0.0]],"
             f"[4,50,50,50],z10,tool0 EXT3;"
@@ -186,7 +187,7 @@ class MainframeWinTest(unittest.TestCase):
         TCoor1 = du.Coordinate(x=1, y=2.2, ext=3)
         Sp = du.SpeedVector(ts=4)
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [du.QEntry(id=1, pt="Q", Coor1=TCoor1, Speed=Sp).print_short()],
         )
 
@@ -197,14 +198,14 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.add_rapid_sgl(at_id=True, id=1)
         TCoor2 = du.Coordinate(x=1)
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [
                 du.QEntry(id=1, pt="Q", Coor1=TCoor2).print_short(),
                 du.QEntry(id=2, pt="Q", Coor1=TCoor1, Speed=Sp).print_short()
             ],
         )
 
-        du.DCCurrZero = du.Coordinate(z=1)
+        g.ROBCurrZero = du.Coordinate(z=1)
         TestFrame.add_rapid_sgl(
             at_id=True,
             id=2,
@@ -216,7 +217,7 @@ class MainframeWinTest(unittest.TestCase):
         )
         TestCoor3 = du.Coordinate(z=2)
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [
                 du.QEntry(id=1, pt="Q", Coor1=TCoor2).print_short(),
                 du.QEntry(id=2, pt="E", Coor1=TestCoor3).print_short(),
@@ -224,8 +225,8 @@ class MainframeWinTest(unittest.TestCase):
             ],
         )
 
-        du.DCCurrZero = du.Coordinate()
-        du.SCQueue.clear()
+        g.ROBCurrZero = du.Coordinate()
+        g.SCQueue.clear()
 
 
     def test_add_SIB(self):
@@ -253,14 +254,14 @@ class MainframeWinTest(unittest.TestCase):
         Sp1 = du.SpeedVector(ts=400)
         Sp2 = du.SpeedVector(ts=900)
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [
                 du.QEntry(id=1, Coor1=TCoor1, Speed=Sp1).print_short(),
                 du.QEntry(id=2, Coor1=TCoor2, Speed=Sp2).print_short(),
             ],
         )
 
-        du.DCCurrZero = du.Coordinate(x=1)
+        g.ROBCurrZero = du.Coordinate(x=1)
         TestFrame.add_SIB(num=2, at_end=True)
         TCoor3 = du.Coordinate(
             x=1.1,y=2.2, z=3.3, rx=4.4, ry=5.5, rz=6.6, q=7.7, ext=600
@@ -269,7 +270,7 @@ class MainframeWinTest(unittest.TestCase):
         Sp3 = du.SpeedVector(ts=18, ors=19, acr=20, dcr=21)
         Sp4 = du.SpeedVector(ts=110, ors=120, acr=130, dcr=140)
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [
                 du.QEntry(id=1, Coor1=TCoor1, Speed=Sp1).print_short(),
                 du.QEntry(id=2, Coor1=TCoor2, Speed=Sp2).print_short(),
@@ -278,10 +279,10 @@ class MainframeWinTest(unittest.TestCase):
             ],
         )
 
-        du.DCCurrZero = du.Coordinate(x=1)
+        g.ROBCurrZero = du.Coordinate(x=1)
         TestFrame.add_SIB(num=3, at_end=False)
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [
                 du.QEntry(id=1, pt='Q', Coor1=TCoor3, Speed=Sp3).print_short(),
                 du.QEntry(id=2, mt='J', Coor1=TCoor4, Speed=Sp4).print_short(),
@@ -292,15 +293,16 @@ class MainframeWinTest(unittest.TestCase):
             ],
         )
 
-        du.SCQueue.clear()
-        du.DCCurrZero = du.Coordinate()
+        g.SCQueue.clear()
+        g.ROBCurrZero = du.Coordinate()
 
 
     def test_amcon_script_overwrite(self):
         global TestFrame
         self.maxDiff = 3000
 
-        du.SCQueue.clear()
+        g.SCQueue.clear()
+        g.SC_curr_comm_id = 1
         for i in range(1, 5, 1):
             TestFrame.add_gcode_sgl(
                 at_id=False, id=0, from_file=True, file_txt=f"G1 X{i}"
@@ -315,7 +317,7 @@ class MainframeWinTest(unittest.TestCase):
         ToolOff = du.ToolCommand()
         ToolOn = du.ToolCommand(11, True, True, True, False, 0)
         self.assertEqual(
-            f"{du.SCQueue}",
+            f"{g.SCQueue}",
             f"{du.QEntry(id=1, Coor1=du.Coordinate(x=1), Tool=ToolOff)}\n"\
             f"{du.QEntry(id=2, Coor1=du.Coordinate(x=2), Tool=ToolOn)}\n"\
             f"{du.QEntry(id=3, Coor1=du.Coordinate(x=3), Tool=ToolOn)}\n"\
@@ -325,7 +327,7 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.ASC_entry_SCLines.setText('4')
         TestFrame.amcon_script_overwrite()
         self.assertEqual(
-            f"{du.SCQueue}",
+            f"{g.SCQueue}",
             f"{du.QEntry(id=1, Coor1=du.Coordinate(x=1), Tool=ToolOff)}\n"\
             f"{du.QEntry(id=2, Coor1=du.Coordinate(x=2), Tool=ToolOn)}\n"\
             f"{du.QEntry(id=3, Coor1=du.Coordinate(x=3), Tool=ToolOn)}\n"\
@@ -333,10 +335,10 @@ class MainframeWinTest(unittest.TestCase):
         )
 
         TestFrame.clr_queue(partial=False)
-        TestFrame.ASC_num_trolley.setValue(du.DEF_PRH_TROLLEY)
-        TestFrame.ASC_btt_clamp.setChecked(du.DEF_PRH_CLAMP)
-        TestFrame.ASC_btt_cut.setChecked(du.DEF_PRH_CUT)
-        TestFrame.ASC_btt_placeSpring.setChecked(du.DEF_PRH_PLACE_SPR)
+        TestFrame.ASC_num_trolley.setValue(g.PRH_DEFAULT.trolley_steps)
+        TestFrame.ASC_btt_clamp.setChecked(g.PRH_DEFAULT.clamp)
+        TestFrame.ASC_btt_cut.setChecked(g.PRH_DEFAULT.cut)
+        TestFrame.ASC_btt_placeSpring.setChecked(g.PRH_DEFAULT.place_spring)
 
 
     def test_apply_settings(self):
@@ -344,80 +346,80 @@ class MainframeWinTest(unittest.TestCase):
         global TestFrame
 
         # check if defaults were loaded
-        self.assertEqual(TestFrame.SET_num_zone.value(), du.DEF_IO_ZONE)
+        self.assertEqual(TestFrame.SET_num_zone.value(), g.IO_ZONE)
         self.assertEqual(
-            TestFrame.CONN_num_commForerun.value(), du.DEF_ROB_COMM_FR
+            TestFrame.CONN_num_commForerun.value(), g.ROB_COMM_FR
         )
         self.assertEqual(
-            TestFrame.SET_float_volPerMM.value(), du.DEF_SC_VOL_PER_M
+            TestFrame.SET_float_volPerMM.value(), g.SC_VOL_PER_M
         )
         self.assertEqual(
-            TestFrame.SET_float_frToMms.value(), du.DEF_IO_FR_TO_TS
+            TestFrame.SET_float_frToMms.value(), g.IO_FR_TO_TS
         )
         self.assertEqual(
-            TestFrame.SET_num_transSpeed_dc.value(), du.DEF_DC_SPEED.ts
+            TestFrame.SET_num_transSpeed_dc.value(), g.DC_SPEED.ts
         )
         self.assertEqual(
-            TestFrame.SET_num_orientSpeed_dc.value(), du.DEF_DC_SPEED.ors
+            TestFrame.SET_num_orientSpeed_dc.value(), g.DC_SPEED.ors
         )
         self.assertEqual(
-            TestFrame.SET_num_accelRamp_dc.value(), du.DEF_DC_SPEED.acr
+            TestFrame.SET_num_accelRamp_dc.value(), g.DC_SPEED.acr
         )
         self.assertEqual(
-            TestFrame.SET_num_decelRamp_dc.value(), du.DEF_DC_SPEED.dcr
+            TestFrame.SET_num_decelRamp_dc.value(), g.DC_SPEED.dcr
         )
         self.assertEqual(
-            TestFrame.SET_num_transSpeed_print.value(), du.DEF_PRIN_SPEED.ts
+            TestFrame.SET_num_transSpeed_print.value(), g.SC_SPEED.ts
         )
         self.assertEqual(
-            TestFrame.SET_num_orientSpeed_print.value(), du.DEF_PRIN_SPEED.ors
+            TestFrame.SET_num_orientSpeed_print.value(), g.SC_SPEED.ors
         )
         self.assertEqual(
-            TestFrame.SET_num_accelRamp_print.value(), du.DEF_PRIN_SPEED.acr
+            TestFrame.SET_num_accelRamp_print.value(), g.SC_SPEED.acr
         )
         self.assertEqual(
-            TestFrame.SET_num_decelRamp_print.value(), du.DEF_PRIN_SPEED.dcr
+            TestFrame.SET_num_decelRamp_print.value(), g.SC_SPEED.dcr
         )
         self.assertEqual(
             TestFrame.SET_num_followInterv.value(),
-            du.DEF_SC_EXT_TRAIL[0],
+            g.SC_EXT_TRAIL[0],
         )
         self.assertEqual(
             TestFrame.SET_num_followSkip.value(),
-            du.DEF_SC_EXT_TRAIL[1],
+            g.SC_EXT_TRAIL[1],
         )
         self.assertEqual(
-            TestFrame.SET_num_retractSpeed.value(), du.DEF_PUMP_RETR_SPEED
+            TestFrame.SET_num_retractSpeed.value(), g.PMP_RETR_SPEED
         )
         self.assertEqual(
-            TestFrame.SET_float_p1Flow.value(), du.DEF_PUMP_LPS
+            TestFrame.SET_float_p1Flow.value(), g.PMP_LPS
         )
         self.assertEqual(
-            TestFrame.SET_float_p2Flow.value(), du.DEF_PUMP_LPS
+            TestFrame.SET_float_p2Flow.value(), g.PMP_LPS
         )
         self.assertEqual(
-            TestFrame.ADC_num_trolley.value(), du.DEF_PRH_TROLLEY
+            TestFrame.ADC_num_trolley.value(), g.PRH_DEFAULT.trolley_steps
         )
         self.assertEqual(
-            TestFrame.ADC_btt_clamp.isChecked(), du.DEF_PRH_CLAMP
+            TestFrame.ADC_btt_clamp.isChecked(), g.PRH_DEFAULT.clamp
         )
         self.assertEqual(
-            TestFrame.ADC_btt_cut.isChecked(), du.DEF_PRH_CUT
+            TestFrame.ADC_btt_cut.isChecked(), g.PRH_DEFAULT.cut
         )
         self.assertEqual(
-            TestFrame.ADC_btt_placeSpring.isChecked(), du.DEF_PRH_PLACE_SPR
+            TestFrame.ADC_btt_placeSpring.isChecked(), g.PRH_DEFAULT.place_spring
         )
         self.assertEqual(
-            TestFrame.ASC_num_trolley.value(), du.DEF_PRH_TROLLEY
+            TestFrame.ASC_num_trolley.value(), g.PRH_DEFAULT.trolley_steps
         )
         self.assertEqual(
-            TestFrame.ASC_btt_clamp.isChecked(), du.DEF_PRH_CLAMP
+            TestFrame.ASC_btt_clamp.isChecked(), g.PRH_DEFAULT.clamp
         )
         self.assertEqual(
-            TestFrame.ASC_btt_cut.isChecked(), du.DEF_PRH_CUT
+            TestFrame.ASC_btt_cut.isChecked(), g.PRH_DEFAULT.cut
         )
         self.assertEqual(
-            TestFrame.ASC_btt_placeSpring.isChecked(), du.DEF_PRH_PLACE_SPR
+            TestFrame.ASC_btt_placeSpring.isChecked(), g.PRH_DEFAULT.place_spring
         )
 
         # test setting by user
@@ -440,79 +442,79 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.SET_float_p2Flow.setValue(17)
         TestFrame.apply_settings()
 
-        self.assertEqual(du.ROB_comm_fr, 1)
-        self.assertEqual(du.SC_vol_per_m, 2.2)
-        self.assertEqual(du.IO_fr_to_ts, 3.3)
-        self.assertEqual(du.IO_zone, 4)
-        self.assertEqual(du.DCSpeed.ts, 5)
-        self.assertEqual(du.DCSpeed.ors, 6)
-        self.assertEqual(du.DCSpeed.acr, 7)
-        self.assertEqual(du.DCSpeed.dcr, 8)
-        self.assertEqual(du.PRINSpeed.ts, 9)
-        self.assertEqual(du.PRINSpeed.ors, 10)
-        self.assertEqual(du.PRINSpeed.acr, 11)
-        self.assertEqual(du.PRINSpeed.dcr, 12)
-        self.assertEqual(du.SC_ext_trail[0], 13)
-        self.assertEqual(du.SC_ext_trail[1], 14)
-        self.assertEqual(du.PMP_retract_speed, 15)
-        self.assertEqual(du.PMP1_liter_per_s, 16)
-        self.assertEqual(du.PMP2_liter_per_s, 17)
+        self.assertEqual(g.ROB_comm_fr, 1)
+        self.assertEqual(g.SC_vol_per_m, 2.2)
+        self.assertEqual(g.IO_fr_to_ts, 3.3)
+        self.assertEqual(g.IO_zone, 4)
+        self.assertEqual(g.DCSpeed.ts, 5)
+        self.assertEqual(g.DCSpeed.ors, 6)
+        self.assertEqual(g.DCSpeed.acr, 7)
+        self.assertEqual(g.DCSpeed.dcr, 8)
+        self.assertEqual(g.SCSpeed.ts, 9)
+        self.assertEqual(g.SCSpeed.ors, 10)
+        self.assertEqual(g.SCSpeed.acr, 11)
+        self.assertEqual(g.SCSpeed.dcr, 12)
+        self.assertEqual(g.SC_ext_trail[0], 13)
+        self.assertEqual(g.SC_ext_trail[1], 14)
+        self.assertEqual(g.PMP_retract_speed, 15)
+        self.assertEqual(g.PMP1_liter_per_s, 16)
+        self.assertEqual(g.PMP2_liter_per_s, 17)
 
         # test resetting by user
         TestFrame.CONN_num_commForerun.setValue(10)
         TestFrame.load_defaults()
         TestFrame.apply_settings()
 
-        self.assertEqual(TestFrame.SET_num_zone.value(), du.DEF_IO_ZONE)
+        self.assertEqual(TestFrame.SET_num_zone.value(), g.IO_ZONE)
         self.assertEqual(
-            TestFrame.CONN_num_commForerun.value(), du.DEF_ROB_COMM_FR
+            TestFrame.CONN_num_commForerun.value(), g.ROB_COMM_FR
         )
         self.assertEqual(
-            TestFrame.SET_float_volPerMM.value(), du.DEF_SC_VOL_PER_M
+            TestFrame.SET_float_volPerMM.value(), g.SC_VOL_PER_M
         )
         self.assertEqual(
-            TestFrame.SET_float_frToMms.value(), du.DEF_IO_FR_TO_TS
+            TestFrame.SET_float_frToMms.value(), g.IO_FR_TO_TS
         )
         self.assertEqual(
-            TestFrame.SET_num_transSpeed_dc.value(), du.DEF_DC_SPEED.ts
+            TestFrame.SET_num_transSpeed_dc.value(), g.DC_SPEED.ts
         )
         self.assertEqual(
-            TestFrame.SET_num_orientSpeed_dc.value(), du.DEF_DC_SPEED.ors
+            TestFrame.SET_num_orientSpeed_dc.value(), g.DC_SPEED.ors
         )
         self.assertEqual(
-            TestFrame.SET_num_accelRamp_dc.value(), du.DEF_DC_SPEED.acr
+            TestFrame.SET_num_accelRamp_dc.value(), g.DC_SPEED.acr
         )
         self.assertEqual(
-            TestFrame.SET_num_decelRamp_dc.value(), du.DEF_DC_SPEED.dcr
+            TestFrame.SET_num_decelRamp_dc.value(), g.DC_SPEED.dcr
         )
         self.assertEqual(
-            TestFrame.SET_num_transSpeed_print.value(), du.DEF_PRIN_SPEED.ts
+            TestFrame.SET_num_transSpeed_print.value(), g.SC_SPEED.ts
         )
         self.assertEqual(
-            TestFrame.SET_num_orientSpeed_print.value(), du.DEF_PRIN_SPEED.ors
+            TestFrame.SET_num_orientSpeed_print.value(), g.SC_SPEED.ors
         )
         self.assertEqual(
-            TestFrame.SET_num_accelRamp_print.value(), du.DEF_PRIN_SPEED.acr
+            TestFrame.SET_num_accelRamp_print.value(), g.SC_SPEED.acr
         )
         self.assertEqual(
-            TestFrame.SET_num_decelRamp_print.value(), du.DEF_PRIN_SPEED.dcr
+            TestFrame.SET_num_decelRamp_print.value(), g.SC_SPEED.dcr
         )
         self.assertEqual(
             TestFrame.SET_num_followInterv.value(),
-            du.DEF_SC_EXT_TRAIL[0],
+            g.SC_EXT_TRAIL[0],
         )
         self.assertEqual(
             TestFrame.SET_num_followSkip.value(),
-            du.DEF_SC_EXT_TRAIL[1],
+            g.SC_EXT_TRAIL[1],
         )
         self.assertEqual(
-            TestFrame.SET_num_retractSpeed.value(), du.DEF_PUMP_RETR_SPEED
+            TestFrame.SET_num_retractSpeed.value(), g.PMP_RETR_SPEED
         )
         self.assertEqual(
-            TestFrame.SET_float_p1Flow.value(), du.DEF_PUMP_LPS
+            TestFrame.SET_float_p1Flow.value(), g.PMP_LPS
         )
         self.assertEqual(
-            TestFrame.SET_float_p2Flow.value(), du.DEF_PUMP_LPS
+            TestFrame.SET_float_p2Flow.value(), g.PMP_LPS
         )
 
 
@@ -520,18 +522,17 @@ class MainframeWinTest(unittest.TestCase):
         global TestFrame
         self.maxDiff = 2000
 
-        du.SCQueue.clear()
-        du.SC_ext_trail = (500, 200)
+        g.SCQueue.clear()
+        g.SC_ext_trail = (500, 200)
 
         for i in range(1, 7, 1):
             TestFrame.add_gcode_sgl(
                 at_id=False, id=0, from_file=True, file_txt=f"G1 X{i}"
             )
-
         TestFrame.SCTRL_entry_clrByID.setText('2..4')
         TestFrame.clr_queue(partial=True)
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [
                 du.QEntry(id=1, Coor1=du.Coordinate(x=1)).print_short(),
                 du.QEntry(id=2, Coor1=du.Coordinate(x=5)).print_short(),
@@ -542,7 +543,7 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.SCTRL_entry_clrByID.setText('2')
         TestFrame.clr_queue(partial=True)
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [
                 du.QEntry(id=1, Coor1=du.Coordinate(x=1)).print_short(),
                 du.QEntry(id=2, Coor1=du.Coordinate(x=6)).print_short(),
@@ -550,9 +551,9 @@ class MainframeWinTest(unittest.TestCase):
         )
 
         TestFrame.clr_queue(partial=False)
-        self.assertEqual(du.SCQueue.display(), ['Queue is empty!'])
+        self.assertEqual(g.SCQueue.display(), ['Queue is empty!'])
 
-        du.SC_ext_trail = du.DEF_SC_EXT_TRAIL
+        g.SC_ext_trail = g.SC_EXT_TRAIL
 
 
     def test_home_command(self):
@@ -561,28 +562,28 @@ class MainframeWinTest(unittest.TestCase):
         TestHome = du.Coordinate(
             x=1, y=2000, z=0, rx=4, ry=5, rz=6, q=0.5, ext=100
         )
-        du.DCCurrZero = copy.deepcopy(TestHome)
+        g.ROBCurrZero = copy.deepcopy(TestHome)
         TestFrame.DC_drpd_moveType.setCurrentText('LINEAR')
         TestFrame.home_command()
-        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(command[0], du.QEntry(id=1, z=0, Coor1=TestHome))
-        self.assertTrue(du.DC_rob_moving)
+        self.assertTrue(g.DC_rob_moving)
 
         TestFrame.robo_send(command[0], True, 1, True)
-        du.DC_rob_moving = False
+        g.DC_rob_moving = False
 
         TestFrame.DC_drpd_moveType.setCurrentText("JOINT")
         TestFrame.home_command()
-        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(
             command[0],
             du.QEntry(id=2, z=0, mt="J", Coor1=TestHome),
         )
 
-        du.DCCurrZero = du.Coordinate()
-        du.SC_curr_comm_id = 1
-        du.DC_rob_moving = False
-        du.SCQueue.clear()
+        g.ROBCurrZero = du.Coordinate()
+        g.SC_curr_comm_id = 1
+        g.DC_rob_moving = False
+        g.SCQueue.clear()
 
 
     def test_init(self):
@@ -617,7 +618,7 @@ class MainframeWinTest(unittest.TestCase):
         """rababer rababer"""
         global TestFrame
 
-        du.DCCurrZero = du.Coordinate(1.1, 2, 3, 4, 5, 6, 7, 8)
+        g.ROBCurrZero = du.Coordinate(1.1, 2, 3, 4, 5, 6, 7, 8)
         TestFrame.label_update_on_new_zero()
 
         self.assertEqual(TestFrame.ZERO_disp_x.text(), '1.1')
@@ -628,7 +629,7 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(TestFrame.ZERO_disp_rz.text(), '6.0')
         self.assertEqual(TestFrame.ZERO_disp_ext.text(), '8.0')
 
-        du.DCCurrZero = du.Coordinate()
+        g.ROBCurrZero = du.Coordinate()
 
 
     def test_label_update_on_send(self):
@@ -636,7 +637,7 @@ class MainframeWinTest(unittest.TestCase):
         global TestFrame
         global ACON_btt_group
 
-        du.DCCurrZero = du.Coordinate()
+        g.ROBCurrZero = du.Coordinate()
 
         TestFrame.SGLC_entry_gcodeSglComm.setText('G1 X2.2 Y1')
         TestTool = du.ToolCommand(1, True, True, False, True, 0)
@@ -659,27 +660,27 @@ class MainframeWinTest(unittest.TestCase):
             TestFrame.SCTRL_arr_queue.item(0).text(),
             du.QEntry(id=1, Coor1=du.Coordinate(x=2.2, y=1)).print_short(),
         )
-        du.SCQueue.clear()
+        g.SCQueue.clear()
 
 
     def test_load_file(self):
         global TestFrame
 
-        du.IO_curr_filepath = pl.Path("test.abc")
+        g.IO_curr_filepath = pl.Path("test.abc")
         TestFrame.load_file()
         self.assertEqual(
             TestFrame.IO_lbl_loadFile.text(),
             '... no valid file, not executed',
         )
 
-        du.IO_curr_filepath = pl.Path("test.mod")
+        g.IO_curr_filepath = pl.Path("test.mod")
         TestFrame.load_file(testrun=True)
         self.assertEqual(
             TestFrame.IO_lbl_loadFile.text(),
             '... conversion running ...',
         )
 
-        du.IO_curr_filepath = None
+        g.IO_curr_filepath = None
 
 
     def test_load_file_finished(self):
@@ -701,11 +702,11 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.PRH_sld_speed.setValue(78)
 
         TestFrame.mixer_set_speed()
-        self.assertEqual(du.MIX_speed, 56)
+        self.assertEqual(g.MIX_speed, 56)
         TestFrame.mixer_set_speed('sld')
-        self.assertEqual(du.MIX_speed, 78)
+        self.assertEqual(g.MIX_speed, 78)
         TestFrame.mixer_set_speed('0')
-        self.assertEqual(du.MIX_speed, 0)
+        self.assertEqual(g.MIX_speed, 0)
 
 
     def test_open_file(self):
@@ -713,11 +714,11 @@ class MainframeWinTest(unittest.TestCase):
         global gcode_test_path
         global rapid_test_path
 
-        currSetting = du.SC_vol_per_m
-        du.SC_vol_per_m = 0.1
+        currSetting = g.SC_vol_per_m
+        g.SC_vol_per_m = 0.1
 
         TestFrame.open_file(testrun=True, testpath=gcode_test_path)
-        self.assertEqual(du.IO_curr_filepath, gcode_test_path)
+        self.assertEqual(g.IO_curr_filepath, gcode_test_path)
         self.assertEqual(
             TestFrame.IO_disp_filename.text(), gcode_test_path.name
         )
@@ -726,7 +727,7 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(TestFrame.IO_disp_estimVol.text(), '0.3 L')
 
         TestFrame.open_file(testrun=True, testpath=rapid_test_path)
-        self.assertEqual(du.IO_curr_filepath, rapid_test_path)
+        self.assertEqual(g.IO_curr_filepath, rapid_test_path)
         self.assertEqual(
             TestFrame.IO_disp_filename.text(), rapid_test_path.name
         )
@@ -734,33 +735,33 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(TestFrame.IO_disp_estimLen.text(), '3.0 m')
         self.assertEqual(TestFrame.IO_disp_estimVol.text(), '0.3 L')
 
-        du.SC_vol_per_m = currSetting
+        g.SC_vol_per_m = currSetting
 
 
     def test_pump_recv(self):
         global TestFrame
 
-        du.STTDataBlock.Pump1 = du.PumpTelemetry(1.1, 2.2, 3.3, 4.4)
-        TestFrame.pump_recv(telem=du.STTDataBlock.Pump1, source='P1')
+        g.DBDataBlock.Pump1 = du.PumpTelemetry(1.1, 2.2, 3.3, 4.4)
+        TestFrame.pump_recv(telem=g.DBDataBlock.Pump1, source='P1')
 
         self.assertEqual(TestFrame.PUMP_disp_freqP1.text(), '1.1%')
         self.assertEqual(TestFrame.PUMP_disp_voltP1.text(), '2.2 V')
         self.assertEqual(TestFrame.PUMP_disp_ampsP1.text(), '3.3 A')
         self.assertEqual(TestFrame.PUMP_disp_torqP1.text(), '4.4 Nm')
 
-        du.STTDataBlock.Pump2 = du.PumpTelemetry(5, 6, 7, 8)
-        du.PMP1Serial.connected = True
-        du.PMP2Serial.connected = True
-        TestFrame.pump_recv(telem=du.STTDataBlock.Pump2, source='P2')
+        g.DBDataBlock.Pump2 = du.PumpTelemetry(5, 6, 7, 8)
+        g.PMP1Serial.connected = True
+        g.PMP2Serial.connected = True
+        TestFrame.pump_recv(telem=g.DBDataBlock.Pump2, source='P2')
 
         self.assertEqual(TestFrame.PUMP_disp_freqP2.text(), '5.0%')
         self.assertEqual(TestFrame.PUMP_disp_voltP2.text(), '6.0 V')
         self.assertEqual(TestFrame.PUMP_disp_ampsP2.text(), '7.0 A')
         self.assertEqual(TestFrame.PUMP_disp_torqP2.text(), '8.0 Nm')
 
-        du.STTDataBlock.Pump1 = du.STTDataBlock.Pump2 = du.PumpTelemetry()
-        du.PMP1Serial.connected = False
-        du.PMP2Serial.connected = False
+        g.DBDataBlock.Pump1 = g.DBDataBlock.Pump2 = du.PumpTelemetry()
+        g.PMP1Serial.connected = False
+        g.PMP2Serial.connected = False
 
 
 
@@ -789,24 +790,27 @@ class MainframeWinTest(unittest.TestCase):
     def test_pump_set_speed(self):
         global TestFrame
 
-        du.PMP_speed = 10
+        g.PMP_speed = 10
         TestFrame.PUMP_num_setSpeed.setValue(5)
-        du.ROBCommQueue.add(du.QEntry(Speed=du.SpeedVector(ts=123)))
+        g.ROBCommQueue.add(
+            du.QEntry(Speed=du.SpeedVector(ts=123)),
+            g.SC_curr_comm_id,
+        )
 
         TestFrame.pump_set_speed(flag='1')
-        self.assertEqual(du.PMP_speed, 11)
+        self.assertEqual(g.PMP_speed, 11)
         TestFrame.pump_set_speed(flag='0')
-        self.assertEqual(du.PMP_speed, 0)
+        self.assertEqual(g.PMP_speed, 0)
         TestFrame.pump_set_speed(flag='-1')
-        self.assertEqual(du.PMP_speed, -1)
+        self.assertEqual(g.PMP_speed, -1)
         TestFrame.pump_set_speed(flag='r')
-        self.assertEqual(du.PMP_speed, 1)
+        self.assertEqual(g.PMP_speed, 1)
         TestFrame.pump_set_speed()
-        self.assertEqual(du.PMP_speed, 5)
+        self.assertEqual(g.PMP_speed, 5)
         TestFrame.pump_set_speed('def')
-        self.assertEqual(du.PMP_speed, 9.84)
+        self.assertEqual(g.PMP_speed, 9.84)
 
-        du.PMP_speed = 0
+        g.PMP_speed = 0
 
 
     def test_robo_send(self):
@@ -816,9 +820,9 @@ class MainframeWinTest(unittest.TestCase):
         global TestFrame
         self.maxDiff = 2000
 
-        du.SC_curr_comm_id = 2991
+        g.SC_curr_comm_id = 2991
         TestFrame.robo_send(du.QEntry(id=12), True, 10, True)
-        self.assertEqual(du.SC_curr_comm_id, 1)
+        self.assertEqual(g.SC_curr_comm_id, 1)
         self.assertEqual(
             TestFrame.CONN_ROB_disp_writeBuffer.text(),
             f"ID: 12 -- L, E -- COOR_1: X: 0.0   Y: 0.0   Z: 0.0   "
@@ -839,7 +843,7 @@ class MainframeWinTest(unittest.TestCase):
             'None is not an instance of QEntry!',
         )
 
-        du.ROB_send_list.clear()
+        g.ROB_send_list.clear()
 
 
     def test_robo_recv(self):
@@ -847,15 +851,15 @@ class MainframeWinTest(unittest.TestCase):
         global TestFrame
 
         # prep
-        du.DCCurrZero = du.Coordinate()
+        g.ROBCurrZero = du.Coordinate()
         TestCoor = du.Coordinate(1, 2, 3, 4, 5, 6, 7, 8.8)
-        du.ROBTelem = du.RoboTelemetry(0, 0, TestCoor)
+        g.ROBTelem = du.RoboTelemetry(0, 0, TestCoor)
         TestFrame.robo_recv(raw_data_string='ABC', telem=du.RoboTelemetry())
 
         # check loop run
-        du.SC_curr_comm_id = 15
-        du.DCCurrZero = du.Coordinate(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
-        du.ROBTelem = du.RoboTelemetry(
+        g.SC_curr_comm_id = 15
+        g.ROBCurrZero = du.Coordinate(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
+        g.ROBTelem = du.RoboTelemetry(
             9.9, 10, du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8)
         )
         TestFrame.robo_recv(raw_data_string='ABC', telem=du.RoboTelemetry())
@@ -896,10 +900,10 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(TestFrame.TRANS_disp_zEnd.text(), '2.9')
         self.assertEqual(TestFrame.TRANS_disp_extEnd.text(), '8.7')
 
-        du.DCCurrZero = du.Coordinate()
-        du.ROBTelem = du.RoboTelemetry()
-        du.SC_curr_comm_id = 1
-        du.SCQueue.clear()
+        g.ROBCurrZero = du.Coordinate()
+        g.ROBTelem = du.RoboTelemetry()
+        g.SC_curr_comm_id = 1
+        g.SCQueue.clear()
 
 
     def test_send_DC_command(self):
@@ -908,30 +912,31 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.DC_sld_stepWidth.setValue(1)
         TestFrame.DC_drpd_moveType.setCurrentText('LINEAR')
 
-        du.ROBTelem.Coor = du.Coordinate(1, 2000, 0, 4, 5, 6, 0.5, 100)
+        g.DC_rob_moving = False
+        g.ROBTelem.Coor = du.Coordinate(1, 2000, 0, 4, 5, 6, 0.5, 100)
         TCoor = du.Coordinate(2, 2000, 0, 4, 5, 6, 0.5, 100)
         TestFrame.send_DC_command(axis='X', dir='+')
-        command,_ = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command,_ = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(command, du.QEntry(id=1, z=0, Coor1=TCoor))
 
-        du.DC_rob_moving = False
+        g.DC_rob_moving = False
         TestFrame.robo_send(command, True, 1, True)
         TestFrame.DC_sld_stepWidth.setValue(2)
         TestFrame.DC_drpd_moveType.setCurrentText('JOINT')
         TCoor = du.Coordinate(1, 1990, 0, 4, 5, 6, 0.5, 100)
         TestFrame.send_DC_command(axis='Y', dir='-')
-        command,_ = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command,_ = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(command, du.QEntry(id=2, mt='J', z=0, Coor1=TCoor))
 
-        du.DC_rob_moving = False
+        g.DC_rob_moving = False
         TestFrame.robo_send(command, True, 1, True)
         TestFrame.DC_sld_stepWidth.setValue(3)
         TCoor = du.Coordinate(1, 2000, 100, 4, 5, 6, 0.5, 100)
         TestFrame.send_DC_command(axis='Z', dir='+')
-        command,_ = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command,_ = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(command, du.QEntry(id=3, mt='J', z=0, Coor1=TCoor))
 
-        du.DC_rob_moving = False
+        g.DC_rob_moving = False
         TestFrame.robo_send(command, True, 1, True)
         self.assertRaises(
             ValueError,
@@ -939,7 +944,7 @@ class MainframeWinTest(unittest.TestCase):
             axis='A',
             dir='+',
         )
-        du.DC_rob_moving = False
+        g.DC_rob_moving = False
         self.assertRaises(
             ValueError,
             TestFrame.send_DC_command,
@@ -947,37 +952,39 @@ class MainframeWinTest(unittest.TestCase):
             dir='/',
         )
 
-        du.DC_rob_moving = False
-        du.SC_curr_comm_id = 1
-        du.ROBTelem.Coor = du.Coordinate()
-        du.ROB_send_list.clear()
+        g.DC_rob_moving = False
+        g.SC_curr_comm_id = 1
+        g.ROBTelem.Coor = du.Coordinate()
+        g.ROB_send_list.clear()
 
 
     def test_send_command(self):
         global TestFrame
 
-        du.SC_curr_comm_id = 1
+        g.SC_curr_comm_id = 1
         TestFrame.robo_send(
             command=du.QEntry(id=1, Coor1=du.Coordinate(x=2.2)),
             no_error=True,
             num_send=1,
             dc=True,
         )
-        self.assertEqual(du.SC_curr_comm_id, 2)
+        self.assertEqual(g.SC_curr_comm_id, 2)
 
-        du.SC_curr_comm_id = 1
-        du.ROB_send_list.clear()
+        g.SC_curr_comm_id = 1
+        g.ROB_send_list.clear()
 
 
     def test_send_gcode_command(self):
         global TestFrame
 
         TestFrame.TERM_entry_gcodeInterp.setText('G1 Y2.2 EXT100 TRL0.1 TCL1 TCU1')
-        du.ROBTelem.Coor = du.Coordinate(1, 1900, 1, 1, 1, 1, 1, 100)
-        du.DCCurrZero = du.Coordinate(y=2000, ext=100)
+        g.DC_rob_moving = False
+        g.SC_curr_comm_id = 1
+        g.ROBTelem.Coor = du.Coordinate(1, 1900, 1, 1, 1, 1, 1, 100)
+        g.ROBCurrZero = du.Coordinate(y=2000, ext=100)
         TCoor = du.Coordinate(x=1, y=2002.2, z=1, rx=1, ry=1, rz=1, q=1, ext=200)
         TestTool = du.ToolCommand(
-            0.1 * du.DEF_TOOL_TROL_RATIO,
+            0.1 * g.PRH_trol_ratio,
             True,
             True,
             False,
@@ -986,24 +993,24 @@ class MainframeWinTest(unittest.TestCase):
         )
 
         TestFrame.send_gcode_command()
-        command,_ = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command,_ = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(command, du.QEntry(id=1, Coor1=TCoor, Tool=TestTool))
 
-        du.DC_rob_moving = False
+        g.DC_rob_moving = False
         TestFrame.robo_send(command, True, 1, True)
         TestFrame.TERM_entry_gcodeInterp.setText('G1 X1 Z3')
         TCoor = du.Coordinate(1.1, 2002.2, 3.3, 4.4, 5.5, 6.6, 0.7, 108.8)
-        du.ROBTelem.Coor = du.DCCurrZero = TCoor
+        g.ROBTelem.Coor = g.ROBCurrZero = TCoor
 
         TestFrame.send_gcode_command()
         TCoor = du.Coordinate(2.1, 2002.2, 6.3, 4.4, 5.5, 6.6, 0.7, 108.8)
-        command,_ = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command,_ = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(command, du.QEntry(id=2, Coor1=TCoor))
 
-        du.DC_rob_moving = False
-        du.ROBTelem.Coor = du.Coordinate()
-        du.SC_curr_comm_id = 1
-        du.ROB_send_list.clear()
+        g.DC_rob_moving = False
+        g.ROBTelem.Coor = du.Coordinate()
+        g.SC_curr_comm_id = 1
+        g.ROB_send_list.clear()
 
 
     def test_send_NC_command(self):
@@ -1019,31 +1026,31 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.NC_float_ext.setValue(102)
         TestFrame.DC_drpd_moveType.setCurrentText('LINEAR')
 
-        du.ROB_send_list.clear()
-        du.SC_curr_comm_id = 1
-        du.DC_rob_moving = False
-        du.ROBTelem.Coor = du.Coordinate(1, 1, 1, 0, 0, 0, 0, 100)
+        g.ROB_send_list.clear()
+        g.SC_curr_comm_id = 1
+        g.DC_rob_moving = False
+        g.ROBTelem.Coor = du.Coordinate(1, 1, 1, 0, 0, 0, 0, 100)
         TestFrame.send_NC_command([1, 2, 3])
-        command,_ = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command,_ = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(
             command,
             du.QEntry(id=1, z=0, Coor1=du.Coordinate(x=1, y=2000, z=0, ext=100))
         )
 
-        du.DC_rob_moving = False
+        g.DC_rob_moving = False
         TestFrame.robo_send(command, True, 1, True)
-        du.ROBTelem.Coor = du.Coordinate(1, 2000, 1, 1, 1, 1, 0, 1)
+        g.ROBTelem.Coor = du.Coordinate(1, 2000, 1, 1, 1, 1, 0, 1)
         TestFrame.DC_drpd_moveType.setCurrentText('JOINT')
 
         TCoor = du.Coordinate(x=1, y=2000, z=1, rx=4, ry=5, rz=6, ext=102)
         TestFrame.send_NC_command([4, 5, 6, 8])
-        command,_ = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command,_ = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(command, du.QEntry(id=2, mt='J', z=0, Coor1=TCoor))
 
-        du.DC_rob_moving = False
-        du.ROBTelem.Coor = du.Coordinate()
-        du.SC_curr_comm_id = 1
-        du.ROB_send_list.clear()
+        g.DC_rob_moving = False
+        g.ROBTelem.Coor = du.Coordinate()
+        g.SC_curr_comm_id = 1
+        g.ROB_send_list.clear()
 
 
     def test_send_rapid_command(self):
@@ -1056,27 +1063,27 @@ class MainframeWinTest(unittest.TestCase):
         TCoor = du.Coordinate(x=1, y=2000, z=3, rx=4, ry=5, rz=6, q=1, ext=600)
         TestTool = du.ToolCommand(0, False, False, True, True, 0)
         TestFrame.send_rapid_command()
-        command,_ = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command,_ = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(
             command,
             du.QEntry(id=1, pt='Q', z=50, Coor1=TCoor, Tool=TestTool),
         )
 
-        du.SC_curr_comm_id = 1
-        du.ROB_send_list.clear()
+        g.SC_curr_comm_id = 1
+        g.ROB_send_list.clear()
 
 
     def test_set_zero(self):
         global TestFrame
 
-        du.DCCurrZero = du.Coordinate(1, 2, 3, 4, 5, 6, 7, 8)
-        du.ROBTelem.Coor = du.Coordinate()
+        g.ROBCurrZero = du.Coordinate(1, 2, 3, 4, 5, 6, 7, 8)
+        g.ROBTelem.Coor = du.Coordinate()
 
         TestFrame.set_zero([1, 2, 3])
-        self.assertEqual(du.DCCurrZero, du.Coordinate(0, 0, 0, 4, 5, 6, 7, 8))
+        self.assertEqual(g.ROBCurrZero, du.Coordinate(0, 0, 0, 4, 5, 6, 7, 8))
 
         TestFrame.set_zero([4, 5, 6, 8])
-        self.assertEqual(du.DCCurrZero, du.Coordinate(0, 0, 0, 0, 0, 0, 7, 0))
+        self.assertEqual(g.ROBCurrZero, du.Coordinate(0, 0, 0, 0, 0, 0, 7, 0))
 
         TestFrame.ZERO_float_x.setValue(1)
         TestFrame.ZERO_float_y.setValue(2)
@@ -1086,33 +1093,33 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.ZERO_float_rz.setValue(6)
         TestFrame.ZERO_float_ext.setValue(7)
         TestFrame.set_zero([1, 2, 3, 4, 5, 6, 8], source='user')
-        self.assertEqual(du.DCCurrZero, du.Coordinate(1, 2, 3, 4, 5, 6, 7, 7))
+        self.assertEqual(g.ROBCurrZero, du.Coordinate(1, 2, 3, 4, 5, 6, 7, 7))
 
-        du.DCCurrZero = du.Coordinate()
+        g.ROBCurrZero = du.Coordinate()
 
 
     def test_system_stop_commands(self):
         global TestFrame
 
         TestFrame.forced_stop_command()
-        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(command[0], du.QEntry(id=1, mt='S'))
 
         TestFrame.robo_send(command[0], True, 1, True)
         TestFrame.robot_stop_command()
-        command = du.ROB_send_list[len(du.ROB_send_list) - 1]
+        command = g.ROB_send_list[len(g.ROB_send_list) - 1]
         self.assertEqual(command[0], du.QEntry(id=1, mt='E'))
 
         TestFrame.robo_send(command[0], True, 1, True)
         TestFrame.robot_stop_command(directly=False)
 
         self.assertEqual(
-            du.SCQueue.display(),
+            g.SCQueue.display(),
             [du.QEntry(id=3, mt='E').print_short()],
         )
 
-        du.SC_curr_comm_id = 1
-        du.SCQueue.clear()
+        g.SC_curr_comm_id = 1
+        g.SCQueue.clear()
 
 
     def test_zz_end(self):
@@ -1120,14 +1127,14 @@ class MainframeWinTest(unittest.TestCase):
         named '_zz_' to be executed by unittest at last"""
         global TestFrame
 
-        du.ROBTcp.connected = False
-        du.PMP1Serial.connected = False
-        du.PMP2Serial.connected = False
-        du.PRH_connected = False
+        g.ROBTcp.connected = False
+        g.PMP1Serial.connected = False
+        g.PMP2Serial.connected = False
+        g.PRH_connected = False
         TestFrame.close()
 
-        du.ROBTcp.close(end=True)
-        du.TERM_log.clear()
+        g.ROBTcp.close(end=True)
+        g.TERM_log.clear()
 
 
 #################################  MAIN  #####################################

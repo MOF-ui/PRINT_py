@@ -6,7 +6,7 @@
 #   instituion: TU Berlin,
 #               Department Baustoffe und Bauchemie
 #               (Material Science and Technology)
-#   email:      m.frohmue@web.de
+#   email:      m.frohmueller@tu-berlin.de
 #   date:       2023-06-21
 #
 #   LICENSE

@@ -12,6 +12,7 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
+import libs.global_var as g
 import libs.data_utilities as du
 import libs.func_utilities as fu
 
@@ -200,6 +201,7 @@ class DataLibTest(unittest.TestCase):
         EmptyQueue = du.Queue()
         TestCoor = du.Coordinate(3, 3, 3, 3, 3, 3, 3, 3)
         TestQueue = du.Queue()
+        g.SC_curr_comm_id = 1
         TestQueue.add(du.QEntry(), g.SC_curr_comm_id)
         TestQueue.add(du.QEntry(id=10, Coor1=TestCoor), g.SC_curr_comm_id)
         TestQueue.add(du.QEntry(id=2, Coor1=TestCoor+1), g.SC_curr_comm_id)
@@ -308,8 +310,8 @@ class DataLibTest(unittest.TestCase):
                 du.QEntry(id=6, Coor1=TestCoor+3).print_short(),
             ],
         )
-        TestQueue.add(du.QEntry(id=1, Coor1=TestCoor+4))
-        TestQueue.add(du.QEntry(id=4, Coor1=TestCoor+5))
+        TestQueue.add(du.QEntry(id=1, Coor1=TestCoor+4), g.SC_curr_comm_id)
+        TestQueue.add(du.QEntry(id=4, Coor1=TestCoor+5), g.SC_curr_comm_id)
         self.assertEqual(
             TestQueue.display(),
             [
@@ -374,8 +376,8 @@ class DataLibTest(unittest.TestCase):
 
         # pop_first_item
         self.assertIsInstance(EmptyQueue.pop_first_item(), BufferError)
-        TestQueue.add(du.QEntry())
-        TestQueue.add(du.QEntry(id=3, Coor1=TestCoor))
+        TestQueue.add(du.QEntry(), g.SC_curr_comm_id)
+        TestQueue.add(du.QEntry(id=3, Coor1=TestCoor), g.SC_curr_comm_id)
         self.assertEqual(TestQueue.pop_first_item(), du.QEntry(id=1))
         self.assertEqual(
             TestQueue.display(),
@@ -386,7 +388,7 @@ class DataLibTest(unittest.TestCase):
         AddQueue = du.Queue()
         AddQueue.add(du.QEntry(id=1, Coor1=TestCoor+1), thread_call=True)
         AddQueue.add(du.QEntry(id=2, Coor1=TestCoor+2), thread_call=True)
-        TestQueue.add_queue(AddQueue)
+        TestQueue.add_queue(AddQueue, g.SC_curr_comm_id)
         self.assertEqual(
             TestQueue.display(),
             [
@@ -398,7 +400,7 @@ class DataLibTest(unittest.TestCase):
         AddQueue.clear()
         AddQueue.add(du.QEntry(id=4, Coor1=TestCoor+4), thread_call=True)
         AddQueue.add(du.QEntry(id=5, Coor1=TestCoor+5), thread_call=True)
-        TestQueue.add_queue(AddQueue)
+        TestQueue.add_queue(AddQueue, g.SC_curr_comm_id)
         self.assertEqual(
             TestQueue.display(),
             [
@@ -413,7 +415,7 @@ class DataLibTest(unittest.TestCase):
         AddQueue.clear()
         AddQueue.add(du.QEntry(id=4, Coor1=TestCoor+4), thread_call=True)
         AddQueue.add(du.QEntry(id=5, Coor1=TestCoor+5), thread_call=True)
-        TestQueue.add_queue(AddQueue)
+        TestQueue.add_queue(AddQueue, g.SC_curr_comm_id)
         self.assertEqual(
             TestQueue.display(),
             [
@@ -427,7 +429,7 @@ class DataLibTest(unittest.TestCase):
         AddQueue.clear()
         AddQueue.add(du.QEntry(id=0, Coor1=TestCoor+4), thread_call=True)
         AddQueue.add(du.QEntry(id=1, Coor1=TestCoor+5), thread_call=True)
-        TestQueue.add_queue(AddQueue)
+        TestQueue.add_queue(AddQueue, g.SC_curr_comm_id)
         self.assertEqual(
             TestQueue.display(),
             [
@@ -441,7 +443,7 @@ class DataLibTest(unittest.TestCase):
         AddQueue.clear()
         AddQueue.add(du.QEntry(id=10, Coor1=TestCoor+4), thread_call=True)
         AddQueue.add(du.QEntry(id=11, Coor1=TestCoor+5), thread_call=True)
-        TestQueue.add_queue(AddQueue)
+        TestQueue.add_queue(AddQueue, g.SC_curr_comm_id)
         self.assertEqual(
             TestQueue.display(),
             [
@@ -453,10 +455,10 @@ class DataLibTest(unittest.TestCase):
         )
         TestQueue.clear(all=True)
         AddQueue.clear()
-        du.SC_curr_comm_id = 8
+        g.SC_curr_comm_id = 8
         AddQueue.add(du.QEntry(id=10, Coor1=TestCoor+4), thread_call=True)
         AddQueue.add(du.QEntry(id=11, Coor1=TestCoor+5), thread_call=True)
-        TestQueue.add_queue(AddQueue)
+        TestQueue.add_queue(AddQueue, g.SC_curr_comm_id)
         self.assertEqual(
             TestQueue.display(),
             [
@@ -464,8 +466,14 @@ class DataLibTest(unittest.TestCase):
                 du.QEntry(id=9, Coor1=TestCoor+5).print_short(),
             ],
         )
-        self.assertIsInstance(TestQueue.add_queue(du.Queue()), AttributeError)
-        self.assertIsInstance(TestQueue.add_queue(None), ValueError)
+        self.assertIsInstance(
+            TestQueue.add_queue(du.Queue(), g.SC_curr_comm_id),
+            AttributeError
+        )
+        self.assertIsInstance(
+            TestQueue.add_queue(None, g.SC_curr_comm_id),
+            ValueError
+        )
 
         # append
         TestEntry = du.QEntry(id=2, Coor1=TestCoor+6)
@@ -670,7 +678,7 @@ class DataLibTest(unittest.TestCase):
             TestDqB != 5
         
         # store
-        invalid_time = du.DEF_STT_VALID_TIME + 1
+        invalid_time = g.DB_valid_time + 1
         self.assertIsNone(TestDqB.store((1, invalid_time), '', ''))
         with self.assertRaises(KeyError):
             TestDqB.store((0, 0), 'wrong', 'wrong')
@@ -768,7 +776,7 @@ class DataLibTest(unittest.TestCase):
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, ValueError)
 
-        TestRobCon.w_bl = du.DEF_ROB_TCP['w_bl']
+        TestRobCon.w_bl = g.ROB_TCP.w_bl
         ans0, ans1 = TestRobCon.send(du.QEntry(id=1))
         self.assertFalse(ans0)
         self.assertIsInstance(ans1, OSError)

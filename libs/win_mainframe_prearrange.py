@@ -143,6 +143,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self.ADC_btt_clamp,
             self.ADC_btt_cut,
             self.ADC_btt_placeSpring,
+            self.ADC_btt_loadSpring,
+            self.ADC_btt_calibrate
         ]
 
         self.ASC_group = [
@@ -150,6 +152,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self.ASC_btt_clamp,
             self.ASC_btt_cut,
             self.ASC_btt_placeSpring,
+            self.ASC_btt_loadSpring,
         ]
 
         self.DC_group = [
@@ -461,7 +464,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                     f"in sendCommand!"
                 ),
             )
-            if isinstance(num_send, ValueError):
+            if isinstance(num_send, ValueError) and not self._testrun:
                 usr_warn = strd_dialog(
                     f"Command ID out of range: {num_send}!",
                     'ID ERROR',

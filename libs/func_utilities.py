@@ -276,24 +276,27 @@ def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
     entry.pinch = bool(int(pinch))
 
     # set tool settings
-    troll_steps = re_short(None, txt, 0, find_coor='TRL')
+    Tool = entry.Tool
+    if 'TCALIBRATE' in txt:
+        entry.Tool.trolley_calibrate= g.PRH_TROLL_CALIBRATE 
+    else:
+        entry.Tool.trolley_calibrate = 0
+    troll_steps = re_short(None, txt, Tool.trolley_steps, find_coor='TRL')
     entry.Tool.trolley_steps = int(float(troll_steps) * g.PRH_trol_ratio)
-    clamp = re_short(None, txt, 0, find_coor='TCL')
+    clamp = re_short(None, txt, Tool.clamp, find_coor='TCL')
     entry.Tool.clamp = bool(int(clamp))
-    cut = re_short(None, txt, 0, find_coor='TCU')
+    cut = re_short(None, txt, Tool.cut, find_coor='TCU')
     entry.Tool.cut = bool(int(cut))
-    place_spring = re_short(None, txt, 0, find_coor='TPS')
+    place_spring = re_short(None, txt, Tool.place_spring, find_coor='TPS')
     entry.Tool.place_spring = bool(int(place_spring))
-    load_spring = re_short(None, txt, 0, find_coor='TLS')
+    load_spring = re_short(None, txt, Tool.load_spring, find_coor='TLS')
     entry.Tool.load_spring = bool(int(load_spring))
     
     return entry
 
 
 def gcode_to_qentry(
-        mut_pos:du.Coordinate,
-        mut_speed:du.SpeedVector,
-        zone:int,
+        last_entry:du.QEntry,
         txt:str,
         ext_trail=True
     ) -> (
@@ -320,14 +323,10 @@ def gcode_to_qentry(
     """
 
     # handle mutuables here
-    pos = dcpy(mut_pos)
-    speed = dcpy(mut_speed)
-    zero = dcpy(g.ROBCurrZero)
-
-    if not isinstance(pos, du.Coordinate):
-        raise ValueError(f"{pos} is not an instance of Coordinate!")
-    if not isinstance(speed, du.SpeedVector):
-        raise ValueError(f"{speed} is not an instance of SpeedVector!")
+    Entry = dcpy(last_entry)
+    Zero = dcpy(g.ROBCurrZero)
+    if not isinstance(Entry, du.QEntry):
+        raise ValueError(f"{Entry} is not an instance of QEntry!")
     
     command = re_short([r'G\d+', '^;'], txt, None)
     if command is None:
@@ -337,88 +336,83 @@ def gcode_to_qentry(
     match command:
 
         case 'G1':
-            entry = du.QEntry(id=0, Coor1=pos, Speed=speed, z=zone)
-
             # set position and speed
-            x = re_short(None, txt, pos.x, find_coor='X')
-            if x != pos.x:
-                entry.Coor1.x = float(x.replace(',', '.'))
-                entry.Coor1.x += zero.x
+            x = re_short(None, txt, Entry.Coor1.x, find_coor='X')
+            if x != Entry.Coor1.x:
+                Entry.Coor1.x = float(x.replace(',', '.'))
+                Entry.Coor1.x += Zero.x
                 
                 if ext_trail:
                     # calculate following position of external axis
-                    if entry.Coor1.x > 0:
-                        entry.Coor1.ext = (
-                            int(entry.Coor1.x / g.SC_ext_trail[0])
+                    if Entry.Coor1.x > 0:
+                        Entry.Coor1.ext = (
+                            int(Entry.Coor1.x / g.SC_ext_trail[0])
                             * g.SC_ext_trail[1]
                         )
-                        entry.Coor1.ext += zero.ext
-
+                        Entry.Coor1.ext += Zero.ext
                     else:
-                        entry.Coor1.ext = zero.ext
+                        Entry.Coor1.ext = Zero.ext
 
-            y = re_short(None, txt, pos.y, find_coor='Y')
-            if y != pos.y:
-                entry.Coor1.y = float(y.replace(',', '.'))
-                entry.Coor1.y += zero.y
+            y = re_short(None, txt, Entry.Coor1.y, find_coor='Y')
+            if y != Entry.Coor1.y:
+                Entry.Coor1.y = float(y.replace(',', '.'))
+                Entry.Coor1.y += Zero.y
 
-            z = re_short(None, txt, pos.z, find_coor='Z')
-            if z != pos.z:
-                entry.Coor1.z = float(z.replace(',', '.'))
-                entry.Coor1.z += zero.z
+            z = re_short(None, txt, Entry.Coor1.z, find_coor='Z')
+            if z != Entry.Coor1.z:
+                Entry.Coor1.z = float(z.replace(',', '.'))
+                Entry.Coor1.z += Zero.z
 
             # set tool angulation
-            rx = re_short(None, txt, pos.rx, find_coor='XR')
-            if rx != pos.rx:
-                entry.Coor1.rx = float(rx.replace(',', '.'))
-                entry.Coor1.rx += zero.rx #to-do: check if running out of 0-359 crashes the robot
+            rx = re_short(None, txt, Entry.Coor1.rx, find_coor='XR')
+            if rx != Entry.Coor1.rx:
+                Entry.Coor1.rx = float(rx.replace(',', '.'))
+                Entry.Coor1.rx += Zero.rx #to-do: check if running out of 0-359 crashes the robot
                 
-            ry = re_short(None, txt, pos.ry, find_coor='YR')
-            if ry != pos.ry:
-                entry.Coor1.ry = float(ry.replace(',', '.'))
-                entry.Coor1.ry += zero.ry
+            ry = re_short(None, txt, Entry.Coor1.ry, find_coor='YR')
+            if ry != Entry.Coor1.ry:
+                Entry.Coor1.ry = float(ry.replace(',', '.'))
+                Entry.Coor1.ry += Zero.ry
                 
-            rz = re_short(None, txt, pos.rz, find_coor='ZR')
-            if rz != pos.rz:
-                entry.Coor1.rz = float(rz.replace(',', '.'))
-                entry.Coor1.rz += zero.rz
+            rz = re_short(None, txt, Entry.Coor1.rz, find_coor='ZR')
+            if rz != Entry.Coor1.rz:
+                Entry.Coor1.rz = float(rz.replace(',', '.'))
+                Entry.Coor1.rz += Zero.rz
 
             # set speed and external axis
-            fr = re_short(None, txt, speed.ts, find_coor='F')
-            if fr != speed.ts:
+            fr = re_short(None, txt, Entry.Speed.ts, find_coor='F')
+            if fr != Entry.Speed.ts:
                 fr = float(fr.replace(',', '.'))
-                entry.Speed.ts = int(fr * g.IO_fr_to_ts)
+                Entry.Speed.ts = int(fr * g.IO_fr_to_ts)
 
-            ext = re_short(None, txt, pos.ext, find_coor='EXT')
-            if ext != pos.ext:
-                entry.Coor1.ext = float(ext.replace(',', '.'))
-                entry.Coor1.ext += zero.ext
+            ext = re_short(None, txt, Entry.Coor1.ext, find_coor='EXT')
+            if ext != Entry.Coor1.ext:
+                Entry.Coor1.ext = float(ext.replace(',', '.'))
+                Entry.Coor1.ext += Zero.ext
 
-            entry.Coor1 = round(entry.Coor1, 2)
-            entry = re_pump_tool(entry, txt)
+            Entry.Coor1 = round(Entry.Coor1, 2)
+            Entry = re_pump_tool(Entry, txt)
 
         case 'G28':
-            entry = du.QEntry(id=0, Coor1=pos, Speed=speed, z=zone)
             if 'X0' in txt:
-                entry.Coor1.x = zero.x
+                Entry.Coor1.x = Zero.x
             if 'Y0' in txt:
-                entry.Coor1.y = zero.y
+                Entry.Coor1.y = Zero.y
             if 'Z0' in txt:
-                entry.Coor1.z = zero.z
+                Entry.Coor1.z = Zero.z
             if 'EXT0' in txt:
-                entry.Coor1.ext = zero.ext
-
-            entry = re_pump_tool(entry, txt)
+                Entry.Coor1.ext = Zero.ext
+            Entry = re_pump_tool(Entry, txt)
 
         case 'G92':
             if 'X0' in txt:
-                g.ROBCurrZero.x = pos.x
+                g.ROBCurrZero.x = Entry.Coor1.x
             if 'Y0' in txt:
-                g.ROBCurrZero.y = pos.y
+                g.ROBCurrZero.y = Entry.Coor1.y
             if 'Z0' in txt:
-                g.ROBCurrZero.z = pos.z
+                g.ROBCurrZero.z = Entry.Coor1.z
             if 'EXT0' in txt:
-                g.ROBCurrZero.ext = pos.ext
+                g.ROBCurrZero.ext = Entry.Coor1.ext
             return None, command
 
         case ';':
@@ -427,7 +421,7 @@ def gcode_to_qentry(
         case _:
             return None, ''
 
-    return entry, command
+    return Entry, command
 
 
 def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:

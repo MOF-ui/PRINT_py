@@ -304,6 +304,7 @@ class RoboCommWorker(QObject):
                         ):
                         g.ROBMovStartP = g.ROBMovEndP
                         g.ROBMovEndP = dcpy(g.ROBCommQueue[0].Coor1)
+                        g.PRH_status = dcpy(g.ROBCommQueue[0].Tool)
 
                     # set new values to globals
                     g.ROBTelem = dcpy(Telem)
@@ -369,7 +370,7 @@ class RoboCommWorker(QObject):
         while len(g.ROB_send_list) > 0:
             Comm, direct_ctrl = g.ROB_send_list.pop(0)
 
-            # check for type, ID overflow & live adjustments to tcp speed
+            # check type and ID
             if not isinstance(Comm, du.QEntry):
                 err = TypeError(f"{Comm} is not an instance of QEntry!")
                 self.sendElem.emit(Comm, False, err, direct_ctrl)
@@ -380,6 +381,7 @@ class RoboCommWorker(QObject):
                 self.sendElem.emit(Comm, False, err, direct_ctrl)
                 print(f"send error: {err}")
                 break
+            # check for ID overflow
             while Comm.id > g.ROB_BUFFER_SIZE:
                 Comm.id -= g.ROB_BUFFER_SIZE
             # check for TCP speed overwrites
@@ -601,7 +603,7 @@ class LoadFileWorker(QObject):
             self.check_routine(fu.base_dist_check)
 
         # add to command queue
-        g.SCQueue.add_queue(self._CommList)
+        g.SCQueue.add_queue(self._CommList, g.SC_curr_comm_id)
         self.convFinished.emit(line_id, start_id, skips)
         lfw_running = False
 
@@ -610,18 +612,16 @@ class LoadFileWorker(QObject):
         """row-wise conversion from GCode"""
 
         skips = 0
-        Speed = dcpy(g.SCSpeed)
         # file import always starts from home, regardless of current pos:
-        LastPos = g.ROBCurrZero
+        LastEntry = du.QEntry(
+            id=0,
+            Coor1=g.ROBCurrZero,
+            Speed=g.SCSpeed,
+            z=g.IO_zone
+        )
 
         for row in rows:
-            Entry, command = fu.gcode_to_qentry(
-                LastPos,
-                Speed,
-                g.IO_zone,
-                row,
-                lfw_ext_trail
-            )
+            Entry, command = fu.gcode_to_qentry(LastEntry, row, lfw_ext_trail)
             # check if valid command
             if (command == "G1") or (command == "G28"):
                 Entry.id = line
@@ -630,7 +630,7 @@ class LoadFileWorker(QObject):
                     self.convFailed.emit(f"COULD NOT ADD: {command}!")
                     return False, 0, 0
                 line += 1
-                LastPos = Entry.Coor1
+                LastEntry = Entry
             elif (command == "G92") or (command == ";") or (command == ''):
                 skips += 1
             else:
