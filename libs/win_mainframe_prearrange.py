@@ -52,6 +52,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     #                                ATTRIBUTES                              #
     ##########################################################################
 
+    _first_pos = True  # one-time switch to get robot home position
     _logpath = ''  # reference for logEntry, set by __init__
     _testrun = False
 
@@ -74,10 +75,11 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     #                                  SETUP                                #
     #########################################################################
 
-    def __init__(self, lpath, testrun=False, parent=None) -> None:
+    def __init__(self, lpath, testrun=False, p_log='', parent=None) -> None:
 
         super().__init__(parent)
         self._testrun = testrun
+        self._p_log = p_log
 
         # UI SETUP
         self.setupUi(self)
@@ -177,7 +179,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self.PRH_disp_currSpeed,
             self.PRH_num_setSpeed,
             self.PRH_sld_speed,
-            self.PRH_btt_pinchValve
+            self.PRH_btt_pinchValve,
+            self.PRH_btt_stop,
         ]
         for elem in self.PRH_group:
             elem.setEnabled(False)
@@ -187,6 +190,23 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self.NC_btt_xyzextSend,
             self.NC_btt_rSend,
         ]
+
+        self.PMP_group = [
+            self.PUMP_disp_currSpeed,
+            self.PUMP_num_setSpeed,
+            self.PUMP_btt_setSpeed,
+            self.PUMP_sld_outputRatio,
+            self.PUMP_btt_stop,
+            self.PUMP_btt_plus1,
+            self.PUMP_btt_plus10,
+            self.PUMP_btt_plus25,
+            self.PUMP_btt_minus1,
+            self.PUMP_btt_minus10,
+            self.PUMP_btt_minus25,
+            self.PUMP_btt_reverse,
+        ]
+        for elem in self.PMP_group:
+            elem.setEnabled(False)
 
         self.PMP1_group = [
             self.PUMP_num_setSpeedP1,
@@ -217,11 +237,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self.SCTRL_btt_forcedStop,
             self.TERM_btt_gcodeInterp,
             self.TERM_btt_rapidInterp,
-            self.ADC_btt_clamp,
-            self.ADC_btt_cut,
-            self.ADC_btt_placeSpring,
-            self.ADC_num_trolley,
         ]
+        self.ROB_group += self.ADC_group
         self.ROB_group += self.DC_group
         self.ROB_group += self.NC_group
         for elem in self.ROB_group:
@@ -580,6 +597,12 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             display[2].setText(f"{stt_data.amps} A")            
             display[3].setText(f"{stt_data.torq} Nm")
             setattr(self, dump, telem)
+            if self._p_log != '':
+                with open(self._p_log, 'w') as p_log:
+                    p_log.write(
+                        f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')},{source},"
+                        f"{telem.freq},{telem.volt},{telem.amps},{telem.torq}\n"
+                        )
 
         match source:
             case 'P1':
@@ -631,7 +654,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         End = g.ROBMovEndP
         try:
             prog_id = g.SCQueue[0].id
-        except AttributeError:
+        except IndexError:
             prog_id = com_id
 
         # SCRIPT  CONTROL
@@ -699,7 +722,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self.SCTRL_disp_buffComms.setText(
                 str(g.SCQueue[0].id - rob_id - 1)
             )
-        except AttributeError:
+        except IndexError:
             pass
 
         # update Amcon & Pump tab
@@ -714,6 +737,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.ASC_btt_cut.setChecked(entry.Tool.cut)
         self.ADC_btt_placeSpring.setChecked(entry.Tool.place_spring)
         self.ASC_btt_placeSpring.setChecked(entry.Tool.place_spring)
+        self.ADC_btt_loadSpring.setChecked(entry.Tool.load_spring)
+        self.ASC_btt_loadSpring.setChecked(entry.Tool.load_spring)
+        self.ADC_btt_calibrate.setChecked(entry.Tool.trolley_calibrate)
 
         for widget in self.ADC_group: widget.blockSignals(False)
         for widget in self.ASC_group: widget.blockSignals(False)
@@ -992,13 +1018,13 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             )
         elif source == 'file':
             try:
-                with open(g.CTRL_log_path, 'r') as save_file:
+                with open(g.IO_zero_log_path, 'r') as save_file:
                     zero_vals = save_file.read().split('_')
                     ZeroOverwrite = du.Coordinate(zero_vals)
             except Exception as e:
                 self.log_entry(
                     'ZERO',
-                    f"failed to load ZERO data from {g.CTRL_log_path} due to {e}!"
+                    f"failed to load ZERO data from {g.IO_zero_log_path} due to {e}!"
                 )
                 return
         elif source == 'default':

@@ -666,21 +666,21 @@ class MainframeWinTest(unittest.TestCase):
     def test_load_file(self):
         global TestFrame
 
-        g.IO_curr_filepath = pl.Path("test.abc")
+        g.IO_curr_file_path = pl.Path("test.abc")
         TestFrame.load_file()
         self.assertEqual(
             TestFrame.IO_lbl_loadFile.text(),
             '... no valid file, not executed',
         )
 
-        g.IO_curr_filepath = pl.Path("test.mod")
+        g.IO_curr_file_path = pl.Path("test.mod")
         TestFrame.load_file(testrun=True)
         self.assertEqual(
             TestFrame.IO_lbl_loadFile.text(),
             '... conversion running ...',
         )
 
-        g.IO_curr_filepath = None
+        g.IO_curr_file_path = None
 
 
     def test_load_file_finished(self):
@@ -718,7 +718,7 @@ class MainframeWinTest(unittest.TestCase):
         g.SC_vol_per_m = 0.1
 
         TestFrame.open_file(testrun=True, testpath=gcode_test_path)
-        self.assertEqual(g.IO_curr_filepath, gcode_test_path)
+        self.assertEqual(g.IO_curr_file_path, gcode_test_path)
         self.assertEqual(
             TestFrame.IO_disp_filename.text(), gcode_test_path.name
         )
@@ -727,7 +727,7 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(TestFrame.IO_disp_estimVol.text(), '0.3 L')
 
         TestFrame.open_file(testrun=True, testpath=rapid_test_path)
-        self.assertEqual(g.IO_curr_filepath, rapid_test_path)
+        self.assertEqual(g.IO_curr_file_path, rapid_test_path)
         self.assertEqual(
             TestFrame.IO_disp_filename.text(), rapid_test_path.name
         )
@@ -1174,7 +1174,7 @@ rapid_test_file.close()
 app = 0
 win = 0
 app = QApplication(sys.argv)
-TestFrame = mf.Mainframe(lpath=logpath, testrun=True)
+TestFrame = mf.Mainframe(l_path=logpath, testrun=True)
 rapid_test_file.close()
 
 # grouping

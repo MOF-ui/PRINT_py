@@ -734,9 +734,10 @@ class Queue:
     def __add__(self, other) -> 'Queue':
         if not isinstance(other, Queue):
             raise ValueError(f"{other} is not an instance of 'Queue'!")
-        if len(self) == 0:
-            return other
-        self.add_queue(other)
+        if len(other) == 0:
+            # check other queue to avoid error in 'other[0].id'
+            return self
+        self.add_queue(other, other[0].id)
         return self
 
 
@@ -745,10 +746,7 @@ class Queue:
 
 
     def __getitem__(self, i) -> QEntry | None:
-        try:
-            return self._queue[i]
-        except IndexError:
-            return None
+        return self._queue[i]
     
 
     def __iter__(self) -> 'Queue':
@@ -771,8 +769,8 @@ class Queue:
     def __str__(self) -> str:
         if len(self) != 0:
             ans = ''
-            for x in self._queue:
-                ans += f'{x}\n'
+            for Entry in self:
+                ans += f'{Entry}\n'
             return ans
         return 'Queue is empty!'
 
@@ -810,59 +808,41 @@ class Queue:
 
     def __repr__(self) -> str:
         ret = "%s(" % (self.__class__.__name__)
-        for id, elem in enumerate(range(len(self))):
-            ret += "element %r: %r," % (id, self[elem])
+        for idx, elem in enumerate(self):
+            ret += "element %r: %r," % (idx, elem)
         ret += ")"
         return ret
-
-
-    def last_entry(self) -> QEntry | None:
-        """returns last item in queue (surprise!), returns None if queue
-        is empty
-        """
-        if len(self) == 0:
-            return None
-        return self._queue[len(self) - 1]
 
 
     def id_pos(self, id:int) -> int | None:
         """return queue entry index(!) at given ID, not the entry itself,
         returns None if no such entry
         """
+        idx = 0
         length = len(self)
-        i = 0
-        if length <= 0:
+        if length <= 0 or id < 0:
             return None
-
-        for entry in range(length):
-            if self[entry].id == id:
+        for entry in self:
+            if entry.id == id:
                 break
-            else:
-                i += 1
-
-        if i < 0 or i >= length:
+            idx += 1
+        if idx < 0 or idx >= length:
             return None
-        return i
+        return idx
 
 
-    def entry_before_id(self, id:int) -> QEntry:
-        """return queue entry before (index - 1) a specific ID, raises
-        AttributeError if no such entry
+    def entry_before_id(self, id:int) -> QEntry | None:
+        """return queue entry before (index - 1) a specific ID, returns
+        None if no such entry
         """
-        length = len(self)
-        i = 0
-        if length <= 0:
-            raise AttributeError
-
-        for j in range(length):
-            if self[j].id == id:
-                break
-            else:
-                i += 1
-
-        if i < 1 or i >= length:
-            raise AttributeError
-        return self[i - 1]
+        idx = self.id_pos(id)
+        try:
+            if idx == 0:
+                return None
+            Entry = self[idx - 1]
+        except:
+            Entry = None
+        return Entry
 
 
     def display(self) -> list[str]:
@@ -870,13 +850,8 @@ class Queue:
         """
         if len(self) != 0:
             ans = []
-            for x in self:
-                if not isinstance(x, QEntry):
-                    raise ValueError(
-                        f"could not print entry '{x}', it's not 'QEntry' type!"
-                    )
-                ans.append(x.print_short())
-
+            for Entry in self:
+                ans.append(Entry.print_short())
             return ans
         return ['Queue is empty!']
 
@@ -889,92 +864,120 @@ class Queue:
             i.id += int(summand)
 
 
-    def add(self, entry:QEntry, curr_id=-1, thread_call=False) -> None | Exception:
+    def add(
+            self,
+            entry:QEntry,
+            curr_id=-1,
+            thread_call=False
+        ) -> None | Exception:
         """adds a new QEntry to queue, checks if QEntry.ID makes sense, places
         QEntry in queue according to the ID given, threadCall option allows
-        the first ID to be 0
+        the first ID to be any number and ID==0 will be sorted to the front
         """
-        new_entry = dcpy(entry)
-        last_item = len(self) - 1
-        if not isinstance(new_entry, QEntry):
+        NewEntry = dcpy(entry)
+        if not isinstance(NewEntry, QEntry):
             return TypeError('entry is not an instance of QEntry')
         if curr_id == -1 and not thread_call:
             raise ValueError(f"curr_id=-1 not allowed outside thread_calls!")
 
-        if last_item < 0:
+        try:
+            first_id = self[0].id
+            last_id = self[-1].id
+        except IndexError:
+            # if self is empty start with new entry
+            # at new_entry.id or curr_id
             if not thread_call:
-                new_entry.id = curr_id
-            self._queue.append(new_entry)
+                NewEntry.id = curr_id
+            self._queue.append(NewEntry)
             return None
 
-        last_id = self[last_item].id
-        first_id = self[0].id
-        if new_entry.id == 0 or new_entry.id > last_id:
-            if thread_call and new_entry.id == 0:
+        if NewEntry.id == 0 or NewEntry.id > last_id:
+            if thread_call and NewEntry.id == 0:
+                # if thread_call and ID == 0, insert at the front of the queue
                 self.increment()
-                self._queue.insert(0, new_entry)
+                self._queue.insert(0, NewEntry)
             else:
-                new_entry.id = last_id + 1
-                self._queue.append(new_entry)
-        elif new_entry.id < 0:
+                # outside thread_call, append at end
+                NewEntry.id = last_id + 1
+                self._queue.append(NewEntry)
+        elif NewEntry.id < 0:
+            # return error if ID invalid
             return ValueError
         else:
-            if new_entry.id < first_id:
-                new_entry.id = first_id
-
-            front_skip = new_entry.id - first_id
-            self._queue.insert(front_skip, new_entry)
-            for i in range(last_item + 1 - front_skip):
-                i += 1
-                self[i + front_skip].id += 1
+            if NewEntry.id < first_id:
+                # if 0 < ID < first_id, append at front
+                NewEntry.id = first_id
+            # otherwise, insert at ID and shift all following IDs by 1;
+            # should be impossible for id_pos to return None here
+            # as ID was checked to be on the list beforehand;
+            # if None is returned, following line would raise exception
+            idx = self.id_pos(NewEntry.id)
+            self._queue.insert(idx, NewEntry)
+            len_self = len(self)
+            idx += 1
+            while idx < len_self:
+                self[idx].id += 1
+                idx += 1
 
         return None
 
 
-    def add_queue(self, add_queue:'Queue', curr_id=-1) -> None | Exception:
+    def add_queue(self, add_queue:'Queue', curr_id:int) -> None | Exception:
         """adds another queue, hopefully less time-consuming than a for loop
         with self.add
         """
-        new_list = dcpy(add_queue)
-        if not isinstance(new_list, Queue):
-            return ValueError(f"{new_list} is not an instance of 'Queue'!")
+        Other = dcpy(add_queue)
+        if not isinstance(Other, Queue):
+            raise ValueError(f"{Other} is not an instance of 'Queue'!")
         try:
-            nl_first_id = new_list[0].id
-        except Exception as err:
-            return err
-
-        last_item = len(self) - 1
-        # if current queue is empty, start with the first ID of the new list
-        if last_item < 0:
-            if nl_first_id != curr_id:
-                new_list.increment(curr_id - nl_first_id)
-            self._queue.extend(new_list._queue)
+            other_first_id = Other[0].id
+        except:
+            # if other queue is empty, just return
             return
 
-        len_new_list = len(new_list)
-        last_id = self[last_item].id
-        first_id = self[0].id
-        if (nl_first_id > last_id + 1) or (nl_first_id == 0):
-            new_list.increment(last_id + 1 - nl_first_id)
-            nl_first_id = last_id + 1     
-        if nl_first_id == (last_id + 1):
-            self._queue.extend(new_list._queue)
+        try:
+            first_id = self[0].id
+            last_id = self[-1].id
+        except IndexError:
+            # if current queue is empty, start with the current ID given
+            if other_first_id != curr_id:
+                Other.increment(curr_id - other_first_id)
+            self._queue.extend(Other._queue)
+            return
+
+        if (other_first_id > last_id + 1) or (other_first_id == 0):
+            # if first ID of other is either larger than last ID of self or
+            # == 0, increment other until its first ID starts with last_id + 1
+            Other.increment(last_id + 1 - other_first_id)
+            other_first_id = last_id + 1
+        if other_first_id == (last_id + 1):
+            # if both list IDs form a continuous list, append the other queue
+            self._queue.extend(Other._queue)
         else:
-            if nl_first_id < first_id:
-                new_list.increment(first_id - nl_first_id)
-                nl_first_id = first_id
-            front_skip = nl_first_id - first_id
-            for i in range(len(self) - front_skip):
-                self[i + front_skip].id += len_new_list
-            self._queue[front_skip:front_skip] = new_list._queue
+            # otherwise, insert other queue inside or infront of self
+            # and ensure that the IDs are continuous
+            if other_first_id < first_id:
+                # if others first ID is smaller than self first ID,
+                # increment other until its equal
+                Other.increment(first_id - other_first_id)
+                other_first_id = first_id
+            idx = i = self.id_pos(other_first_id)
+            len_self = len(self)
+            len_other = len(Other)
+            while i < len_self:
+                self[i].id += len_other
+                i += 1
+            self._queue[idx:idx] = Other._queue
 
 
     def append(self, entry:QEntry) -> None:
         """other than '.add' this simply appends an entry indifferently
         to its ID
         """
-        new_entry = dcpy(entry)
-        self._queue.append(new_entry)
+        if not isinstance(entry, QEntry):
+            raise TypeError(f"{entry} is not an instance of 'QEntry'!")
+        NewEntry = dcpy(entry)
+        self._queue.append(NewEntry)
         return None
 
 
@@ -988,54 +991,44 @@ class Queue:
         if len(self) == 0:
             return
 
+        # look for IDs in given str
         ids = re.findall(r'\d+', id)
         id_num = len(ids)
-        first_id = self[0].id
-        last_id = self[len(self) - 1].id
         match id_num:
             case 1:
-                id1 = int(ids[0])
-                if id1 < first_id or id1 > last_id:
+                # if just one ID was found, delete that specific entry
+                id = int(ids[0])
+                idx = self.id_pos(id)
+                if idx is None:
                     return
-
-                i = 0
-                for entry in self:
-                    if entry.id == id1:
-                        break
-                    else:
-                        i += 1
-
-                self._queue.__delitem__(i)
-                while i < len(self):
-                    self[i].id -= 1
-                    i += 1
+                # delete the entry and shift all following IDs by -1
+                self._queue.__delitem__(idx)
+                len_self = len(self)
+                while idx < len_self:
+                    self[idx].id -= 1
+                    idx += 1
             case 2:
+                # if two IDs were found, delete the range between them
                 id1, id2 = int(ids[0]), int(ids[1])
+                idx1 = self.id_pos(id1)
+                idx2 = self.id_pos(id2)
                 if (
-                    id1 < first_id
-                    or id1 > last_id
-                    or id2 < id1
-                    or id2 > last_id
-                    or id.find('..') == -1
+                    None in [idx1, idx2]
+                    or idx2 < idx1
                 ):
                     return
 
-                id_dist = id2 - id1 + 1
-                i = 0
-                for entry in self:
-                    if entry.id == id1:
-                        break
-                    else:
-                        i += 1
-                
+                id_dist = idx2 - idx1 + 1                
                 # dont get confused, I'm iterating for the num of entries to
-                # delete, but I'm always deleting the same i-th entry as the
-                # stack moves along
+                # delete, but I'm always deleting the entry at 
+                # the same idx as the stack moves along
                 for n in range(id_dist):
-                    self._queue.__delitem__(i)
-                while i < len(self):
-                    self[i].id -= id_dist
-                    i += 1
+                    self._queue.__delitem__(idx1)
+                # shift all following IDs by -id_dist
+                len_self = len(self)
+                while idx1 < len_self:
+                    self[idx1].id -= id_dist
+                    idx1 += 1
             case _:
                 return
 

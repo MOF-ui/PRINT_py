@@ -79,11 +79,9 @@ CAM_urls = [
 DC_rob_moving = False
 DCSpeed = dcpy(DC_SPEED)
 
-# general control properties
-CTRL_log_path = Path()
-
 # file IO
-IO_curr_filepath = None
+IO_zero_log_path = Path()
+IO_curr_file_path = None
 IO_fr_to_ts = IO_FR_TO_TS
 IO_zone = IO_ZONE
 

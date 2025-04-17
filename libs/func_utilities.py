@@ -521,16 +521,14 @@ def create_logfile() -> Path | None:
         desk = os.environ['USERPROFILE']
         log_path = desk / Path('Desktop/PRINT_py_log')
         log_path.mkdir(parents=True, exist_ok=True)
-        g.CTRL_log_path = Path(log_path / Path('ZERO.zrf'))
+        g.IO_zero_log_path = Path(log_path / Path('ZERO.zrf'))
 
         time = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-
         log_path = log_path / Path(f"{time}.txt")
         text = f"{time}    [GNRL]:        program booting, starting GUI...\n"
 
-        logfile = open(log_path, 'x')
-        logfile.write(text)
-        logfile.close()
+        with open(log_path, 'x') as logfile:
+            logfile.write(text)
 
     except Exception as err:
         print(f"Exception occured during log file creation: {err}")

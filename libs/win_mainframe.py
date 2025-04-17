@@ -57,28 +57,22 @@ from mtec.mtec_mod import MtecMod
 class Mainframe(PreMainframe):
     """main UI of PRINT_py (further details pending)"""
 
-    ##########################################################################
-    #                                ATTRIBUTES                              #
-    ##########################################################################
-
-    _first_pos = True  # one-time switch to get robot home position
-
-
     #########################################################################
     #                                  SETUP                                #
     #########################################################################
 
     def __init__(
             self,
-            lpath=None,
+            l_path=None,
             dev_avail=False,
+            p_log='',
             testrun=False,
             parent=None
         ) -> None:
         """setup main and daq UI, start subsystems & threads"""
 
         # getting all prearranged UI functions from PreMainframe
-        super().__init__(lpath, testrun, parent)
+        super().__init__(l_path, testrun, p_log, parent)
 
         # LOAD THREADS, SIGNALS & DEFAULT SETTINGS
         self.log_entry('GNRL', 'connecting signals...')
@@ -393,8 +387,11 @@ class Mainframe(PreMainframe):
                 if result:
                     if not self._PumpCommThread.isRunning():
                         # restart if necessary; if so reconnect threads
+                        # and enable UI buttons
                         self.connect_threads('PMP')
                         self._PumpCommThread.start()
+                        for elem in self.PMP_group:
+                            elem.setEnabled(True)
 
                     wd.start()
                     _action_on_success(
@@ -487,7 +484,7 @@ class Mainframe(PreMainframe):
                 g.ROB_send_list.clear()
             self.switch_rob_moving(end=True)
             try:
-                with open(g.CTRL_log_path, 'x') as save_file:
+                with open(g.IO_zero_log_path, 'x') as save_file:
                     save_file.write(
                         f"{Zero.x}_{Zero.y}_{Zero.z}_{Zero.rx}_{Zero.ry}_"
                         f"{Zero.rz}_{Zero.q}_{Zero.ext}"
@@ -543,6 +540,8 @@ class Mainframe(PreMainframe):
                 if isinstance(g.PMPSerialDefBus, serial.Serial):
                     g.PMPSerialDefBus.close()
                     g.PMPSerialDefBus = None
+                    for elem in self.PMP_group:
+                        elem.setEnabled(False)
         
         # PRH DISCONNECT
         def prh_disconnect() -> None:
@@ -714,7 +713,7 @@ class Mainframe(PreMainframe):
 
         if not isinstance(file_path, Path):
             self.IO_disp_filename.setText('no file selected')
-            g.IO_curr_filepath = None
+            g.IO_curr_file_path = None
             return
         with open(file_path, 'r') as file:
             txt = file.read()
@@ -732,7 +731,7 @@ class Mainframe(PreMainframe):
                 'F-IO',
                 f"Error while opening {file_path} file: {comm_num}"
             )
-            g.IO_curr_filepath = None
+            g.IO_curr_file_path = None
             return
         if res == 'empty':
             self.IO_disp_filename.setText('FILE EMPTY!')
@@ -753,7 +752,7 @@ class Mainframe(PreMainframe):
                 f"{skips} lines skipted, {fil_length}m filament, {fil_vol}L"
             ),
         )
-        g.IO_curr_filepath = file_path
+        g.IO_curr_file_path = file_path
 
 
     def load_file(self, lf_at_id=False, testrun=False) -> None:
@@ -769,7 +768,7 @@ class Mainframe(PreMainframe):
         p_ctrl = self.IO_chk_autoPCtrl.isChecked()
         range_chk = self.IO_chk_rangeChk.isChecked()
         xy_ext_chk = self.IO_chk_xyextChk.isChecked()
-        fpath = g.IO_curr_filepath
+        fpath = g.IO_curr_file_path
 
         if fpath is None or not (
                 fpath.suffix == '.gcode' or fpath.suffix == '.mod'
@@ -879,15 +878,16 @@ class Mainframe(PreMainframe):
         """
 
         # get text and position BEFORE PLANNED COMMAND EXECUTION
-        try:
-            if not at_id:
-                LastEntry = dcpy(g.SCQueue.last_entry())
-                if LastEntry is None:
-                    raise AttributeError
+        if not at_id:
+            try:
+                LastEntry = dcpy(g.SCQueue[-1])
                 LastEntry.id = 0
-            else:
-                LastEntry = dcpy(g.SCQueue.entry_before_id(id))
-        except AttributeError:
+            except IndexError:
+                LastEntry = None
+        else:
+            LastEntry = dcpy(g.SCQueue.entry_before_id(id))
+        if LastEntry is None:
+            # if no entry is found, start relative to robot zero
             LastEntry = du.QEntry(
                 id=0,
                 Coor1=g.ROBCurrZero,
@@ -1004,72 +1004,69 @@ class Mainframe(PreMainframe):
     def add_SIB(self, num:int, at_end=False) -> bool:
         """add standard instruction block (SIB) to queue"""
 
-        num -= 1
         sib_entry = [
             self.SIB_entry_sib1,
             self.SIB_entry_sib2,
             self.SIB_entry_sib3,
         ]
-        txt = sib_entry[num].toPlainText()
-
-        if (len(g.SCQueue) == 0) or not at_end:
-            try:
-                line_id = g.SCQueue[0].id
-            except AttributeError:
-                line_id = g.ROBTelem.id + 1
-        else:
-            line_id = g.SCQueue.last_entry().id + 1
-
-        if line_id < 1: line_id = 1
-        line_id_start = line_id
+        txt = sib_entry[num - 1].toPlainText()
         rows = txt.split('\n')
 
-        # interpret rows as either RAPID or GCode, row-wise, handling the
-        # entry is unnessecary as its added to queue by the addRapidSgl /
-        # addGcodeSgl funcions already
+        # gcode needs position information before the command
+        LastEntry = du.QEntry(
+            id=0,
+            Coor1=g.ROBCurrZero,
+            Speed=g.SCSpeed,
+            z=g.IO_zone
+        )
+        if len(g.SCQueue) == 0:
+            line_id = 1
+        else:
+            if not at_end:
+                line_id = g.SCQueue[0].id
+            else:
+                LastEntry = dcpy(g.SCQueue[-1])
+                line_id = LastEntry.id + 1
+        line_id_start = line_id            
+
+        # interpret rows as either RAPID or GCode, row-wise
+        err_txt = ''
         for row in rows:
             if 'Move' in row:
-                Entry = self.add_rapid_sgl(
-                    at_id=True, id=line_id, from_file=True, file_txt=row
-                )
-
+                Entry = fu.rapid_to_qentry(row)
                 if not isinstance(Entry, du.QEntry):
-                    sib_entry[num].setText(f"COMMAND ERROR, ABORTED\n {txt}")
-                    self.log_entry(
-                        f"SIB{num + 1}",
-                        (
-                            f"ERROR: SIB command import aborted ({Entry})! "
-                            f"false entry: {txt}"
-                        ),
-                    )
-                    return False
-                else:
-                    line_id += 1
-
+                    err_txt = f"ERROR while parsing: ({Entry})! Input: {row}"
             else:
-                Entry, command = self.add_gcode_sgl(
-                    at_id=True, id=line_id, from_file=True, file_txt=row
-                )
+                Entry, command = fu.gcode_to_qentry(LastEntry, row, False)
+                if command != 'G1' and command != 'G28':
+                    err_txt = f"ERROR while parsing: ({command})! Input: {row}"
+            
+            # break if invalid entry or unreachable position
+            if err_txt:
+                self.log_entry(f"SIB{num}", err_txt)
+                warn_usr = strd_dialog(err_txt, f"SIB{num} ERROR")
+                warn_usr.exec()
+                return False
+            if not self.coor_plausibility_check(Entry):
+                return False
 
-                if (command == 'G1') or (command == 'G28'):
-                    line_id += 1
-                else:
-                    sib_entry[num].setText(f"COMMAND ERROR, ABORTED\n {txt}")
-                    self.log_entry(
-                        f"SIB{num + 1}",
-                        (
-                            f"ERROR: SIB command import aborted ({command})! "
-                            f"false entry: {txt}"
-                        ),
-                    )
-                    return False
-
+            # otherwise add to SCQueue
+            Entry.id = line_id
+            with QMutexLocker(GlobalMutex):
+                res = g.SCQueue.add(Entry, g.SC_curr_comm_id)
+            if res == ValueError:
+                return False
+            else:
+                LastEntry = dcpy(Entry)
+                line_id += 1
+    
         log_txt = f"{line_id - line_id_start} SIB lines added"
         if at_end:
             log_txt += ' at end of queue'
         else:
             log_txt += ' in front of queue'
         self.log_entry(f"SIB{num + 1}", log_txt)
+        self.label_update_on_queue_change()
         return True
 
 
@@ -1665,7 +1662,7 @@ if __name__ == '__main__':
     app = 0  # leave that here so app doesnt include the remnant of a previous QApplication instance
     win = 0
     app = QApplication(sys.argv)
-    win = Mainframe(lpath=logpath)
+    win = Mainframe(l_path=logpath)
     win.show()
 
     # start application (uses sys for CMD)

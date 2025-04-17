@@ -36,7 +36,7 @@
 
 # python standard libraries
 import sys
-
+from pathlib import Path
 
 # PyQt stuff
 from PyQt5.QtWidgets import QApplication
@@ -130,6 +130,11 @@ if not skip_dialog:
 
 # create logfile and get path
 logpath = fu.create_logfile()
+pmp_log_name = f"pmp_data_{logpath.stem}.csv"
+pmp_save_path = Path(logpath).parent / pmp_log_name
+with open(pmp_save_path, 'x') as f:
+    f.write('time,pmp,freq,volt,amps,torq\n')
+
 print(f"writing log at: {logpath}")
 print(f"connecting: ", end='')
 for i in range(0, 5):
@@ -142,7 +147,7 @@ print('\n')
 app = 0  
 win = 0
 app = QApplication(sys.argv)
-win = Mainframe(logpath, dev_avail)
+win = Mainframe(logpath, dev_avail, pmp_save_path)
 win.show()
 app.exec()
 # sys.exit(app.exec())

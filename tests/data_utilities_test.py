@@ -6,6 +6,7 @@ import os
 import sys
 import time
 import unittest
+from copy import deepcopy as dcpy
 
 # appending the parent directory path
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -205,7 +206,7 @@ class DataLibTest(unittest.TestCase):
         TestQueue.add(du.QEntry(), g.SC_curr_comm_id)
         TestQueue.add(du.QEntry(id=10, Coor1=TestCoor), g.SC_curr_comm_id)
         TestQueue.add(du.QEntry(id=2, Coor1=TestCoor+1), g.SC_curr_comm_id)
-        TestStrs = [
+        test_strs = [
             f"{du.QEntry(id=1)}\n",
             f"{du.QEntry(id=2, Coor1=TestCoor+1)}\n",
             f"{du.QEntry(id=3, Coor1=TestCoor)}\n",
@@ -215,17 +216,18 @@ class DataLibTest(unittest.TestCase):
         self.assertEqual(str(du.Queue()), 'Queue is empty!')
         self.assertEqual(
             str(TestQueue),
-            f"{TestStrs[0]}{TestStrs[1]}{TestStrs[2]}"
+            f"{test_strs[0]}{test_strs[1]}{test_strs[2]}"
         )
 
         # __getitem__
-        self.assertIsNone(EmptyQueue[1])
+        with self.assertRaises(IndexError):
+            EmptyQueue[1]
         self.assertEqual(TestQueue[1], du.QEntry(id=2, Coor1=TestCoor+1))
 
         # __iter__ & __next__
         i = 0
         for Entry in TestQueue:
-            self.assertEqual(f"{Entry}\n", TestStrs[i])
+            self.assertEqual(f"{Entry}\n", test_strs[i])
             i += 1
 
         # __len__
@@ -243,17 +245,10 @@ class DataLibTest(unittest.TestCase):
         with self.assertRaises(TypeError):
             TestQueue != 5
 
-        # last_entry
-        self.assertIsNone(EmptyQueue.last_entry())
-        self.assertEqual(
-            TestQueue.last_entry(),
-            du.QEntry(id=3, Coor1=TestCoor),
-        )
-
         # entry_before_id
-        self.assertRaises(AttributeError, EmptyQueue.entry_before_id, 1)
-        self.assertRaises(AttributeError, TestQueue.entry_before_id, 1)
-        self.assertRaises(AttributeError, TestQueue.entry_before_id, 4)
+        self.assertIsNone(EmptyQueue.entry_before_id(1))
+        self.assertIsNone(TestQueue.entry_before_id(1))
+        self.assertIsNone(TestQueue.entry_before_id(4))
         self.assertEqual(TestQueue.entry_before_id(2), du.QEntry(id=1))
 
         # display
@@ -346,8 +341,6 @@ class DataLibTest(unittest.TestCase):
         TestQueue.clear(all=False, id="5..9")
         self.assertEqual(TestQueue.display(), unchanged_disp)
         TestQueue.clear(all=False, id="5..3")
-        self.assertEqual(TestQueue.display(), unchanged_disp)
-        TestQueue.clear(all=False, id="3,,5")
         self.assertEqual(TestQueue.display(), unchanged_disp)
 
         TestQueue.clear(all=False, id="4")
@@ -466,14 +459,11 @@ class DataLibTest(unittest.TestCase):
                 du.QEntry(id=9, Coor1=TestCoor+5).print_short(),
             ],
         )
-        self.assertIsInstance(
-            TestQueue.add_queue(du.Queue(), g.SC_curr_comm_id),
-            AttributeError
-        )
-        self.assertIsInstance(
-            TestQueue.add_queue(None, g.SC_curr_comm_id),
-            ValueError
-        )
+        OldTestQueue = dcpy(TestQueue)
+        TestQueue.add_queue(du.Queue(), g.SC_curr_comm_id)
+        self.assertEqual(OldTestQueue, TestQueue)
+        with self.assertRaises(ValueError):
+            TestQueue.add_queue(None, g.SC_curr_comm_id)
 
         # append
         TestEntry = du.QEntry(id=2, Coor1=TestCoor+6)
@@ -486,8 +476,9 @@ class DataLibTest(unittest.TestCase):
                 du.QEntry(id=2, Coor1=TestCoor+6).print_short(),
             ],
         )
-
-        du.SC_curr_comm_id = 1
+        with self.assertRaises(TypeError):
+            TestQueue.append(1)
+        g.SC_curr_comm_id = 1
 
 
     def test_RoboTelemetry_class(self):

@@ -307,7 +307,7 @@ def get_base_speed(base='default', fallback=0.0) -> float | None:
                 base_speed = next_comm.Speed.ts * g.SC_vol_per_m * 0.001 / lps
                 base_speed = float(base_speed *100)
 
-            except AttributeError:
+            except IndexError:
                 base_speed = fallback
 
         case _:

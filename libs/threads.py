@@ -619,7 +619,6 @@ class LoadFileWorker(QObject):
             Speed=g.SCSpeed,
             z=g.IO_zone
         )
-
         for row in rows:
             Entry, command = fu.gcode_to_qentry(LastEntry, row, lfw_ext_trail)
             # check if valid command
