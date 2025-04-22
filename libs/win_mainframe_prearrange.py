@@ -11,6 +11,7 @@
 # python standard libraries
 import os
 import sys
+import requests
 from datetime import datetime
 from copy import deepcopy as dcpy
 
@@ -876,9 +877,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         else:
             with QMutexLocker(GlobalMutex):
-                g.PMP_speed = 0
-                g.SC_q_prep_end = False
-                g.SC_q_processing = False
+                du.PMP_speed = 0
+                du.SC_q_prep_end = False
+                du.SC_q_processing = False
+            self.pinch_valve_toggle(True, 0.0)
             self.log_entry("ComQ", "queue processing stopped")
             self.switch_rob_moving(end=True)
 
@@ -910,6 +912,23 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                 f"queue IDs cleared: {self.SCTRL_entry_clrByID.text()}"
             )
         self.label_update_on_queue_change()
+
+
+    def pinch_valve_toggle(self, internal=False, val=0.0) -> None:
+        """send pinch command to PRH using secondary network"""
+
+        if not du.PRH_connected:
+            return
+        if not internal:
+            pinch_state = int(not self.PRH_btt_pinchValve.isChecked())
+        else:
+            pinch_state = val
+        try:
+            requests.post(f"{du.PRH_url}/pinch", data={'s': pinch_state}, timeout=1)
+        except requests.Timeout as e:
+            log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
+            self.log_entry('CONN', log_txt)
+            print(log_txt)
 
 
     ##########################################################################

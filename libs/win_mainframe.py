@@ -1434,23 +1434,6 @@ class Mainframe(PreMainframe):
         return
 
 
-    def pinch_valve_toggle(self, internal=False, val=0.0) -> None:
-        """no docstring yet"""
-
-        if not g.PRH_connected:
-            return
-        if not internal:
-            pinch_state = int(not self.PRH_btt_pinchValve.isChecked())
-        else:
-            pinch_state = val
-        try:
-            requests.post(f"{g.PRH_url}/pinch", data={'s': pinch_state}, timeout=1)
-        except requests.Timeout as e:
-            log_txt = f"post to pinch valve failed! {g.PRH_url} not present!"
-            self.log_entry('CONN', log_txt)
-            print(log_txt)
-
-
     ##########################################################################
     #                              MIXER CONTROL                             #
     ##########################################################################

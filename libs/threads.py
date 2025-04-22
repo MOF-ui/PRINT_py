@@ -119,13 +119,16 @@ class PumpCommWorker(QObject):
             else:
                 mixer_speed = g.MIX_speed
             
-            post_url = f"{g.PRH_url}/motor"
-            post_resp = requests.post(post_url, data={'s': mixer_speed}, timeout=0.1)
-            if post_resp.ok and f"RECV: " in post_resp.text:
-                with QMutexLocker(GlobalMutex):
-                    g.MIX_last_speed = mixer_speed
-                print(f"MIX: {mixer_speed}; resp: {post_resp.text}")
-                self.dataMixerSend.emit(mixer_speed)            
+            post_url = f"{du.PRH_url}/motor"
+            try:
+                post_resp = requests.post(post_url, data={'s': mixer_speed}, timeout=0.1)
+                if post_resp.ok and f"RECV: " in post_resp.text:
+                    with QMutexLocker(GlobalMutex):
+                        du.MIX_last_speed = mixer_speed
+                    print(f"MIX: {mixer_speed}; resp: {post_resp.text}")
+                    self.dataMixerSend.emit(mixer_speed)
+            except:
+                pass
 
 
     def receive(self) -> None:
@@ -176,10 +179,13 @@ class PumpCommWorker(QObject):
                         self.dataRecv.emit(Telem, p_num)
 
         # RECEIVE FROM PRINTHEAD (just ping to check)
-        if g.PRH_connected:
-            ping_resp = requests.get(f"{g.PRH_url}/ping", timeout=0.1)
-            if ping_resp.ok and ping_resp.text == 'ack':
-                self.prhActive.emit()
+        if du.PRH_connected:
+            try:
+                ping_resp = requests.get(f"{du.PRH_url}/ping", timeout=0.2)
+                if ping_resp.ok and ping_resp.text == 'ack':
+                    self.prhActive.emit()
+            except:
+                pass
 
 
 
