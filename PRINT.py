@@ -65,12 +65,14 @@ if arg_len == 2:
         case 'local':
             du.PRH_url = f"http://{du.PRH_url}"
             du.ROBTcp.ip = 'localhost'
+            du.PRH_url = f"http://{du.PRH_url}"
             dev_avail = True<<4
             skip_dialog = True
         case 'overwrite':
             du.PRH_url = f"http://{du.PRH_url}"
             du.ROBTcp.ip = '192.168.125.1'
             du.ROBTcp.port = '10001'
+            du.PRH_url = f"http://{du.PRH_url}"
             dev_avail = True<<4
             skip_dialog = True
         case _: 

@@ -570,9 +570,9 @@ class LoadFileWorker(QObject):
 
         # iterate over file rows
         if file_path.suffix == ".gcode":
-            result, skips = self.gcode_conv(line_id, rows)
+            result, line_id, skips = self.gcode_conv(line_id, rows)
         else:
-            result, skips = self.rapid_conv(line_id, rows)
+            result, line_id, skips = self.rapid_conv(line_id, rows)
         if len(self._CommList) == 0:
             self.convFailed.emit("No commands found!")
             result = False
@@ -611,7 +611,7 @@ class LoadFileWorker(QObject):
         lfw_running = False
 
 
-    def gcode_conv(self, id:int, rows:list) -> tuple[bool, int]:
+    def gcode_conv(self, line:int, rows:list) -> tuple[bool, int, int]:
         """row-wise conversion from GCode"""
 
         skips = 0
@@ -629,12 +629,12 @@ class LoadFileWorker(QObject):
             )
             # check if valid command
             if (command == "G1") or (command == "G28"):
-                Entry.id = id
+                Entry.id = line
                 res = self._CommList.add(Entry, thread_call=True)
                 if res == ValueError:
                     self.convFailed.emit(f"COULD NOT ADD: {command}!")
-                    return False, 0
-                id += 1
+                    return False, 0, 0
+                line += 1
                 LastPos = Entry.Coor1
             elif (command == "G92") or (command == ";") or (command == ''):
                 skips += 1
@@ -644,11 +644,11 @@ class LoadFileWorker(QObject):
                     self.convFailed.emit(f"VALUE ERROR: {command}!")
                 else:
                     self.convFailed.emit(f"{command}, ABORTED!")
-                return False, 0
-        return True, skips
+                return False, 0, 0
+        return True, line, skips
 
 
-    def rapid_conv(self, id:int, rows:list) -> tuple[bool, int]:
+    def rapid_conv(self, line:int, rows:list) -> tuple[bool, int, int]:
         """single line conversion from RAPID"""
 
         skips = 0
@@ -658,15 +658,15 @@ class LoadFileWorker(QObject):
                 skips += 1
             elif isinstance(Entry, Exception):
                 self.convFailed.emit(f"ERROR: {Entry}")
-                return False, 0
+                return False, 0, 0
             else:
-                Entry.id = id
+                Entry.id = line
                 res = self._CommList.add(Entry, thread_call=True)
                 if res == ValueError:
-                    return False, 0
-                id += 1
-        return True, skips
-    
+                    return False, 0, 0
+                line += 1
+        return True, line, skips
+
 
     def check_routine(self, func):
         """preformes a line-wise check, check function to be stated unter 
