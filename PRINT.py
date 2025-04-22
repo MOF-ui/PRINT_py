@@ -123,6 +123,7 @@ if not skip_dialog:
     )
     if not ret:
         print(f"User choose to abort setup! Exiting..")
+        print(f"-------------- FINISHED --------------\n\n")
         exit()
 
 

@@ -572,13 +572,12 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             curr_total, p1_ratio = fu.calc_pump_ratio(
                 g.PMP1_speed, g.PMP2_speed
             )
-            with QMutexLocker(GlobalMutex):
-                g.PMP_speed = curr_total
-                g.PMP_output_ratio = p1_ratio
-
         else:
             curr_total = new_speed
             p1_ratio = 1.0 if (source == 'P1') else 0.0
+        with QMutexLocker(GlobalMutex):
+            g.PMP_speed = curr_total
+            g.PMP_output_ratio = p1_ratio
 
         sld = int((1 - p1_ratio) * 100)
         self.PUMP_disp_currSpeed.setText(f"{round(curr_total, 2)}%")
@@ -599,7 +598,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             display[3].setText(f"{stt_data.torq} Nm")
             setattr(self, dump, telem)
             if self._p_log != '':
-                with open(self._p_log, 'w') as p_log:
+                with open(self._p_log, 'a') as p_log:
                     p_log.write(
                         f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')},{source},"
                         f"{telem.freq},{telem.volt},{telem.amps},{telem.torq}\n"
@@ -877,9 +876,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         else:
             with QMutexLocker(GlobalMutex):
-                du.PMP_speed = 0
-                du.SC_q_prep_end = False
-                du.SC_q_processing = False
+                g.PMP_speed = 0
+                g.SC_q_prep_end = False
+                g.SC_q_processing = False
             self.pinch_valve_toggle(True, 0.0)
             self.log_entry("ComQ", "queue processing stopped")
             self.switch_rob_moving(end=True)
@@ -917,16 +916,16 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     def pinch_valve_toggle(self, internal=False, val=0.0) -> None:
         """send pinch command to PRH using secondary network"""
 
-        if not du.PRH_connected:
+        if not g.PRH_connected:
             return
         if not internal:
             pinch_state = int(not self.PRH_btt_pinchValve.isChecked())
         else:
             pinch_state = val
         try:
-            requests.post(f"{du.PRH_url}/pinch", data={'s': pinch_state}, timeout=1)
+            requests.post(f"{g.PRH_url}/pinch", data={'s': pinch_state}, timeout=1)
         except requests.Timeout as e:
-            log_txt = f"post to pinch valve failed! {du.PRH_url} not present!"
+            log_txt = f"post to pinch valve failed! {g.PRH_url} not present!"
             self.log_entry('CONN', log_txt)
             print(log_txt)
 
@@ -1123,12 +1122,12 @@ class Watchdog(QObject):
         connection everytime if disconnected inbetween
         """
 
-        Connection = getattr(du, self._device)
+        Connection = getattr(g, self._device)
         try:
             if Connection.connected:
                 self._timer.start()
         except AttributeError:
-            if getattr(du, self._device):
+            if getattr(g, self._device):
                 self._timer.start()
 
 

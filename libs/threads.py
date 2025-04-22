@@ -92,13 +92,13 @@ class PumpCommWorker(QObject):
                 (g.PMP2Serial, p2_speed, 'PMP2_live_ad', 'PMP2_speed', 'P2'),
         ]:
             if serial.connected and speed is not None:
-                new_speed = speed * getattr(du, live_ad)
+                new_speed = speed * getattr(g, live_ad)
                 new_speed = fu.domain_clip(new_speed, min_speed, max_speed)
                 new_speed = int(round(new_speed, 0))
                 res = serial.set_speed(new_speed)
                 if res is not None:
                     with QMutexLocker(GlobalMutex):
-                        setattr(du, speed_global, speed)
+                        setattr(g, speed_global, speed)
                     print(f"{p_num}: {speed}")
                     self.dataSend.emit(speed, res[0], res[1], p_num)
 
@@ -119,12 +119,12 @@ class PumpCommWorker(QObject):
             else:
                 mixer_speed = g.MIX_speed
             
-            post_url = f"{du.PRH_url}/motor"
+            post_url = f"{g.PRH_url}/motor"
             try:
                 post_resp = requests.post(post_url, data={'s': mixer_speed}, timeout=0.1)
                 if post_resp.ok and f"RECV: " in post_resp.text:
                     with QMutexLocker(GlobalMutex):
-                        du.MIX_last_speed = mixer_speed
+                        g.MIX_last_speed = mixer_speed
                     print(f"MIX: {mixer_speed}; resp: {post_resp.text}")
                     self.dataMixerSend.emit(mixer_speed)
             except:
@@ -169,19 +169,19 @@ class PumpCommWorker(QObject):
 
                     # telemetry contains no info about the rotation direction,
                     # interpret according to settings
-                    if getattr(du, speed_global) < 0:
+                    if getattr(g, speed_global) < 0:
                         Telem.freq *= -1
 
-                    if Telem != getattr(du, last_telem):
+                    if Telem != getattr(g, last_telem):
                         with QMutexLocker(GlobalMutex):
-                            setattr(du, last_telem, Telem)
+                            setattr(g, last_telem, Telem)
                             setattr(g.DBDataBlock, stt_attr, Telem)
                         self.dataRecv.emit(Telem, p_num)
 
         # RECEIVE FROM PRINTHEAD (just ping to check)
-        if du.PRH_connected:
+        if g.PRH_connected:
             try:
-                ping_resp = requests.get(f"{du.PRH_url}/ping", timeout=0.2)
+                ping_resp = requests.get(f"{g.PRH_url}/ping", timeout=0.2)
                 if ping_resp.ok and ping_resp.text == 'ack':
                     self.prhActive.emit()
             except:
@@ -297,7 +297,7 @@ class RoboCommWorker(QObject):
                 try:
                     while g.ROBCommQueue[0].id < Telem.id:
                         g.ROBCommQueue.pop_first_item()
-                except AttributeError:
+                except IndexError:
                     pass
 
                 # refresh data only if new
@@ -356,7 +356,7 @@ class RoboCommWorker(QObject):
                         while (rob_id + g.ROB_comm_fr) >= g.SCQueue[0].id:
                             comm_tuple = (g.SCQueue.pop_first_item(), False)
                             g.ROB_send_list.append(comm_tuple)
-                    except AttributeError:
+                    except IndexError:
                         pass
 
             else:

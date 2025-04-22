@@ -1501,9 +1501,8 @@ class Mainframe(PreMainframe):
         """override entire/partial SC queue with custom Amcon settings"""
 
         def overwrite(i:int, tool:du.ToolCommand) -> bool:
-            try:
-                j = g.SCQueue.id_pos(i + id_start)
-            except AttributeError:
+            j = g.SCQueue.id_pos(i + id_start)
+            if j is None:
                 return False
             g.SCQueue[j].Tool.trolley_steps = tool.trolley_steps
             g.SCQueue[j].Tool.clamp = tool.clamp
@@ -1528,7 +1527,7 @@ class Mainframe(PreMainframe):
 
         try:
             SC_first = g.SCQueue[0].id
-        except AttributeError:
+        except IndexError:
             usr_txt = 'SC queue contains no commands, nothing was done.'
 
         if usr_txt:
