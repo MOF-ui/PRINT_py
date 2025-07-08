@@ -99,11 +99,11 @@ SCSpeed = dcpy(SC_SPEED)
 TERM_log = []
 
 # database
+DB_name = str(cfg['DATABASE']['NAME'])
 DB_log_interval = int(cfg['DATABASE']['LOG_INTERVAL'])
-DB_org = 'MC3DB'
-DB_session = 'not set'
-DB_token = None
+DB_password = str(cfg['DATABASE']['PASSWORD'])
 DB_url = str(cfg['DATABASE']['URL'])
+DB_user = str(cfg['DATABASE']['USER'])
 DB_valid_time = int(cfg['DATABASE']['VALID_TIME'])
 DBDataBlock = DaqBlock(valid_time=DB_valid_time)
 

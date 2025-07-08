@@ -129,6 +129,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         # SIDE WINDOW SETUP
         self.Daq = daq_window()
+        self.Daq.urlChanged.connect(self.mutex_setattr())
         self.CamCap = cam_cap_window()
         for side_win in [self.Daq, self.CamCap]:
             side_win.logEntry.connect(self.log_entry)
@@ -287,7 +288,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     #                                SETTINGS                                #
     ##########################################################################
 
-    def mutex_setattr(self, flag:str) -> None:
+    def mutex_setattr(self, flag:str, new_val=None) -> None:
         """reduce the Mutex lock/unlock game to a single line,
         but makes refactoring a little more tedious
         """
@@ -323,6 +324,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                 case 'pmp_look_ahead_retract':
                     new_val = self.LAH_float_retractFactor.value()
                     g.PMP_look_ahead_retract = new_val
+                case 'database_url':
+                    if new_val is not None:
+                        g.DB_url = new_val
                 case _:
                     raise KeyError(f"'{flag}' is not a defined flag")
 

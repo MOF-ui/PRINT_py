@@ -1284,8 +1284,8 @@ class Mainframe(PreMainframe):
         """
 
         res = True
+        Command = du.QEntry(id=1, mt='S')
         if not no_dialog:
-            Command = du.QEntry(id=1, mt='S')
             if self._testrun:
                 return self.send_command(Command, dc=True)
             fs_warning = strd_dialog(
@@ -1297,7 +1297,7 @@ class Mainframe(PreMainframe):
             fs_warning.exec()
             res = fs_warning.result()
 
-        if res or no_dialog:
+        if res:
             self.stop_SCTRL_queue()
             g.ROBTcp.send(Command) # bypass all queued commands
             self.pump_set_speed('0')

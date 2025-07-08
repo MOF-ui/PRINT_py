@@ -25,9 +25,8 @@ from PyQt5.QtWidgets import QApplication, QWidget
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
 from ui.UI_daq import Ui_DAQWindow
 
-# InfluxDB
-import influxdb_client
-from influxdb_client.client.write_api import SYNCHRONOUS
+# mysql connector
+import mysql.connector
 
 # import my own libs
 import libs.global_var as g
@@ -41,10 +40,10 @@ class DAQWindow(QWidget, Ui_DAQWindow):
     """setup and run Data AcQuisition (DAQ) window"""
 
     logEntry = pyqtSignal(str, str)
+    urlChanged = pyqtSignal(str, str)
     
     _Database = None
     _db_active = True
-    _db_bucket = None
     _influx_error = False
 
 
@@ -74,23 +73,10 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         # connect signals
         self.ADD_btt_add.pressed.connect(self.to_influx_db)
         self.ADD_btt_dbPause.pressed.connect(self.db_on_off)
-        self.PATH_btt_chgPath.pressed.connect(self.new_path)
+        self.PATH_btt_chgPath.pressed.connect(self.set_db_path)
 
         # database setup
-        self._Database = influxdb_client.InfluxDBClient(
-                url=g.DB_url,
-                token=g.DB_token,
-                org=g.DB_org,
-                timeout=500
-            )
-        daq_starttime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        self._db_bucket = daq_starttime + "__" + g.DB_session 
-        self.db_connection = self._Database.write_api(
-            write_options=SYNCHRONOUS
-        )
-
-        # default display setup
-        self.PATH_disp_path.setText(g.DB_url)
+        self.set_db_path(g.DB_url)
 
 
     def time_update(self) -> None:
@@ -139,37 +125,39 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         self.ROB_disp_extPos.setText(f"{g.DBDataBlock.Robo.Coor.ext}  mm")
 
 
-    def new_path(self) -> None:
+    def set_db_path(self, new_url=None) -> None:
         """write new path to g.DB_url"""
         
         # no Mutex as DB_url is only read in other functions
-        new_url = self.PATH_entry_newPath.text()
-        commit_dialog = strd_dialog(
-            usr_text=(
-                f"Resetting the DB URL could result in data loss!\n"
-                f"Are you sure you want to do this?"
-            ),
-            usr_title="Confirm Dialog"
-        )
-        commit_dialog.exec()
-
-        if commit_dialog.result() == 1:
-            g.DB_url = new_url
-
-            #restart DB client with new url
-            self._Database.close()
-            self._Database = influxdb_client.InfluxDBClient(
-                    url=g.DB_url,
-                    token=g.DB_token,
-                    org=g.DB_org
-                )
-            self.db_connection = self._Database.write_api(
-                write_options=SYNCHRONOUS
+        if new_url is None:
+            new_url = self.PATH_entry_newPath.text()
+            commit_dialog = strd_dialog(
+                usr_text=(
+                    f"Resetting the DB URL could result in data loss!\n"
+                    f"Are you sure you want to do this?"
+                ),
+                usr_title="Confirm Dialog"
             )
+            commit_dialog.exec()
+            if commit_dialog.result() == 0:
+                return
 
-            # display
-            self.PATH_disp_path.setText(g.DB_url)
-            self.logEntry.emit('DAQW', f"user set DB path to {g.DB_url}")
+        if new_url is not None:
+            # update global variable
+            self.urlChanged.emit('database_url', new_url)
+
+            # database setup
+            self._Database = mysql.connector.connect(
+                host=new_url,
+                user=g.DB_user,
+                password=g.DB_password,
+                database=g.DB_name,
+            )
+            daq_starttime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
+            # default display setup
+            self.PATH_disp_path.setText(str(f"{g.DB_name} at {g.DB_url}"))
+            self.logEntry.emit('DAQW', f"DB path set to {g.DB_url}")
     
 
     def db_on_off(self, error_indi=False) -> None:

@@ -116,7 +116,10 @@ SC:
     EXT_TRAIL: !!python/tuple [5, 2] # [mm]
     VOL_PER_M: 0.4 # [L/m] calculated for 1m of 4cm x 1cm high filament
 DATABASE:
-    URL: '192.168.178.50:8086'
+    NAME: 'PRINT_PY'
+    PASSWORD: ''
+    URL: 'localhost'
+    USER: 'FROHMUELLER'
     LOG_INTERVAL: 10 # [seconds]
     VALID_TIME: 60 # [seconds]
 WATCHDOG:
