@@ -561,7 +561,7 @@ def connect_pump(p_num:int) -> None:
 
     if g.PMPSerialDefBus is None:
         g.PMPSerialDefBus = serial.Serial(
-            baudrate=g.PMP_SERIAL_BAUD['baud'],
+            baudrate=g.PMP_SERIAL_BAUD,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_TWO,
             bytesize=serial.EIGHTBITS,
