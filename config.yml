@@ -39,7 +39,7 @@ ROBOT:
     SAFE_RANGE_MIN:
         !Coordinate
         x: -1600.0
-        y: 0.0
+        y: 1500.0
         z: -895.0
         rx: 150.0
         ry: -30.0
@@ -79,6 +79,7 @@ ROBOT:
 PRINTHEAD:
     TROLL_CALIBRATE: 99 # ID
     TROLL_RATIO: 500
+    RAPID_NAME: 'tAmconMoertel'
     DEFAULT:
         !ToolCommand
         trolley_steps: 0
@@ -92,16 +93,16 @@ PRINTHEAD:
 SPEED:
     DIRECT:
         !SpeedVector
-        acr: 50.0
-        dcr: 50.0
-        ts: 200.0
-        ors: 50.0
+        ela: 50.0
+        eoa: 50.0
+        tcp: 200.0
+        tor: 50.0
     SCRIPT:
         !SpeedVector
-        acr: 50.0
-        dcr: 50.0
-        ts: 200.0
-        ors: 50.0
+        ela: 50.0
+        eoa: 50.0
+        tcp: 200.0
+        tor: 50.0
 
 # GENERAL DEFAULT SETTINGS
 MAX_LINES:
@@ -116,8 +117,14 @@ SC:
     EXT_TRAIL: !!python/tuple [5, 2] # [mm]
     VOL_PER_M: 0.4 # [L/m] calculated for 1m of 4cm x 1cm high filament
 DATABASE:
-    URL: '192.168.178.50:8086'
-    LOG_INTERVAL: 10 # [seconds]
+    NAME: 'PRINT_PY'
+    PASSWORD: ''
+    TOKEN: ''
+    URL: 'localhost:8086'
+    USER: 'FROHMUELLER'
+    LOG_INTERVAL: 2 # [seconds]
+    MAX_RETRIES: 2
+    RETRY_INTERVAL: 500 # [milliseconds]
     VALID_TIME: 60 # [seconds]
 WATCHDOG:
     TIMEOUT: 10000 # [ms]

@@ -36,6 +36,7 @@
 
 # python standard libraries
 import sys
+import argparse
 from pathlib import Path
 
 # PyQt stuff
@@ -50,6 +51,26 @@ import libs.func_utilities as fu
 
 
 #######################    COMMAND LINE ARGUMENTS    #########################
+# parsing comand line arguments
+parser = argparse.ArgumentParser(
+    prog='PRINT.py',
+    usage='%(prog)s [options]',
+    epilog='Example: python PRINT.py --mode local',
+    description=(
+        'PRINT (PRINT is a Robot INTerface) is a GUI for controlling '
+        'the PBH printing system.'
+    ),
+)
+parser.add_argument(
+    '--mode',
+    '-m',
+    type=str,
+    nargs='?',
+    help='choose between standard, test, local or overwrite mode.',
+    default='standard',
+)
+args = parser.parse_args()
+
 
 print(
     f"\n\n\n"
@@ -57,38 +78,28 @@ print(
     f"starting with arguments: {sys.argv}\n"
 )
 
-arg_len = len(sys.argv)
-arg1 = ''
-skip_dialog = False
-dev_avail = True<<4
-
-if arg_len == 2:
-    arg1 = sys.argv[1]
-    match arg1:
-        case 'test':
-            print(f"MODE: TEST\n")
-            import tests.all_test as at
-            at.run_all()
-            exit()
-        case 'local':
-            print(f"MODE: LOCAL\n")
-            g.PRH_url = f"http://{g.PRH_url}"
-            g.ROBTcp.ip = 'localhost'
-            skip_dialog = True
-        case 'overwrite':
-            print(f"dialog skipped..\n")
-            g.PRH_url = f"http://{g.PRH_url}"
-            g.ROBTcp.ip = '192.168.125.1'
-            g.ROBTcp.port = '10001'
-            skip_dialog = True
-        case _:
-            raise KeyError(f"{arg1} is not a valid argument for PRINT.py!")
-
-elif arg_len > 2:
-    raise KeyError(
-        f"PRINT.py got too many arguments! "
-        f"Expected less than 3, got {arg_len}"
-    )
+match args.mode:
+    case 'standard':
+        skip_dialog = False
+        dev_avail = True<<4
+    case 'test':
+        print(f"MODE: TEST\n")
+        import tests.all_test as at
+        at.run_all()
+        exit()
+    case 'local':
+        print(f"MODE: LOCAL\n")
+        g.PRH_url = f"http://{g.PRH_url}"
+        g.ROBTcp.ip = 'localhost'
+        skip_dialog = True
+    case 'overwrite':
+        print(f"dialog skipped..\n")
+        g.PRH_url = f"http://{g.PRH_url}"
+        g.ROBTcp.ip = '192.168.125.1'
+        g.ROBTcp.port = '10001'
+        skip_dialog = True
+    case _:
+        raise KeyError(f"{args.mode} is not a valid argument for PRINT.py!")
 
 
 ################################    SETUP    #################################

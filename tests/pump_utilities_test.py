@@ -118,7 +118,7 @@ class PumpLibTest(unittest.TestCase):
         g.PMP_speed = 89
         g.ROBCommQueue.clear()
         testEntry = du.QEntry(
-            Speed=du.SpeedVector(ts=2000),
+            Speed=du.SpeedVector(tcp=2000),
             p_mode=1001, # = default mode
             p_ratio=0.345
         )
@@ -126,7 +126,7 @@ class PumpLibTest(unittest.TestCase):
         # domain control
         g.ROBCommQueue.add(testEntry, g.SC_curr_comm_id)
         self.assertEqual(pu.calc_speed(), (100, 100, False))
-        g.ROBCommQueue[0].Speed.ts = -2000
+        g.ROBCommQueue[0].Speed.tcp = -2000
         self.assertEqual(pu.calc_speed(), (-100, -100, False))
 
         # test empty ROB_commQueue
@@ -139,14 +139,14 @@ class PumpLibTest(unittest.TestCase):
         self.assertEqual(pu.calc_speed(), (89, 0, False))
 
         # mode: None
-        testEntry = du.QEntry(Speed=du.SpeedVector(ts=123))
+        testEntry = du.QEntry(Speed=du.SpeedVector(tcp=123))
         g.ROBCommQueue.add(testEntry, g.SC_curr_comm_id)
         self.assertEqual(pu.calc_speed(), (89, 0, False))
 
         # mode: default
         testEntry = du.QEntry(
             id=1,
-            Speed=du.SpeedVector(ts=234),
+            Speed=du.SpeedVector(tcp=234),
             p_mode=1001,
             p_ratio=0.765
         )
@@ -166,7 +166,7 @@ class PumpLibTest(unittest.TestCase):
         self.assertIsNone(pu.default_mode(None))
 
         # newCommand ( default Speed.ts for QEntry is 200 )
-        testEntry = du.QEntry(Speed=du.SpeedVector(ts=1))
+        testEntry = du.QEntry(Speed=du.SpeedVector(tcp=1))
         self.assertEqual(pu.default_mode(testEntry), 10)
 
 
@@ -181,7 +181,7 @@ class PumpLibTest(unittest.TestCase):
         self.assertEqual(pu.get_base_speed("conn", 12), 12)
 
         TestCoor= du.Coordinate(10)
-        TestVector=du.SpeedVector(ts=1)
+        TestVector=du.SpeedVector(tcp=1)
         g.ROBCommQueue.append(
             du.QEntry(id=2, Coor1=TestCoor, Speed=TestVector)
         )
@@ -198,7 +198,7 @@ class PumpLibTest(unittest.TestCase):
         g.PMP_retract_speed = -50.0
         g.ROBMovStartP = du.Coordinate()
         TestCoor= du.Coordinate(10)
-        TestVector=du.SpeedVector(ts=1)
+        TestVector=du.SpeedVector(tcp=1)
         TestEntry = du.QEntry(Coor1=TestCoor, Speed=TestVector)
         g.ROBCommQueue.append(
             du.QEntry(id=2, Coor1=TestCoor, Speed=TestVector)

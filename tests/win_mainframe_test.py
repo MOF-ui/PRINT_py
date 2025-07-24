@@ -54,9 +54,10 @@ class MainframeWinTest(unittest.TestCase):
         TestFrame.ADC_btt_placeSpring.setChecked(False)
 
         g.SC_curr_comm_id = 1
+        g.ROBTelem.Coor = du.Coordinate()
         TestFrame.adc_user_change()
         TestTool = du.ToolCommand(11, True, True, False, False, 0)
-        command,_ = g.ROB_send_list[len(g.ROB_send_list) - 1]
+        command,_ = g.ROB_send_list[-1]
         self.assertEqual(command, du.QEntry(id=1, z=0, Tool=TestTool))
 
         g.SC_curr_comm_id = 1
@@ -82,7 +83,7 @@ class MainframeWinTest(unittest.TestCase):
 
         # G1
         TestCoor1 = du.Coordinate(x=1, y=2.2, ext=3)
-        TestVec = du.SpeedVector(ts=4)
+        TestVec = du.SpeedVector(tcp=4)
         TestFrame.SGLC_entry_gcodeSglComm.setText('G1 X1 Y2.2 EXT3 F40')
         TestFrame.add_gcode_sgl()
         self.assertEqual(
@@ -102,12 +103,8 @@ class MainframeWinTest(unittest.TestCase):
             ],
         )
 
-        TestFrame.add_gcode_sgl(
-            at_id=True,
-            id=2,
-            from_file=True,
-            file_txt='G1 Z1'
-        )
+        TestFrame.SGLC_entry_gcodeSglComm.setText('G1 Z1')
+        TestFrame.add_gcode_sgl(at_id=True, id=2)
         TestCoor3 = du.Coordinate(x=2, y=1, z=1)
         self.assertEqual(
             g.SCQueue.display(),
@@ -118,12 +115,8 @@ class MainframeWinTest(unittest.TestCase):
             ],
         )
 
-        TestFrame.add_gcode_sgl(
-            at_id=False,
-            id=0,
-            from_file=True,
-            file_txt='G1 X1.2'
-        )
+        TestFrame.SGLC_entry_gcodeSglComm.setText('G1 X1.2')
+        TestFrame.add_gcode_sgl(at_id=False, id=0)
         TestCoor4 = du.Coordinate(x=2.2, y=2.2, ext=3)
         self.assertEqual(
             g.SCQueue.display(),
@@ -138,20 +131,12 @@ class MainframeWinTest(unittest.TestCase):
         )
 
         # G28 & G92
-        TestFrame.add_gcode_sgl(
-            at_id=False,
-            id=0,
-            from_file=True,
-            file_txt='G92 Y0 EXT0'
-        )
+        TestFrame.SGLC_entry_gcodeSglComm.setText('G92 Y0 EXT0')
+        TestFrame.add_gcode_sgl(at_id=False, id=0)
         self.assertEqual(g.ROBCurrZero, du.Coordinate(x=1, y=2.2, ext=3))
 
-        TestFrame.add_gcode_sgl(
-            at_id=False,
-            id=0,
-            from_file=True,
-            file_txt='G28 Y0 EXT0'
-        )
+        TestFrame.SGLC_entry_gcodeSglComm.setText('G28 Y0 EXT0')
+        TestFrame.add_gcode_sgl(at_id=False, id=0)
         self.assertEqual(
             g.SCQueue.display(),
             [
@@ -163,12 +148,8 @@ class MainframeWinTest(unittest.TestCase):
             ],
         )
 
-        TestFrame.add_gcode_sgl(
-            at_id=True,
-            id=3,
-            from_file=True,
-            file_txt='G92 X0 Z0'
-        )
+        TestFrame.SGLC_entry_gcodeSglComm.setText('G92 X0 Z0')
+        TestFrame.add_gcode_sgl(at_id=True, id=3)
         self.assertEqual(g.ROBCurrZero, du.Coordinate(x=2, y=2.2, z=1, ext=3))
 
         g.ROBCurrZero = du.Coordinate()
@@ -185,7 +166,7 @@ class MainframeWinTest(unittest.TestCase):
         )
         TestFrame.add_rapid_sgl()
         TCoor1 = du.Coordinate(x=1, y=2.2, ext=3)
-        Sp = du.SpeedVector(ts=4)
+        Sp = du.SpeedVector(tcp=4)
         self.assertEqual(
             g.SCQueue.display(),
             [du.QEntry(id=1, pt="Q", Coor1=TCoor1, Speed=Sp).print_short()],
@@ -206,15 +187,11 @@ class MainframeWinTest(unittest.TestCase):
         )
 
         g.ROBCurrZero = du.Coordinate(z=1)
-        TestFrame.add_rapid_sgl(
-            at_id=True,
-            id=2,
-            from_file=True,
-            file_txt=(
-                f"MoveL Offs(pHome,0.0,0.0,1.0),[200,50,50,50],"
-                f"z10,tool0 EXT0;"
-            )
+        TestFrame.SGLC_entry_rapidSglComm.setText(
+            f"MoveL Offs(pHome,0.0,0.0,1.0),[200,50,50,50],"
+            f"z10,tool0 EXT0;"
         )
+        TestFrame.add_rapid_sgl(at_id=True, id=2)
         TestCoor3 = du.Coordinate(z=2)
         self.assertEqual(
             g.SCQueue.display(),
@@ -248,11 +225,12 @@ class MainframeWinTest(unittest.TestCase):
             f"MoveJ Offs(pHome,7.0,8.0,9.0),[110,120,130,140],z15,tool0 EXT160"
         )
 
+        g.ROBCurrZero = du.Coordinate()
         TestFrame.add_SIB(num=1, at_end=False)
         TCoor1 = du.Coordinate(x=1, y=2, z=3, ext=500)
         TCoor2 = du.Coordinate(x=6, y=7, z=8, ext=990)
-        Sp1 = du.SpeedVector(ts=400)
-        Sp2 = du.SpeedVector(ts=900)
+        Sp1 = du.SpeedVector(tcp=400)
+        Sp2 = du.SpeedVector(tcp=900)
         self.assertEqual(
             g.SCQueue.display(),
             [
@@ -267,8 +245,8 @@ class MainframeWinTest(unittest.TestCase):
             x=1.1,y=2.2, z=3.3, rx=4.4, ry=5.5, rz=6.6, q=7.7, ext=600
         )
         TCoor4 = du.Coordinate(x=8, y=8, z=9, ext=160)
-        Sp3 = du.SpeedVector(ts=18, ors=19, acr=20, dcr=21)
-        Sp4 = du.SpeedVector(ts=110, ors=120, acr=130, dcr=140)
+        Sp3 = du.SpeedVector(tcp=18, tor=19, ela=20, eoa=21)
+        Sp4 = du.SpeedVector(tcp=110, tor=120, ela=130, eoa=140)
         self.assertEqual(
             g.SCQueue.display(),
             [
@@ -303,10 +281,10 @@ class MainframeWinTest(unittest.TestCase):
 
         g.SCQueue.clear()
         g.SC_curr_comm_id = 1
+        g.ROBCurrZero = du.Coordinate()
         for i in range(1, 5, 1):
-            TestFrame.add_gcode_sgl(
-                at_id=False, id=0, from_file=True, file_txt=f"G1 X{i}"
-            )
+            TestFrame.SGLC_entry_gcodeSglComm.setText(f"G1 X{i}")
+            TestFrame.add_gcode_sgl(at_id=False, id=0)
         TestFrame.ASC_num_trolley.setValue(11)
         TestFrame.ASC_btt_clamp.setChecked(True)
         TestFrame.ASC_btt_cut.setChecked(True)
@@ -357,28 +335,28 @@ class MainframeWinTest(unittest.TestCase):
             TestFrame.SET_float_frToMms.value(), g.IO_FR_TO_TS
         )
         self.assertEqual(
-            TestFrame.SET_num_transSpeed_dc.value(), g.DC_SPEED.ts
+            TestFrame.SET_num_transSpeed_dc.value(), g.DC_SPEED.tcp
         )
         self.assertEqual(
-            TestFrame.SET_num_orientSpeed_dc.value(), g.DC_SPEED.ors
+            TestFrame.SET_num_orientSpeed_dc.value(), g.DC_SPEED.tor
         )
         self.assertEqual(
-            TestFrame.SET_num_accelRamp_dc.value(), g.DC_SPEED.acr
+            TestFrame.SET_num_accelRamp_dc.value(), g.DC_SPEED.ela
         )
         self.assertEqual(
-            TestFrame.SET_num_decelRamp_dc.value(), g.DC_SPEED.dcr
+            TestFrame.SET_num_decelRamp_dc.value(), g.DC_SPEED.eoa
         )
         self.assertEqual(
-            TestFrame.SET_num_transSpeed_print.value(), g.SC_SPEED.ts
+            TestFrame.SET_num_transSpeed_print.value(), g.SC_SPEED.tcp
         )
         self.assertEqual(
-            TestFrame.SET_num_orientSpeed_print.value(), g.SC_SPEED.ors
+            TestFrame.SET_num_orientSpeed_print.value(), g.SC_SPEED.tor
         )
         self.assertEqual(
-            TestFrame.SET_num_accelRamp_print.value(), g.SC_SPEED.acr
+            TestFrame.SET_num_accelRamp_print.value(), g.SC_SPEED.ela
         )
         self.assertEqual(
-            TestFrame.SET_num_decelRamp_print.value(), g.SC_SPEED.dcr
+            TestFrame.SET_num_decelRamp_print.value(), g.SC_SPEED.eoa
         )
         self.assertEqual(
             TestFrame.SET_num_followInterv.value(),
@@ -446,14 +424,14 @@ class MainframeWinTest(unittest.TestCase):
         self.assertEqual(g.SC_vol_per_m, 2.2)
         self.assertEqual(g.IO_fr_to_ts, 3.3)
         self.assertEqual(g.IO_zone, 4)
-        self.assertEqual(g.DCSpeed.ts, 5)
-        self.assertEqual(g.DCSpeed.ors, 6)
-        self.assertEqual(g.DCSpeed.acr, 7)
-        self.assertEqual(g.DCSpeed.dcr, 8)
-        self.assertEqual(g.SCSpeed.ts, 9)
-        self.assertEqual(g.SCSpeed.ors, 10)
-        self.assertEqual(g.SCSpeed.acr, 11)
-        self.assertEqual(g.SCSpeed.dcr, 12)
+        self.assertEqual(g.DCSpeed.tcp, 5)
+        self.assertEqual(g.DCSpeed.tor, 6)
+        self.assertEqual(g.DCSpeed.ela, 7)
+        self.assertEqual(g.DCSpeed.eoa, 8)
+        self.assertEqual(g.SCSpeed.tcp, 9)
+        self.assertEqual(g.SCSpeed.tor, 10)
+        self.assertEqual(g.SCSpeed.ela, 11)
+        self.assertEqual(g.SCSpeed.eoa, 12)
         self.assertEqual(g.SC_ext_trail[0], 13)
         self.assertEqual(g.SC_ext_trail[1], 14)
         self.assertEqual(g.PMP_retract_speed, 15)
@@ -476,28 +454,28 @@ class MainframeWinTest(unittest.TestCase):
             TestFrame.SET_float_frToMms.value(), g.IO_FR_TO_TS
         )
         self.assertEqual(
-            TestFrame.SET_num_transSpeed_dc.value(), g.DC_SPEED.ts
+            TestFrame.SET_num_transSpeed_dc.value(), g.DC_SPEED.tcp
         )
         self.assertEqual(
-            TestFrame.SET_num_orientSpeed_dc.value(), g.DC_SPEED.ors
+            TestFrame.SET_num_orientSpeed_dc.value(), g.DC_SPEED.tor
         )
         self.assertEqual(
-            TestFrame.SET_num_accelRamp_dc.value(), g.DC_SPEED.acr
+            TestFrame.SET_num_accelRamp_dc.value(), g.DC_SPEED.ela
         )
         self.assertEqual(
-            TestFrame.SET_num_decelRamp_dc.value(), g.DC_SPEED.dcr
+            TestFrame.SET_num_decelRamp_dc.value(), g.DC_SPEED.eoa
         )
         self.assertEqual(
-            TestFrame.SET_num_transSpeed_print.value(), g.SC_SPEED.ts
+            TestFrame.SET_num_transSpeed_print.value(), g.SC_SPEED.tcp
         )
         self.assertEqual(
-            TestFrame.SET_num_orientSpeed_print.value(), g.SC_SPEED.ors
+            TestFrame.SET_num_orientSpeed_print.value(), g.SC_SPEED.tor
         )
         self.assertEqual(
-            TestFrame.SET_num_accelRamp_print.value(), g.SC_SPEED.acr
+            TestFrame.SET_num_accelRamp_print.value(), g.SC_SPEED.ela
         )
         self.assertEqual(
-            TestFrame.SET_num_decelRamp_print.value(), g.SC_SPEED.dcr
+            TestFrame.SET_num_decelRamp_print.value(), g.SC_SPEED.eoa
         )
         self.assertEqual(
             TestFrame.SET_num_followInterv.value(),
@@ -524,11 +502,11 @@ class MainframeWinTest(unittest.TestCase):
 
         g.SCQueue.clear()
         g.SC_ext_trail = (500, 200)
+        g.ROBCurrZero = du.Coordinate()
 
         for i in range(1, 7, 1):
-            TestFrame.add_gcode_sgl(
-                at_id=False, id=0, from_file=True, file_txt=f"G1 X{i}"
-            )
+            TestFrame.SGLC_entry_gcodeSglComm.setText(f"G1 X{i}")
+            TestFrame.add_gcode_sgl(at_id=False, id=0)
         TestFrame.SCTRL_entry_clrByID.setText('2..4')
         TestFrame.clr_queue(partial=True)
         self.assertEqual(
@@ -793,7 +771,7 @@ class MainframeWinTest(unittest.TestCase):
         g.PMP_speed = 10
         TestFrame.PUMP_num_setSpeed.setValue(5)
         g.ROBCommQueue.add(
-            du.QEntry(Speed=du.SpeedVector(ts=123)),
+            du.QEntry(Speed=du.SpeedVector(tcp=123)),
             g.SC_curr_comm_id,
         )
 
@@ -827,7 +805,7 @@ class MainframeWinTest(unittest.TestCase):
             TestFrame.CONN_ROB_disp_writeBuffer.text(),
             f"ID: 12 -- L, E -- COOR_1: X: 0.0   Y: 0.0   Z: 0.0   "
             f"RX: 0.0   RY: 0.0   RZ: 0.0   Q: 0.0   EXT: 0.0 -- "
-            f"SV: TS: 200   OS: 50   ACR: 50   DCR: 50 -- "
+            f"SV: TCP: 200   TOR: 50   ELA: 50   EOA: 50 -- "
             f"PM/PR,PIN:  -1001/1.0, False",
         )
         self.assertEqual(TestFrame.CONN_ROB_disp_bytesWritten.text(), '10')
@@ -1157,10 +1135,10 @@ gcode_test_path = dir_path / pl.Path("0_UT_testfile.gcode")
 rapid_test_path = dir_path / pl.Path("0_UT_testfile.mod")
 gcode_txt = ';comment\nG1 Y2000\nG1 Z1000'
 rapid_txt = (
-    '!comment\nMoveJ pHome,v200,fine,tool0;\n\n\
-    ! start printjob relative to pStart\n\
-    MoveL Offs(pHome,0.0,2000.0,0.0),[200,50,50,50],z10,tool0 EXT:11;\n\
-    MoveL Offs(pHome,0.0,2000.0,1000.0),[200,50,50,50],z10,tool0 EXT:11;'
+    '!comment\n\n\
+    ! start printjob relative to pHome\n\
+    MoveL Offs(pHome,0.0,2000.0,0.0),[200,50,50,50],z10,tool0 EXT11;\n\
+    MoveL Offs(pHome,0.0,2000.0,1000.0),[200,50,50,50],z10,tool0 EXT11;'
 )
 
 gcode_test_file = open(gcode_test_path, 'w')

@@ -47,15 +47,21 @@ class Coordinate(yaml.YAMLObject):
             external axis position
     
     CLASS METHODS:
+        from_list:
+            returns a new Coordinate object from a list of values in the
+            order of ['x', 'y', 'z', 'rx', 'ry', 'rz', 'q', 'ext']
         from_class:
             returns a new Coordinate object with the same values as the given
             one
 
     METHODS:
-        __add__, __eq__, __init__, __ne__, __repr__, __round__, __str__, __sub__
+        __add__, __eq__, __init__, __ne__, __repr__, 
+        __round__, __str__, __sub__
         
         distance:
             returns distance from self to other coordinate
+        scale:
+            scales the x, y and ext coordinate by a given factor
     """
     yaml_tag = u'!Coordinate'
     _iter_value = 0
@@ -72,13 +78,6 @@ class Coordinate(yaml.YAMLObject):
             q=0.0,
             ext=0.0
     ) -> None:
-        if isinstance(x, list):
-            if len(x) != 8:
-                raise ValueError(f"length of {x} does not fit attribute list")
-            else:
-                ext, q, rz, ry, rx = x[7], x[6], x[5], x[4], x[3]
-                y, z = x[2], x[1]
-                x = x[0]
         self.x = float(x)
         self.y = float(y)
         self.z = float(z)
@@ -88,6 +87,20 @@ class Coordinate(yaml.YAMLObject):
         self.q = float(q)
         self.ext = float(ext)
     
+
+    @classmethod
+    def from_list(cls, values:list) -> 'Coordinate':
+        if not isinstance(values, list):
+            raise TypeError(f"{values} is not a list!")
+        if len(values) != 8:
+            raise ValueError(
+                f"length of {values} does not fit attribute list: "
+                f"{cls._attr_names}"
+            )
+        values = [float(v) for v in values]
+        return cls(*values)
+
+
 
     @classmethod
     def from_class(cls, coor:'Coordinate') -> 'Coordinate':
@@ -270,6 +283,26 @@ class Coordinate(yaml.YAMLObject):
                 + m.pow(other.y - self.y, 2)
                 + m.pow(other.z - self.z, 2)
             )
+    
+    
+    def scale(self, factor:float) -> 'Coordinate':
+        """scales the x, y and ext coordinate by a given factor;
+        round everything to 2 digits because less than 10µm accuracy is
+        just pointless with a meter-large robot
+        """
+        if not isinstance(factor, (int, float)):
+            raise TypeError(f"{factor} is not a number!")
+        Result = Coordinate(
+            self.x * factor,
+            self.y * factor,
+            self.z,
+            self.rx,
+            self.ry,
+            self.rz,
+            self.q,
+            self.ext * factor,
+        )
+        return round(Result, 2)
 
 
     @property
@@ -282,16 +315,19 @@ class SpeedVector(yaml.YAMLObject):
     """standard speed vector (4 attributes).
 
     ATTRIBUTES:
-        acr:
-            acceleration ramp
-        dcr:
-            deceleration ramp
-        ts:
-            transition speed
-        os:
-            orientation speed
-    
+        ela:
+            external linear axis speed [mm/s] 
+        eoa:
+            external rotation axis speed [°/s]
+        tcp:
+            tool center point speed [mm/s]
+        tor:
+            tool orientation speed [°/s]
+
     CLASS METHODS:
+        from_list:
+            returns a new SpeedVector object from a list of values in the
+            order of ['tcp', 'tor', 'ela', 'eoa']
         from_class:
             returns a new SpeedVector object with the same values as the given
             one
@@ -300,12 +336,28 @@ class SpeedVector(yaml.YAMLObject):
         __eq__, __init__, __mul__, __ne__, __repr__, __rmul__, __str__
     """
     yaml_tag = u'!SpeedVector'
+    _attr_names = ['tcp', 'tor', 'ela', 'eoa']
 
-    def __init__(self, acr=50, dcr=50, ts=200, ors=50) -> None:
-        self.acr = int(round(acr, 0))
-        self.dcr = int(round(dcr, 0))
-        self.ts = int(round(ts, 0))
-        self.ors = int(round(ors, 0))
+    def __init__(self, tcp=200, tor=50, ela=50, eoa=50) -> None:
+        self.ela = int(round(ela, 0))
+        self.eoa = int(round(eoa, 0))
+        self.tcp = int(round(tcp, 0))
+        self.tor = int(round(tor, 0))
+    
+
+    @classmethod
+    def from_list(cls, values:list) -> 'Coordinate':
+        if not isinstance(values, list):
+            raise TypeError(f"{values} is not a list!")
+        if len(values) != 4:
+            raise ValueError(
+                f"length of {values} does not fit attribute list: "
+                f"{cls._attr_names}"
+            )
+        # converting '1.2'-like strings to int throws an error
+        # convert to float first
+        values = [int(float(v)) for v in values]
+        return cls(*values)
     
 
     @classmethod
@@ -318,17 +370,17 @@ class SpeedVector(yaml.YAMLObject):
                 f"{vector} is not an instance of 'SpeedVector'!"
             )
         return cls(
-            vector.acr,
-            vector.dcr,
-            vector.ts,
-            vector.ors,
+            vector.tcp,
+            vector.tor,
+            vector.ela,
+            vector.eoa,
         )
 
 
     def __str__(self) -> str:
         return (
-            f"TS: {self.ts}   OS: {self.ors}   "
-            f"ACR: {self.acr}   DCR: {self.dcr}"
+            f"TCP: {self.tcp}   TOR: {self.tor}   "
+            f"ELA: {self.ela}   EOA: {self.eoa}"
         )
 
 
@@ -337,10 +389,10 @@ class SpeedVector(yaml.YAMLObject):
         just pointless with a meter-large robot
         """
         res = SpeedVector(
-            ts=int(round(self.ts * other, 0)),
-            ors=int(round(self.ors * other, 0)),
-            acr=int(round(self.acr * other, 0)),
-            dcr=int(round(self.dcr * other, 0)),
+            tcp=int(round(self.tcp * other, 0)),
+            tor=int(round(self.tor * other, 0)),
+            ela=int(round(self.ela * other, 0)),
+            eoa=int(round(self.eoa * other, 0)),
         )
         return res
 
@@ -352,10 +404,10 @@ class SpeedVector(yaml.YAMLObject):
     def __eq__(self, other) -> bool:
         if isinstance(other, SpeedVector):
             if (
-                self.acr == other.acr
-                and self.dcr == other.dcr
-                and self.ts == other.ts
-                and self.ors == other.ors
+                self.ela == other.ela
+                and self.eoa == other.eoa
+                and self.tcp == other.tcp
+                and self.tor == other.tor
             ):
                 return True
         elif other is not None:
@@ -370,10 +422,10 @@ class SpeedVector(yaml.YAMLObject):
             return True
         elif isinstance(other, SpeedVector):
             if (
-                self.acr != other.acr
-                or self.dcr != other.dcr
-                or self.ts != other.ts
-                or self.ors != other.ors
+                self.ela != other.ela
+                or self.eoa != other.eoa
+                or self.tcp != other.tcp
+                or self.tor != other.tor
             ):
                 return True
         else:
@@ -384,12 +436,12 @@ class SpeedVector(yaml.YAMLObject):
     
 
     def __repr__(self) -> str:
-        return "%s(acr=%r, dcr=%r, ts=%r, ors=%r)" % (
+        return "%s(ela=%r, eoa=%r, tcp=%r, tor=%r)" % (
             self.__class__.__name__,
-            self.acr,
-            self.dcr,
-            self.ts,
-            self.ors,
+            self.ela,
+            self.eoa,
+            self.tcp,
+            self.tor,
         )
 
 
@@ -557,6 +609,10 @@ class QEntry:
 
         print_short:
             prints only most important parameters
+        to_gcode:
+            converts QEntry to GCode command string
+        to_rapid:
+            converts QEntry to Rapid command string
     """
 
 
@@ -656,16 +712,6 @@ class QEntry:
                 f"{other} is not None or an instance of 'QEntry'!"
             )
         return False
-
-
-    def print_short(self) -> str:
-        """prints only most important parameters, saving display space
-        """
-        return (
-            f"ID: {self.id} -- {self.mt}, {self.pt} -- "
-            f"COOR_1: {self.Coor1} -- SV: {self.Speed} -- "
-            f"PM/PR,PIN:  {self.p_mode}/{self.p_ratio}, {self.pinch}"
-        )
     
 
     def __repr__(self) -> str:
@@ -686,6 +732,50 @@ class QEntry:
                 self.p_ratio,
                 self.pinch,
             )
+
+
+    def print_short(self) -> str:
+        """prints only most important parameters, saving display space
+        """
+        return (
+            f"ID: {self.id} -- {self.mt}, {self.pt} -- "
+            f"COOR_1: {self.Coor1} -- SV: {self.Speed} -- "
+            f"PM/PR,PIN:  {self.p_mode}/{self.p_ratio}, {self.pinch}"
+        )
+    
+
+    def to_gcode(self) -> str:
+        """converts QEntry to GCode command string, angle of attack is not
+        transported in this version, as there is no quaternion converter yet
+        """
+        
+        line = (
+            f"G1"
+            f" X{self.Coor1.x} Y{self.Coor1.y} Z{self.Coor1.z}"
+            f" EXT{self.Coor1.ext} F{self.Speed.tcp}"
+            f" PIN{int(self.pinch)} PR{self.p_ratio}"
+            f" PMP{self.p_mode if -100.0 < self.p_mode < 100.0 else 0}"
+            f"\n"
+        )
+        return line
+    
+
+    def to_rapid(self, tool:str) -> str:
+        """converts QEntry to Rapid command string, angle of attack is not
+        transported in this version, as there is no quaternion converter yet
+        """
+
+        line = (
+            f"\t\tMoveL Offs"
+            f"(pHome,{self.Coor1.x},{self.Coor1.y},{self.Coor1.z}),"
+            f"[{self.Speed.tcp},{self.Speed.tor},"
+            f"{self.Speed.ela},{self.Speed.eoa}],"
+            f"z{self.z},"
+            f"{tool}; "
+            f"! EXT{self.Coor1.ext}"
+            f"\n"
+        )
+        return line
 
 
 
@@ -869,14 +959,14 @@ class Queue:
             entry:QEntry,
             curr_id=-1,
             thread_call=False
-        ) -> None | Exception:
+        ) -> None:
         """adds a new QEntry to queue, checks if QEntry.ID makes sense, places
         QEntry in queue according to the ID given, threadCall option allows
         the first ID to be any number and ID==0 will be sorted to the front
         """
         NewEntry = dcpy(entry)
         if not isinstance(NewEntry, QEntry):
-            return TypeError('entry is not an instance of QEntry')
+            raise TypeError('entry is not an instance of QEntry')
         if curr_id == -1 and not thread_call:
             raise ValueError(f"curr_id=-1 not allowed outside thread_calls!")
 
@@ -901,8 +991,7 @@ class Queue:
                 NewEntry.id = last_id + 1
                 self._queue.append(NewEntry)
         elif NewEntry.id < 0:
-            # return error if ID invalid
-            return ValueError
+            raise ValueError(f"invalid curr_id: {NewEntry.id}")
         else:
             if NewEntry.id < first_id:
                 # if 0 < ID < first_id, append at front
@@ -922,18 +1011,16 @@ class Queue:
         return None
 
 
-    def add_queue(self, add_queue:'Queue', curr_id:int) -> None | Exception:
+    def add_queue(self, add_queue:'Queue', curr_id:int) -> None:
         """adds another queue, hopefully less time-consuming than a for loop
         with self.add
         """
         Other = dcpy(add_queue)
         if not isinstance(Other, Queue):
             raise ValueError(f"{Other} is not an instance of 'Queue'!")
-        try:
-            other_first_id = Other[0].id
-        except:
-            # if other queue is empty, just return
+        if len(Other) == 0:
             return
+        other_first_id = Other[0].id
 
         try:
             first_id = self[0].id
@@ -1033,11 +1120,11 @@ class Queue:
                 return
 
 
-    def pop_first_item(self) -> QEntry | Exception:
+    def pop_first_item(self) -> QEntry:
         """returns and deletes the QEntry at index 0
         """
         if len(self) <= 0:
-            return BufferError('Queue empty!')
+            raise BufferError('Queue empty!')
         entry = self[0]
         self._queue.__delitem__(0)
         return entry
@@ -1831,10 +1918,10 @@ class RoboConnection(TCPSocket):
                 entry.Coor2.rz,
                 entry.Coor2.q,
                 entry.Coor2.ext,
-                entry.Speed.acr,
-                entry.Speed.dcr,
-                entry.Speed.ts,
-                entry.Speed.ors,
+                entry.Speed.ela,
+                entry.Speed.eoa,
+                entry.Speed.tcp,
+                entry.Speed.tor,
                 entry.sbt,
                 bytes(entry.sc, 'utf-8'),
                 entry.z,

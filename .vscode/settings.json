@@ -1,3 +1,12 @@
 {
-    "cmake.sourceDirectory": "C:/Users/Max/Desktop/MultiCarb3D/TCP_Robo/PRINT_py/c/data_AP_IDF"
+    "cmake.sourceDirectory": "C:/Users/Max/Desktop/PRINT_py/c/data_AP_IDF",
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./tests",
+        "-p",
+        "*test*.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true
 }

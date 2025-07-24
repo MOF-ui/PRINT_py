@@ -187,7 +187,7 @@ def default_mode(command=None) -> float | None:
         g.PMP2_liter_per_s * (1.0 - g.PMP_output_ratio)
     )
     # [%] =      ( [mm/s]       * [L/m]           * [m/mm]/ [L/s])*100.0
-    speed = float(Comm.Speed.ts * g.SC_vol_per_m * 0.001 / lps) * 100.0
+    speed = float(Comm.Speed.tcp * g.SC_vol_per_m * 0.001 / lps) * 100.0
 
     return speed
 
@@ -227,7 +227,7 @@ def profile_mode(command=None, profile=None) -> float | None:
     )
 
     # get the remaining time ( [mm] / [mm/s] = [s] )
-    time_remaining = float(dist_remaining / Comm.Speed.ts)
+    time_remaining = float(dist_remaining / Comm.Speed.tcp)
     # get time-dependent settings
     settings = None
     prev_set = None
@@ -258,7 +258,7 @@ def profile_mode(command=None, profile=None) -> float | None:
         )
 
         # get the remaining time ( [mm] / [mm/s] = [s] )
-        time_0 = dist_total / Comm.Speed.ts
+        time_0 = dist_total / Comm.Speed.tcp
         base_0 = preceeding_speed
 
     match settings['mode']:
@@ -304,7 +304,7 @@ def get_base_speed(base='default', fallback=0.0) -> float | None:
                     g.PMP2_liter_per_s * (1.0 - g.PMP_output_ratio)
                 )
 
-                base_speed = next_comm.Speed.ts * g.SC_vol_per_m * 0.001 / lps
+                base_speed = next_comm.Speed.tcp * g.SC_vol_per_m * 0.001 / lps
                 base_speed = float(base_speed *100)
 
             except IndexError:

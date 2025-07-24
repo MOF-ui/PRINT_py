@@ -129,6 +129,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         # SIDE WINDOW SETUP
         self.Daq = daq_window()
+        self.Daq.urlChanged.connect(self.mutex_setattr)
         self.CamCap = cam_cap_window()
         for side_win in [self.Daq, self.CamCap]:
             side_win.logEntry.connect(self.log_entry)
@@ -287,7 +288,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     #                                SETTINGS                                #
     ##########################################################################
 
-    def mutex_setattr(self, flag:str) -> None:
+    def mutex_setattr(self, flag:str, new_val=None) -> None:
         """reduce the Mutex lock/unlock game to a single line,
         but makes refactoring a little more tedious
         """
@@ -323,6 +324,9 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
                 case 'pmp_look_ahead_retract':
                     new_val = self.LAH_float_retractFactor.value()
                     g.PMP_look_ahead_retract = new_val
+                case 'database_url':
+                    if new_val is not None:
+                        g.DB_url = new_val
                 case _:
                     raise KeyError(f"'{flag}' is not a defined flag")
 
@@ -334,14 +338,14 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             g.SC_vol_per_m = self.SET_float_volPerMM.value()
             g.IO_fr_to_ts = self.SET_float_frToMms.value()
             g.IO_zone = self.SET_num_zone.value()
-            g.DCSpeed.ts = self.SET_num_transSpeed_dc.value()
-            g.DCSpeed.ors = self.SET_num_orientSpeed_dc.value()
-            g.DCSpeed.acr = self.SET_num_accelRamp_dc.value()
-            g.DCSpeed.dcr = self.SET_num_decelRamp_dc.value()
-            g.SCSpeed.ts = self.SET_num_transSpeed_print.value()
-            g.SCSpeed.ors = self.SET_num_orientSpeed_print.value()
-            g.SCSpeed.acr = self.SET_num_accelRamp_print.value()
-            g.SCSpeed.dcr = self.SET_num_decelRamp_print.value()
+            g.DCSpeed.tcp = self.SET_num_transSpeed_dc.value()
+            g.DCSpeed.tor = self.SET_num_orientSpeed_dc.value()
+            g.DCSpeed.ela = self.SET_num_accelRamp_dc.value()
+            g.DCSpeed.eoa = self.SET_num_decelRamp_dc.value()
+            g.SCSpeed.tcp = self.SET_num_transSpeed_print.value()
+            g.SCSpeed.tor = self.SET_num_orientSpeed_print.value()
+            g.SCSpeed.ela = self.SET_num_accelRamp_print.value()
+            g.SCSpeed.eoa = self.SET_num_decelRamp_print.value()
             g.SC_ext_trail = (
                 self.SET_num_followInterv.value(),
                 self.SET_num_followSkip.value(),
@@ -354,10 +358,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             'SETS',
             f"General settings updated -- VolPerMM: {g.SC_vol_per_m}"
             f", FR2TS: {g.IO_fr_to_ts}, IOZ: {g.IO_zone}"
-            f", PrinTS: {g.SCSpeed.ts}, PrinOS: {g.SCSpeed.ors}"
-            f", PrinACR: {g.SCSpeed.acr} PrinDCR: {g.SCSpeed.dcr}"
-            f", DCTS: {g.DCSpeed.ts}, DCOS: {g.DCSpeed.ors}"
-            f", DCACR: {g.DCSpeed.acr}, DCDCR: {g.DCSpeed.dcr}, "
+            f", PrinTS: {g.SCSpeed.tcp}, PrinOS: {g.SCSpeed.tor}"
+            f", PrinACR: {g.SCSpeed.ela} PrinDCR: {g.SCSpeed.eoa}"
+            f", DCTS: {g.DCSpeed.tcp}, DCOS: {g.DCSpeed.tor}"
+            f", DCACR: {g.DCSpeed.ela}, DCDCR: {g.DCSpeed.eoa}, "
             f"FB_inter: {g.SC_ext_trail[0]}, "
             f"FB_skip: {g.SC_ext_trail[1]}, "
             f"PmpRS: {g.PMP_retract_speed}, "
@@ -372,14 +376,14 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.SET_float_volPerMM.setValue(g.SC_VOL_PER_M)
         self.SET_float_frToMms.setValue(g.IO_FR_TO_TS)
         self.SET_num_zone.setValue(g.IO_ZONE)
-        self.SET_num_transSpeed_dc.setValue(g.DC_SPEED.ts)
-        self.SET_num_orientSpeed_dc.setValue(g.DC_SPEED.ors)
-        self.SET_num_accelRamp_dc.setValue(g.DC_SPEED.acr)
-        self.SET_num_decelRamp_dc.setValue(g.DC_SPEED.dcr)
-        self.SET_num_transSpeed_print.setValue(g.SC_SPEED.ts)
-        self.SET_num_orientSpeed_print.setValue(g.SC_SPEED.ors)
-        self.SET_num_accelRamp_print.setValue(g.SC_SPEED.acr)
-        self.SET_num_decelRamp_print.setValue(g.SC_SPEED.dcr)
+        self.SET_num_transSpeed_dc.setValue(g.DC_SPEED.tcp)
+        self.SET_num_orientSpeed_dc.setValue(g.DC_SPEED.tor)
+        self.SET_num_accelRamp_dc.setValue(g.DC_SPEED.ela)
+        self.SET_num_decelRamp_dc.setValue(g.DC_SPEED.eoa)
+        self.SET_num_transSpeed_print.setValue(g.SC_SPEED.tcp)
+        self.SET_num_orientSpeed_print.setValue(g.SC_SPEED.tor)
+        self.SET_num_accelRamp_print.setValue(g.SC_SPEED.ela)
+        self.SET_num_decelRamp_print.setValue(g.SC_SPEED.eoa)
         self.SET_num_followInterv.setValue(g.SC_EXT_TRAIL[0])
         self.SET_num_followSkip.setValue(g.SC_EXT_TRAIL[1])
         self.SET_float_p1Flow.setValue(g.PMP_LPS)
@@ -853,6 +857,8 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         with QMutexLocker(GlobalMutex):
             g.SC_q_processing = True
             g.SC_q_prep_end = False
+            # name session after program starttime
+            g.DB_session = datetime.now().strftime('%Y-%m-%d_%H%M%S')
         self.switch_rob_moving()
         self.log_entry("ComQ", "queue processing started")
 
@@ -1038,7 +1044,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             try:
                 with open(g.IO_zero_log_path, 'r') as save_file:
                     zero_vals = save_file.read().split('_')
-                    ZeroOverwrite = du.Coordinate(zero_vals)
+                    ZeroOverwrite = du.Coordinate.from_list(zero_vals)
             except Exception as e:
                 self.log_entry(
                     'ZERO',

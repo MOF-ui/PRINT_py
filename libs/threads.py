@@ -14,6 +14,7 @@ import cv2
 import sys
 import math as m
 import requests
+from pathlib import Path
 from copy import deepcopy as dcpy
 
 # appending the parent directory path
@@ -297,7 +298,7 @@ class RoboCommWorker(QObject):
                 try:
                     while g.ROBCommQueue[0].id < Telem.id:
                         g.ROBCommQueue.pop_first_item()
-                except IndexError:
+                except (IndexError, BufferError):
                     pass
 
                 # refresh data only if new
@@ -356,7 +357,7 @@ class RoboCommWorker(QObject):
                         while (rob_id + g.ROB_comm_fr) >= g.SCQueue[0].id:
                             comm_tuple = (g.SCQueue.pop_first_item(), False)
                             g.ROB_send_list.append(comm_tuple)
-                    except IndexError:
+                    except (IndexError, BufferError):
                         pass
 
             else:
@@ -392,13 +393,13 @@ class RoboCommWorker(QObject):
                 Comm.id -= g.ROB_BUFFER_SIZE
             # check for TCP speed overwrites
             if g.ROB_speed_overwrite >= 0.0:
-                Comm.Speed.ts = g.ROB_speed_overwrite
+                Comm.Speed.tcp = g.ROB_speed_overwrite
                 # limit reorientation speed to avoid damage
                 r_speed = (g.ROB_speed_overwrite / 2)
-                Comm.Speed.ors = min([r_speed, g.ROB_max_r_speed])
+                Comm.Speed.tor = min([r_speed, g.ROB_max_r_speed])
             else:
-                Comm.Speed.ts = int(Comm.Speed.ts * g.ROB_live_ad)
-                Comm.Speed.ors = int(Comm.Speed.ors * g.ROB_live_ad)
+                Comm.Speed.tcp = int(Comm.Speed.tcp * g.ROB_live_ad)
+                Comm.Speed.tor = int(Comm.Speed.tor * g.ROB_live_ad)
 
             # if testrun, skip actually sending the message
             if testrun:
@@ -545,39 +546,38 @@ class LoadFileWorker(QObject):
     _CommList = du.Queue()
 
 
-    def run(self, testrun=False) -> None:
+    def run(self) -> None:
         """get data, start conversion loop"""
         global lfw_file_path
         global lfw_line_id
         global lfw_ext_trail
         global lfw_p_ctrl
-        global lfw_range_chk
-        global lfw_base_dist_chk
         global lfw_running
-        global lfw_pre_run_time
 
         lfw_running = True
         line_id = lfw_line_id
-        file_path = lfw_file_path
-        if file_path is None:
-            self.convFailed.emit("No filepath given!")
+        try:
+            file_path = Path(lfw_file_path)
+        except:
+            self.convFailed.emit('Invalid filepath given!')
             lfw_running = False
             return
 
         # init vars
         with open(file_path, 'r') as file:
             txt = file.read()
-        rows = txt.split("\n")
+        rows = txt.split('\n')
         self._CommList.clear()
         start_id = line_id
 
         # iterate over file rows
-        if file_path.suffix == ".gcode":
-            result, line_id, skips = self.gcode_conv(line_id, rows)
+        if file_path.suffix == '.gcode':
+            converter = self.gcode_conv
         else:
-            result, line_id, skips = self.rapid_conv(line_id, rows)
+            converter = self.rapid_conv
+        result, line_id, skips = converter(line_id, rows)
         if len(self._CommList) == 0:
-            self.convFailed.emit("No commands found!")
+            self.convFailed.emit('No commands found!')
             result = False
         if not result:
             lfw_running = False
@@ -585,28 +585,11 @@ class LoadFileWorker(QObject):
 
         # automatic pump control
         if lfw_p_ctrl:
-            # set all entries to pmode=default
-            for Entry in self._CommList:
-                Entry.p_mode = "default"
-
-            # add a startvector with a speed of 1mm/s with pMode=start
-            # (so X seconds of approach if length is X mm (lfw_pre_run_time))
-            StartVector = dcpy(self._CommList[0])
-            StartVector.id = start_id
-            StartVector.Coor1.x += lfw_pre_run_time
-            StartVector.Coor1.y += lfw_pre_run_time
-            StartVector.p_mode = "start"
-            StartVector.Speed = du.SpeedVector(acr=1, dcr=1, ts=1, ors=1)
-            self._CommList.add(StartVector, thread_call=True)
-
-            # set the last entry to pMode=end
-            self._CommList[len(self._CommList) - 1].p_mode = "end"
-        
+            if not self.auto_pmp_ctrl(start_id):
+                return
         # entry checks
-        if lfw_range_chk:
-            self.check_routine(fu.range_check)
-        if lfw_base_dist_chk:
-            self.check_routine(fu.base_dist_check)
+        if not self.check_routine():
+            return
 
         # add to command queue
         g.SCQueue.add_queue(self._CommList, g.SC_curr_comm_id)
@@ -628,22 +611,19 @@ class LoadFileWorker(QObject):
         for row in rows:
             Entry, command = fu.gcode_to_qentry(LastEntry, row, lfw_ext_trail)
             # check if valid command
-            if (command == "G1") or (command == "G28"):
+            if (command == 'G1') or (command == 'G28'):
                 Entry.id = line
-                res = self._CommList.add(Entry, thread_call=True)
-                if res == ValueError:
-                    self.convFailed.emit(f"COULD NOT ADD: {command}!")
+                try:
+                    self._CommList.add(Entry, thread_call=True)
+                except (ValueError, TypeError) as err:
+                    self.convFailed.emit(f"{err}\n{Entry}")
                     return False, 0, 0
                 line += 1
                 LastEntry = Entry
-            elif (command == "G92") or (command == ";") or (command == ''):
+            elif (command == 'G92') or (command == ';') or (command == ''):
                 skips += 1
             else:
-                # if invalid, break conversion
-                if isinstance(Entry, Exception):
-                    self.convFailed.emit(f"VALUE ERROR: {command}!")
-                else:
-                    self.convFailed.emit(f"{command}, ABORTED!")
+                self.convFailed.emit(f"{command}, ABORTED!")
                 return False, 0, 0
         return True, line, skips
 
@@ -653,43 +633,83 @@ class LoadFileWorker(QObject):
 
         skips = 0
         for row in rows:
-            Entry = fu.rapid_to_qentry(row, lfw_ext_trail)
-            if Entry is None:
-                skips += 1
-            elif isinstance(Entry, Exception):
+            Entry, sort = fu.rapid_to_qentry(row, lfw_ext_trail)
+            if not sort:
                 self.convFailed.emit(f"ERROR: {Entry}")
                 return False, 0, 0
+            elif sort == '!':
+                skips += 1
             else:
                 Entry.id = line
-                res = self._CommList.add(Entry, thread_call=True)
-                if res == ValueError:
+                try:
+                    self._CommList.add(Entry, thread_call=True)
+                except (ValueError, TypeError) as err:
+                    self.convFailed.emit(f"{err}\n{Entry}")
                     return False, 0, 0
                 line += 1
         return True, line, skips
+    
+
+    def auto_pmp_ctrl(self, start_id:int) -> bool:
+        """calculate default pump speeds and add start vector
+        """
+        global lfw_pre_run_time
+
+        # set all entries to pmode=default
+        for Entry in self._CommList:
+            Entry.p_mode = 'default'
+        # set the last entry to pMode=end
+        self._CommList[-1].p_mode = 'end'
+
+        # add a startvector with a speed of 1 mm/s with pMode=start
+        # (so X seconds of approach if length is X mm (lfw_pre_run_time))
+        StartVector = dcpy(self._CommList[0])
+        StartVector.id = start_id
+        StartVector.Coor1.z += lfw_pre_run_time
+        StartVector.p_mode = 'start'
+        StartVector.Speed = du.SpeedVector(ela=1, eoa=1, tcp=1, tor=1)
+        try:
+            self._CommList.add(StartVector, thread_call=True)
+        except (ValueError, TypeError) as err:
+            msg = f"could not add vector in auto pump ctrl: {err}!"
+            self.convFailed.emit(msg)
+            return False
+        return True
 
 
-    def check_routine(self, func):
-        """preformes a line-wise check, check function to be stated unter 
-        'func', needs to be a callable that returns (bool, str)"""
-        if not callable(func):
-            raise TypeError(f"{func} is not callable!")
+
+    def check_routine(self) -> bool:
+        """preformes a line-wise check, check function to be stated under 
+        'checks', needs to be a callable that returns (bool, str)"""
+        global lfw_range_chk
+        global lfw_base_dist_chk
+        
         line = 0
         warnings = 0
         chk_msg = ''
+        checks = []
+        if lfw_range_chk:
+            checks.append(fu.range_check)
+        if lfw_base_dist_chk:
+            checks.append(fu.base_dist_check)
+        
         for Entry in self._CommList:
             line += 1
-            result, msg = func(Entry)
-            if not result:
-                warnings += 1
-                chk_msg += f"Line {line}: {msg}\n"
-                if warnings >= g.WARN_MAX_RAISED:
-                    chk_msg += (
-                        f"Maximum number of warnings reached, "
-                        f"stopping check.."
-                    )
-                    break
+            for check in checks:
+                result, msg = check(Entry)
+                if not result:
+                    warnings += 1
+                    chk_msg += f"Line {line}: {msg}\n"
+                    if warnings >= g.WARN_MAX_RAISED:
+                        chk_msg += (
+                            f"Maximum number of warnings reached, "
+                            f"stopping check.."
+                        )
+                        break
         if chk_msg != '':
             self.rangeChkWarning.emit(chk_msg)
+            return False
+        return True
 
 
 
