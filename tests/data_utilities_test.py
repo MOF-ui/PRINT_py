@@ -87,11 +87,11 @@ class DataLibTest(unittest.TestCase):
         settings"""
 
         # __init__ & __str__
-        TestVector = du.SpeedVector(acr=1.2, dcr=3.4, ts=5.6, ors=7.8)
-        self.assertEqual(str(TestVector), f"TS: 6   OS: 8   ACR: 1   DCR: 3")
+        TestVector = du.SpeedVector(ela=1.2, eoa=3.4, tcp=5.6, tor=7.8)
+        self.assertEqual(str(TestVector), f"TCP: 6   TOR: 8   ELA: 1   EOA: 3")
         self.assertEqual(
             str(du.SpeedVector()),
-            f"TS: 200   OS: 50   ACR: 50   DCR: 50"
+            f"TCP: 200   TOR: 50   ELA: 50   EOA: 50"
         )
 
         # __eq__ & __ne__
@@ -107,8 +107,8 @@ class DataLibTest(unittest.TestCase):
             TestVector != 5
 
         # __mul__ & __rmul__
-        TestVector = du.SpeedVector(22, 44, 6, 8)
-        ResVector = du.SpeedVector(24, 48, 7, 9)
+        TestVector = du.SpeedVector(6, 8, 22, 44)
+        ResVector = du.SpeedVector(7, 9, 24, 48)
         self.assertEqual(TestVector * 1.1, ResVector)
         self.assertEqual(TestVector * 1.1, 1.1 * TestVector)
 
@@ -292,7 +292,8 @@ class DataLibTest(unittest.TestCase):
         )
 
         # add
-        self.assertEqual(TestQueue.add(du.QEntry(id=-1), g.SC_curr_comm_id), ValueError)
+        with self.assertRaises(ValueError):
+            TestQueue.add(du.QEntry(id=-1), g.SC_curr_comm_id)
         TestQueue.add(du.QEntry(id=0, Coor1=TestCoor+2), g.SC_curr_comm_id)
         TestQueue.add(du.QEntry(id=9, Coor1=TestCoor+3), g.SC_curr_comm_id)
         self.assertEqual(
@@ -368,7 +369,8 @@ class DataLibTest(unittest.TestCase):
         self.assertEqual(TestQueue.display(), ['Queue is empty!'])
 
         # pop_first_item
-        self.assertIsInstance(EmptyQueue.pop_first_item(), BufferError)
+        with self.assertRaises(BufferError):
+            EmptyQueue.pop_first_item()
         TestQueue.add(du.QEntry(), g.SC_curr_comm_id)
         TestQueue.add(du.QEntry(id=3, Coor1=TestCoor), g.SC_curr_comm_id)
         self.assertEqual(TestQueue.pop_first_item(), du.QEntry(id=1))

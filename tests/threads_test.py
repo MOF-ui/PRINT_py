@@ -23,21 +23,22 @@ import libs.threads as T
 class ThreadsTest(unittest.TestCase):
 
     def test_loadFileWorker(self):
+        # to-do: write better test (subfunctions)
         global LFWorker
         global gcode_test_path
         global rapid_test_path
 
         self.maxDiff = 3000
         g.SC_curr_comm_id = 1
-        g.ROBCurrZero = du.Coordinate()
+        g.ROBCurrZero = du.Coordinate(rx=180, ext=15)
         g.SCQueue.clear()
 
         # GCode
         T.lfw_file_path = gcode_test_path
         T.lfw_line_id = 0
-        LFWorker.run(testrun=True)
-        TestCoor1 = du.Coordinate(y=2000, z=0)
-        TestCoor2 = du.Coordinate(y=2000, z=1000)
+        LFWorker.run()
+        TestCoor1 = du.Coordinate(y=2000, rx=180, ext=15)
+        TestCoor2 = du.Coordinate(y=2000, z=1000, rx=180, ext=15)
 
         self.assertEqual(
             g.SCQueue.display(),
@@ -50,7 +51,7 @@ class ThreadsTest(unittest.TestCase):
         # GCode at ID
         T.lfw_file_path = gcode_test_path
         T.lfw_line_id = 2
-        LFWorker.run(testrun=True)
+        LFWorker.run()
 
         self.assertEqual(
             g.SCQueue.display(),
@@ -65,12 +66,12 @@ class ThreadsTest(unittest.TestCase):
         # RAPID
         g.SCQueue.clear()
         g.SC_curr_comm_id = 1
-        TestCoor1.ext = 11.0
-        TestCoor2.ext = 11.0
+        TestCoor1.ext = 26.0
+        TestCoor2.ext = 26.0
 
         T.lfw_file_path = rapid_test_path
         T.lfw_line_id = 0
-        LFWorker.run(testrun=True)
+        LFWorker.run()
         self.assertEqual(
             g.SCQueue.display(),
             [
@@ -82,7 +83,7 @@ class ThreadsTest(unittest.TestCase):
         # RAPID at ID
         T.lfw_file_path = rapid_test_path
         T.lfw_line_id = 2
-        LFWorker.run(testrun=True)
+        LFWorker.run()
         self.assertEqual(
             g.SCQueue.display(),
             [
@@ -145,17 +146,15 @@ dir_path.mkdir(parents=True, exist_ok=True)
 gcode_test_path = dir_path / pl.Path("0_UT_testfile.gcode")
 rapid_test_path = dir_path / pl.Path("0_UT_testfile.mod")
 gcode_txt = ";comment\nG1 Y2000\nG1 Z1000"
-rapid_txt = "!comment\nMoveJ pHome,v200,fine,tool0;\n\n\
-             ! start printjob relative to pStart\n\
+rapid_txt = "!comment\n\n\
+             ! start printjob relative to pHome\n\
              MoveL Offs(pHome,0.0,2000.0,0.0),[200,50,50,50],z10,tool0 EXT11;\n\
              MoveL Offs(pHome,0.0,2000.0,1000.0),[200,50,50,50],z10,tool0 EXT11;"
 
-gcode_test_file = open(gcode_test_path, "w")
-rapid_test_file = open(rapid_test_path, "w")
-gcode_test_file.write(gcode_txt)
-rapid_test_file.write(rapid_txt)
-gcode_test_file.close()
-rapid_test_file.close()
+with open(gcode_test_path, "w") as f:
+    f.write(gcode_txt)
+with open(rapid_test_path, "w") as f:
+    f.write(rapid_txt)
 
 LFWorker = T.LoadFileWorker()
 RCWorker = T.RoboCommWorker()

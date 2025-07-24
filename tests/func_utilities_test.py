@@ -71,7 +71,7 @@ class FuncLibTest(unittest.TestCase):
             z=3,
         )
         ResPos = du.Coordinate(9.5, 10, 1, 1, 1, 1, 1, 11)
-        ResSpeed = du.SpeedVector(2, 2, 8, 2)
+        ResSpeed = du.SpeedVector(8, 2, 2, 2)
         ResTool = du.ToolCommand(
             0.1 * g.PRH_trol_ratio,
             True,
@@ -113,7 +113,7 @@ class FuncLibTest(unittest.TestCase):
             f"[0,0,0,0,0,0]],[8,9,10,11],z12,tool0 EXT13 TRL0.1 TCL1 TCU1 TLS1"
         )
         ResPos = du.Coordinate(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 13)
-        ResSpeed = du.SpeedVector(10, 11, 8, 9)
+        ResSpeed = du.SpeedVector(8, 9, 10, 11)
         ResTool = du.ToolCommand(
             0.1 * g.PRH_trol_ratio,
             True,
@@ -124,14 +124,17 @@ class FuncLibTest(unittest.TestCase):
         )
         self.assertEqual(
             fu.rapid_to_qentry(txt=test_txt),
-            du.QEntry(
-                mt='J',
-                pt='Q',
-                Coor1=ResPos,
-                Speed=ResSpeed,
-                z=12,
-                Tool=ResTool
-            ),
+            (
+                du.QEntry(
+                    mt='J',
+                    pt='Q',
+                    Coor1=ResPos,
+                    Speed=ResSpeed,
+                    z=12,
+                    Tool=ResTool
+                ),
+                'J'
+            )
         )
 
         test_txt = "MoveL Offs(pHome,1.1,2.2,3.3),[8,9,10,11],z12,tool0 EXT13"
@@ -141,9 +144,10 @@ class FuncLibTest(unittest.TestCase):
                 du.QEntry(
                     pt='E',
                     Coor1=du.Coordinate(5.1, 6.2, 7.3, 4, 4, 4, 4, 17),
-                    Speed=du.SpeedVector(10, 11, 8, 9),
+                    Speed=du.SpeedVector(8, 9, 10, 11),
                     z=12,
-                )
+                ),
+                'L'
             ),
         )
 

@@ -717,7 +717,6 @@ class Mainframe(PreMainframe):
             return
         with open(file_path, 'r') as file:
             txt = file.read()
-        file.close()
 
         # get number of commands and filament length
         if file_path.suffix == '.mod':
@@ -863,20 +862,15 @@ class Mainframe(PreMainframe):
     #                             COMMAND QUEUE                              #
     ##########################################################################
 
-    def add_gcode_sgl(
-            self,
-            at_id=False,
-            id=0,
-            from_file=False,
-            file_txt=''
-    ) -> (
-        tuple[du.QEntry | None | ValueError, str]
+    def add_gcode_sgl(self, at_id=False, id=0) -> (
+        tuple[du.QEntry | None, str]
     ):
         """function meant to convert any single gcode lines to QEntry,
         uses the position BEFORE PLANNED COMMAND EXECUTION, as this is the
         fallback option if no X, Y, Z or EXT position is given
         """
 
+        txt = self.SGLC_entry_gcodeSglComm.toPlainText()
         # get text and position BEFORE PLANNED COMMAND EXECUTION
         if not at_id:
             try:
@@ -895,52 +889,37 @@ class Mainframe(PreMainframe):
                 z=g.IO_zone
             )
 
-        if not from_file:
-            txt = self.SGLC_entry_gcodeSglComm.toPlainText()
-        else:
-            txt = file_txt
-
         # act according to GCode command
         Entry, command = fu.gcode_to_qentry(LastEntry, txt, False)
         err_txt = ''
-        if command != 'G1' and command != 'G28' and command != 'G92':
-            if command == ';':
-                err_txt = f"leading semicolon interpreted as comment:\n{txt}"
-            elif Entry is None:
-                err_txt = f"SYNTAX ERROR:\n{txt}"
-            else:
-                err_txt = f"{command}\n{txt}"
-        elif command == 'G92':
+        if command == 'G92':
             self.label_update_on_new_zero()
             return Entry, command
-
+        elif command != 'G1' and command != 'G28':
+            if command == ';':
+                err_txt = f"leading semicolon interpreted as comment:\n{txt}"
+            else:
+                err_txt = f"SYNTAX ERROR:\n{txt}"
+            self.SGLC_entry_gcodeSglComm.setText(err_txt)
+            return Entry, command
+        
+        # check plausibility of coordinates
         if not self.coor_plausibility_check(Entry):
-            err_txt = f"POSITION UNREACHABLE:\n{txt}"
-        if err_txt != '':
-            if not from_file:
-                self.SGLC_entry_gcodeSglComm.setText(err_txt)
             return Entry, command
 
         # set command ID if given, sorting is done later by 'Queue' class
         if at_id:
             Entry.id = id
         with QMutexLocker(GlobalMutex):
-            res = g.SCQueue.add(Entry, g.SC_curr_comm_id)
-        if res == ValueError:
-            if not from_file:
-                self.SGLC_entry_gcodeSglComm.setText(f"VALUE ERROR: \n {txt}")
-            return ValueError, ''
-        if not from_file:
-            self.log_entry(
-                'ComQ',
-                f"single GCode command added -- "
-                f"ID: {Entry.id}  MT: {Entry.mt}  PT: {Entry.pt}"
-                f"  --  COOR_1: {Entry.Coor1}  --  COOR_2: {Entry.Coor2}"
-                f"  --  SV: {Entry.Speed}  --  SBT: {Entry.sbt}"
-                f"  SC: {Entry.sc}  --  Z: {Entry.z}"
-                f"  --  TOOL: {Entry.Tool}",
-            )
-
+            try:
+                g.SCQueue.add(Entry, g.SC_curr_comm_id)
+            except (ValueError, TypeError) as err:
+                self.SGLC_entry_gcodeSglComm.setText(f"{err}:\n{txt}")
+                return None, ''
+        self.log_entry(
+            'ComQ',
+            f"single GCode command added: {Entry}",
+        )
         self.label_update_on_queue_change()
         return Entry, command
 
@@ -949,52 +928,37 @@ class Mainframe(PreMainframe):
             self,
             at_id=False,
             id=0,
-            from_file=False,
-            file_txt=''
-    ) -> du.QEntry | None | Exception:
+    ) -> du.QEntry | None:
         """function meant to convert all RAPID single lines into QEntry"""
 
-        # get text and current position, (identify command -- to be added)
-        if not from_file:
-            txt = self.SGLC_entry_rapidSglComm.toPlainText()
-        else:
-            txt = file_txt
-
-        Entry = fu.rapid_to_qentry(txt)
+        # get text and current position, (to-do: identify command)
+        txt = self.SGLC_entry_rapidSglComm.toPlainText()
+        Entry, sort = fu.rapid_to_qentry(txt)
         err_txt = ''
-        if Entry is None:
-            err_txt = (
-                f"ERROR: no detectable move-type "
-                f"or missing 'EXT' in:\n{txt}"
-            )
-        if isinstance(Entry, Exception):
+        if not sort:
             err_txt = f"SYNTAX ERROR: {Entry}\n{txt}"
+        if sort == '!':
+            err_txt = f"invalid command:\n{txt}"
+        if err_txt:
+            self.SGLC_entry_rapidSglComm.setText(err_txt)
+            return None
+
         if not self.coor_plausibility_check(Entry):
-            err_txt = f"COORDINATE ERROR:\n {txt}"
-        if err_txt != '':
-            if not from_file:
-                self.SGLC_entry_rapidSglComm.setText(err_txt)
-            return Entry
+            return None
         
         # set command ID if given, sorting is done later by 'Queue' class
         if at_id:
             Entry.id = id
         with QMutexLocker(GlobalMutex):
-            res = g.SCQueue.add(Entry, g.SC_curr_comm_id)
-        if res == ValueError:
-            if not from_file:
-                self.SGLC_entry_rapidSglComm.setText(f"VALUE ERROR: \n {txt}")
-            return ValueError
-
-        if not from_file:
-            self.log_entry(
-                'ComQ',
-                f"single RAPID command added -- "
-                f"ID: {Entry.id}  MT: {Entry.mt}  PT: {Entry.pt}"
-                f"  --  COOR_1: {Entry.Coor1}  --  COOR_2: {Entry.Coor2}"
-                f"  --  SV: {Entry.Speed}  --  SBT: {Entry.sbt}   SC: {Entry.sc}"
-                f"  --  Z: {Entry.z}  --  TOOL: {Entry.Tool}",
-            )
+            try:
+                g.SCQueue.add(Entry, g.SC_curr_comm_id)
+            except (ValueError, TypeError) as err:
+                self.SGLC_entry_rapidSglComm.setText(f"{err}:\n{txt}")
+                return None
+        self.log_entry(
+            'ComQ',
+            f"single RAPID command added: {Entry}",
+        )
 
         # update displays
         self.label_update_on_queue_change()
@@ -1033,8 +997,8 @@ class Mainframe(PreMainframe):
         err_txt = ''
         for row in rows:
             if 'Move' in row:
-                Entry = fu.rapid_to_qentry(row)
-                if not isinstance(Entry, du.QEntry):
+                Entry, sort = fu.rapid_to_qentry(row)
+                if not sort or sort == '!':
                     err_txt = f"ERROR while parsing: ({Entry})! Input: {row}"
             else:
                 Entry, command = fu.gcode_to_qentry(LastEntry, row, False)
@@ -1053,12 +1017,12 @@ class Mainframe(PreMainframe):
             # otherwise add to SCQueue
             Entry.id = line_id
             with QMutexLocker(GlobalMutex):
-                res = g.SCQueue.add(Entry, g.SC_curr_comm_id)
-            if res == ValueError:
-                return False
-            else:
-                LastEntry = dcpy(Entry)
-                line_id += 1
+                try:
+                    g.SCQueue.add(Entry, g.SC_curr_comm_id)
+                except (ValueError, TypeError) as err:
+                    return False
+            LastEntry = dcpy(Entry)
+            line_id += 1
     
         log_txt = f"{line_id - line_id_start} SIB lines added"
         if at_end:
@@ -1090,12 +1054,15 @@ class Mainframe(PreMainframe):
 
         if self._testrun:
             return True
-        res, msg = fu.range_check(entry)
-        if not res:
-            return raise_warn(msg)
-        res, msg = fu.base_dist_check(entry)
-        if not res:
-            return raise_warn(msg)
+
+        checks = [
+            fu.range_check,
+            fu.base_dist_check,
+        ]
+        for check in checks:
+            res, msg = check(entry)
+            if not res:
+                return raise_warn(msg)
         return True
 
 
@@ -1264,8 +1231,8 @@ class Mainframe(PreMainframe):
 
         # get entry
         txt = self.TERM_entry_rapidInterp.text()
-        Command = fu.rapid_to_qentry(txt)
-        if isinstance(Command, Exception) or Command is None:
+        Command, sort = fu.rapid_to_qentry(txt)
+        if not sort or sort == '!':
             self.TERM_entry_rapidInterp.setText(f"SYNTAX ERROR: {Command}\n" + txt)
             return None
 
@@ -1335,9 +1302,11 @@ class Mainframe(PreMainframe):
             return self.send_command(Command, dc=True)
         else:
             Command.id = 0
-            g.SCQueue.add(Command, g.SC_curr_comm_id)
-            self.log_entry('SysC', 'added robot stop command to queue')
-            return None
+            try:
+                g.SCQueue.add(Command, g.SC_curr_comm_id)
+                self.log_entry('SysC', 'added robot stop command to queue')
+            except (ValueError, TypeError) as err:
+                self.log_entry('SysC', f"could not add stop command: {err}")
 
 
     ##########################################################################

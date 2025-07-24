@@ -25,12 +25,16 @@ from PyQt5.QtWidgets import QApplication, QWidget
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
 from ui.UI_daq import Ui_DAQWindow
 
-# mysql connector
-import mysql.connector
+# influxdb connector
+from influxdb_client import InfluxDBClient, Point
+from influxdb_client.client.exceptions import InfluxDBError
+from influxdb_client.client.write_api import SYNCHRONOUS, WriteOptions, WriteType
+
 
 # import my own libs
 import libs.global_var as g
 from libs.win_dialogs import strd_dialog
+
 
 
 
@@ -42,7 +46,8 @@ class DAQWindow(QWidget, Ui_DAQWindow):
     logEntry = pyqtSignal(str, str)
     urlChanged = pyqtSignal(str, str)
     
-    _Database = None
+    _db_client = None
+    _db_write = None
     _db_active = True
     _influx_error = False
 
@@ -141,23 +146,15 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             commit_dialog.exec()
             if commit_dialog.result() == 0:
                 return
-
-        if new_url is not None:
-            # update global variable
-            self.urlChanged.emit('database_url', new_url)
-
-            # database setup
-            self._Database = mysql.connector.connect(
-                host=new_url,
-                user=g.DB_user,
-                password=g.DB_password,
-                database=g.DB_name,
-            )
-            daq_starttime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-
-            # default display setup
-            self.PATH_disp_path.setText(str(f"{g.DB_name} at {g.DB_url}"))
-            self.logEntry.emit('DAQW', f"DB path set to {g.DB_url}")
+        
+        self._db_client = InfluxDBClient(
+            url=new_url,
+            token=g.DB_token,
+            org=g.DB_name
+        )
+        self._db_write = self._db_client.write_api
+        # update global variable
+        self.urlChanged.emit('database_url', new_url)
     
 
     def db_on_off(self, error_indi=False) -> None:
@@ -168,7 +165,6 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             btt_style = 'background-color: #a28230;'
             indi_stlye = "border-radius: 35px;\nbackground-color: #ffda1e;"
             self._db_active = False
-        
         elif self._db_active:
             self._DBTimer.stop()
             btt_txt = 'start\nDB entries'
@@ -176,7 +172,6 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             indi_stlye = "border-radius: 35px;\nbackground-color: #4c4a48;"
             self._db_active = False
             self.logEntry.emit('DAQW', 'stop posting DB entries')
-
         else:
             self._DBTimer.start()
             btt_txt = 'pause\nDB entries'
@@ -198,8 +193,7 @@ class DAQWindow(QWidget, Ui_DAQWindow):
 
         # upload to TCP Influx server
         now = datetime.now().strftime('%Y-%m-%d    %H:%M:%S')
-        DBEntry = influxdb_client\
-            .Point(now)\
+        DBEntry = Point('default')\
             .tag("session:", g.DB_session)\
             .field("Amb. temp.", g.DBDataBlock.amb_temp)\
             .field("Amb. humid.", g.DBDataBlock.amb_humidity)\
@@ -230,25 +224,29 @@ class DAQWindow(QWidget, Ui_DAQWindow):
             .field("ROB RX", g.DBDataBlock.Robo.Coor.rx)\
             .field("ROB RY", g.DBDataBlock.Robo.Coor.ry)\
             .field("ROB RZ", g.DBDataBlock.Robo.Coor.rz)\
-            .field("ROB EXT", g.DBDataBlock.Robo.Coor.ext)
+            .field("ROB EXT", g.DBDataBlock.Robo.Coor.ext)\
+            \
+            .time(now)
         
-        try: #to-do: write a non-blocking entry post routine, this one waits for 500ms timeout
-            self.db_connection.write(
-                bucket=self._db_bucket,
-                org=g.DB_org,
-                record=DBEntry
+        try:
+            write_opt = WriteOptions(
+                write_type=WriteType.synchronous, 
+                retry_interval=g.DB_retry_interval,
+                max_retries=g.DB_retries,
             )
-        except Exception as err:
-            self.db_connection.flush()
+            self._db_write(
+                bucket=g.DB_session,
+                record=DBEntry,
+                write_options=write_opt,
+            )
+        except InfluxDBError as err:
             self.db_on_off(error_indi=True)
-            
             if self._influx_error == False:
                 self._influx_error = True
                 self.logEntry.emit(
                     'DAQW',
-                    f"error writing to DB at {self._Database.url}: {err}")
+                    f"error writing to DB at {self._db_client.url}: {err}")
                 self.logEntry.emit('DAQW', 'trying to reconnect..')
-            return
                 
         if self._influx_error:
             self._influx_error = False

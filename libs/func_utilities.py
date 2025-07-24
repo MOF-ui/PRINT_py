@@ -244,6 +244,8 @@ def re_short(
     if find_coor != '':
         regex = [find_coor + r'(-?\d+[,\.]?[\d+]?)']
     
+    if isinstance(regex, str):
+        regex = [regex]
     if not isinstance(regex, list):
         raise ValueError
 
@@ -269,9 +271,7 @@ def re_pump_tool(entry:du.QEntry, txt:str) -> du.QEntry:
     else:
         p_mode = -1001 # = no pump mode given
     p_ratio = re_short(None, txt, 1.0, find_coor='PR')
-    p_ratio = float(p_ratio)
-    p_ratio = domain_clip(p_ratio, 0.0, 1.0)
-    entry.p_ratio = p_ratio
+    entry.p_ratio = domain_clip(float(p_ratio), 0.0, 1.0)
     pinch = re_short(None, txt, False, find_coor='PIN')
     entry.pinch = bool(int(pinch))
 
@@ -303,17 +303,14 @@ def gcode_to_qentry(
         tuple[du.QEntry|None, str]
     ):
     """converts a single line of GCode G1 command to a QEntry, can be used in
-    loops for multiline code, 'pos' should be the pos before this command is
-    executed (before its EXECUTED, not before its added to SC_queue) as its
-    the fallback option if no new X, Y, Z or EXT posistion is passed
+    loops for multiline code, 'last_entry' should be the entry before this
+    command is executed (before its EXECUTED, not before its added to SC_queue)
+    as its the fallback option if no new X, Y, Z or EXT posistion is passed
 
     accepts:
-        mut_pos: 
-            postion immediately prior to planned command execution,
-            is deepcopied inside function to avoid mutuable behavior
-        mut_speed:
-            speed to be used in this movement,
-            is deepcopied inside function to avoid mutuable behavior
+        last_entry:
+            needs to be the active Entry immediately prior to execution
+            of this command, used as a fallback for missing coordinates
         zone:
             RAPID-like accuracy zone for the movement
         txt: 
@@ -380,10 +377,10 @@ def gcode_to_qentry(
                 Entry.Coor1.rz += Zero.rz
 
             # set speed and external axis
-            fr = re_short(None, txt, Entry.Speed.ts, find_coor='F')
-            if fr != Entry.Speed.ts:
+            fr = re_short(None, txt, Entry.Speed.tcp, find_coor='F')
+            if fr != Entry.Speed.tcp:
                 fr = float(fr.replace(',', '.'))
-                Entry.Speed.ts = int(fr * g.IO_fr_to_ts)
+                Entry.Speed.tcp = int(fr * g.IO_fr_to_ts)
 
             ext = re_short(None, txt, Entry.Coor1.ext, find_coor='EXT')
             if ext != Entry.Coor1.ext:
@@ -424,92 +421,84 @@ def gcode_to_qentry(
     return Entry, command
 
 
-def rapid_to_qentry(txt:str, ext_trail=True) -> du.QEntry | None | Exception:
+def rapid_to_qentry(txt:str, ext_trail=True) -> tuple[du.QEntry|None, str]:
     """converts a single line of MoveL, MoveJ, MoveC or Move* Offs command 
     (no Reltool) to a QEntry (relative to DC_curr_zero for 'Offs'), can be
     used in loops for multiline code, returns entry or any Exceptions, 
     return None if no movement-type keyword is found
 
     accepts:
-        txt: RAPID-like command line specifying movement
+        txt: 
+            RAPID-like command line specifying movement
+        ext_trail:
+            toggle for external trailing (fllwBhvr), True to turn on
     """
 
-    entry = du.QEntry(id=0)
-
-    # if no movement-type command is given, return None
-    try:
-        entry.mt = re.findall('Move([J,L,C])', txt, 0)[0]
-    except IndexError:
-        return None
-    
-    # otherwise try to decode
-    # re matches '12', '-12.3' or '12.34'
+    # re matches positive and negative float- & integer-like numbers
     num_regex = r'-?\d+\.?[\d+]*'
-    # but only if they follow behind a '[' or ','
-    regex = r'[\[,](' + num_regex + r')' 
-    decimals = re.findall(regex, txt)
-    if not decimals:
-        return None
-    
+
+    Entry = du.QEntry(id=0)
     try:
-        # look for relative coordinates
-        if 'Offs' in txt:
-            res_coor = [
-                g.ROBCurrZero.x + float(decimals[0]),
-                g.ROBCurrZero.y + float(decimals[1]),
-                g.ROBCurrZero.z + float(decimals[2]),
-                g.ROBCurrZero.rx,
-                g.ROBCurrZero.ry,
-                g.ROBCurrZero.rz,
-                g.ROBCurrZero.q,
-            ]
-            ext = g.ROBCurrZero.ext
-
-        # or standard robtarget
+        # decode:
+        # look for comment:
+        if re_short(r'^\s*!', txt, None) is not None:
+            return None, '!'
+        # movement type:
+        mt = re.findall('Move([J,L,C])', txt, 0)
+        if not mt:
+            return None, '!'
+        Entry.mt = mt[0]
+        # positions:
+        # match all float-like numbers behind a comma or bracket
+        regex = r'[\[,](' + num_regex + r')' 
+        numbers = re.findall(regex, txt)
+        if not numbers:
+            raise ValueError
+        numbers = [float(numbers[i]) for i in range(7)]
+        # speeds:
+        # match all numbers, dots or commas between '[' and '],z'
+        # extract float-like numbers
+        speed_block = re.findall(r'\[([\d,\.]+)\],z', txt)[0]
+        speeds = re.findall(num_regex, speed_block)
+        # specific values for external axis:
+        ext = re_short(None, txt, None, find_coor='EXT')
+        if ext is not None:
+            ext = float(ext)
         else:
-            ext = 0.0
-            entry.pt = 'Q'
-            res_coor = [float(decimals[i]) for i in range(7)]
-
-        speed_regex = f"{num_regex},{num_regex},{num_regex},{num_regex}" + r'\],z'
-        res_speed = re.findall(speed_regex, txt)[0]
-        res_speed = re.findall(num_regex, res_speed)
-
-        entry.Coor1.x = res_coor[0]
-        entry.Coor1.y = res_coor[1]
-        entry.Coor1.z = res_coor[2]
-        entry.Coor1.rx = res_coor[3]
-        entry.Coor1.ry = res_coor[4]
-        entry.Coor1.rz = res_coor[5]
-        entry.Coor1.q = res_coor[6]
-        ext_from_file = re_short(None, txt, None, find_coor='EXT')
-        if ext_from_file is None:
             if ext_trail:
-                ext_from_file = (
-                    int(entry.Coor1.x / g.SC_ext_trail[0])
+                ext = (
+                    int(Entry.Coor1.x / g.SC_ext_trail[0])
                     * g.SC_ext_trail[1]
                 )
+            else:
+                ext = 0.0
+        # zone:
+        zone = re_short(r'z(\d+)', txt, g.IO_zone)
+
+        # build entry to return:
+        # coordinate type
+        if 'Offs' in txt:
+            ResCoor = du.Coordinate(
+                x=numbers[0],
+                y=numbers[1],
+                z=numbers[2],
+                ext=ext,
+            )
+            ResCoor += g.ROBCurrZero
         else:
-            ext_from_file = float(ext_from_file)
-        entry.Coor1.ext = ext + ext_from_file
+            Entry.pt = 'Q'
+            numbers.append(ext)
+            ResCoor = du.Coordinate.from_list(numbers)
 
-        # converting '1.2'-like strings to int throws an error
-        # convert to float first
-        entry.Speed.ts = int(float(res_speed[0]))
-        entry.Speed.ors = int(float(res_speed[1]))
-        entry.Speed.acr = int(float(res_speed[2]))
-        entry.Speed.dcr = int(float(res_speed[3]))
-        zone = re_short([r'z\d+'], txt, g.IO_zone)
-        entry.z = int(zone[1:])
+        Entry.Coor1 = ResCoor
+        Entry.Speed = du.SpeedVector.from_list(speeds)
+        Entry.z = int(zone)
+        Entry = re_pump_tool(Entry, txt)
 
-        # rounding everything to 2 decimals causes inaccuarcy on quaternions
-        # entry.Coor1 = round(entry.Coor1, 2)
-        entry = re_pump_tool(entry, txt)
+    except Exception:
+        return None, ''
 
-    except Exception as err:
-        return err
-
-    return entry
+    return Entry, str(Entry.mt)
 
 
 def create_logfile() -> Path | None:
