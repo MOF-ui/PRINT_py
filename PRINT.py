@@ -131,10 +131,13 @@ if not skip_dialog:
 
 # create logfile and get path
 logpath = fu.create_logfile()
-pmp_log_name = f"pmp_data_{logpath.stem}.csv"
-pmp_save_path = Path(logpath).parent / pmp_log_name
-with open(pmp_save_path, 'x') as f:
-    f.write('time,pmp,freq,volt,amps,torq\n')
+data_log_name = f"PRINT_data_{logpath.stem}.csv"
+datalog_save_path = Path(logpath).parent / data_log_name
+with open(datalog_save_path, 'x') as f:
+    f.write(
+        f"time,ID,X,Y,Z,XR,YR,ZR,TCP,freq_P1,volt_P1,amps_P1,torq_P1,freq_P2,"
+        f"volt_P2,amps_P2,torq_P2,mix_freq,temp_IN,temp_OUT\n"
+    )
 
 print(f"writing log at: {logpath}")
 print(f"connecting: ", end='')
@@ -148,7 +151,7 @@ print('\n')
 app = 0  
 win = 0
 app = QApplication(sys.argv)
-win = Mainframe(logpath, dev_avail, pmp_save_path)
+win = Mainframe(logpath, dev_avail, datalog_save_path)
 win.show()
 app.exec()
 # sys.exit(app.exec())

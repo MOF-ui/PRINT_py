@@ -76,11 +76,10 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
     #                                  SETUP                                #
     #########################################################################
 
-    def __init__(self, lpath, testrun=False, p_log='', parent=None) -> None:
+    def __init__(self, lpath, testrun=False, log_to_file='', parent=None) -> None:
 
         super().__init__(parent)
         self._testrun = testrun
-        self._p_log = p_log
 
         # UI SETUP
         self.setupUi(self)
@@ -128,7 +127,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             self.log_entry('GNRL', 'main GUI running.')
 
         # SIDE WINDOW SETUP
-        self.Daq = daq_window()
+        self.Daq = daq_window(log_to_file=log_to_file)
         self.CamCap = cam_cap_window()
         for side_win in [self.Daq, self.CamCap]:
             side_win.logEntry.connect(self.log_entry)
@@ -597,12 +596,6 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             display[2].setText(f"{stt_data.amps} A")            
             display[3].setText(f"{stt_data.torq} Nm")
             setattr(self, dump, telem)
-            if self._p_log != '':
-                with open(self._p_log, 'a') as p_log:
-                    p_log.write(
-                        f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')},{source},"
-                        f"{telem.freq},{telem.volt},{telem.amps},{telem.torq}\n"
-                        )
 
         match source:
             case 'P1':
@@ -634,6 +627,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
 
         self.CONN_PRH_disp_writeBuffer.setText(str(mixer_speed))
         self.CONN_PRH_disp_bytesWritten.setText("length of float")
+        g.DBDataBlock.imp_freq = g.MIX_last_speed
         self.log_entry('PRTH', f"speed set to {mixer_speed}")
 
 

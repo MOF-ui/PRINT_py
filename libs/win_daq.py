@@ -46,10 +46,12 @@ class DAQWindow(QWidget, Ui_DAQWindow):
     _db_active = True
     _db_bucket = None
     _influx_error = False
+    _log_to_file = ''
 
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, log_to_file:str, parent=None) -> None:
         super().__init__(parent)
+        self._log_to_file = log_to_file
 
         # UI setup
         self.setupUi(self)
@@ -60,10 +62,9 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         )
 
         # timer setup
-        self.time_update()
         self._ClockTimer = QTimer()
-        self._ClockTimer.setInterval(1000)
-        self._ClockTimer.timeout.connect(self.time_update)
+        self._ClockTimer.setInterval(500)
+        self._ClockTimer.timeout.connect(self.data_update)
         self._ClockTimer.start()
 
         self._DBTimer = QTimer()
@@ -93,16 +94,12 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         self.PATH_disp_path.setText(g.DB_url)
 
 
-    def time_update(self) -> None:
-        """clock update, signal from mainframe"""
+    def data_update(self) -> None:
+        """data label update, signal from robo_recv"""
 
         self.PATH_disp_datetime.setText(
             f"{datetime.now().strftime('%Y-%m-%d    %H:%M:%S')}"
         )
-
-    def data_update(self) -> None:
-        """data label update, signal from robo_recv"""
-
         self.BASIC_disp_ambTemp.setText(f"{g.DBDataBlock.amb_temp} °C")
         self.BASIC_disp_ambHum.setText(f"{g.DBDataBlock.amb_humidity} rH")
         self.BASIC_disp_delivPumpTemp.setText(
@@ -208,6 +205,22 @@ class DAQWindow(QWidget, Ui_DAQWindow):
         signal from (robo_recv or sensor_cycle?) 
         """
 
+        # log to file
+        if self._log_to_file != '':
+            with open(self._log_to_file, 'a') as log:
+                Curr = g.DBDataBlock
+                Pos = Curr.Robo.Coor
+                Pmp1 = Curr.Pump1
+                Pmp2 = Curr.Pump2
+                log.write(
+                    f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')},"
+                    f"{Curr.Robo.id},{Pos.x},{Pos.y},{Pos.z},"
+                    f"{Pos.rx},{Pos.ry},{Pos.rz},{Curr.Robo.t_speed},"
+                    f"{Pmp1.freq},{Pmp1.volt},{Pmp1.amps},{Pmp1.torq},"
+                    f"{Pmp2.freq},{Pmp2.volt},{Pmp2.amps},{Pmp2.torq},"
+                    f"{Curr.imp_freq},{Curr.amb_temp},{Curr.imp_temp}\n"
+                    )
+                    
         # upload to TCP Influx server
         now = datetime.now().strftime('%Y-%m-%d    %H:%M:%S')
         DBEntry = influxdb_client\
@@ -280,7 +293,7 @@ class DAQWindow(QWidget, Ui_DAQWindow):
 
 ########################     DAQ WIN DIALOG      ############################
 
-def daq_window(standalone=False) -> 'DAQWindow':
+def daq_window(standalone=False, log_to_file='') -> 'DAQWindow':
     """shows a dialog window, text and title can be set, returns the users
     choice
     """
@@ -291,7 +304,7 @@ def daq_window(standalone=False) -> 'DAQWindow':
         daq_app = 0
         daq_app = QApplication(sys.argv)
 
-    daq_win = DAQWindow()
+    daq_win = DAQWindow(log_to_file)
 
     if standalone:
         daq_win.show()

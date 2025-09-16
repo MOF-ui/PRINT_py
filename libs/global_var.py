@@ -182,7 +182,7 @@ SEN_dict = { # add available datasources here
     'msp': { # Main Supply Pump
         'ip': '192.168.178.36:17',
         'err': False,
-        'temp': True,
+        'temp': False,
         'pressure': False,
     },
     'imp': { # Inline Mixing Pump
@@ -194,8 +194,9 @@ SEN_dict = { # add available datasources here
         'amps': False
     },
     'phc': { # Print Head Controller
-        'ip': '',
+        'ip': '192.168.178.58:17',
         'err': False,
+        'temp': True,
         'aircon': False,
         'fdist': False,
         'edist': False

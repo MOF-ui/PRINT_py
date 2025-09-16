@@ -10,6 +10,7 @@
 
 # python standard libraries
 import os
+import re
 import cv2
 import sys
 import math as m
@@ -492,42 +493,69 @@ class SensorCommWorker(QObject):
             fu.store_sensor_data while its at it
             """
 
-            for sub_key in loc:
-                if sub_key == 'ip' or sub_key == 'err': 
-                    continue
+        #     for sub_key in loc:
+        #         if sub_key == 'ip' or sub_key == 'err': 
+        #             continue
                 
-                if loc[sub_key]: # only check true-marked sensors
-                    data = fu.sensor_req(loc["ip"], sub_key)
+        #         if loc[sub_key]: # only check true-marked sensors
+        #             data = fu.sensor_req(loc["ip"], sub_key)
                     
-                    if isinstance(data, list):
-                        # to-do: write handling for legacy data
-                        self.dataReceived.emit(loc['ip'])
-                        # extract tuple from list: (val, uptime)
-                        # newest entry is at the end of the list
-                        latest_data = data[len(data) - 1]
-                        loc['err'] = False
+        #             if isinstance(data, list):
+        #                 # to-do: write handling for legacy data
+        #                 self.dataReceived.emit(loc['ip'])
+        #                 # extract tuple from list: (val, uptime)
+        #                 # newest entry is at the end of the list
+        #                 latest_data = data[len(data) - 1]
+        #                 loc['err'] = False
 
-                        with QMutexLocker(GlobalMutex):
-                            g.DBDataBlock.store(latest_data, key, sub_key)
+        #                 with QMutexLocker(GlobalMutex):
+        #                     g.DBDataBlock.store(latest_data, key, sub_key)
 
-                    elif data is not None:
-                        # log recurring error from one location only once
-                        if loc['err'] == False:
-                            loc['err'] = True
-                            self.logEntry.emit(
-                                'SENS',
-                                f"request error from {loc['ip']}: {data}"
-                            )
-                            self.logEntry.emit(
-                                'SENS',
-                                f"trying to reconnect to {loc['ip']}.."
-                            )
+        #             elif data is not None:
+        #                 # log recurring error from one location only once
+        #                 if loc['err'] == False:
+        #                     loc['err'] = True
+        #                     self.logEntry.emit(
+        #                         'SENS',
+        #                         f"request error from {loc['ip']}: {data}"
+        #                     )
+        #                     self.logEntry.emit(
+        #                         'SENS',
+        #                         f"trying to reconnect to {loc['ip']}.."
+        #                     )
             
-            return None
+        #     return None
 
-        # main cycle
-        for key in g.SEN_dict:
-            loc_request(g.SEN_dict[key], key)
+        # # main cycle
+        # for key in g.SEN_dict:
+        #     loc_request(g.SEN_dict[key], key)
+
+        # overwrite for simplicity
+        try:
+            ans = requests.get(f"http://192.168.178.58:17/data", timeout=g.SEN_timeout)
+            ans.raise_for_status()
+        except Exception as err:
+            print(f"request failed: {err}!")
+            return
+
+        ans_str = ans.text
+        if 'no data available' in ans_str:
+            return None
+        
+        data_loss_str, entry_str = ans_str.split('&')
+        if data_loss_str.find('true') != -1:
+            data_loss = True
+        else:
+            data_loss = False
+        entries = entry_str.split(';')
+        # use last entry 
+        temps = re.findall('>(\d+\.\d+)', entries[-2])
+        try:
+            g.DBDataBlock.amb_temp = float(temps[0])
+            g.DBDataBlock.imp_temp = float(temps[1])
+        except:
+            pass
+        # print(f"New TEMP -- IN: {temps[0]} -- OUT: {temps[1]} ({entries} // {data_loss})")
 
         self.cycleDone.emit()
 
