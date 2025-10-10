@@ -2795,6 +2795,7 @@ class Ui_MainWindow(object):
             QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
         )
         self.PRH_num_setSpeed.setObjectName("PRH_num_setSpeed")
+        self.PRH_num_setSpeed.setMaximum(300)
         self.PRH_lbl_currSpeed = QtWidgets.QLabel(self.PRH_frame)
         self.PRH_lbl_currSpeed.setGeometry(QtCore.QRect(350, 80, 171, 31))
         self.PRH_lbl_currSpeed.setStyleSheet(
@@ -5694,7 +5695,7 @@ class Ui_MainWindow(object):
         self.PRH_0_frameLabel.setText(_translate("MainWindow", "PRH CTRL"))
         self.PRH_btt_stop.setText(_translate("MainWindow", "⛔ STOP"))
         self.PRH_disp_currSpeed.setText(_translate("MainWindow", "0%"))
-        self.PRH_num_setSpeed.setSuffix(_translate("MainWindow", "%"))
+        self.PRH_num_setSpeed.setSuffix(_translate("MainWindow", "U/min"))
         self.PRH_lbl_currSpeed.setText(_translate("MainWindow", "current speed"))
         self.PRH_lbl_setSpeed.setText(_translate("MainWindow", "set speed"))
         self.PRH_btt_setSpeed.setText(_translate("MainWindow", "SET"))

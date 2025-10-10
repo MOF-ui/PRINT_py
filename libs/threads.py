@@ -31,7 +31,7 @@ import libs.global_var as g
 import libs.data_utilities as du
 import libs.func_utilities as fu
 import libs.pump_utilities as pu
-from libs.win_mainframe_prearrange import GlobalMutex, PmpMutex
+from libs.win_mainframe_prearrange import GlobalMutex, PmpMutex, PrhMutex
 
 
 
@@ -106,12 +106,11 @@ class PumpCommWorker(QObject):
                 serial.keepAlive()
         if pinch is not None and g.PRH_connected:
             try:
-                ans = requests.post(f"{g.PRH_url}/pinch", data={'s': str(float(pinch))}, timeout=0.1)
-                print(ans.text)
-            except requests.Timeout as e:
+                requests.post(f"{g.PRH_url}/pinch", data={'s': str(float(pinch))}, timeout=1)
+            except:
                 log_txt = f"post to pinch valve failed! {g.PRH_url} not present!"
                 self.logEntry.emit('CONN', log_txt)
-                print(log_txt)
+                # print(log_txt)
 
         # SEND TO MIXER
         if g.PRH_connected and g.MIX_last_speed != g.MIX_speed:
@@ -532,10 +531,10 @@ class SensorCommWorker(QObject):
 
         # overwrite for simplicity
         try:
-            ans = requests.get(f"http://192.168.178.58:17/data", timeout=g.SEN_timeout)
+            ans = requests.get(f"{g.PRH_url}/data", timeout=g.SEN_timeout)
             ans.raise_for_status()
-        except Exception as err:
-            print(f"request failed: {err}!")
+        except:
+            # print(f"request failed: {err}!")
             return
 
         ans_str = ans.text

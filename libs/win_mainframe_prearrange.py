@@ -918,7 +918,7 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
             pinch_state = val
         try:
             requests.post(f"{g.PRH_url}/pinch", data={'s': pinch_state}, timeout=1)
-        except requests.Timeout as e:
+        except:
             log_txt = f"post to pinch valve failed! {g.PRH_url} not present!"
             self.log_entry('CONN', log_txt)
             print(log_txt)
@@ -1010,6 +1010,20 @@ class PreMainframe(QMainWindow, Ui_MainWindow):
         self.CHKR_disp_ry.setText(f"{new_min.ry}/{new_max.ry}")
         self.CHKR_disp_rz.setText(f"{new_min.rz}/{new_max.rz}")
         self.CHKR_disp_ext.setText(f"{new_min.ext}/{new_max.ext}")
+        self.CHKR_float_x_min.setValue(new_min.x)
+        self.CHKR_float_y_min.setValue(new_min.y)
+        self.CHKR_float_z_min.setValue(new_min.z)
+        self.CHKR_float_rx_min.setValue(new_min.rx)
+        self.CHKR_float_ry_min.setValue(new_min.ry)
+        self.CHKR_float_rz_min.setValue(new_min.rz)
+        self.CHKR_float_ext_min.setValue(new_min.ext)
+        self.CHKR_float_x_max.setValue(new_max.x)
+        self.CHKR_float_y_max.setValue(new_max.y)
+        self.CHKR_float_z_max.setValue(new_max.z)
+        self.CHKR_float_rx_max.setValue(new_max.rx)
+        self.CHKR_float_ry_max.setValue(new_max.ry)
+        self.CHKR_float_rz_max.setValue(new_max.rz)
+        self.CHKR_float_ext_max.setValue(new_max.ext)
 
 
     def set_zero(self, axis:list, source='') -> None:
@@ -1185,6 +1199,7 @@ class Watchdog(QObject):
 # used to manage global data exchange of modbus shutdown
 GlobalMutex = QMutex()
 PmpMutex = QMutex()
+PrhMutex = QMutex()
 
 # only do the following if run as main program
 if __name__ == "__main__":

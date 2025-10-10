@@ -1610,6 +1610,7 @@ class TCPSocket (yaml.YAMLObject):
             close TCP/IP connection
     """
     yaml_tag = u'!TCPSocket'
+    connected = False
 
     def __init__(
             self,
@@ -1692,6 +1693,9 @@ class TCPSocket (yaml.YAMLObject):
         not possible
         """
 
+        if self.connected:
+            return
+        
         try:
             server_address = (self.ip, int(self.port))
         except ValueError:
@@ -1705,7 +1709,7 @@ class TCPSocket (yaml.YAMLObject):
             self._Socket.settimeout(self.rw_tout)
 
         except Exception as err:
-            self.connected = 0
+            self.connected = False
             return err
 
         return server_address

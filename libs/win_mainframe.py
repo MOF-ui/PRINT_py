@@ -31,7 +31,7 @@ from PyQt5.QtWidgets import QApplication, QShortcut
 
 # import PyQT UIs (converted from .ui to .py using Qt-Designer und pyuic5)
 from libs.win_mainframe_prearrange import PreMainframe, Watchdog
-from libs.win_mainframe_prearrange import GlobalMutex, PmpMutex
+from libs.win_mainframe_prearrange import GlobalMutex, PmpMutex, PrhMutex
 
 
 # import my own libs
