@@ -581,7 +581,7 @@ color: #E1E5EE;</string>
       <widget class="QPushButton" name="IO_btt_xyzextZero">
        <property name="geometry">
         <rect>
-         <x>500</x>
+         <x>250</x>
          <y>360</y>
          <width>231</width>
          <height>41</height>
@@ -595,7 +595,7 @@ color: #E1E5EE;</string>
        <property name="geometry">
         <rect>
          <x>500</x>
-         <y>420</y>
+         <y>360</y>
          <width>231</width>
          <height>41</height>
         </rect>
@@ -1107,8 +1107,8 @@ color: #E1E5EE;</string>
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Bahnschrift'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[0.0,1900.0,-600.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[200,100,200,200],z50,tool0 EXT400&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[0.0,1900.0,-895.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[200,100,200,200],z0,tool0 EXT400&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MoveJ [[-340.0,2060.0,0.0],[0.00344,0.72283,0.69100,0.00380],[,,,,,]],[300,100,200,200],z100,tool0 EXT200&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;G28&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="acceptRichText">
         <bool>false</bool>
@@ -5633,9 +5633,9 @@ color: #E1E5EE;</string>
       <widget class="QSpinBox" name="PRH_num_setSpeed">
        <property name="geometry">
         <rect>
-         <x>161</x>
+         <x>141</x>
          <y>190</y>
-         <width>111</width>
+         <width>131</width>
          <height>41</height>
         </rect>
        </property>
@@ -5646,7 +5646,13 @@ color: #E1E5EE;</string>
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
        <property name="suffix">
-        <string>%</string>
+        <string> U/min</string>
+       </property>
+       <property name="maximum">
+        <number>600</number>
+       </property>
+       <property name="value">
+        <number>200</number>
        </property>
       </widget>
       <widget class="QLabel" name="PRH_lbl_currSpeed">
@@ -5673,9 +5679,9 @@ color: #E1E5EE;</string>
       <widget class="QLabel" name="PRH_lbl_setSpeed">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>50</x>
          <y>200</y>
-         <width>131</width>
+         <width>91</width>
          <height>31</height>
         </rect>
        </property>
@@ -10963,6 +10969,19 @@ color: #E1E5EE;</string>
  </widget>
  <tabstops>
   <tabstop>tab</tabstop>
+  <tabstop>IO_btt_newFile</tabstop>
+  <tabstop>IO_btt_xyzextZero</tabstop>
+  <tabstop>IO_btt_rZero</tabstop>
+  <tabstop>IO_chk_extTrailing</tabstop>
+  <tabstop>IO_chk_autoPCtrl</tabstop>
+  <tabstop>IO_chk_rangeChk</tabstop>
+  <tabstop>IO_chk_xyextChk</tabstop>
+  <tabstop>IO_btt_loadFile</tabstop>
+  <tabstop>IO_num_addByID</tabstop>
+  <tabstop>IO_btt_addByID</tabstop>
+  <tabstop>SIB_entry_sib1</tabstop>
+  <tabstop>SIB_entry_sib2</tabstop>
+  <tabstop>SIB_entry_sib3</tabstop>
   <tabstop>SGLC_btt_sendFirstQComm</tabstop>
   <tabstop>SGLC_entry_gcodeSglComm</tabstop>
   <tabstop>SGLC_btt_gcodeSglComm</tabstop>
@@ -10974,23 +10993,24 @@ color: #E1E5EE;</string>
   <tabstop>SGLC_btt_rapidSglComm_addByID</tabstop>
   <tabstop>SCTRL_btt_startQProcessing</tabstop>
   <tabstop>SCTRL_btt_holdQProcessing</tabstop>
+  <tabstop>SCTRL_num_mmsOverwrite</tabstop>
+  <tabstop>SCTRL_btt_mmsOverwrite</tabstop>
   <tabstop>SCTRL_num_liveAd_robot</tabstop>
   <tabstop>SCTRL_num_liveAd_pump1</tabstop>
+  <tabstop>SCTRL_num_liveAd_pump2</tabstop>
   <tabstop>SCTRL_btt_addSIB1_atFront</tabstop>
   <tabstop>SCTRL_btt_addSIB1_atEnd</tabstop>
   <tabstop>SCTRL_btt_addSIB2_atFront</tabstop>
   <tabstop>SCTRL_btt_addSIB2_atEnd</tabstop>
   <tabstop>SCTRL_btt_addSIB3_atFront</tabstop>
   <tabstop>SCTRL_btt_addSIB3_atEnd</tabstop>
+  <tabstop>SCTRL_btt_clrQ</tabstop>
   <tabstop>SCTRL_entry_clrByID</tabstop>
   <tabstop>SCTRL_btt_clrByID</tabstop>
-  <tabstop>SCTRL_btt_clrQ</tabstop>
   <tabstop>SCTRL_arr_queue</tabstop>
   <tabstop>SCTRL_btt_forcedStop</tabstop>
+  <tabstop>SCTRL_chk_autoScroll</tabstop>
   <tabstop>DC_drpd_moveType</tabstop>
-  <tabstop>DC_btt_xyzZero</tabstop>
-  <tabstop>DC_btt_extZero</tabstop>
-  <tabstop>DC_btt_home</tabstop>
   <tabstop>DC_sld_stepWidth</tabstop>
   <tabstop>DC_btt_xPlus</tabstop>
   <tabstop>DC_btt_xMinus</tabstop>
@@ -11000,16 +11020,19 @@ color: #E1E5EE;</string>
   <tabstop>DC_btt_zMinus</tabstop>
   <tabstop>DC_btt_extPlus</tabstop>
   <tabstop>DC_btt_extMinus</tabstop>
+  <tabstop>DC_btt_xyzZero</tabstop>
+  <tabstop>DC_btt_extZero</tabstop>
+  <tabstop>DC_btt_home</tabstop>
+  <tabstop>NC_btt_getValues</tabstop>
   <tabstop>NC_float_x</tabstop>
   <tabstop>NC_float_y</tabstop>
   <tabstop>NC_float_z</tabstop>
   <tabstop>NC_float_ext</tabstop>
+  <tabstop>NC_btt_xyzSend</tabstop>
+  <tabstop>NC_btt_xyzextSend</tabstop>
   <tabstop>NC_float_rx</tabstop>
   <tabstop>NC_float_ry</tabstop>
   <tabstop>NC_float_rz</tabstop>
-  <tabstop>NC_btt_getValues</tabstop>
-  <tabstop>NC_btt_xyzSend</tabstop>
-  <tabstop>NC_btt_xyzextSend</tabstop>
   <tabstop>NC_btt_rSend</tabstop>
   <tabstop>NC_btt_rZero</tabstop>
   <tabstop>TERM_arr_terminal</tabstop>
@@ -11018,13 +11041,57 @@ color: #E1E5EE;</string>
   <tabstop>TERM_btt_gcodeInterp</tabstop>
   <tabstop>TERM_entry_rapidInterp</tabstop>
   <tabstop>TERM_btt_rapidInterp</tabstop>
-  <tabstop>CONN_tab</tabstop>
+  <tabstop>ADC_num_trolley</tabstop>
+  <tabstop>ADC_btt_clamp</tabstop>
+  <tabstop>ADC_btt_cut</tabstop>
+  <tabstop>ADC_btt_placeSpring</tabstop>
+  <tabstop>ADC_btt_loadSpring</tabstop>
+  <tabstop>ADC_btt_calibrate</tabstop>
+  <tabstop>ADC_btt_resetAll</tabstop>
+  <tabstop>ASC_num_trolley</tabstop>
+  <tabstop>ASC_btt_clamp</tabstop>
+  <tabstop>ASC_btt_cut</tabstop>
+  <tabstop>ASC_btt_placeSpring</tabstop>
+  <tabstop>ASC_btt_loadSpring</tabstop>
+  <tabstop>ASC_entry_SCLines</tabstop>
+  <tabstop>ASC_btt_overwrSC</tabstop>
+  <tabstop>PRH_sld_speed</tabstop>
+  <tabstop>PRH_num_setSpeed</tabstop>
+  <tabstop>PRH_btt_setSpeed</tabstop>
+  <tabstop>PRH_btt_stop</tabstop>
+  <tabstop>PRH_btt_actWithPump</tabstop>
+  <tabstop>PRH_btt_pinchValve</tabstop>
+  <tabstop>PUMP_num_setSpeed</tabstop>
+  <tabstop>PUMP_btt_setSpeed</tabstop>
+  <tabstop>PUMP_btt_stop</tabstop>
+  <tabstop>PUMP_btt_plus1</tabstop>
+  <tabstop>PUMP_btt_minus1</tabstop>
+  <tabstop>PUMP_btt_plus10</tabstop>
+  <tabstop>PUMP_btt_minus10</tabstop>
+  <tabstop>PUMP_btt_plus25</tabstop>
+  <tabstop>PUMP_btt_minus25</tabstop>
+  <tabstop>PUMP_btt_reverse</tabstop>
+  <tabstop>PUMP_sld_outputRatio</tabstop>
+  <tabstop>PUMP_num_setSpeedP1</tabstop>
+  <tabstop>PUMP_btt_setSpeedP1</tabstop>
+  <tabstop>PUMP_num_setSpeedP2</tabstop>
+  <tabstop>PUMP_btt_setSpeedP2</tabstop>
+  <tabstop>PUMP_btt_ccToDefault</tabstop>
+  <tabstop>PUMP_btt_scToDefault</tabstop>
+  <tabstop>LAH_btt_active</tabstop>
+  <tabstop>LAH_num_distance</tabstop>
+  <tabstop>LAH_float_retractFactor</tabstop>
+  <tabstop>LAH_float_prerunFactor</tabstop>
   <tabstop>CONN_num_commForerun</tabstop>
+  <tabstop>CONN_tab</tabstop>
   <tabstop>CONN_ROB_btt_reconn</tabstop>
   <tabstop>CONN_ROB_btt_discon</tabstop>
-  <tabstop>SET_float_volPerMM</tabstop>
-  <tabstop>SET_float_frToMms</tabstop>
-  <tabstop>SET_num_zone</tabstop>
+  <tabstop>CONN_PUMP1_btt_reconn</tabstop>
+  <tabstop>CONN_PUMP1_btt_discon</tabstop>
+  <tabstop>CONN_PUMP2_btt_reconn</tabstop>
+  <tabstop>CONN_PUMP2_btt_discon</tabstop>
+  <tabstop>CONN_PRH_btt_reconn</tabstop>
+  <tabstop>CONN_PRH_btt_discon</tabstop>
   <tabstop>SET_num_transSpeed_dc</tabstop>
   <tabstop>SET_num_orientSpeed_dc</tabstop>
   <tabstop>SET_num_accelRamp_dc</tabstop>
@@ -11033,10 +11100,37 @@ color: #E1E5EE;</string>
   <tabstop>SET_num_orientSpeed_print</tabstop>
   <tabstop>SET_num_accelRamp_print</tabstop>
   <tabstop>SET_num_decelRamp_print</tabstop>
+  <tabstop>SET_float_volPerMM</tabstop>
+  <tabstop>SET_float_frToMms</tabstop>
+  <tabstop>SET_num_zone</tabstop>
+  <tabstop>SET_num_followInterv</tabstop>
+  <tabstop>SET_num_followSkip</tabstop>
+  <tabstop>SET_num_retractSpeed</tabstop>
+  <tabstop>SET_float_p1Flow</tabstop>
+  <tabstop>SET_float_p2Flow</tabstop>
   <tabstop>SET_btt_apply</tabstop>
   <tabstop>SET_btt_default</tabstop>
+  <tabstop>CHKR_float_x_min</tabstop>
+  <tabstop>CHKR_float_x_max</tabstop>
+  <tabstop>CHKR_float_y_min</tabstop>
+  <tabstop>CHKR_float_y_max</tabstop>
+  <tabstop>CHKR_float_z_min</tabstop>
+  <tabstop>CHKR_float_z_max</tabstop>
+  <tabstop>CHKR_float_ext_min</tabstop>
+  <tabstop>CHKR_float_ext_max</tabstop>
+  <tabstop>CHKR_float_rx_min</tabstop>
+  <tabstop>CHKR_float_rx_max</tabstop>
+  <tabstop>CHKR_float_ry_min</tabstop>
+  <tabstop>CHKR_float_ry_max</tabstop>
+  <tabstop>CHKR_float_rz_min</tabstop>
+  <tabstop>CHKR_float_rz_max</tabstop>
+  <tabstop>CHKR_btt_default</tabstop>
+  <tabstop>CHKR_btt_overwrite</tabstop>
+  <tabstop>SID_num_overwrite</tabstop>
+  <tabstop>SID_btt_overwrite</tabstop>
   <tabstop>ICQ_arr_terminal</tabstop>
-  <tabstop>ZERO_btt_newZero</tabstop>
+  <tabstop>ICQ_chk_autoScroll</tabstop>
+  <tabstop>ZERO_btt_loadDefault</tabstop>
   <tabstop>ZERO_float_x</tabstop>
   <tabstop>ZERO_float_y</tabstop>
   <tabstop>ZERO_float_z</tabstop>
@@ -11044,8 +11138,8 @@ color: #E1E5EE;</string>
   <tabstop>ZERO_float_rx</tabstop>
   <tabstop>ZERO_float_ry</tabstop>
   <tabstop>ZERO_float_rz</tabstop>
-  <tabstop>CONN_PUMP1_btt_reconn</tabstop>
-  <tabstop>CONN_PUMP1_btt_discon</tabstop>
+  <tabstop>ZERO_btt_newZero</tabstop>
+  <tabstop>ZERO_btt_loadZeroFile</tabstop>
  </tabstops>
  <resources>
   <include location="../resources.qrc"/>
